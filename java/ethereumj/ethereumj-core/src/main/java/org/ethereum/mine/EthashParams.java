@@ -25,7 +25,7 @@ public class EthashParams {
     private final int WORD_BYTES = 4;
 
     // bytes in dataset at genesis
-    private final long DATASET_BYTES_INIT = 1L << 30;
+    private final long DATASET_BYTES_INIT = 1L << 10;
 
     // dataset growth per epoch
     private final long DATASET_BYTES_GROWTH = 1L << 23;
