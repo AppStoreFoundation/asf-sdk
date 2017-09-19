@@ -28,8 +28,9 @@ import org.ethereum.mine.Ethash;
 import org.ethereum.mine.MinerListener;
 import org.ethereum.samples.BasicSample;
 import org.ethereum.util.ByteUtil;
-import org.spongycastle.util.encoders.Hex;
 import org.springframework.context.annotation.Bean;
+
+import cm.aptoide.pt.AptoideAccounts;
 
 /**
  * The sample creates a small private net with two peers: one is the miner, another is a regular
@@ -217,10 +218,12 @@ public class Miner {
 		private void generateTransactions() throws Exception {
 			logger.info("Start generating transactions...");
 
+			AptoideAccounts.Account mainMinerAccount = AptoideAccounts.MAIN_MINER;
+			AptoideAccounts.Account mainRegularAccount = AptoideAccounts.MAIN_REGULAR;
+
 			// the sender which some coins from the genesis
-			ECKey senderKey = ECKey.fromPrivate(
-							Hex.decode("6ef8da380c27cea8fdf7448340ea99e8e2268fc2950d79ed47cbf6f85dc977ec"));
-			byte[] receiverAddr = Hex.decode("5db10750e8caff27f906b41c71b3471057dd2004");
+			ECKey senderKey = ECKey.fromPrivate(mainMinerAccount.getPrivateKey());
+			byte[] receiverAddr = mainRegularAccount.getAddress();
 
 			for (int i = ethereum.getRepository()
 							.getNonce(senderKey.getAddress())
