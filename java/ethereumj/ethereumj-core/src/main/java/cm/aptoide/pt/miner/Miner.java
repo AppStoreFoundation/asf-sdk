@@ -75,7 +75,7 @@ public class Miner {
 										// our private net ID
 										"peer.networkId = 555 \n" +
 										// we have no peers to sync with
-										"sync.enabled = false \n" +
+										"sync.enabled = true \n" +
 										// genesis with a lower initial difficulty and some predefined known funded
 										// accounts
 										"genesis = sample-genesis.json \n" +
