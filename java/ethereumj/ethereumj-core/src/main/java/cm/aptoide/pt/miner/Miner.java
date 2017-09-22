@@ -59,9 +59,6 @@ public class Miner {
 
 		BasicSample.sLogger.info("Starting EthtereumJ miner instance!");
 		EthereumFactory.createEthereum(MinerConfig.class);
-
-		BasicSample.sLogger.info("Starting EthtereumJ regular instance!");
-		EthereumFactory.createEthereum(RegularConfig.class);
 	}
 
 	/**
@@ -134,6 +131,16 @@ public class Miner {
 							.addListener(this);
 			ethereum.getBlockMiner()
 							.startMining();
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						generateTransactions();
+					} catch (Exception e) {
+						logger.error("Error generating tx: ", e);
+					}
+				}
+			}).start();
 		}
 
 		@Override
@@ -160,61 +167,7 @@ public class Miner {
 		public void blockMiningCanceled(Block block) {
 			logger.info("Cancel mining block: " + block.getShortDescr());
 		}
-	}
 
-	/**
-	 * Spring configuration class for the Regular peer
-	 */
-	private static class RegularConfig {
-
-		private final String config =
-						// no discovery: we are connecting directly to the miner peer
-						"peer.discovery.enabled = false \n" + "peer.listen.port = 30336 \n" + "peer.privateKey" +
-										" = 3ec771c31cac8c0dba77a69e503765701d3c2bb62435888d4ffa38fed60c445c \n" +
-										"peer.networkId = 555 \n" +
-										// actively connecting to the miner
-										"peer.active = [" + "    { url = " +
-										"'enode://26ba1aadaf59d7607ad7f437146927d79e80312f026cfa635c6b2ccf2c5d3521f5812ca2beb3b295b14f97110e6448c1c7ff68f14c5328d43a3c62b44143e9b1@localhost:30335' }" + "] \n" + "sync.enabled = true \n" +
-										// all peers in the same network need to use the same genesis block
-										"genesis = sample-genesis.json \n" +
-										// two peers need to have separate database dirs
-										"database.dir = sampleDB-2 \n";
-
-		@Bean
-		public RegularNode node() {
-			return new RegularNode();
-		}
-
-		/**
-		 * Instead of supplying properties via config file for the peer we are substituting the
-		 * corresponding bean which returns required config for this instance.
-		 */
-		@Bean
-		public SystemProperties systemProperties() {
-			SystemProperties props = new SystemProperties();
-			props.overrideParams(ConfigFactory.parseString(config.replaceAll("'", "\"")));
-			return props;
-		}
-	}
-
-	/**
-	 * The second node in the network which connects to the miner waits for the sync and starts
-	 * submitting transactions. Those transactions should be included into mined blocks and the
-	 * peer
-	 * should receive those blocks back
-	 */
-	static class RegularNode extends BasicSample {
-
-		public RegularNode() {
-			// peers need different loggers
-			super("sampleNode");
-		}
-
-		/**
-		 * Generate one simple value transfer transaction each 7 seconds. Thus blocks will include
-		 * one,
-		 * several and none transactions
-		 */
 		private void generateTransactions() throws Exception {
 			logger.info("Start generating transactions...");
 
@@ -239,20 +192,6 @@ public class Miner {
 				}
 				Thread.sleep(2000);
 			}
-		}
-
-		@Override
-		public void onSyncDone() {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						generateTransactions();
-					} catch (Exception e) {
-						logger.error("Error generating tx: ", e);
-					}
-				}
-			}).start();
 		}
 	}
 }
