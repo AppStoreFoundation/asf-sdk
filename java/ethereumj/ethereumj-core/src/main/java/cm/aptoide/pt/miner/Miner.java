@@ -131,16 +131,6 @@ public class Miner {
 							.addListener(this);
 			ethereum.getBlockMiner()
 							.startMining();
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						generateTransactions();
-					} catch (Exception e) {
-						logger.error("Error generating tx: ", e);
-					}
-				}
-			}).start();
 		}
 
 		@Override
@@ -161,6 +151,11 @@ public class Miner {
 		@Override
 		public void blockMined(Block block) {
 			logger.info("Block mined! : \n" + block);
+			try {
+				generateTransactions();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		@Override
@@ -178,20 +173,17 @@ public class Miner {
 			ECKey senderKey = ECKey.fromPrivate(mainMinerAccount.getPrivateKey());
 			byte[] receiverAddr = mainRegularAccount.getAddress();
 
-			for (int i = ethereum.getRepository()
+			int nonce = ethereum.getRepository()
 							.getNonce(senderKey.getAddress())
-							.intValue(), j = 0; j < 20000; i++, j++) {
-				{
-					Transaction tx = new Transaction(ByteUtil.intToBytesNoLeadZeroes(i),
-									ByteUtil.longToBytesNoLeadZeroes(50_000_000_000L),
-									ByteUtil.longToBytesNoLeadZeroes(0xfffff), receiverAddr, new byte[]{77},
-									new byte[0], ethereum.getChainIdForNextBlock());
-					tx.sign(senderKey);
-					logger.info("<== Submitting tx: " + tx);
-					ethereum.submitTransaction(tx);
-				}
-				Thread.sleep(2000);
-			}
+							.intValue();
+
+			Transaction tx = new Transaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
+							ByteUtil.longToBytesNoLeadZeroes(50_000_000_000L),
+							ByteUtil.longToBytesNoLeadZeroes(0xfffff), receiverAddr, new byte[]{77}, new byte[0],
+							ethereum.getChainIdForNextBlock());
+			tx.sign(senderKey);
+			logger.info("<== Submitting tx: " + tx);
+			ethereum.submitTransaction(tx);
 		}
 	}
 }
