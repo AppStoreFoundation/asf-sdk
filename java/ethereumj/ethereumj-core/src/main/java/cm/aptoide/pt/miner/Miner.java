@@ -20,14 +20,9 @@ package cm.aptoide.pt.miner;
 import com.typesafe.config.ConfigFactory;
 
 import org.ethereum.config.SystemProperties;
-import org.ethereum.core.Block;
-import org.ethereum.core.Transaction;
-import org.ethereum.crypto.ECKey;
 import org.ethereum.facade.EthereumFactory;
 import org.ethereum.mine.Ethash;
-import org.ethereum.mine.MinerListener;
 import org.ethereum.samples.BasicSample;
-import org.ethereum.util.ByteUtil;
 import org.springframework.context.annotation.Bean;
 
 import cm.aptoide.pt.AptoideAccounts;
@@ -106,7 +101,7 @@ public class Miner {
 	/**
 	 * Miner bean, which just start a miner upon creation and prints miner events
 	 */
-	static class MinerNode extends BasicSample implements MinerListener {
+	static class MinerNode extends BasicSample {
 
 		public MinerNode() {
 			// peers need different loggers
@@ -128,62 +123,10 @@ public class Miner {
 				logger.info("Full dataset generated (loaded).");
 			}
 			ethereum.getBlockMiner()
-							.addListener(this);
+							.addListener(new GenerateTransactionOnBlockMinedListener(logger, ethereum,
+											AptoideAccounts.MAIN_MINER, AptoideAccounts.MAIN_REGULAR));
 			ethereum.getBlockMiner()
 							.startMining();
-		}
-
-		@Override
-		public void miningStarted() {
-			logger.info("Miner started");
-		}
-
-		@Override
-		public void miningStopped() {
-			logger.info("Miner stopped");
-		}
-
-		@Override
-		public void blockMiningStarted(Block block) {
-			logger.info("Start mining block: " + block.getShortDescr());
-		}
-
-		@Override
-		public void blockMined(Block block) {
-			logger.info("Block mined! : \n" + block);
-			try {
-				generateTransactions();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		public void blockMiningCanceled(Block block) {
-			logger.info("Cancel mining block: " + block.getShortDescr());
-		}
-
-		private void generateTransactions() throws Exception {
-			logger.info("Start generating transactions...");
-
-			AptoideAccounts.Account mainMinerAccount = AptoideAccounts.MAIN_MINER;
-			AptoideAccounts.Account mainRegularAccount = AptoideAccounts.MAIN_REGULAR;
-
-			// the sender which some coins from the genesis
-			ECKey senderKey = ECKey.fromPrivate(mainMinerAccount.getPrivateKey());
-			byte[] receiverAddr = mainRegularAccount.getAddress();
-
-			int nonce = ethereum.getRepository()
-							.getNonce(senderKey.getAddress())
-							.intValue();
-
-			Transaction tx = new Transaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
-							ByteUtil.longToBytesNoLeadZeroes(50_000_000_000L),
-							ByteUtil.longToBytesNoLeadZeroes(0xfffff), receiverAddr, new byte[]{77}, new byte[0],
-							ethereum.getChainIdForNextBlock());
-			tx.sign(senderKey);
-			logger.info("<== Submitting tx: " + tx);
-			ethereum.submitTransaction(tx);
 		}
 	}
 }
