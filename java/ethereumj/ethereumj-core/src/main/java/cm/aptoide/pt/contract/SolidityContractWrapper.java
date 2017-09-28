@@ -53,7 +53,7 @@ public class SolidityContractWrapper {
 		logger.info("Contract modified! called successfully!");
 	}
 
-	public byte[] deployContract(byte[] senderPrivateKey) {
+	public byte[] deploy(byte[] senderPrivateKey) {
 
 		assertContractIsCompiled();
 

@@ -23,9 +23,11 @@ import org.ethereum.config.SystemProperties;
 import org.ethereum.facade.EthereumFactory;
 import org.ethereum.mine.Ethash;
 import org.ethereum.samples.BasicSample;
+import org.ethereum.solidity.compiler.SolidityCompiler;
 import org.springframework.context.annotation.Bean;
 
 import cm.aptoide.pt.AptoideAccounts;
+import cm.aptoide.pt.TransactionManager;
 
 /**
  * The sample creates a small private net with two peers: one is the miner, another is a regular
@@ -125,6 +127,11 @@ public class Miner {
 			ethereum.getBlockMiner()
 							.addListener(new GenerateTransactionOnBlockMinedListener(logger, ethereum,
 											AptoideAccounts.MAIN_MINER, AptoideAccounts.MAIN_REGULAR));
+			ethereum.getBlockMiner()
+							.addListener(
+											new DeployContractListener(logger, ethereum, SolidityCompiler.getInstance(),
+															new TransactionManager(ethereum, logger),
+															AptoideAccounts.MAIN_MINER.getPrivateKey()));
 			ethereum.getBlockMiner()
 							.startMining();
 		}
