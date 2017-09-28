@@ -12,7 +12,7 @@ import cm.aptoide.pt.TransactionManager;
 
 public class CoffeeMachineContract extends SolidityContractWrapper {
 
-	private static final String CONTRACT_PATH = "ethereumj-core/src/main/resources/coffee_token.sol";
+	private static final String CONTRACT_PATH = "coffee_token.sol";
 
 	public CoffeeMachineContract(Logger logger, Ethereum ethereum, SolidityCompiler compiler,
 															 TransactionManager transactionManager) {

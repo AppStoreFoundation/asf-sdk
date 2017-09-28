@@ -33,7 +33,9 @@ public class DeployContractListener implements MinerListener {
 
 	@Override
 	public void miningStarted() {
-		if (getContractAddress() == null) {
+		if (getContractAddress() == null || ethereum.getBlockchain()
+						.getBestBlock()
+						.getNumber() == 0) {
 			try {
 				CoffeeMachineContract coffeeMachineContract = new CoffeeMachineContract(logger, ethereum,
 								compiler, transactionManager);
