@@ -42,6 +42,8 @@ import cm.aptoide.pt.TransactionManager;
  */
 public class Miner {
 
+	public static final int NETWORK_ID = 432646346;
+
 	/**
 	 * Creating two EthereumJ instances with different config classes
 	 */
@@ -70,14 +72,14 @@ public class Miner {
 										"peer.privateKey = " +
 										"6ef8da380c27cea8fdf7448340ea99e8e2268fc2950d79ed47cbf6f85dc977ec \n" +
 										// our private net ID
-										"peer.networkId = 555 \n" +
+										"peer.networkId = " + NETWORK_ID + " \n" +
 										// we have no peers to sync with
 										"sync.enabled = true \n" +
 										// genesis with a lower initial difficulty and some predefined known funded
 										// accounts
 										"genesis = sample-genesis.json \n" +
 										// two peers need to have separate database dirs
-										"database.dir = sampleDB-1 \n" +
+										"database.dir = minerDB \n" +
 										// when more than 1 miner exist on the network extraData helps to identify the
 										// block creator
 										"mine.extraDataHex = cccccccccccccccccccc \n" + "mine.cpuMineThreads = 2 \n" +
