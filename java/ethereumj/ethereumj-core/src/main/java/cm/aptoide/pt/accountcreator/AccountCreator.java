@@ -11,20 +11,19 @@ import java.io.IOException;
 public class AccountCreator {
 
 	private static final String FILE_NAME = "generatedAccounts";
-	private static String scriptName = "fundAccount.sh";
+	private static String fundAccountScriptName = "fundAccount.sh";
+	private static String fundAppCoinAccountScriptName = "fundAppCoinAccount.sh";
 	private String sourceAddr;
-	private String amount;
+	private String contractAddr;
 
 	public static void main(String[] args) {
 
-		if (args.length != 2) {
+		if (args.length != 3) {
 			throw new IllegalArgumentException(
-							"Wrong number os arguments! Expected 2, received " + args.length);
+							"Wrong number os arguments! Expected 3, received " + args.length);
 		}
 
-		for (int i = 0; i < 3; i++) {
 			new AccountCreator().run(args);
-		}
 	}
 
 	public Account createEthereumAccount() {
@@ -44,7 +43,8 @@ public class AccountCreator {
 
 		String pwd = System.getProperty("user.dir");
 
-		pb = new ProcessBuilder((pwd.concat("/" + scriptName)), sourceAddr, destAddr, amount);
+		pb = new ProcessBuilder((pwd.concat("/" + fundAccountScriptName)), sourceAddr, destAddr,
+						amount);
 		try {
 			Process p = pb.start();
 			int strm = 0;
@@ -74,7 +74,7 @@ public class AccountCreator {
 
 	private void loadArguments(String[] args) {
 		sourceAddr = args[0];
-		amount = args[1];
+		contractAddr = args[1];
 	}
 
 	private void run(String[] args) {
@@ -83,7 +83,8 @@ public class AccountCreator {
 		System.out.println("Account created!");
 		System.out.println(ethereumAccount);
 		saveAccount(ethereumAccount);
-		transferEthereum(sourceAddr, ethereumAccount.getAddress(), amount);
+		transferEthereum(sourceAddr, ethereumAccount.getAddress(), "100000000000000000");
+		transferAppcoins(contractAddr, ethereumAccount.getAddress());
 	}
 
 	private void saveAccount(Account account) {
@@ -107,5 +108,40 @@ public class AccountCreator {
 			} catch (Exception e) {
 			}
 		}
+	}
+
+	private int transferAppcoins(String contractAddr, String destAddr) {
+		ProcessBuilder pb;
+		int exitValue;
+
+		String pwd = System.getProperty("user.dir");
+
+		pb = new ProcessBuilder((pwd.concat("/" + fundAppCoinAccountScriptName)), contractAddr,
+						destAddr);
+		try {
+			Process p = pb.start();
+			int strm = 0;
+			while (strm != -1) {
+				System.out.print(((char) (strm = p.getInputStream()
+								.read())));
+			}
+
+			exitValue = -1;
+			while (exitValue == -1) {
+				try {
+					exitValue = p.exitValue();
+				} catch (Exception _e) {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			exitValue = -1;
+		}
+		return exitValue;
 	}
 }
