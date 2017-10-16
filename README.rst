@@ -18,20 +18,24 @@ Aptoide Development:
    *  Commits in the last 30 days: https://github.com/Aptoide/aptoide-client-v8/graphs/contributors
 
 
-AppCoins other repositories: 
+AppCoins - other repositories: 
 ------------
 
    * AppCoins - White paper
       https://github.com/Aptoide/AppCoins
 
    * AppCoins-ethereumj - Java implementation of the Ethereum yellowpaper
-   
-   * AppCoins-ProofOfAttention - 
+      https://github.com/Aptoide/AppCoins-ethereumj
+      
+   * AppCoins-proof-of-attention - 
       https://github.com/Aptoide/AppCoins-proof-of-attention
 
 
-AppCoins-ethereumj
+AppCoins-ethereumj:
 ------------
-ethereumj - Java implementation of the Ethereum yellowpaper
+ethereumj - Java implementation of the Ethereum yellowpaper. 
+
+This repo is a fork of:
+https://github.com/ethereum/ethereumj 
 
 
