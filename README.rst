@@ -22,7 +22,7 @@ AppCoins - other repositories:
 ------------
 
    * AppCoins - White paper
-      https://github.com/Aptoide/AppCoins
+      https://github.com/Aptoide/AppCoins-white-paper
 
    * AppCoins-ethereumj - Java implementation of the Ethereum yellowpaper
       https://github.com/Aptoide/AppCoins-ethereumj
