@@ -1,4 +1,5 @@
 rootProject.name = "ethereumj"
 include "ethereumj-core"
 include 'transaction-generator'
+include 'transaction-generator'
 
