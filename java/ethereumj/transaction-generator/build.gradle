@@ -16,4 +16,12 @@ dependencies {
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     compile "org.apache.commons:commons-lang3:3.4"
     compile "com.cedarsoftware:java-util:1.8.0" // for deep equals
+
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
+    compile group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.3.0'
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/adapter-rxjava
+    compile group: 'com.squareup.retrofit2', name: 'adapter-rxjava', version: '2.3.0'
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
+    compile group: 'com.squareup.retrofit2', name: 'converter-jackson', version: '2.3.0'
+
 }
