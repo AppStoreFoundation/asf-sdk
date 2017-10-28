@@ -23,5 +23,6 @@ dependencies {
     compile group: 'com.squareup.retrofit2', name: 'adapter-rxjava', version: '2.3.0'
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
     compile group: 'com.squareup.retrofit2', name: 'converter-jackson', version: '2.3.0'
-
+    // https://mvnrepository.com/artifact/com.madgag.spongycastle/core
+    compile group: 'com.madgag.spongycastle', name: 'core', version: '1.58.0.0'
 }
