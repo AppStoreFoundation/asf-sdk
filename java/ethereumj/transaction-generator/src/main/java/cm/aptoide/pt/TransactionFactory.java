@@ -1,7 +1,5 @@
 package cm.aptoide.pt;
 
-import org.spongycastle.util.encoders.Hex;
-
 import cm.aptoide.pt.ethereumj.Transaction;
 import cm.aptoide.pt.ethereumj.util.ByteUtil;
 
@@ -20,7 +18,7 @@ public class TransactionFactory {
 					chainIdForNextBlock) {
 		return createTransaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
 						ByteUtil.longToBytesNoLeadZeroes(gasPrice), ByteUtil.longToBytesNoLeadZeroes(gasLimit),
-						HexProxy.decode(receiverAddr), HexProxy.decode(Long.toHexString(value)),
-						Hex.decode(data), chainIdForNextBlock);
+						HexProxy.decode(receiverAddr), HexProxy.decode(Long.toHexString(value)), data,
+						chainIdForNextBlock);
 	}
 }
