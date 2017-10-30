@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">EthereumApiExample</string>
+  <string name="app_name">App Coin Ethereum Sample</string>
   <string name="balance">Balance</string>
   <string name="pay_something">pay something</string>
   <string name="app_coin">App Coin</string>
