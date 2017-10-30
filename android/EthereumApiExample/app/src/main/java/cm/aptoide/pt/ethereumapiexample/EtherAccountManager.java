@@ -1,0 +1,57 @@
+package cm.aptoide.pt.ethereumapiexample;
+
+import android.content.SharedPreferences;
+import cm.aptoide.pt.EthereumApi;
+import cm.aptoide.pt.ethereumj.crypto.ECKey;
+import java.math.BigInteger;
+import org.spongycastle.util.encoders.Hex;
+import rx.Observable;
+
+/**
+ * Created by neuro on 30-10-2017.
+ */
+
+public class EtherAccountManager {
+  private final EthereumApi ethereumApi;
+  private final ECKey ecKey;
+  private final String ETHER_ACCOUNT_MANAGER_KEY = "EtherAccountManagerKey";
+  private final SharedPreferences sharedPreferences;
+
+  public EtherAccountManager(EthereumApi ethereumApi, SharedPreferences sharedPreferences) {
+    this.ethereumApi = ethereumApi;
+    this.sharedPreferences = sharedPreferences;
+    if (isStored()) {
+      ecKey = ECKey.fromPrivate(getStoredECKey());
+    } else {
+      ecKey = new ECKey();
+      storeKey(ecKey);
+    }
+  }
+
+  private void storeKey(ECKey ecKey) {
+    sharedPreferences.edit()
+        .putString(ETHER_ACCOUNT_MANAGER_KEY, ecKey.getPrivKey()
+            .toString())
+        .apply();
+  }
+
+  private boolean isStored() {
+    return sharedPreferences.contains(ETHER_ACCOUNT_MANAGER_KEY);
+  }
+
+  private BigInteger getStoredECKey() {
+    return new BigInteger(sharedPreferences.getString(ETHER_ACCOUNT_MANAGER_KEY, null));
+  }
+
+  Observable<Long> getCurrentNonce() {
+    return ethereumApi.getCurrentNonce(Hex.toHexString(ecKey.getAddress()));
+  }
+
+  public void load() {
+    // TODO: 30-10-2017 neuro
+  }
+
+  public ECKey getECKey() {
+    return ecKey;
+  }
+}

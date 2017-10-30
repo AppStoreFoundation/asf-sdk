@@ -5,7 +5,7 @@ android {
     defaultConfig {
         applicationId "cm.aptoide.cm.aptoide.pt.ethereumapiexample"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
