@@ -15,8 +15,12 @@ import java.math.MathContext;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.StringUtils;
 import org.spongycastle.util.encoders.Hex;
+import rx.Observable;
+import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
   private TextView balanceTextView;
   private TextView yourId;
+  private TextView addressTextView;
+  private TextView amountTextView;
 
   private ScheduledExecutorService scheduledExecutorService;
 
@@ -93,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
   private void assignViews() {
     balanceTextView = findViewById(R.id.balanceTextView);
     yourId = findViewById(R.id.your_id);
+    addressTextView = findViewById(R.id.address_text_view);
+    amountTextView = findViewById(R.id.amount);
   }
 
   public void paySomething(View v) {
@@ -100,12 +108,14 @@ public class MainActivity extends AppCompatActivity {
       @Override public void onClick(DialogInterface dialogInterface, int i) {
         new Thread(new Runnable() {
           @Override public void run() {
-            Erc20Transfer erc20Transfer = new Erc20Transfer(RECEIVER_ADDR, 1);
-            int nonce = etherAccountManager.getCurrentNonce()
-                .toBlocking()
-                .first()
-                .intValue();
-            ethereumApi.call(nonce, CONTRACT_ADDRESS, erc20Transfer, etherAccountManager.getECKey())
+            etherAccountManager.getCurrentNonce()
+                .flatMap(new Func1<Long, Observable<?>>() {
+                  @Override public Observable<Object> call(Long nonce) {
+                    return ethereumApi.call(nonce.intValue(), CONTRACT_ADDRESS,
+                        new Erc20Transfer(RECEIVER_ADDR, 1), etherAccountManager.getECKey());
+                  }
+                })
+                //ethereumApi.call(nonce, CONTRACT_ADDRESS, erc20Transfer, etherAccountManager.getECKey())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Action1<Object>() {
                   @Override public void call(Object o) {
@@ -127,5 +137,53 @@ public class MainActivity extends AppCompatActivity {
       }
     })
         .show(getSupportFragmentManager(), "MyDialog");
+  }
+
+  public void sendTokens(final View view) {
+    if (validateInputs((TextView) view, amountTextView)) {
+      etherAccountManager.getCurrentNonce()
+          .flatMap(new Func1<Long, Observable<?>>() {
+            @Override public Observable<Object> call(Long nonce) {
+              String receiverAddr = addressTextView.getText()
+                  .toString();
+              return ethereumApi.call(nonce.intValue(), CONTRACT_ADDRESS,
+                  new Erc20Transfer(receiverAddr.substring(2), Integer.parseInt(
+                      amountTextView.getText()
+                          .toString())), etherAccountManager.getECKey());
+            }
+          })
+          .subscribeOn(Schedulers.io())
+          .doOnSubscribe(new Action0() {
+            @Override public void call() {
+              runOnUiThread(new Runnable() {
+                @Override public void run() {
+                  Toast.makeText(MainActivity.this, "Sending transaction", Toast.LENGTH_SHORT)
+                      .show();
+                  amountTextView.setText("");
+                }
+              });
+            }
+          })
+          .subscribe(new Action1<Object>() {
+            @Override public void call(Object o) {
+            }
+          }, new Action1<Throwable>() {
+            @Override public void call(Throwable throwable) {
+              throwable.printStackTrace();
+            }
+          });
+    } else {
+      runOnUiThread(new Runnable() {
+        @Override public void run() {
+          Toast.makeText(MainActivity.this, "Address and Amount required!", Toast.LENGTH_SHORT)
+              .show();
+        }
+      });
+    }
+  }
+
+  private boolean validateInputs(TextView addressTextView, TextView amountTextView) {
+    return !StringUtils.isEmpty(addressTextView.getText()) && !StringUtils.isEmpty(
+        amountTextView.getText());
   }
 }
