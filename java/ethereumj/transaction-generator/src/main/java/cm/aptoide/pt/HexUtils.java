@@ -2,6 +2,8 @@ package cm.aptoide.pt;
 
 import org.spongycastle.util.encoders.Hex;
 
+import cm.aptoide.pt.ethereumj.util.ByteUtil;
+
 public class HexUtils {
 
 	static String fromPrefixString(String hexWithPrefix) {
@@ -10,7 +12,7 @@ public class HexUtils {
 
 	static byte[] decode(String s) {
 		if (s.charAt(0) == '0') {
-			return new byte[]{0};
+			return ByteUtil.ZERO_BYTE_ARRAY;
 		}
 
 		if (s.length() % 2 != 0) {
