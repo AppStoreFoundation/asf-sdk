@@ -8,13 +8,15 @@ import rx.Observable;
 public interface EtherscanApi {
 
 	@GET("api?module=account&action=tokenbalance&tag=latest")
-	Observable<BalanceResponse> getTokenBalance(@Query("contractaddress") String
-																													 contractaddress, @Query("address")
-					String address);
+	Observable<BalanceResponse> getTokenBalance(@Query("contractaddress") String contractaddress,
+																							@Query("address") String address);
 
 	@GET("api?module=account&action=balance&tag=latest")
 	Observable<BalanceResponse> getBalance(@Query("address") String address);
 
 	@POST("api?module=proxy&action=eth_sendRawTransaction")
 	Observable<Object> sendRawTransaction(@Query("hex") String rawData);
+
+	@GET("api?module=proxy&action=eth_getTransactionCount&tag=latest")
+	Observable<TransactionCountResponse> getTransactionCount(@Query("address") String address);
 }
