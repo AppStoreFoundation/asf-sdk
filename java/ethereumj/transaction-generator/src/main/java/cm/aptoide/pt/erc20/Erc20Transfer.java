@@ -2,16 +2,21 @@ package cm.aptoide.pt.erc20;
 
 import cm.aptoide.pt.ethereumj.core.CallTransaction;
 
-public class Erc20Transfer extends Erc20 {
+public class Erc20Transfer implements Erc20 {
 
 	private static final String METHOD = "transfer";
 
-	public Erc20Transfer() {
-		super(CallTransaction.Function.fromSignature(METHOD, Type.address.name(), Type.uint256.name
-						()));
+	private final String receiverAddr;
+	private final long amount;
+
+	public Erc20Transfer(String receiverAddr, long amount) {
+		this.receiverAddr = receiverAddr;
+		this.amount = amount;
 	}
 
-	public byte[] encode(String receiverAddr, long amount) {
-		return function.encode(receiverAddr, amount);
+	@Override
+	public byte[] encode() {
+		return CallTransaction.Function.fromSignature(METHOD, Type.address.name(), Type.uint256.name())
+						.encode(receiverAddr, amount);
 	}
 }

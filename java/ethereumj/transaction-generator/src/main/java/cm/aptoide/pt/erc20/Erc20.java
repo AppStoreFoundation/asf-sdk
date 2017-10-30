@@ -1,16 +1,10 @@
 package cm.aptoide.pt.erc20;
 
-import cm.aptoide.pt.ethereumj.core.CallTransaction;
+public interface Erc20 {
 
-public abstract class Erc20 {
+	byte[] encode();
 
-	protected final CallTransaction.Function function;
-
-	protected Erc20(CallTransaction.Function function) {
-		this.function = function;
-	}
-
-	protected enum Type {
+	enum Type {
 		address,
 		uint256
 	}
