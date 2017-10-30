@@ -6,6 +6,7 @@ import cm.aptoide.pt.ethereumj.crypto.ECKey;
 import java.math.BigInteger;
 import org.spongycastle.util.encoders.Hex;
 import rx.Observable;
+import rx.functions.Action1;
 
 /**
  * Created by neuro on 30-10-2017.
@@ -16,6 +17,7 @@ public class EtherAccountManager {
   private final ECKey ecKey;
   private final String ETHER_ACCOUNT_MANAGER_KEY = "EtherAccountManagerKey";
   private final SharedPreferences sharedPreferences;
+  private volatile long nonce = -1;
 
   public EtherAccountManager(EthereumApi ethereumApi, SharedPreferences sharedPreferences) {
     this.ethereumApi = ethereumApi;
@@ -44,7 +46,16 @@ public class EtherAccountManager {
   }
 
   Observable<Long> getCurrentNonce() {
-    return ethereumApi.getCurrentNonce(Hex.toHexString(ecKey.getAddress()));
+    if (nonce == -1) {
+      return ethereumApi.getCurrentNonce(Hex.toHexString(ecKey.getAddress()))
+          .doOnNext(new Action1<Long>() {
+            @Override public void call(Long aLong) {
+              nonce = aLong;
+            }
+          });
+    } else {
+      return Observable.just(nonce++);
+    }
   }
 
   public void load() {

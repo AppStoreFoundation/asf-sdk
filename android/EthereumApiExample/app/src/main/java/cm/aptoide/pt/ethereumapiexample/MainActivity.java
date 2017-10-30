@@ -140,19 +140,14 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void sendTokens(final View view) {
+    int amount = Integer.parseInt(amountTextView.getText()
+        .toString());
+    final Erc20Transfer erc20 = new Erc20Transfer(addressTextView.getText()
+        .toString()
+        .substring(2), amount);
+
     if (validateInputs((TextView) view, amountTextView)) {
       etherAccountManager.getCurrentNonce()
-          .flatMap(new Func1<Long, Observable<?>>() {
-            @Override public Observable<Object> call(Long nonce) {
-              String receiverAddr = addressTextView.getText()
-                  .toString();
-              return ethereumApi.call(nonce.intValue(), CONTRACT_ADDRESS,
-                  new Erc20Transfer(receiverAddr.substring(2), Integer.parseInt(
-                      amountTextView.getText()
-                          .toString())), etherAccountManager.getECKey());
-            }
-          })
-          .subscribeOn(Schedulers.io())
           .doOnSubscribe(new Action0() {
             @Override public void call() {
               runOnUiThread(new Runnable() {
@@ -164,6 +159,13 @@ public class MainActivity extends AppCompatActivity {
               });
             }
           })
+          .flatMap(new Func1<Long, Observable<?>>() {
+            @Override public Observable<Object> call(Long nonce) {
+              return ethereumApi.call(nonce.intValue(), CONTRACT_ADDRESS, erc20,
+                  etherAccountManager.getECKey());
+            }
+          })
+          .subscribeOn(Schedulers.io())
           .subscribe(new Action1<Object>() {
             @Override public void call(Object o) {
             }
