@@ -145,13 +145,16 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void sendTokens(final View view) {
-    int amount = Integer.parseInt(amountTextView.getText()
-        .toString());
-    final Erc20Transfer erc20 = new Erc20Transfer(addressTextView.getText()
-        .toString()
-        .substring(2), amount);
-
     if (validateInputs((TextView) view, amountTextView)) {
+      float floatAmount = Float.parseFloat(amountTextView.getText()
+          .toString());
+
+      int amount = (int) (floatAmount * 100);
+
+      final Erc20Transfer erc20 = new Erc20Transfer(addressTextView.getText()
+          .toString()
+          .substring(2), amount);
+
       etherAccountManager.getCurrentNonce()
           .doOnSubscribe(new Action0() {
             @Override public void call() {
@@ -190,8 +193,16 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private boolean validateInputs(TextView addressTextView, TextView amountTextView) {
-    return !StringUtils.isEmpty(addressTextView.getText()) && !StringUtils.isEmpty(
+    boolean validInputs = !StringUtils.isEmpty(addressTextView.getText()) && !StringUtils.isEmpty(
         amountTextView.getText());
+
+    String s = amountTextView.getText()
+        .toString();
+    float value = !"".equals(s) ? Float.parseFloat(s) : 0;
+
+    boolean limit = value > 100;
+
+    return validInputs && !limit;
   }
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
