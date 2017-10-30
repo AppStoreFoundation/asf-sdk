@@ -1,6 +1,7 @@
 package cm.aptoide.pt.ethereumapiexample;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
   private EtherAccountManager etherAccountManager;
 
   private TextView balanceTextView;
-  private TextView yourId;
+  private TextView yourAddress;
   private TextView addressTextView;
   private TextView amountTextView;
 
@@ -56,8 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         runOnUiThread(new Runnable() {
           @Override public void run() {
-            yourId.setText(Hex.toHexString(etherAccountManager.getECKey()
-                .getAddress()));
+            setMyAddress();
           }
         });
       }
@@ -88,6 +88,11 @@ public class MainActivity extends AppCompatActivity {
     }, 0, 5, TimeUnit.SECONDS);
   }
 
+  private void setMyAddress() {
+    yourAddress.setText(Hex.toHexString(etherAccountManager.getECKey()
+        .getAddress()));
+  }
+
   private void setBalance(final TextView balanceTextView, final String result) {
     runOnUiThread(new Runnable() {
       @Override public void run() {
@@ -98,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
   private void assignViews() {
     balanceTextView = findViewById(R.id.balanceTextView);
-    yourId = findViewById(R.id.your_id);
+    yourAddress = findViewById(R.id.your_address);
     addressTextView = findViewById(R.id.address_text_view);
     amountTextView = findViewById(R.id.amount);
   }
@@ -187,5 +192,20 @@ public class MainActivity extends AppCompatActivity {
   private boolean validateInputs(TextView addressTextView, TextView amountTextView) {
     return !StringUtils.isEmpty(addressTextView.getText()) && !StringUtils.isEmpty(
         amountTextView.getText());
+  }
+
+  @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+  }
+
+  public void createWallet(View view) {
+    NewAccountFragment.newInstance(this, new DialogInterface.OnClickListener() {
+      @Override public void onClick(DialogInterface dialogInterface, int i) {
+        etherAccountManager.createNewAccount();
+        setMyAddress();
+        balanceTextView.setText(Integer.toString(0));
+      }
+    })
+        .show(getSupportFragmentManager(), "NewAccount");
   }
 }

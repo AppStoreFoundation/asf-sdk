@@ -101,12 +101,20 @@
       />
 
   <TextView
-      android:id="@+id/your_id"
+      android:id="@+id/your_address"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
       android:layout_marginTop="16dp"
       android:textSize="16sp"
+      />
+
+  <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:onClick="createWallet"
+      android:text="@string/create_wallet"
       />
 
 </LinearLayout>

@@ -14,9 +14,9 @@ import rx.functions.Action1;
 
 public class EtherAccountManager {
   private final EthereumApi ethereumApi;
-  private final ECKey ecKey;
   private final String ETHER_ACCOUNT_MANAGER_KEY = "EtherAccountManagerKey";
   private final SharedPreferences sharedPreferences;
+  private ECKey ecKey;
   private volatile long nonce = -1;
 
   public EtherAccountManager(EthereumApi ethereumApi, SharedPreferences sharedPreferences) {
@@ -64,5 +64,11 @@ public class EtherAccountManager {
 
   public ECKey getECKey() {
     return ecKey;
+  }
+
+  public void createNewAccount() {
+    nonce = 0;
+    ecKey = new ECKey();
+    storeKey(ecKey);
   }
 }
