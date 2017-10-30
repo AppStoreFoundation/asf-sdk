@@ -11,6 +11,10 @@ import cm.aptoide.pt.EthereumApiFactory;
 import cm.aptoide.pt.erc20.Erc20Transfer;
 import cm.aptoide.pt.ws.etherscan.BalanceResponse;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import org.spongycastle.util.encoders.Hex;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -27,15 +31,20 @@ public class MainActivity extends AppCompatActivity {
   private TextView balanceTextView;
   private TextView yourId;
 
+  private ScheduledExecutorService scheduledExecutorService;
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    scheduledExecutorService = Executors.newScheduledThreadPool(1);
+
     assignViews();
 
-    new Thread(new Runnable() {
+    scheduledExecutorService.schedule(new Runnable() {
       @Override public void run() {
         ethereumApi = EthereumApiFactory.createEthereumApi();
+
         etherAccountManager =
             new EtherAccountManager(ethereumApi, getSharedPreferences(MAIN_PREFS, MODE_PRIVATE));
 
@@ -45,20 +54,32 @@ public class MainActivity extends AppCompatActivity {
                 .getAddress()));
           }
         });
+      }
+    }, 0, TimeUnit.SECONDS);
 
+    scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+      @Override public void run() {
         ethereumApi.getTokenBalance(CONTRACT_ADDRESS, Hex.toHexString(etherAccountManager.getECKey()
             .getAddress()))
             .subscribeOn(Schedulers.io())
             .subscribe(new Action1<BalanceResponse>() {
               @Override public void call(BalanceResponse balanceResponse) {
+                runOnUiThread(new Runnable() {
+                  @Override public void run() {
+                    Toast.makeText(MainActivity.this, "Refreshing data", Toast.LENGTH_SHORT)
+                        .show();
+                  }
+                });
+
                 BigDecimal resultBigDecimal = new BigDecimal(balanceResponse.result);
 
-                setBalance(balanceTextView, resultBigDecimal.divide(new BigDecimal("100"))
-                    .toString());
+                setBalance(balanceTextView,
+                    resultBigDecimal.divide(new BigDecimal("100"), MathContext.DECIMAL32)
+                        .toString());
               }
             });
       }
-    }).start();
+    }, 0, 5, TimeUnit.SECONDS);
   }
 
   private void setBalance(final TextView balanceTextView, final String result) {
