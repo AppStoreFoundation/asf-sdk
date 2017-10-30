@@ -18,7 +18,7 @@ public class TransactionFactory {
 					chainIdForNextBlock) {
 		return createTransaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
 						ByteUtil.longToBytesNoLeadZeroes(gasPrice), ByteUtil.longToBytesNoLeadZeroes(gasLimit),
-						HexProxy.decode(receiverAddr), HexProxy.decode(Long.toHexString(value)), data,
+						HexUtils.decode(receiverAddr), HexUtils.decode(Long.toHexString(value)), data,
 						chainIdForNextBlock);
 	}
 }
