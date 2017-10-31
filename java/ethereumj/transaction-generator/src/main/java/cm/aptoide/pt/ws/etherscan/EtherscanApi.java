@@ -19,4 +19,7 @@ public interface EtherscanApi {
 
 	@GET("api?module=proxy&action=eth_getTransactionCount&tag=latest")
 	Observable<TransactionCountResponse> getTransactionCount(@Query("address") String address);
+
+	@GET("api?module=proxy&action=eth_getTransactionByHash")
+	Observable<TransactionByHashResponse> getTransactionByHash(@Query("txhash") String txhash);
 }
