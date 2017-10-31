@@ -18,4 +18,6 @@ public interface EthereumApi {
 	Observable<BalanceResponse> getBalance(String address);
 
 	Observable<BalanceResponse> getTokenBalance(String contractAddress, String address);
+
+	Observable<Boolean> isTransactionAccepted(String txhash);
 }

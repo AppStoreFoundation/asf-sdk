@@ -12,6 +12,7 @@ import cm.aptoide.pt.ws.Network;
 import cm.aptoide.pt.ws.WebServiceFactory;
 import cm.aptoide.pt.ws.etherscan.BalanceResponse;
 import cm.aptoide.pt.ws.etherscan.EtherscanApi;
+import cm.aptoide.pt.ws.etherscan.TransactionResultResponse;
 
 public class Example {
 
@@ -45,12 +46,13 @@ public class Example {
 						.toBlocking()
 						.first();
 
-		Object call = ethereumApi.call((int) nonce, CONTRACT_ADDRESS,
+		TransactionResultResponse call = ethereumApi.call((int) nonce, CONTRACT_ADDRESS,
 						new Erc20Transfer(RECEIVER_ADDR, 1), senderKey)
 						.toBlocking()
 						.first();
 
 		System.out.println(call);
+		String txHash = call.result;
 
 		BalanceResponse balance = ethereumApi.getBalance(RECEIVER_ADDR)
 						.toBlocking()
@@ -59,7 +61,12 @@ public class Example {
 						.toBlocking()
 						.first();
 
+		Boolean accepted = ethereumApi.isTransactionAccepted(txHash)
+						.toBlocking()
+						.first();
+
 		System.out.println("Balance: " + balance);
 		System.out.println("Token Balance: " + tokenBalance);
+		System.out.println(accepted);
 	}
 }

@@ -11,6 +11,7 @@ import cm.aptoide.pt.ws.Network;
 import cm.aptoide.pt.ws.WebServiceFactory;
 import cm.aptoide.pt.ws.etherscan.BalanceResponse;
 import cm.aptoide.pt.ws.etherscan.EtherscanApi;
+import cm.aptoide.pt.ws.etherscan.TransactionByHashResponse;
 import cm.aptoide.pt.ws.etherscan.TransactionCountResponse;
 import cm.aptoide.pt.ws.etherscan.TransactionResultResponse;
 import rx.Observable;
@@ -70,5 +71,16 @@ class EthereumApiImpl implements EthereumApi {
 	@Override
 	public Observable<BalanceResponse> getTokenBalance(String contractAddress, String address) {
 		return etherscanApi.getTokenBalance(contractAddress, address);
+	}
+
+	@Override
+	public Observable<Boolean> isTransactionAccepted(String txhash) {
+		return etherscanApi.getTransactionByHash(txhash)
+						.map(new Func1<TransactionByHashResponse, Boolean>() {
+							@Override
+							public Boolean call(TransactionByHashResponse transactionByHashResponse) {
+								return transactionByHashResponse.result.blockNumber != null;
+							}
+						});
 	}
 }
