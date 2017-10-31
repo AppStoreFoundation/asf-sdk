@@ -15,7 +15,7 @@ public interface EtherscanApi {
 	Observable<BalanceResponse> getBalance(@Query("address") String address);
 
 	@POST("api?module=proxy&action=eth_sendRawTransaction")
-	Observable<Object> sendRawTransaction(@Query("hex") String rawData);
+	Observable<TransactionResultResponse> sendRawTransaction(@Query("hex") String rawData);
 
 	@GET("api?module=proxy&action=eth_getTransactionCount&tag=latest")
 	Observable<TransactionCountResponse> getTransactionCount(@Query("address") String address);

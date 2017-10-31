@@ -12,6 +12,7 @@ import cm.aptoide.pt.ws.WebServiceFactory;
 import cm.aptoide.pt.ws.etherscan.BalanceResponse;
 import cm.aptoide.pt.ws.etherscan.EtherscanApi;
 import cm.aptoide.pt.ws.etherscan.TransactionCountResponse;
+import cm.aptoide.pt.ws.etherscan.TransactionResultResponse;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -48,12 +49,13 @@ class EthereumApiImpl implements EthereumApi {
 	}
 
 	@Override
-	public Observable<Object> sendRawTransaction(String rawData) {
+	public Observable<TransactionResultResponse> sendRawTransaction(String rawData) {
 		return etherscanApi.sendRawTransaction(rawData);
 	}
 
 	@Override
-	public Observable<Object> call(int nonce, String contractAddress, Erc20 erc20, ECKey ecKey) {
+	public Observable<TransactionResultResponse> call(int nonce, String contractAddress, Erc20
+					erc20, ECKey ecKey) {
 		Transaction transaction = contractTransactionFactory.createTransaction(nonce, contractAddress,
 						erc20.encode(), 3);
 		transaction.sign(ecKey);
