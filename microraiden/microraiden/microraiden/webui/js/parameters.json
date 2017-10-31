@@ -1,0 +1,851 @@
+{
+  "contractAddr": "0xffa52825c7997dd2be80fb91080500a52abd6d5b",
+  "contractABI": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "challenge_period",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_open_block_number",
+          "type": "uint32"
+        },
+        {
+          "name": "_balance",
+          "type": "uint192"
+        }
+      ],
+      "name": "getBalanceMessage",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_open_block_number",
+          "type": "uint32"
+        }
+      ],
+      "name": "getChannelInfo",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "name": "",
+          "type": "uint192"
+        },
+        {
+          "name": "",
+          "type": "uint32"
+        },
+        {
+          "name": "",
+          "type": "uint192"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_open_block_number",
+          "type": "uint32"
+        },
+        {
+          "name": "_balance",
+          "type": "uint192"
+        },
+        {
+          "name": "_balance_msg_sig",
+          "type": "bytes"
+        },
+        {
+          "name": "_closing_sig",
+          "type": "bytes"
+        }
+      ],
+      "name": "close",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_deposit",
+          "type": "uint192"
+        }
+      ],
+      "name": "createChannelERC20",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_open_block_number",
+          "type": "uint32"
+        }
+      ],
+      "name": "settle",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_open_block_number",
+          "type": "uint32"
+        },
+        {
+          "name": "_balance",
+          "type": "uint192"
+        },
+        {
+          "name": "_balance_msg_sig",
+          "type": "bytes"
+        }
+      ],
+      "name": "verifyBalanceProof",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_open_block_number",
+          "type": "uint32"
+        }
+      ],
+      "name": "getKey",
+      "outputs": [
+        {
+          "name": "data",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "token_address",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "name": "_deposit",
+          "type": "uint256"
+        },
+        {
+          "name": "_data",
+          "type": "bytes"
+        }
+      ],
+      "name": "tokenFallback",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_open_block_number",
+          "type": "uint32"
+        },
+        {
+          "name": "_added_deposit",
+          "type": "uint192"
+        }
+      ],
+      "name": "topUpERC20",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_open_block_number",
+          "type": "uint32"
+        },
+        {
+          "name": "_balance",
+          "type": "uint192"
+        },
+        {
+          "name": "_balance_msg_sig",
+          "type": "bytes"
+        }
+      ],
+      "name": "close",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "_token",
+          "type": "address"
+        },
+        {
+          "name": "_challenge_period",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_deposit",
+          "type": "uint192"
+        }
+      ],
+      "name": "ChannelCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "_open_block_number",
+          "type": "uint32"
+        },
+        {
+          "indexed": false,
+          "name": "_added_deposit",
+          "type": "uint192"
+        },
+        {
+          "indexed": false,
+          "name": "_deposit",
+          "type": "uint192"
+        }
+      ],
+      "name": "ChannelToppedUp",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "_open_block_number",
+          "type": "uint32"
+        },
+        {
+          "indexed": false,
+          "name": "_balance",
+          "type": "uint192"
+        }
+      ],
+      "name": "ChannelCloseRequested",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "_open_block_number",
+          "type": "uint32"
+        },
+        {
+          "indexed": false,
+          "name": "_balance",
+          "type": "uint192"
+        }
+      ],
+      "name": "ChannelSettled",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_function_name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "_gaslimit",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "_gas_remaining",
+          "type": "uint256"
+        }
+      ],
+      "name": "GasCost",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "UintE",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "bytes"
+        }
+      ],
+      "name": "BytesE",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "bytes32"
+        }
+      ],
+      "name": "Bytes32E",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "bytes4"
+        }
+      ],
+      "name": "Bytes4E",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "bytes20"
+        }
+      ],
+      "name": "Bytes20E",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "address"
+        }
+      ],
+      "name": "AddressE",
+      "type": "event"
+    }
+  ],
+  "tokenAddr": "0x04c7f744a0c751d89e99ae79a39060ec6f3c4397",
+  "tokenABI": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_addr",
+          "type": "address"
+        }
+      ],
+      "name": "contractIsTrusted",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "name",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_spender",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "approve",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+      {
+        "constant": false,
+        "inputs": [],
+        "name": "mint",
+        "outputs": [],
+        "payable": true,
+        "type": "function"
+      },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transferFrom",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "decimals",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "version",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "symbol",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        },
+        {
+          "name": "_data",
+          "type": "bytes"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_owner",
+          "type": "address"
+        },
+        {
+          "name": "_spender",
+          "type": "address"
+        }
+      ],
+      "name": "allowance",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "_initialAmount",
+          "type": "uint256"
+        },
+        {
+          "name": "_tokenName",
+          "type": "string"
+        },
+        {
+          "name": "_decimalUnits",
+          "type": "uint8"
+        },
+        {
+          "name": "_tokenSymbol",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_value",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "name": "_data",
+          "type": "bytes"
+        }
+      ],
+      "name": "Transfer",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "_owner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "_spender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Approval",
+      "type": "event"
+    }
+  ],
+  "receiver": "0xb0d5EeAeB7b084a2ba92C24b79f4f2D079A3062b",
+  "amount": 1
+}
