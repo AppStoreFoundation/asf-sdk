@@ -28,13 +28,13 @@ class EthereumApiImpl implements EthereumApi {
 						new WebServiceFactory(retrofitModule.provideOkHttpClient(),
 										retrofitModule.provideConverterFactory(),
 										retrofitModule.provideRxJavaCallAdapterFactory()));
-		this.etherscanApi = apiFactory.createEtherscanApi(Network.ROPSTEN);
-		contractTransactionFactory = new ContractTransactionFactory();
+		etherscanApi = apiFactory.createEtherscanApi(Network.MAINNET);
+		this.contractTransactionFactory = new ContractTransactionFactory();
 	}
 
 	@Override
 	public Observable<Long> getCurrentNonce(String address) {
-		return etherscanApi.getTransactionCount(address)
+		return this.etherscanApi.getTransactionCount(address)
 						.map(new Func1<TransactionCountResponse, String>() {
 							@Override
 							public String call(TransactionCountResponse transactionCountResponse) {
@@ -51,31 +51,31 @@ class EthereumApiImpl implements EthereumApi {
 
 	@Override
 	public Observable<TransactionResultResponse> sendRawTransaction(String rawData) {
-		return etherscanApi.sendRawTransaction(rawData);
+		return this.etherscanApi.sendRawTransaction(rawData);
 	}
 
 	@Override
 	public Observable<TransactionResultResponse> call(int nonce, String contractAddress, Erc20
 					erc20, ECKey ecKey) {
-		Transaction transaction = contractTransactionFactory.createTransaction(nonce, contractAddress,
-						erc20.encode(), 3);
+		Transaction transaction = this.contractTransactionFactory.createTransaction(nonce,
+						contractAddress, erc20.encode(), 1);
 		transaction.sign(ecKey);
-		return sendRawTransaction(Hex.toHexString(transaction.getEncoded()));
+		return this.sendRawTransaction(Hex.toHexString(transaction.getEncoded()));
 	}
 
 	@Override
 	public Observable<BalanceResponse> getBalance(String address) {
-		return etherscanApi.getBalance(address);
+		return this.etherscanApi.getBalance(address);
 	}
 
 	@Override
 	public Observable<BalanceResponse> getTokenBalance(String contractAddress, String address) {
-		return etherscanApi.getTokenBalance(contractAddress, address);
+		return this.etherscanApi.getTokenBalance(contractAddress, address);
 	}
 
 	@Override
 	public Observable<Boolean> isTransactionAccepted(String txhash) {
-		return etherscanApi.getTransactionByHash(txhash)
+		return this.etherscanApi.getTransactionByHash(txhash)
 						.map(new Func1<TransactionByHashResponse, Boolean>() {
 							@Override
 							public Boolean call(TransactionByHashResponse transactionByHashResponse) {
