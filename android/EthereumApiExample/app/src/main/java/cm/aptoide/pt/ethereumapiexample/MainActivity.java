@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void paySomething(View v) {
-    PaySomethingFragment.newInstance(this, new DialogInterface.OnClickListener() {
+    PaySomethingFragment.newInstance(new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialogInterface, int i) {
         new Thread(new Runnable() {
           @Override public void run() {
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void createWallet(View view) {
-    NewAccountFragment.newInstance(this, new DialogInterface.OnClickListener() {
+    NewAccountFragment.newInstance(new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialogInterface, int i) {
         etherAccountManager.createNewAccount();
         setMyAddress();
