@@ -5,8 +5,8 @@ import cm.aptoide.pt.ethereumj.util.ByteUtil;
 
 public class TransactionFactory {
 
-	private static long gasPrice = 50_000_000_000L;
-	private static long gasLimit = 0xfffff;
+	private static final long gasPrice = 12_000_000_000L;
+	private static final long gasLimit = 0xfffff;
 
 	public Transaction createTransaction(byte[] nonce, byte[] gasPrice, byte[] gasLimit, byte[]
 					receiverAddr, byte[] value, byte[] data, int chainIdForNextBlock) {
@@ -16,8 +16,9 @@ public class TransactionFactory {
 
 	public Transaction createTransaction(int nonce, String receiverAddr, int value, byte[] data, int
 					chainIdForNextBlock) {
-		return createTransaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
-						ByteUtil.longToBytesNoLeadZeroes(gasPrice), ByteUtil.longToBytesNoLeadZeroes(gasLimit),
+		return this.createTransaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
+						ByteUtil.longToBytesNoLeadZeroes(TransactionFactory.gasPrice),
+						ByteUtil.longToBytesNoLeadZeroes(TransactionFactory.gasLimit),
 						HexUtils.decode(receiverAddr), HexUtils.decode(Long.toHexString(value)), data,
 						chainIdForNextBlock);
 	}
