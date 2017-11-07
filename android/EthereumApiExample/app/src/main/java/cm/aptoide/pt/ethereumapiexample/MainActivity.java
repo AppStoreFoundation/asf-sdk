@@ -1,6 +1,5 @@
 package cm.aptoide.pt.ethereumapiexample;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +24,10 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        PaySomethingFragment.OnPaymentConfirmedListener,
+        NewAccountFragment.OnDeleteAccountConfirmedListener
+{
 
   private static final String CONTRACT_ADDRESS = "8dbf4349cbeca08a02cc6b5b0862f9dd42c585b9";
   private static final String RECEIVER_ADDR = "62a5c1680554A61334F5c6f6D7dA6044b6AFbFe8";
@@ -110,15 +112,18 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void paySomething(View v) {
-    PaySomethingFragment.newInstance(new DialogInterface.OnClickListener() {
-      @Override public void onClick(DialogInterface dialogInterface, int i) {
-        new Thread(new Runnable() {
-          @Override public void run() {
-            etherAccountManager.getCurrentNonce()
+    new PaySomethingFragment().show(getSupportFragmentManager(), "MyDialog");
+  }
+
+  @Override
+  public void onPaymentConfirmed() {
+    new Thread(new Runnable() {
+      @Override public void run() {
+        etherAccountManager.getCurrentNonce()
                 .flatMap(new Func1<Long, Observable<TransactionResultResponse>>() {
                   @Override public Observable<TransactionResultResponse> call(Long nonce) {
                     return ethereumApi.call(nonce.intValue(), CONTRACT_ADDRESS,
-                        new Erc20Transfer(RECEIVER_ADDR, 1), etherAccountManager.getECKey());
+                            new Erc20Transfer(RECEIVER_ADDR, 1), etherAccountManager.getECKey());
                   }
                 })
                 //ethereumApi.call(nonce, CONTRACT_ADDRESS, erc20Transfer, etherAccountManager.getECKey())
@@ -138,11 +143,8 @@ public class MainActivity extends AppCompatActivity {
                     });
                   }
                 });
-          }
-        }).start();
       }
-    })
-        .show(getSupportFragmentManager(), "MyDialog");
+    }).start();
   }
 
   public void sendTokens(final View view) {
@@ -211,13 +213,13 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void createWallet(View view) {
-    NewAccountFragment.newInstance(new DialogInterface.OnClickListener() {
-      @Override public void onClick(DialogInterface dialogInterface, int i) {
-        etherAccountManager.createNewAccount();
-        setMyAddress();
-        balanceTextView.setText(Integer.toString(0));
-      }
-    })
-        .show(getSupportFragmentManager(), "NewAccount");
+    new NewAccountFragment().show(getSupportFragmentManager(), "NewAccount");
+  }
+
+  @Override
+  public void onDeleteAccountConfirmed() {
+    etherAccountManager.createNewAccount();
+    setMyAddress();
+    balanceTextView.setText(Integer.toString(0));
   }
 }
