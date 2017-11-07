@@ -4,5 +4,10 @@
   <string name="pay_something">pay something</string>
   <string name="app_coin">App Coin</string>
   <string name="your_address_is">Your address is:</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Cancel</string>
   <string name="create_wallet">Create Wallet</string>
+  <string name="delete_account">Delete Account</string>
+  <string name="are_you_sure">Are you sure?</string>
+  <string name="buy_something">Buying something</string>
 </resources>

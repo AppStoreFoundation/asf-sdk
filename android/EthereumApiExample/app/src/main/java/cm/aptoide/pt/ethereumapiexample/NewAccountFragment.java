@@ -29,16 +29,16 @@ public class NewAccountFragment extends DialogFragment {
 
   @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
-    alertDialogBuilder.setTitle("Delete Account");
-    alertDialogBuilder.setMessage("Are you sure?");
+    alertDialogBuilder.setTitle(R.string.delete_account);
+    alertDialogBuilder.setMessage(R.string.are_you_sure);
     //null should be your on click listener
-    alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    alertDialogBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialogInterface, int i) {
         listener.onDeleteAccountConfirmed();
       }
     });
-    alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    alertDialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 
       @Override public void onClick(DialogInterface dialog, int which) {
         dialog.dismiss();
