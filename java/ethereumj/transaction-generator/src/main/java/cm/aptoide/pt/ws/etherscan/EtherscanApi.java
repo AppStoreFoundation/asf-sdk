@@ -22,4 +22,7 @@ public interface EtherscanApi {
 
 	@GET("api?module=proxy&action=eth_getTransactionByHash")
 	Observable<TransactionByHashResponse> getTransactionByHash(@Query("txhash") String txhash);
+
+	@GET("api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc")
+	Observable<TransactionsList> getTransactionsList(@Query("address") String address);
 }
