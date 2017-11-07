@@ -1,11 +1,10 @@
-package cm.aptoide.pt.ws.etherscan;
+package cm.aptoide.pt.ws.etherscan.transactionslist;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonInclude(Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"blockNumber", "timeStamp", "hash", "nonce", "blockHash", "transactionIndex",
 				"from", "to", "value", "gas", "gasPrice", "isError", "input", "contractAddress",
 				"cumulativeGasUsed", "gasUsed", "confirmations"})
@@ -31,16 +30,15 @@ public class Transaction {
 
 	@Override
 	public String toString() {
-		return "Transaction{" + "blockNumber='" + this.blockNumber + '\'' + ", timeStamp='" + this
-						.timeStamp + '\'' + ", hash='" + this.hash + '\'' + ", nonce='" + this.nonce + '\'' +
-						", blockHash='" + this.blockHash + '\'' + ", transactionIndex='" + this
-						.transactionIndex + '\'' + ", from='" + this.from + '\'' + ", to='" + this.to + '\'' +
-						", value='" + this.value + '\'' + ", gas='" + this.gas + '\'' + ", gasPrice='" + this
-						.gasPrice + '\'' + ", isError='" + this.isError + '\'' + ", input='" + this.input +
-						'\'' + ", contractAddress='" + this.contractAddress + '\'' + ", " +
-						"cumulativeGasUsed='" + this.cumulativeGasUsed + '\'' + ", gasUsed='" + this.gasUsed +
+		return "Transaction{" + "blockNumber='" + blockNumber + '\'' + ", timeStamp='" + timeStamp +
+						'\'' + ", hash='" + hash + '\'' + ", nonce='" + nonce + '\'' + ", blockHash='" +
+						blockHash + '\'' + ", transactionIndex='" + transactionIndex + '\'' + ", from='" +
+						from + '\'' + ", to='" + to + '\'' + ", value='" + value + '\'' + ", gas='" + gas +
+						'\'' + ", gasPrice='" + gasPrice + '\'' + ", isError='" + isError + '\'' + ", input='"
+						+ input + '\'' + ", contractAddress='" + contractAddress + '\'' + ", " +
+						"cumulativeGasUsed='" + cumulativeGasUsed + '\'' + ", gasUsed='" + gasUsed +
 						'\'' + "," +
 
-						" confirmations='" + this.confirmations + '\'' + '}';
+						" confirmations='" + confirmations + '\'' + '}';
 	}
 }

@@ -1,5 +1,7 @@
 package cm.aptoide.pt.ws.etherscan;
 
+import cm.aptoide.pt.ws.etherscan.transactionreceipt.TransactionReceipt;
+import cm.aptoide.pt.ws.etherscan.transactionslist.TransactionsList;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -25,4 +27,7 @@ public interface EtherscanApi {
 
 	@GET("api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc")
 	Observable<TransactionsList> getTransactionsList(@Query("address") String address);
+
+	@GET("https://api.etherscan.io/api?module=proxy&action=eth_getTransactionReceipt")
+	Observable<TransactionReceipt> getTransactionReceipt(@Query("txhash") String address);
 }
