@@ -11,6 +11,7 @@ import cm.aptoide.pt.EthereumApi;
 import cm.aptoide.pt.EthereumApiFactory;
 import cm.aptoide.pt.erc20.Erc20Transfer;
 import cm.aptoide.pt.ws.etherscan.BalanceResponse;
+import cm.aptoide.pt.ws.etherscan.TransactionResultResponse;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.concurrent.Executors;
@@ -114,8 +115,8 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
           @Override public void run() {
             etherAccountManager.getCurrentNonce()
-                .flatMap(new Func1<Long, Observable<?>>() {
-                  @Override public Observable<Object> call(Long nonce) {
+                .flatMap(new Func1<Long, Observable<TransactionResultResponse>>() {
+                  @Override public Observable<TransactionResultResponse> call(Long nonce) {
                     return ethereumApi.call(nonce.intValue(), CONTRACT_ADDRESS,
                         new Erc20Transfer(RECEIVER_ADDR, 1), etherAccountManager.getECKey());
                   }
@@ -167,8 +168,8 @@ public class MainActivity extends AppCompatActivity {
               });
             }
           })
-          .flatMap(new Func1<Long, Observable<?>>() {
-            @Override public Observable<Object> call(Long nonce) {
+          .flatMap(new Func1<Long, Observable<TransactionResultResponse>>() {
+            @Override public Observable<TransactionResultResponse> call(Long nonce) {
               return ethereumApi.call(nonce.intValue(), CONTRACT_ADDRESS, erc20,
                   etherAccountManager.getECKey());
             }
