@@ -30,4 +30,7 @@ public interface EtherscanApi {
 
     @GET("api?module=proxy&action=eth_getTransactionReceipt")
     Observable<TransactionReceipt> getTransactionReceipt(@Query("txhash") String address);
+
+	@GET("api?module=proxy&action=eth_gasPrice")
+	Observable<GasPriceResponse> getGasPrice();
 }
