@@ -7,12 +7,12 @@ public class ContractTransactionFactory {
 	private final TransactionFactory transactionFactory;
 
 	public ContractTransactionFactory() {
-		this.transactionFactory = new TransactionFactory();
+		transactionFactory = new TransactionFactory();
 	}
 
 	public Transaction createTransaction(int nonce, String contractAddress, byte[] encodedCall, int
-					chainIdForNextBlock) {
-		return transactionFactory.createTransaction(nonce, contractAddress, 0, encodedCall,
-						chainIdForNextBlock);
+			chainIdForNextBlock, long gasPrice, long gasLimit) {
+		return this.transactionFactory.createTransaction(nonce, contractAddress, 0, encodedCall,
+				chainIdForNextBlock, gasPrice, gasLimit);
 	}
 }

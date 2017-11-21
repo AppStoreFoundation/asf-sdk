@@ -13,7 +13,7 @@ public interface EthereumApi {
 	Observable<TransactionResultResponse> sendRawTransaction(String rawData);
 
 	Observable<TransactionResultResponse> call(int nonce, String contractAddress, Erc20 erc20, ECKey
-					ecKey);
+			ecKey, long gasPrice, long gasLimit);
 
 	Observable<BalanceResponse> getBalance(String address);
 
