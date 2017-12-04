@@ -26,4 +26,22 @@ public class MicroRaiden {
       throw new IllegalArgumentException("Failed to sign " + msg);
     }
   }
+
+  private byte[] signBalance(double newBalance) {
+    if (!channel.isValid()) {
+      throw new IllegalStateException("No valid channelInfo");
+    }
+
+    System.out.println("signBalance " + newBalance + ", channel" + this.channel);
+    if (newBalance == -1) {
+      newBalance = this.channel.balance;
+    }
+
+    if (newBalance == this.channel.balance && this.channel.sign != null) {
+      return channel.sign;
+    }
+
+    // FIXME: 29-11-2017 call contract getBalanceMessage with parms to sign the new balance
+    return null;
+  }
 }
