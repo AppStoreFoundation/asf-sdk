@@ -44,4 +44,25 @@ public class MicroRaiden {
     // FIXME: 29-11-2017 call contract getBalanceMessage with parms to sign the new balance
     return null;
   }
+
+  byte[] incrementBalanceAndSign(double amount, Runnable callback) {
+    if (!channel.isValid()) {
+      throw new IllegalStateException("No valid channelInfo");
+    }
+
+    double newBalance = channel.balance + amount;
+
+    if (channel.info.status != Channel.Info.Status.OPENED) {
+      throw new IllegalStateException("Tried signing on closed channel");
+    } else if (newBalance > channel.info.deposit) {
+      throw new IllegalStateException(
+          "Insuficient funds: current = " + channel.info.deposit + ", required = " + newBalance);
+    }
+
+    byte[] bytes = signBalance(newBalance);
+    channel.balance = newBalance;
+    channel.sign = bytes;
+
+    return bytes;
+  }
 }
