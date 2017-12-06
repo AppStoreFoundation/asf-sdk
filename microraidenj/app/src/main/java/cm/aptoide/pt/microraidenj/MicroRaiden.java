@@ -7,8 +7,14 @@ public class MicroRaiden {
 
   public static final String MY_ADDRESS = "0x";
   private static final String TAG = MicroRaiden.class.getSimpleName();
-  private Web3j web3;
-  private Channel channel;
+
+  private final Web3j web3;
+  private final Channel channel;
+
+  public MicroRaiden(Web3j web3, Channel channel) {
+    this.web3 = web3;
+    this.channel = channel;
+  }
 
   private String signMessage(String msg) {
     if (!channel.isValid()) {
