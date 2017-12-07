@@ -13,22 +13,42 @@ public class Channel {
     return false;
   }
 
+  /**
+   * Class representing the Channel State.
+   */
+  public static class Info {
     /**
-     * Class representing the Channel State.
+     * Status of the channel (Opened, Settled)
      */
-    public static class Info {
-        /**
-         * Status of the channel (Opened, Settled)
-         */
-        public Status status;
-        /**
-         * Channel current available balance.
-         */
-        public double deposit;
+    private Status status;
+    /**
+     * Channel current available balance.
+     */
+    private double deposit;
 
-        enum Status {
-            OPENED,
-            SETTLED,
-        }
+    public Info(Status status, double deposit) {
+      this.status = status;
+      this.deposit = deposit;
     }
+
+    public Status getStatus() {
+      return status;
+    }
+
+    public void setStatus(Status status) {
+      this.status = status;
+    }
+
+    public double getDeposit() {
+      return deposit;
+    }
+
+    public void setDeposit(double deposit) {
+      this.deposit = deposit;
+    }
+
+    enum Status {
+      OPENED, SETTLED,
+    }
+  }
 }
