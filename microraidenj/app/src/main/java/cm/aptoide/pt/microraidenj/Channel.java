@@ -13,13 +13,22 @@ public class Channel {
     return false;
   }
 
-  public static class Info {
-    public Status status;
-    public double deposit;
+    /**
+     * Class representing the Channel State.
+     */
+    public static class Info {
+        /**
+         * Status of the channel (Opened, Settled)
+         */
+        public Status status;
+        /**
+         * Channel current available balance.
+         */
+        public double deposit;
 
-    enum Status {
-      OPENED,
-      SETTLED,
+        enum Status {
+            OPENED,
+            SETTLED,
+        }
     }
-  }
 }
