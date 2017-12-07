@@ -19,6 +19,7 @@ public class Channel {
 
     enum Status {
       OPENED,
+      SETTLED,
     }
   }
 }
