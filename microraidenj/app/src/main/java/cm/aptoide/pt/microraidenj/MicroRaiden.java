@@ -74,4 +74,13 @@ public class MicroRaiden {
 
     return bytes;
   }
+
+  private interface MsgParam {
+
+    String getType();
+
+    String getName();
+
+    String getValue();
+  }
 }
