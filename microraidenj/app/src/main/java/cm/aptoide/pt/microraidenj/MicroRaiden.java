@@ -1,5 +1,6 @@
 package cm.aptoide.pt.microraidenj;
 
+import cm.aptoide.pt.microraidenj.Channel.Info.Status;
 import java.io.IOException;
 import org.web3j.protocol.Web3j;
 
@@ -58,11 +59,13 @@ public class MicroRaiden {
 
     double newBalance = channel.balance + amount;
 
-    if (channel.info.status != Channel.Info.Status.OPENED) {
+    if (channel.info.getStatus() != Status.OPENED) {
       throw new IllegalStateException("Tried signing on closed channel");
-    } else if (newBalance > channel.info.deposit) {
-      throw new IllegalStateException(
-          "Insuficient funds: current = " + channel.info.deposit + ", required = " + newBalance);
+    } else if (newBalance > channel.info.getDeposit()) {
+      throw new IllegalStateException("Insuficient funds: current = "
+          + channel.info.getDeposit()
+          + ", required = "
+          + newBalance);
     }
 
     byte[] bytes = signBalance(newBalance);
