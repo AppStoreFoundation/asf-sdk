@@ -1,7 +1,8 @@
 package cm.aptoide.pt.microraidenj;
 
-import cm.aptoide.pt.microraidenj.Channel.Info.Status;
+import android.support.annotation.Nullable;
 import java.io.IOException;
+import java.math.BigDecimal;
 import org.web3j.protocol.Web3j;
 
 public class MicroRaiden {
@@ -10,15 +11,15 @@ public class MicroRaiden {
   private static final String TAG = MicroRaiden.class.getSimpleName();
 
   private final Web3j web3;
-  private final Channel channel;
+  private final MicroChannel microChannel;
 
-  public MicroRaiden(Web3j web3, Channel channel) {
+  public MicroRaiden(Web3j web3, MicroChannel microChannel) {
     this.web3 = web3;
-    this.channel = channel;
+    this.microChannel = microChannel;
   }
 
   private String signMessage(String msg) {
-    if (!channel.isValid()) {
+    if (!microChannel.isValid()) {
       throw new IllegalStateException("No valid channelInfo");
     }
     byte[] hex = Utils.encodeHex(msg);
@@ -34,45 +35,55 @@ public class MicroRaiden {
     }
   }
 
-  private byte[] signBalance(double newBalance) {
-    if (!channel.isValid()) {
+  private MicroProof signNewProof(@Nullable MicroProof microProof) {
+    if (!microChannel.isValid()) {
       throw new IllegalStateException("No valid channelInfo");
     }
 
-    System.out.println("signBalance " + newBalance + ", channel" + this.channel);
-    if (newBalance == -1) {
-      newBalance = this.channel.balance;
+    System.out.println("signNewProof " + microProof + ", channel" + this.microChannel);
+    if (microProof == null) {
+      microProof = this.microChannel.getProof();
     }
 
-    if (newBalance == this.channel.balance && this.channel.sign != null) {
-      return channel.sign;
+    if (microProof.getSign() != null) {
+      return microProof;
+    }
+
+    if (microProof == this.microChannel.getProof() && this.microChannel.getProof() != null) {
+      return microChannel.getProof();
     }
 
     // FIXME: 29-11-2017 call contract getBalanceMessage with parms to sign the new balance
     return null;
   }
 
-  byte[] incrementBalanceAndSign(double amount, Runnable callback) {
-    if (!channel.isValid()) {
+  MicroProof incrementBalanceAndSign(BigDecimal amount, Runnable callback) {
+    if (!microChannel.isValid()) {
       throw new IllegalStateException("No valid channelInfo");
     }
 
-    double newBalance = channel.balance + amount;
+    BigDecimal newBalance = microChannel.getProof()
+        .getBalance()
+        .add(amount);
 
-    if (channel.info.getStatus() != Status.OPENED) {
+    if (getChannelInfo().getState() != "opened") {
       throw new IllegalStateException("Tried signing on closed channel");
-    } else if (newBalance > channel.info.getDeposit()) {
+    } else if (newBalance.compareTo(getChannelInfo().getDeposit()) == 1) {
       throw new IllegalStateException("Insuficient funds: current = "
-          + channel.info.getDeposit()
+          + getChannelInfo().getDeposit()
           + ", required = "
           + newBalance);
     }
 
-    byte[] bytes = signBalance(newBalance);
-    channel.balance = newBalance;
-    channel.sign = bytes;
+    MicroProof microProof = signNewProof(null  /*newBalance*/);
+    //microChannel.balance = newBalance;
+    //microChannel.sign = microProof;
 
-    return bytes;
+    return microProof;
+  }
+
+  private MicroChannelInfo getChannelInfo() {
+    return null;
   }
 
   private interface MsgParam {

@@ -18,4 +18,6 @@ public interface MicroChannel {
   @Nullable MicroProof nextProofget();
 
   @Nullable String closeSignget();
+
+  boolean isValid();
 }
