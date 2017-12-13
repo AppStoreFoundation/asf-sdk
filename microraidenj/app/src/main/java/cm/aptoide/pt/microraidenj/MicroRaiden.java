@@ -36,6 +36,11 @@ public class MicroRaiden {
   }
 
   private MicroProof signNewProof(@Nullable MicroProof microProof) {
+     /* Ask user for signing a channel balance.
+     * Notice it's the final balance, not the increment, and that the new
+     * balance is set in channel data in next_*, requiring confirmPayment
+     * call to persist it, after successful request.
+     * Returns promise to signed data */
     if (!microChannel.isValid()) {
       throw new IllegalStateException("No valid channelInfo");
     }
@@ -78,8 +83,7 @@ public class MicroRaiden {
     } else if (proof.getBalance()
         .compareTo(getChannelInfo().getDeposit()) == 1) {
       throw new IllegalStateException("Insuficient funds: current = "
-          + getChannelInfo().getDeposit()
-          + ", required = " + proof.getBalance());
+          + getChannelInfo().getDeposit() + ", required = " + proof.getBalance());
     }
 
     // get hash for new balance proof
