@@ -58,6 +58,12 @@ public class MicroRaiden {
   }
 
   MicroProof incrementBalanceAndSign(BigDecimal amount, Runnable callback) {
+     /* Ask user for signing a new balance, which is previous balance added
+     * of a given amount.
+     * Notice that it doesn't replace signed balance proof, but next_* balance
+     * proof. You must call confirmPayment with the signature after confirming
+     * successful request, to persist it.
+     * Returns promise to signed data */
     if (!microChannel.isValid()) {
       throw new IllegalStateException("No valid channelInfo");
     }
