@@ -62,24 +62,22 @@ public class MicroRaiden {
       throw new IllegalStateException("No valid channelInfo");
     }
 
-    BigDecimal newBalance = microChannel.getProof()
-        .getBalance()
-        .add(amount);
+    MicroProof proof = microChannel.getProof();
+    // get current deposit
+    MicroChannelInfo info = getChannelInfo();
 
-    if (getChannelInfo().getState() != "opened") {
+    if (!getChannelInfo().getState()
+        .equals("opened")) {
       throw new IllegalStateException("Tried signing on closed channel");
-    } else if (newBalance.compareTo(getChannelInfo().getDeposit()) == 1) {
+    } else if (proof.getBalance()
+        .compareTo(getChannelInfo().getDeposit()) == 1) {
       throw new IllegalStateException("Insuficient funds: current = "
           + getChannelInfo().getDeposit()
-          + ", required = "
-          + newBalance);
+          + ", required = " + proof.getBalance());
     }
 
-    MicroProof microProof = signNewProof(null  /*newBalance*/);
-    //microChannel.balance = newBalance;
-    //microChannel.sign = microProof;
-
-    return microProof;
+    // get hash for new balance proof
+    return signNewProof(proof);
   }
 
   private MicroChannelInfo getChannelInfo() {

@@ -6,5 +6,7 @@ public interface MicroProof {
 
   BigDecimal getBalance();
 
+  void setBalance(BigDecimal balance);
+
   byte[] getSign();
 }
