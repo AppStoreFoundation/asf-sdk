@@ -3,6 +3,8 @@ package cm.aptoide.pt.microraidenj;
 import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import org.spongycastle.jcajce.provider.digest.Keccak.Digest256;
 import org.web3j.protocol.Web3j;
 
 public class MicroRaiden {
@@ -54,12 +56,45 @@ public class MicroRaiden {
       return microProof;
     }
 
-    if (microProof == this.microChannel.getProof() && this.microChannel.getProof() != null) {
+    if ((microProof == this.microChannel.getProof()) && (this.microChannel.getProof() != null)) {
       return microChannel.getProof();
     }
 
     // FIXME: 29-11-2017 call contract getBalanceMessage with parms to sign the new balance
     return null;
+  }
+
+  void signBalance() {
+    //# Balance message
+    //bytes32 balance_message_hash = keccak256(
+    //    keccak256('address receiver', 'uint32 block_created', 'uint192 balance', 'address contract'),
+    //    keccak256(_receiver_address, _open_block_number, _balance, address(this))
+    //);
+
+    Digest256 keccak256 = new Digest256();
+    digestKeccak("address receiver", "uint32 block_created", "uint192 balance", "address contract");
+    String receiverAddress = microChannel.getReceiver();
+    String openBlockNumber = microChannel.getBlock()
+        .toString();
+    String balance = Integer.valueOf(0)
+        .toString();
+
+    digestKeccak(receiverAddress, openBlockNumber, balance, getAddress());
+  }
+
+  private String getAddress() {
+    return "0x0000000000000000000000000000000000000000";
+  }
+
+  public byte[] digestKeccak(String... args) {
+    StringBuilder stringBuilder = new StringBuilder();
+    for (String arg : args) {
+      stringBuilder.append(arg);
+    }
+
+    // TODO: 13-12-2017 fix defaultCharset
+    return new Digest256().digest(stringBuilder.toString()
+        .getBytes(Charset.defaultCharset()));
   }
 
   MicroProof incrementBalanceAndSign(BigDecimal amount, Runnable callback) {
@@ -83,7 +118,9 @@ public class MicroRaiden {
     } else if (proof.getBalance()
         .compareTo(getChannelInfo().getDeposit()) == 1) {
       throw new IllegalStateException("Insuficient funds: current = "
-          + getChannelInfo().getDeposit() + ", required = " + proof.getBalance());
+          + getChannelInfo().getDeposit()
+          + ", required = "
+          + proof.getBalance());
     }
 
     // get hash for new balance proof
