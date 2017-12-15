@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import org.spongycastle.jcajce.provider.digest.Keccak.Digest256;
+import org.spongycastle.util.encoders.Hex;
 import org.web3j.protocol.Web3j;
 
 public class MicroRaiden {
@@ -72,14 +73,18 @@ public class MicroRaiden {
     //);
 
     Digest256 keccak256 = new Digest256();
-    digestKeccak("address receiver", "uint32 block_created", "uint192 balance", "address contract");
     String receiverAddress = microChannel.getReceiver();
     String openBlockNumber = microChannel.getBlock()
         .toString();
     String balance = Integer.valueOf(0)
         .toString();
 
-    digestKeccak(receiverAddress, openBlockNumber, balance, getAddress());
+    String argumentSignatures = Hex.toHexString(
+        digestKeccak("address receiver", "uint32 block_created", "uint192 balance",
+            "address contract"));
+    String arguments =
+        Hex.toHexString(digestKeccak(receiverAddress, openBlockNumber, balance, getAddress()));
+    digestKeccak(argumentSignatures, arguments);
   }
 
   private String getAddress() {
