@@ -8,24 +8,37 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
 public class PaySomethingFragment extends DialogFragment {
-  private Context mContext;
-  private DialogInterface.OnClickListener okListener;
 
-  public static DialogFragment newInstance(Context mContext,
-      DialogInterface.OnClickListener clickListener) {
-    PaySomethingFragment paySomethingFragment = new PaySomethingFragment();
-    paySomethingFragment.mContext = mContext;
-    paySomethingFragment.okListener = clickListener;
-    return paySomethingFragment;
+  private OnPaymentConfirmedListener listener;
+
+  interface OnPaymentConfirmedListener {
+    void onPaymentConfirmed();
+  }
+
+  @Override
+  public void onAttach(Context context) {
+    super.onAttach(context);
+    listener = (OnPaymentConfirmedListener) context;
+  }
+
+  @Override
+  public void onDetach() {
+    listener = null;
+    super.onDetach();
   }
 
   @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
-    alertDialogBuilder.setTitle("Buying something");
-    alertDialogBuilder.setMessage("Are you sure?");
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+    alertDialogBuilder.setTitle(R.string.buy_something);
+    alertDialogBuilder.setMessage(R.string.are_you_sure);
     //null should be your on click listener
-    alertDialogBuilder.setPositiveButton("OK", okListener);
-    alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    alertDialogBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int i) {
+        listener.onPaymentConfirmed();
+      }
+    });
+    alertDialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 
       @Override public void onClick(DialogInterface dialog, int which) {
         dialog.dismiss();
