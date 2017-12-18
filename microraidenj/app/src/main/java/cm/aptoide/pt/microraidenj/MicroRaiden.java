@@ -65,7 +65,7 @@ public class MicroRaiden {
     return null;
   }
 
-  void signBalance() {
+  byte[] signBalance() {
     //# Balance message
     //bytes32 balance_message_hash = keccak256(
     //    keccak256('address receiver', 'uint32 block_created', 'uint192 balance', 'address contract'),
@@ -84,7 +84,7 @@ public class MicroRaiden {
             "address contract"));
     String arguments =
         Hex.toHexString(digestKeccak(receiverAddress, openBlockNumber, balance, getAddress()));
-    digestKeccak(argumentSignatures, arguments);
+    return digestKeccak(argumentSignatures, arguments);
   }
 
   private String getAddress() {
