@@ -34,8 +34,6 @@
  */
 package cm.aptoide.pt.ethereumj.util;
 
-import cm.aptoide.pt.ethereumj.util.FastByteComparisons.LexicographicalComparerHolder.PureJavaComparer;
-
 /**
  * Utility code to do optimized byte-array comparison.
  * This is borrowed and slightly modified from Guava's UnsignedBytes
@@ -56,6 +54,7 @@ import cm.aptoide.pt.ethereumj.util.FastByteComparisons.LexicographicalComparerH
    * @param b2 buffer2
    * @param s2 offset2
    * @param l2 length2
+   *
    * @return int
    */
   public static int compareTo(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
@@ -63,7 +62,7 @@ import cm.aptoide.pt.ethereumj.util.FastByteComparisons.LexicographicalComparerH
   }
 
   private static Comparer<byte[]> lexicographicalComparerJavaImpl() {
-    return PureJavaComparer.INSTANCE;
+    return LexicographicalComparerHolder.PureJavaComparer.INSTANCE;
   }
 
   private interface Comparer<T> {
@@ -71,11 +70,10 @@ import cm.aptoide.pt.ethereumj.util.FastByteComparisons.LexicographicalComparerH
   }
 
   /**
-   *
    * <p>Uses reflection to gracefully fall back to the Java implementation if
    * {@code Unsafe} isn't available.
    */
-  private static class LexicographicalComparerHolder {
+  static class LexicographicalComparerHolder {
     static final String UNSAFE_COMPARER_NAME =
         LexicographicalComparerHolder.class.getName() + "$UnsafeComparer";
 
