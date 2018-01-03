@@ -4,7 +4,7 @@ android {
   compileSdkVersion 26
   defaultConfig {
     applicationId "cm.aptoide.pt.microraidenj"
-    minSdkVersion 15
+    minSdkVersion 26
     targetSdkVersion 26
     versionCode 1
     versionName "1.0"
@@ -32,4 +32,6 @@ dependencies {
   annotationProcessor "com.cedarsoftware:java-util:1.34.0" // for deep equals
 
   compile 'com.android.support:multidex:1.0.1'
+
+  compile "org.apache.commons:commons-lang3:3.4"
 }
