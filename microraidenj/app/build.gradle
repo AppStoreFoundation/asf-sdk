@@ -28,6 +28,8 @@ dependencies {
 
   // https://mvnrepository.com/artifact/org.web3j/core
   compile group: 'org.web3j', name: 'core', version: '3.0.1-android'
+  compile "com.cedarsoftware:java-util:1.34.0" // for deep equals
+  annotationProcessor "com.cedarsoftware:java-util:1.34.0" // for deep equals
 
   compile 'com.android.support:multidex:1.0.1'
 }
