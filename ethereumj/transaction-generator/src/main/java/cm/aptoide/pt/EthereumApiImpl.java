@@ -1,6 +1,6 @@
 package cm.aptoide.pt;
 
-import cm.aptoide.pt.dependencies.module.RetrofitModule;
+import cm.aptoide.pt.dependencies.RetrofitModule;
 import cm.aptoide.pt.erc20.Erc20;
 import cm.aptoide.pt.ethereumj.Transaction;
 import cm.aptoide.pt.ethereumj.crypto.ECKey;

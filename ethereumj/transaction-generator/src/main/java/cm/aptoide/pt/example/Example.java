@@ -2,7 +2,7 @@ package cm.aptoide.pt.example;
 
 import cm.aptoide.pt.EthereumApi;
 import cm.aptoide.pt.EthereumApiFactory;
-import cm.aptoide.pt.dependencies.module.RetrofitModule;
+import cm.aptoide.pt.dependencies.RetrofitModule;
 import cm.aptoide.pt.erc20.Erc20Transfer;
 import cm.aptoide.pt.ethereumj.crypto.ECKey;
 import cm.aptoide.pt.ws.ApiFactory;
