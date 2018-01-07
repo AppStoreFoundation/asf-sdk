@@ -1,8 +1,9 @@
-package cm.aptoide.pt.ethereum.erc20;
+package cm.aptoide.pt.ethereum.ethereumj.solidity.contract.erc20;
 
 import cm.aptoide.pt.ethereum.ethereumj.core.CallTransaction.Function;
+import cm.aptoide.pt.ethereum.ethereumj.solidity.contract.Contract;
 
-public class Erc20Transfer implements Erc20 {
+public class Erc20Transfer implements Contract {
 
   private static final String METHOD = "transfer";
 

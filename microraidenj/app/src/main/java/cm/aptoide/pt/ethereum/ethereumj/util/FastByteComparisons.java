@@ -34,8 +34,6 @@
  */
 package cm.aptoide.pt.ethereum.ethereumj.util;
 
-import cm.aptoide.pt.ethereum.ethereumj.util.FastByteComparisons.LexicographicalComparerHolder.PureJavaComparer;
-
 /**
  * Utility code to do optimized byte-array comparison.
  * This is borrowed and slightly modified from Guava's UnsignedBytes
@@ -63,7 +61,7 @@ import cm.aptoide.pt.ethereum.ethereumj.util.FastByteComparisons.Lexicographical
   }
 
   private static Comparer<byte[]> lexicographicalComparerJavaImpl() {
-    return PureJavaComparer.INSTANCE;
+    return LexicographicalComparerHolder.PureJavaComparer.INSTANCE;
   }
 
   private interface Comparer<T> {
