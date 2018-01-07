@@ -12,6 +12,7 @@ import cm.aptoide.pt.ethereum.ws.etherscan.BalanceResponse;
 import cm.aptoide.pt.ethereum.ws.etherscan.EtherscanApi;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
 import org.spongycastle.util.encoders.Hex;
+import org.web3j.abi.datatypes.Address;
 
 public class Example {
 
@@ -48,8 +49,8 @@ public class Example {
         .toBlocking()
         .first();
 
-    TransactionResultResponse call =
-        this.ethereumApi.call((int) nonce, CONTRACT_ADDRESS, new Erc20Transfer(RECEIVER_ADDR, 1),
+    TransactionResultResponse call = this.ethereumApi.call((int) nonce,
+        new Erc20Transfer(new Address(CONTRACT_ADDRESS), RECEIVER_ADDR, 1),
             senderKey, gasPrice, gasLimit)
             .toBlocking()
             .first();

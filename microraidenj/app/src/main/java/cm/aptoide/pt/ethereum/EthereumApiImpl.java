@@ -3,7 +3,7 @@ package cm.aptoide.pt.ethereum;
 import cm.aptoide.pt.ethereum.dependencies.RetrofitModule;
 import cm.aptoide.pt.ethereum.ethereumj.Transaction;
 import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
-import cm.aptoide.pt.ethereum.ethereumj.solidity.contract.Contract;
+import cm.aptoide.pt.ethereum.ethereumj.solidity.contract.DeployedContract;
 import cm.aptoide.pt.ethereum.ws.ApiFactory;
 import cm.aptoide.pt.ethereum.ws.Network;
 import cm.aptoide.pt.ethereum.ws.WebServiceFactory;
@@ -49,12 +49,11 @@ class EthereumApiImpl implements EthereumApi {
     return etherscanApi.sendRawTransaction(rawData);
   }
 
-  @Override public Observable<TransactionResultResponse> call(int nonce, String contractAddress,
-      Contract contract,
+  @Override public Observable<TransactionResultResponse> call(int nonce, DeployedContract contract,
       ECKey ecKey, long gasPrice, long gasLimit) {
-    Transaction transaction =
-        contractTransactionFactory.createTransaction(nonce, contractAddress, contract.encode(), 1,
-            gasPrice, gasLimit);
+    Transaction transaction = contractTransactionFactory.createTransaction(nonce,
+        contract.getAddress()
+            .getValue(), contract.encode(), 1, gasPrice, gasLimit);
     transaction.sign(ecKey);
     return sendRawTransaction(Hex.toHexString(transaction.getEncoded()));
   }
