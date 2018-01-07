@@ -8,7 +8,7 @@ import rx.Observable;
 
 public interface EthereumApi {
 
-  Observable<Long> getCurrentNonce(String address);
+  Observable<Integer> getCurrentNonce(String address);
 
   Observable<TransactionResultResponse> sendRawTransaction(String rawData);
 

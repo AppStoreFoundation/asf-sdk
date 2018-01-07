@@ -9,12 +9,9 @@ import cm.aptoide.pt.ethereum.ws.Network;
 import cm.aptoide.pt.ethereum.ws.WebServiceFactory;
 import cm.aptoide.pt.ethereum.ws.etherscan.BalanceResponse;
 import cm.aptoide.pt.ethereum.ws.etherscan.EtherscanApi;
-import cm.aptoide.pt.ethereum.ws.etherscan.TransactionByHashResponse;
-import cm.aptoide.pt.ethereum.ws.etherscan.TransactionCountResponse;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
 import org.spongycastle.util.encoders.Hex;
 import rx.Observable;
-import rx.functions.Func1;
 
 class EthereumApiImpl implements EthereumApi {
 
@@ -31,18 +28,10 @@ class EthereumApiImpl implements EthereumApi {
     contractTransactionFactory = new ContractTransactionFactory();
   }
 
-  @Override public Observable<Long> getCurrentNonce(String address) {
+  @Override public Observable<Integer> getCurrentNonce(String address) {
     return etherscanApi.getTransactionCount(address)
-        .map(new Func1<TransactionCountResponse, String>() {
-          @Override public String call(TransactionCountResponse transactionCountResponse) {
-            return transactionCountResponse.result;
-          }
-        })
-        .map(new Func1<String, Long>() {
-          @Override public Long call(String s) {
-            return Long.parseLong(HexUtils.fromPrefixString(s), 16);
-          }
-        });
+        .map(transactionCountResponse -> transactionCountResponse.result)
+        .map(result -> Integer.parseInt(HexUtils.fromPrefixString(result), 16));
   }
 
   @Override public Observable<TransactionResultResponse> sendRawTransaction(String rawData) {
@@ -69,10 +58,6 @@ class EthereumApiImpl implements EthereumApi {
 
   @Override public Observable<Boolean> isTransactionAccepted(String txhash) {
     return etherscanApi.getTransactionByHash(txhash)
-        .map(new Func1<TransactionByHashResponse, Boolean>() {
-          @Override public Boolean call(TransactionByHashResponse transactionByHashResponse) {
-            return transactionByHashResponse.result.blockNumber != null;
-          }
-        });
+        .map(transactionByHashResponse -> transactionByHashResponse.result.blockNumber != null);
   }
 }
