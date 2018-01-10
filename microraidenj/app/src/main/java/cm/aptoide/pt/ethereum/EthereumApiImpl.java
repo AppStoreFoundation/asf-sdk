@@ -19,12 +19,15 @@ class EthereumApiImpl implements EthereumApi {
   private final ContractTransactionFactory contractTransactionFactory;
 
   EthereumApiImpl() {
+    this(Network.MAINNET);
+  }
+
+  EthereumApiImpl(Network network) {
     RetrofitModule retrofitModule = new RetrofitModule();
     ApiFactory apiFactory = new ApiFactory(
-        new WebServiceFactory(retrofitModule.provideOkHttpClient(),
-            retrofitModule.provideConverterFactory(),
+        new WebServiceFactory(retrofitModule.provideOkHttpClient(), retrofitModule.provideConverterFactory(),
             retrofitModule.provideRxJavaCallAdapterFactory()));
-    this.etherscanApi = apiFactory.createEtherscanApi(Network.MAINNET);
+    this.etherscanApi = apiFactory.createEtherscanApi(network);
     contractTransactionFactory = new ContractTransactionFactory();
   }
 
