@@ -13,16 +13,16 @@ import org.spongycastle.util.encoders.Hex;
 import org.web3j.abi.datatypes.Address;
 import rx.Observable;
 
-class EthereumApiImpl implements EthereumApi {
+public class EthereumApiImpl implements EthereumApi {
 
   private final EtherscanApi etherscanApi;
   private final ContractTransactionFactory contractTransactionFactory;
 
-  EthereumApiImpl() {
+  public EthereumApiImpl() {
     this(Network.MAINNET);
   }
 
-  EthereumApiImpl(Network network) {
+  public EthereumApiImpl(Network network) {
     RetrofitModule retrofitModule = new RetrofitModule();
     ApiFactory apiFactory = new ApiFactory(
         new WebServiceFactory(retrofitModule.provideOkHttpClient(), retrofitModule.provideConverterFactory(),

@@ -1,7 +1,7 @@
 package cm.aptoide.pt.ethereum.example;
 
 import cm.aptoide.pt.ethereum.EthereumApi;
-import cm.aptoide.pt.ethereum.EthereumApiFactory;
+import cm.aptoide.pt.ethereum.EthereumApiImpl;
 import cm.aptoide.pt.ethereum.dependencies.RetrofitModule;
 import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
 import cm.aptoide.pt.ethereum.ethereumj.solidity.contract.erc20.Erc20Transfer;
@@ -25,7 +25,7 @@ public class Example {
   private final EthereumApi ethereumApi;
 
   public Example() {
-    this.ethereumApi = EthereumApiFactory.createEthereumApi();
+    this.ethereumApi = new EthereumApiImpl();
   }
 
   public static void main(String[] args) {
