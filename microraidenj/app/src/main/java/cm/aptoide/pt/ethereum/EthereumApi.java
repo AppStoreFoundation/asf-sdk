@@ -1,9 +1,9 @@
 package cm.aptoide.pt.ethereum;
 
 import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
-import cm.aptoide.pt.ethereum.ethereumj.solidity.contract.DeployedContract;
 import cm.aptoide.pt.ethereum.ws.etherscan.BalanceResponse;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
+import org.web3j.abi.datatypes.Address;
 import rx.Observable;
 
 public interface EthereumApi {
@@ -12,8 +12,8 @@ public interface EthereumApi {
 
   Observable<TransactionResultResponse> sendRawTransaction(String rawData);
 
-  Observable<TransactionResultResponse> call(int nonce, DeployedContract contract, ECKey ecKey,
-      long gasPrice, long gasLimit);
+  Observable<TransactionResultResponse> call(int nonce, ECKey ecKey, long gasPrice, long gasLimit,
+      Address contractAddress, byte[] data);
 
   Observable<BalanceResponse> getBalance(String address);
 

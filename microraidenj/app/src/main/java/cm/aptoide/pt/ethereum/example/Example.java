@@ -49,9 +49,10 @@ public class Example {
         .toBlocking()
         .first();
 
-    TransactionResultResponse call = this.ethereumApi.call((int) nonce,
-        new Erc20Transfer(new Address(CONTRACT_ADDRESS), RECEIVER_ADDR, 1),
-            senderKey, gasPrice, gasLimit)
+    Erc20Transfer contract = new Erc20Transfer(new Address(CONTRACT_ADDRESS), RECEIVER_ADDR, 1);
+    TransactionResultResponse call =
+        this.ethereumApi.call((int) nonce, senderKey, gasPrice, gasLimit, contract.getAddress(),
+            contract.encode())
             .toBlocking()
             .first();
 
