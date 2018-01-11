@@ -37,8 +37,8 @@ public class EthereumApiImpl implements EthereumApi {
         .map(result -> Integer.parseInt(HexUtils.fromPrefixString(result), 16));
   }
 
-  @Override public Observable<TransactionResultResponse> sendRawTransaction(String rawData) {
-    return etherscanApi.sendRawTransaction(rawData);
+  @Override public Observable<TransactionResultResponse> sendRawTransaction(byte[] rawData) {
+    return etherscanApi.sendRawTransaction(Hex.toHexString(rawData));
   }
 
   @Override public Observable<TransactionResultResponse> call(int nonce, ECKey ecKey, long gasPrice,
@@ -48,7 +48,7 @@ public class EthereumApiImpl implements EthereumApi {
             .substring(2, contractAddress.getValue()
                 .length()), data, 4, gasPrice, gasLimit);
     transaction.sign(ecKey);
-    return sendRawTransaction(Hex.toHexString(transaction.getEncoded()));
+    return sendRawTransaction(transaction.getEncoded());
   }
 
   @Override public Observable<BalanceResponse> getBalance(String address) {

@@ -10,7 +10,7 @@ public interface EthereumApi {
 
   Observable<Integer> getCurrentNonce(String address);
 
-  Observable<TransactionResultResponse> sendRawTransaction(String rawData);
+  Observable<TransactionResultResponse> sendRawTransaction(byte[] rawData);
 
   Observable<TransactionResultResponse> call(int nonce, ECKey ecKey, long gasPrice, long gasLimit,
       Address contractAddress, byte[] data);
