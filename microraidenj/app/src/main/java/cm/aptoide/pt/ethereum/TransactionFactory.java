@@ -18,4 +18,12 @@ public class TransactionFactory {
         HexUtils.decode(receiverAddr), HexUtils.decode(Long.toHexString(value)), data,
         chainIdForNextBlock);
   }
+
+  public Transaction createTransaction(int nonce, String receiverAddr, int value,
+      int chainIdForNextBlock, long gasPrice, long gasLimit) {
+    return this.createTransaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
+        ByteUtil.longToBytesNoLeadZeroes(gasPrice), ByteUtil.longToBytesNoLeadZeroes(gasLimit),
+        HexUtils.decode(receiverAddr), HexUtils.decode(Long.toHexString(value)), new byte[0],
+        chainIdForNextBlock);
+  }
 }
