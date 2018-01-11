@@ -43,9 +43,10 @@ public class EthereumApiImpl implements EthereumApi {
 
   @Override public Observable<TransactionResultResponse> call(int nonce, ECKey ecKey, long gasPrice,
       long gasLimit, Address contractAddress, byte[] data) {
-    Transaction transaction =
-        contractTransactionFactory.createTransaction(nonce, contractAddress.getValue(), data, 1,
-            gasPrice, gasLimit);
+    Transaction transaction = contractTransactionFactory.createTransaction(nonce,
+        contractAddress.getValue()
+            .substring(2, contractAddress.getValue()
+                .length()), data, 4, gasPrice, gasLimit);
     transaction.sign(ecKey);
     return sendRawTransaction(Hex.toHexString(transaction.getEncoded()));
   }
