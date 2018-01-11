@@ -11,7 +11,6 @@ public class ApiFactory {
   }
 
   public EtherscanApi createEtherscanApi(Network network) {
-    return webServiceFactory.createWebService(Api.Etherscan.getEndpoint(network),
-        EtherscanApi.class);
+    return webServiceFactory.createWebService(network.getHost(), EtherscanApi.class);
   }
 }
