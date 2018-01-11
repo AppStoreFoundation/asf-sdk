@@ -49,10 +49,10 @@ public class ChannelManager {
   }
 
   private byte[] encodeCreateChannelMethod(Address receiver, Uint192 deposit) {
-    return createChannelFunction.encode(receiver, deposit);
+    return createChannelFunction.encode(receiver.getValue(), deposit.getValue());
   }
 
   private void waitForChannelCreation() {
-    // TODO: 06-01-2018 neuro 
+    // TODO: 06-01-2018 neuro
   }
 }
