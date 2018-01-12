@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import cm.aptoide.pt.ethereum.dependencies.RetrofitModule;
 import cm.aptoide.pt.ethereum.ethereumj.Transaction;
 import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
+import cm.aptoide.pt.ethereum.ethereumj.util.ByteUtil;
 import cm.aptoide.pt.ethereum.ws.ApiFactory;
 import cm.aptoide.pt.ethereum.ws.Network;
 import cm.aptoide.pt.ethereum.ws.WebServiceFactory;
@@ -11,6 +12,7 @@ import cm.aptoide.pt.ethereum.ws.etherscan.BalanceResponse;
 import cm.aptoide.pt.ethereum.ws.etherscan.EtherscanApi;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import org.spongycastle.util.encoders.Hex;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.utils.Convert.Unit;
@@ -20,7 +22,6 @@ public class EthereumApiImpl implements EthereumApi {
 
   private final EtherscanApi etherscanApi;
   private final ContractTransactionFactory contractTransactionFactory;
-  private final TransactionFactory transactionFactory;
 
   public EthereumApiImpl() {
     this(Network.MAINNET);
@@ -34,7 +35,6 @@ public class EthereumApiImpl implements EthereumApi {
             retrofitModule.provideRxJavaCallAdapterFactory()));
     this.etherscanApi = apiFactory.createEtherscanApi(network);
     this.contractTransactionFactory = new ContractTransactionFactory();
-    this.transactionFactory = new TransactionFactory();
   }
 
   @Override public Observable<Integer> getCurrentNonce(String address) {
@@ -73,8 +73,9 @@ public class EthereumApiImpl implements EthereumApi {
   @Override public Observable<TransactionResultResponse> send(Address receiver, BigDecimal amount,
       ECKey ecKey, long gasPrice, long gasLimit) {
     return getCurrentNonce(Hex.toHexString(ecKey.getAddress())).map(
-        nonce -> transactionFactory.createTransaction(nonce, preProcessAddress(receiver),
-            etherToWei(amount), 4, gasPrice, gasLimit))
+        nonce -> contractTransactionFactory.createTransaction(nonce, preProcessAddress(receiver),
+            ByteUtil.EMPTY_BYTE_ARRAY, 4, gasPrice, gasLimit))
+        .doOnNext(transaction -> transaction.sign(ecKey))
         .flatMap(transaction -> etherscanApi.sendRawTransaction(
             Hex.toHexString(transaction.getEncoded())));
   }
@@ -86,7 +87,7 @@ public class EthereumApiImpl implements EthereumApi {
   }
 
   private long etherToWei(BigDecimal amount) {
-    return amount.multiply(Unit.ETHER.getWeiFactor())
-        .longValue();
+    return amount.multiply(Unit.ETHER.getWeiFactor(), MathContext.DECIMAL128)
+        .longValueExact();
   }
 }
