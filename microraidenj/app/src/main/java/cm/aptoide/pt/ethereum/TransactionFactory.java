@@ -11,7 +11,7 @@ public class TransactionFactory {
         chainIdForNextBlock);
   }
 
-  public Transaction createTransaction(int nonce, String receiverAddr, int value, byte[] data,
+  public Transaction createTransaction(int nonce, String receiverAddr, long value, byte[] data,
       int chainIdForNextBlock, long gasPrice, long gasLimit) {
     return this.createTransaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
         ByteUtil.longToBytesNoLeadZeroes(gasPrice), ByteUtil.longToBytesNoLeadZeroes(gasLimit),
@@ -19,7 +19,7 @@ public class TransactionFactory {
         chainIdForNextBlock);
   }
 
-  public Transaction createTransaction(int nonce, String receiverAddr, int value,
+  public Transaction createTransaction(int nonce, String receiverAddr, long value,
       int chainIdForNextBlock, long gasPrice, long gasLimit) {
     return this.createTransaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
         ByteUtil.longToBytesNoLeadZeroes(gasPrice), ByteUtil.longToBytesNoLeadZeroes(gasLimit),

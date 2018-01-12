@@ -11,7 +11,6 @@ import cm.aptoide.pt.ethereum.ws.etherscan.BalanceResponse;
 import cm.aptoide.pt.ethereum.ws.etherscan.EtherscanApi;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import org.spongycastle.util.encoders.Hex;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.utils.Convert.Unit;
@@ -86,9 +85,8 @@ public class EthereumApiImpl implements EthereumApi {
             .length());
   }
 
-  private int etherToWei(BigDecimal amount) {
-    return amount.divide(BigDecimal.TEN.pow(Unit.ETHER.getWeiFactor()
-        .intValue()), RoundingMode.HALF_UP)
-        .intValue();
+  private long etherToWei(BigDecimal amount) {
+    return amount.multiply(Unit.ETHER.getWeiFactor())
+        .longValue();
   }
 }
