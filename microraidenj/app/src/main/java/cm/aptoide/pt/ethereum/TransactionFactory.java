@@ -2,6 +2,9 @@ package cm.aptoide.pt.ethereum;
 
 import cm.aptoide.pt.ethereum.ethereumj.Transaction;
 import cm.aptoide.pt.ethereum.ethereumj.util.ByteUtil;
+import org.spongycastle.util.encoders.Hex;
+
+import static cm.aptoide.pt.ethereum.ethereumj.util.ByteUtil.longToBytesNoLeadZeroes;
 
 public class TransactionFactory {
 
@@ -11,19 +14,23 @@ public class TransactionFactory {
         chainIdForNextBlock);
   }
 
-  public Transaction createTransaction(int nonce, String receiverAddr, long value, byte[] data,
-      int chainIdForNextBlock, long gasPrice, long gasLimit) {
-    return this.createTransaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
-        ByteUtil.longToBytesNoLeadZeroes(gasPrice), ByteUtil.longToBytesNoLeadZeroes(gasLimit),
-        HexUtils.decode(receiverAddr), HexUtils.decode(Long.toHexString(value)), data,
-        chainIdForNextBlock);
+  public Transaction createTransaction(long nonce, long gasPrice, long gasLimit, String toAddress,
+      long value, byte[] data, int chainId) {
+    Transaction tx =
+        new Transaction(longToBytesNoLeadZeroes(nonce), longToBytesNoLeadZeroes(gasPrice),
+            longToBytesNoLeadZeroes(gasLimit), toAddress == null ? null : Hex.decode(toAddress),
+            longToBytesNoLeadZeroes(value), data, chainId);
+    return tx;
   }
 
-  public Transaction createTransaction(int nonce, String receiverAddr, long value,
-      int chainIdForNextBlock, long gasPrice, long gasLimit) {
-    return this.createTransaction(ByteUtil.intToBytesNoLeadZeroes(nonce),
-        ByteUtil.longToBytesNoLeadZeroes(gasPrice), ByteUtil.longToBytesNoLeadZeroes(gasLimit),
-        HexUtils.decode(receiverAddr), HexUtils.decode(Long.toHexString(value)), new byte[0],
-        chainIdForNextBlock);
+  public Transaction createTransaction(int nonce, String receiverAddr, long value, byte[] data,
+      long gasPrice, long gasLimit, int chainId) {
+    return this.createTransaction(nonce, gasPrice, gasLimit, receiverAddr, value, data, chainId);
+  }
+
+  public Transaction createTransaction(int nonce, String receiverAddr, long value, long gasPrice,
+      long gasLimit, int chainId) {
+    return this.createTransaction(nonce, gasPrice, gasLimit, receiverAddr, value,
+        ByteUtil.EMPTY_BYTE_ARRAY, chainId);
   }
 }

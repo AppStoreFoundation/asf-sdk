@@ -13,6 +13,6 @@ public class ContractTransactionFactory {
   public Transaction createTransaction(int nonce, String contractAddress, byte[] encodedCall,
       int chainIdForNextBlock, long gasPrice, long gasLimit) {
     return this.transactionFactory.createTransaction(nonce, contractAddress, 0, encodedCall,
-        chainIdForNextBlock, gasPrice, gasLimit);
+        gasPrice, gasLimit, chainIdForNextBlock);
   }
 }
