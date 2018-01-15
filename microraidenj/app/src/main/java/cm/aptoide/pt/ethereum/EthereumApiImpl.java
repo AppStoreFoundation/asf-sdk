@@ -22,12 +22,14 @@ public class EthereumApiImpl implements EthereumApi {
 
   private final EtherscanApi etherscanApi;
   private final ContractTransactionFactory contractTransactionFactory;
+  private final Network network;
 
   public EthereumApiImpl() {
     this(Network.MAINNET);
   }
 
   public EthereumApiImpl(Network network) {
+    this.network = network;
     RetrofitModule retrofitModule = new RetrofitModule();
     ApiFactory apiFactory = new ApiFactory(
         new WebServiceFactory(retrofitModule.provideOkHttpClient(),
@@ -51,7 +53,7 @@ public class EthereumApiImpl implements EthereumApi {
       long gasLimit, Address contractAddress, byte[] data) {
     Transaction transaction =
         contractTransactionFactory.createTransaction(nonce, preProcessAddress(contractAddress),
-            data, 4, gasPrice, gasLimit);
+            data, network.getNetworkId(), gasPrice, gasLimit);
     transaction.sign(ecKey);
     return sendRawTransaction(transaction.getEncoded());
   }
@@ -74,7 +76,7 @@ public class EthereumApiImpl implements EthereumApi {
       ECKey ecKey, long gasPrice, long gasLimit) {
     return getCurrentNonce(Hex.toHexString(ecKey.getAddress())).map(
         nonce -> contractTransactionFactory.createTransaction(nonce, preProcessAddress(receiver),
-            ByteUtil.EMPTY_BYTE_ARRAY, 4, gasPrice, gasLimit))
+            ByteUtil.EMPTY_BYTE_ARRAY, network.getNetworkId(), gasPrice, gasLimit))
         .doOnNext(transaction -> transaction.sign(ecKey))
         .flatMap(transaction -> etherscanApi.sendRawTransaction(
             Hex.toHexString(transaction.getEncoded())));
