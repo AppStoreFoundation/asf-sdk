@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import cm.aptoide.pt.ethereum.dependencies.RetrofitModule;
 import cm.aptoide.pt.ethereum.ethereumj.Transaction;
 import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
-import cm.aptoide.pt.ethereum.ethereumj.util.ByteUtil;
 import cm.aptoide.pt.ethereum.ws.ApiFactory;
 import cm.aptoide.pt.ethereum.ws.Network;
 import cm.aptoide.pt.ethereum.ws.WebServiceFactory;
@@ -23,6 +22,7 @@ public class EthereumApiImpl implements EthereumApi {
   private final EtherscanApi etherscanApi;
   private final ContractTransactionFactory contractTransactionFactory;
   private final Network network;
+  private final TransactionFactory transactionFactory;
 
   public EthereumApiImpl() {
     this(Network.MAINNET);
@@ -36,6 +36,7 @@ public class EthereumApiImpl implements EthereumApi {
             retrofitModule.provideConverterFactory(),
             retrofitModule.provideRxJavaCallAdapterFactory()));
     this.etherscanApi = apiFactory.createEtherscanApi(network);
+    this.transactionFactory = new TransactionFactory();
     this.contractTransactionFactory = new ContractTransactionFactory();
   }
 
@@ -75,8 +76,8 @@ public class EthereumApiImpl implements EthereumApi {
   @Override public Observable<TransactionResultResponse> send(Address receiver, BigDecimal amount,
       ECKey ecKey, long gasPrice, long gasLimit) {
     return getCurrentNonce(Hex.toHexString(ecKey.getAddress())).map(
-        nonce -> contractTransactionFactory.createTransaction(nonce, preProcessAddress(receiver),
-            ByteUtil.EMPTY_BYTE_ARRAY, network.getNetworkId(), gasPrice, gasLimit))
+        nonce -> transactionFactory.createTransaction(nonce, preProcessAddress(receiver),
+            etherToWei(amount), gasPrice, gasLimit, network.getNetworkId()))
         .doOnNext(transaction -> transaction.sign(ecKey))
         .flatMap(transaction -> etherscanApi.sendRawTransaction(
             Hex.toHexString(transaction.getEncoded())));
