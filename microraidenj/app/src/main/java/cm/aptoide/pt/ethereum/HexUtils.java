@@ -15,7 +15,7 @@ public class HexUtils {
     }
 
     if (s.length() % 2 != 0) {
-      s = " " + s;
+      s = '0' + s;
     }
 
     return Hex.decode(s);
