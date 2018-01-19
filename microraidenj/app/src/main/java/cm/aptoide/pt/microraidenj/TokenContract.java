@@ -1,6 +1,7 @@
 package cm.aptoide.pt.microraidenj;
 
 import cm.aptoide.pt.ethereum.EthereumApi;
+import cm.aptoide.pt.ethereum.HexUtils;
 import cm.aptoide.pt.ethereum.ethereumj.core.CallTransaction.Function;
 import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
@@ -36,9 +37,7 @@ public class TokenContract {
 
   public boolean transfer(ECKey ecKey, Address receiver, Uint256 value) {
     byte[] sender = ecKey.getAddress();
-    byte[] receiverBytes = Hex.decode(receiver.getValue()
-        .substring(2, receiver.getValue()
-            .length()));
+    byte[] receiverBytes = Hex.decode(HexUtils.fromPrefixString(receiver.getValue()));
 
     return transfer(ecKey, receiver, value, buildTransferDataField(sender, receiverBytes));
   }
@@ -59,9 +58,7 @@ public class TokenContract {
 
   public boolean topUp(ECKey ecKey, Address receiver, Uint256 value, int blockNumber) {
     byte[] sender = ecKey.getAddress();
-    byte[] receiverBytes = Hex.decode(receiver.getValue()
-        .substring(2, receiver.getValue()
-            .length()));
+    byte[] receiverBytes = Hex.decode(HexUtils.fromPrefixString(receiver.getValue()));
 
     return transfer(ecKey, receiver, value,
         buildTopUpDataField(sender, receiverBytes, blockNumber));

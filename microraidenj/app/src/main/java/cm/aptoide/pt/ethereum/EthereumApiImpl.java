@@ -84,9 +84,7 @@ public class EthereumApiImpl implements EthereumApi {
   }
 
   @NonNull private String preProcessAddress(Address contractAddress) {
-    return contractAddress.getValue()
-        .substring(2, contractAddress.getValue()
-            .length());
+    return HexUtils.fromPrefixString(contractAddress.getValue());
   }
 
   private long etherToWei(BigDecimal amount) {

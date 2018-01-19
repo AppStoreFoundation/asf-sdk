@@ -5,7 +5,7 @@ import org.spongycastle.util.encoders.Hex;
 
 public class HexUtils {
 
-  static String fromPrefixString(String hexWithPrefix) {
+  public static String fromPrefixString(String hexWithPrefix) {
     return hexWithPrefix.substring(2, hexWithPrefix.length());
   }
 
