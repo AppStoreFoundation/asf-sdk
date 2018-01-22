@@ -4,10 +4,13 @@ import cm.aptoide.pt.ethereum.EthereumApi;
 import cm.aptoide.pt.ethereum.EthereumApiImpl;
 import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
 import cm.aptoide.pt.ethereum.ws.Network;
+import cm.aptoide.pt.microraidenj.ChannelManager;
 import cm.aptoide.pt.microraidenj.TokenContract;
 import org.spongycastle.util.encoders.Hex;
 import org.web3j.abi.datatypes.Address;
+import org.web3j.abi.datatypes.generated.Uint192;
 import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.abi.datatypes.generated.Uint32;
 import org.web3j.utils.Convert.Unit;
 
 import static cm.aptoide.pt.ethereumj.Asadsaddsaad.DESTINATION_WALLET;
@@ -34,7 +37,7 @@ public class CreateChannelExample {
   public static final long GAS_PRICE = 50 * Unit.GWEI.getWeiFactor()
       .longValue();
   public static final long GAS_LIMIT = 200_000;
-
+  private static final int OPEN_BLOCK_NUMBER = 5509612;
   private final TokenContract tokenContract;
 
   public CreateChannelExample(TokenContract tokenContract) {
@@ -47,9 +50,14 @@ public class CreateChannelExample {
     TokenContract tokenContract =
         new TokenContract(TOKEN_ADDRESS, CHANNEL_MANAGER_ADDRESS, ethereumApi);
     CreateChannelExample createChannelExample = new CreateChannelExample(tokenContract);
+    ChannelManager channelManager =
+        new ChannelManager(GAS_PRICE, GAS_LIMIT, CHANNEL_MANAGER_ADDRESS, ethereumApi);
 
     createChannelExample.createChannel();
     createChannelExample.topUpChannel();
+
+    channelManager.uncooperativeClose(ecKey, RECEIVER_ADDRESS, new Uint32(OPEN_BLOCK_NUMBER),
+        new Uint192(0));
   }
 
   public void createChannel() throws Exception {
@@ -57,6 +65,6 @@ public class CreateChannelExample {
   }
 
   public void topUpChannel() throws Exception {
-    tokenContract.topUp(ecKey, RECEIVER_ADDRESS, new Uint256(2), 5509612);
+    tokenContract.topUp(ecKey, RECEIVER_ADDRESS, new Uint256(2), OPEN_BLOCK_NUMBER);
   }
 }
