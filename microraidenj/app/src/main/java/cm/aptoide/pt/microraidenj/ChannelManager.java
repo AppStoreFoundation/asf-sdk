@@ -18,6 +18,8 @@ public class ChannelManager {
       Function.fromSignature("createChannel", "address", "uint192");
   private static final Function uncooperativeCloseFunction =
       Function.fromSignature("uncooperativeClose", "address", "uint32", "uint192");
+  private static final Function settleFunction =
+      Function.fromSignature("settle", "address", "uint32");
 
   private final long gasPrice;
   private final long gasLimit;
@@ -34,6 +36,10 @@ public class ChannelManager {
 
   private byte[] encodeCreateChannelMethod(Address receiver, Uint192 deposit) {
     return createChannelFunction.encode(receiver.getValue(), deposit.getValue());
+  }
+
+  private byte[] settleMethod(Address receiver, Uint32 openBlockNumber) {
+    return settleFunction.encode(receiver.getValue(), openBlockNumber.getValue());
   }
 
   private void waitForChannelCreation() {
@@ -53,6 +59,18 @@ public class ChannelManager {
     TransactionResultResponse first = ethereumApi.getCurrentNonce(senderAddress)
         .flatMap(nonce -> ethereumApi.call(nonce, ecKey, gasPrice, gasLimit, contractAddress,
             encodeUncooperativeCloseMethod(receiverAddress, openBlockNumber, balance)))
+        .toBlocking()
+        .first();
+
+    System.out.println(first);
+  }
+
+  public void settle(ECKey ecKey, Address receiverAddress, Uint32 openBlockNumber) {
+    String senderAddress = Hex.toHexString(ecKey.getAddress());
+
+    TransactionResultResponse first = ethereumApi.getCurrentNonce(senderAddress)
+        .flatMap(nonce -> ethereumApi.call(nonce, ecKey, gasPrice, gasLimit, contractAddress,
+            settleMethod(receiverAddress, openBlockNumber)))
         .toBlocking()
         .first();
 

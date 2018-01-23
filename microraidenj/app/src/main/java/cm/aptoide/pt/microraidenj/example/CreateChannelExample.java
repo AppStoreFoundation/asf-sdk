@@ -58,6 +58,7 @@ public class CreateChannelExample {
 
     channelManager.uncooperativeClose(ecKey, RECEIVER_ADDRESS, new Uint32(OPEN_BLOCK_NUMBER),
         new Uint192(0));
+    channelManager.settle(ecKey, RECEIVER_ADDRESS, new Uint32(OPEN_BLOCK_NUMBER));
   }
 
   public void createChannel() throws Exception {
