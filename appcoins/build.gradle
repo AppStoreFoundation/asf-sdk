@@ -35,7 +35,7 @@ buildscript {
 // build.gradle file cause Android is special...
 configure(allprojects - project("microraidenj-android")) {
   apply plugin: "idea"
-  apply plugin: "java"
+  apply plugin: 'java-library'
 
   compileJava.options.encoding = 'UTF-8'
 
@@ -55,5 +55,9 @@ configure(allprojects - project("microraidenj-android")) {
     optional
     compile.extendsFrom optional
     deployerJar
+  }
+
+  dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
   }
 }
