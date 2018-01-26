@@ -13,7 +13,7 @@ allprojects {
   repositories {
     mavenCentral()
     jcenter()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    google()
   }
 }
 
@@ -22,23 +22,22 @@ buildscript {
     mavenCentral()
     jcenter()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    google()
   }
 
   dependencies {
-    // Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
-    // Version 4.4.10 has a known bug
-    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.4.12"
+    classpath 'com.android.tools.build:gradle:3.0.1'
   }
 }
 
 // apply the following to all projects, except the
 // Android test project, that one has its own
 // build.gradle file cause Android is special...
-configure(allprojects) {
+configure(allprojects - project("microraidenj-android")) {
   apply plugin: "idea"
   apply plugin: "java"
 
-  compileJava.options.encoding = 'UTF-8';
+  compileJava.options.encoding = 'UTF-8'
 
   repositories {
     mavenCentral()
