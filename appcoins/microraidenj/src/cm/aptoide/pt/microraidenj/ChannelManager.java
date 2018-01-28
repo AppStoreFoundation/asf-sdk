@@ -1,9 +1,9 @@
 package cm.aptoide.pt.microraidenj;
 
 import cm.aptoide.pt.ethereum.EthereumApi;
-import cm.aptoide.pt.ethereum.ethereumj.core.CallTransaction.Function;
-import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
+import cm.aptoide.pt.ethereumj.core.CallTransaction.Function;
+import cm.aptoide.pt.ethereumj.crypto.ECKey;
 import org.spongycastle.util.encoders.Hex;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.generated.Uint192;
@@ -57,7 +57,8 @@ public class ChannelManager {
     String senderAddress = Hex.toHexString(ecKey.getAddress());
 
     TransactionResultResponse first = ethereumApi.getCurrentNonce(senderAddress)
-        .flatMap(nonce -> ethereumApi.call(nonce, ecKey, gasPrice, gasLimit, contractAddress,
+        .flatMap(nonce -> ethereumApi.call(Math.toIntExact(nonce), ecKey, gasPrice, gasLimit,
+            contractAddress,
             encodeUncooperativeCloseMethod(receiverAddress, openBlockNumber, balance)))
         .toBlocking()
         .first();
@@ -69,8 +70,8 @@ public class ChannelManager {
     String senderAddress = Hex.toHexString(ecKey.getAddress());
 
     TransactionResultResponse first = ethereumApi.getCurrentNonce(senderAddress)
-        .flatMap(nonce -> ethereumApi.call(nonce, ecKey, gasPrice, gasLimit, contractAddress,
-            settleMethod(receiverAddress, openBlockNumber)))
+        .flatMap(nonce -> ethereumApi.call(Math.toIntExact(nonce), ecKey, gasPrice, gasLimit,
+            contractAddress, settleMethod(receiverAddress, openBlockNumber)))
         .toBlocking()
         .first();
 

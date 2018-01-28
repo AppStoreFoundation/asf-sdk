@@ -1,6 +1,6 @@
 package cm.aptoide.pt.microraidenj;
 
-import android.support.annotation.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * MicroRaiden.channel data structure

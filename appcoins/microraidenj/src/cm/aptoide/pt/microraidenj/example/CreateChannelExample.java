@@ -1,9 +1,9 @@
 package cm.aptoide.pt.microraidenj.example;
 
 import cm.aptoide.pt.ethereum.EthereumApi;
-import cm.aptoide.pt.ethereum.EthereumApiImpl;
-import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
+import cm.aptoide.pt.ethereum.EthereumApiFactory;
 import cm.aptoide.pt.ethereum.ws.Network;
+import cm.aptoide.pt.ethereumj.crypto.ECKey;
 import cm.aptoide.pt.microraidenj.ChannelManager;
 import cm.aptoide.pt.microraidenj.TokenContract;
 import org.spongycastle.util.encoders.Hex;
@@ -13,7 +13,7 @@ import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.abi.datatypes.generated.Uint32;
 import org.web3j.utils.Convert.Unit;
 
-import static cm.aptoide.pt.ethereumj.Asadsaddsaad.DESTINATION_WALLET;
+import static cm.aptoide.pt.ethereumj.WorkInProgress.DESTINATION_WALLET;
 
 /**
  * Created by neuro on 22-01-2018.
@@ -46,7 +46,7 @@ public class CreateChannelExample {
 
   public static void main(String[] args) throws Exception {
 
-    EthereumApi ethereumApi = new EthereumApiImpl(Network.KOVAN);
+    EthereumApi ethereumApi = EthereumApiFactory.createEthereumApi(Network.ROPSTEN);
     TokenContract tokenContract =
         new TokenContract(TOKEN_ADDRESS, CHANNEL_MANAGER_ADDRESS, ethereumApi);
     CreateChannelExample createChannelExample = new CreateChannelExample(tokenContract);

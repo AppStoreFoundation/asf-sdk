@@ -1,9 +1,9 @@
 package cm.aptoide.pt.ethereumj;
 
 import cm.aptoide.pt.ethereum.EthereumApi;
-import cm.aptoide.pt.ethereum.EthereumApiImpl;
-import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
+import cm.aptoide.pt.ethereum.EthereumApiFactory;
 import cm.aptoide.pt.ethereum.ws.Network;
+import cm.aptoide.pt.ethereumj.crypto.ECKey;
 import cm.aptoide.pt.microraidenj.ChannelManager;
 import cm.aptoide.pt.microraidenj.TokenContract;
 import org.spongycastle.util.encoders.Hex;
@@ -31,33 +31,34 @@ public class WorkInProgress {
   public static final ECKey ecKey = ECKey.fromPrivate(
       Hex.decode("0808fb96be6e847aec8e71542d84fc9b51a4c9237a0b8f0f12c8dfdab16aef37"));
 
-  public static final long GAS_PRICE = 50 * Unit.GWEI.getWeiFactor().longValue();
+  public static final long GAS_PRICE = 50 * Unit.GWEI.getWeiFactor()
+      .longValue();
   public static final long GAS_LIMIT = 200_000_0;
 
   private static ChannelManager channelManager;
   private static TokenContract tokenContract;
+  private static EthereumApi ethereumApi;
 
   public static void main(String[] args) throws Exception {
     initClass();
   }
 
   /**
-   * mas olha se te der jeito eu nao me importo de passar algures, se nao fica para amanha se lá chegar lo0l
+   * mas olha se te der jeito eu nao me importo de passar algures, se nao fica para amanha se lá
+   * chegar lo0l
+   *
    * @throws Exception
    */
   public static void initClass() throws Exception {
-    EthereumApi ethereumApi = new EthereumApiImpl(Network.ROPSTEN);
+    ethereumApi = EthereumApiFactory.createEthereumApi(Network.ROPSTEN);
     channelManager = new ChannelManager(GAS_PRICE, GAS_LIMIT, CHANNEL_MANAGER_ADDRESS, ethereumApi);
     tokenContract = new TokenContract(TOKEN_ADDRESS, CHANNEL_MANAGER_ADDRESS, ethereumApi);
     //ethereumApi.send(DESTINATION_WALLET, BigDecimal.valueOf(0.001), ecKey, GAS_PRICE, GAS_LIMIT)
     //    .subscribe(transactionResultResponse -> System.out.println(transactionResultResponse),
     //        Throwable::printStackTrace);
-
-    new Asadsaddsaad().createChannel();
   }
 
   public void createChannel() throws Exception {
-    EthereumApi ethereumApi = new EthereumApiImpl(Network.ROPSTEN);
     ECKey ecKey = ECKey.fromPrivate(
         Hex.decode("0808fb96be6e847aec8e71542d84fc9b51a4c9237a0b8f0f12c8dfdab16aef37"));
     //channelManager.createChannel(ecKey, DESTINATION_WALLET, new Uint192(1));

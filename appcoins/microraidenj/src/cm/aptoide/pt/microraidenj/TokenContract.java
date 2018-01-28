@@ -2,9 +2,9 @@ package cm.aptoide.pt.microraidenj;
 
 import cm.aptoide.pt.ethereum.EthereumApi;
 import cm.aptoide.pt.ethereum.HexUtils;
-import cm.aptoide.pt.ethereum.ethereumj.core.CallTransaction.Function;
-import cm.aptoide.pt.ethereum.ethereumj.crypto.ECKey;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
+import cm.aptoide.pt.ethereumj.core.CallTransaction.Function;
+import cm.aptoide.pt.ethereumj.crypto.ECKey;
 import org.spongycastle.util.encoders.Hex;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.generated.Uint256;
@@ -45,11 +45,14 @@ public class TokenContract {
   private boolean transfer(ECKey ecKey, Address receiver, Uint256 value, byte[] data) {
     transferFunction.encode(receiver.getValue(), value.getValue(), data);
 
-    TransactionResultResponse response = ethereumApi.getCurrentNonce(Hex.toHexString(ecKey.getAddress()))
-        .flatMap(nonce -> ethereumApi.call(nonce, ecKey, GAS_PRICE, GAS_LIMIT, tokenAddress,
-            transferFunction.encode(channelManagerContractAddress.getValue(), value.getValue(), data)))
-        .toBlocking()
-        .first();
+    TransactionResultResponse response =
+        ethereumApi.getCurrentNonce(Hex.toHexString(ecKey.getAddress()))
+            .flatMap(nonce -> ethereumApi.call(Math.toIntExact(nonce), ecKey, GAS_PRICE, GAS_LIMIT,
+                tokenAddress,
+                transferFunction.encode(channelManagerContractAddress.getValue(), value.getValue(),
+                    data)))
+            .toBlocking()
+            .first();
 
     System.out.println(TAG + " transfer returned: " + response);
 

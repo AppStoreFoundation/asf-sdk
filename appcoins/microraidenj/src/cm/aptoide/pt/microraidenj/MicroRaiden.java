@@ -1,42 +1,38 @@
 package cm.aptoide.pt.microraidenj;
 
-import android.support.annotation.Nullable;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import javax.annotation.Nullable;
 import org.spongycastle.jcajce.provider.digest.Keccak.Digest256;
 import org.spongycastle.util.encoders.Hex;
-import org.web3j.protocol.Web3j;
 
 public class MicroRaiden {
 
   public static final String MY_ADDRESS = "0x";
   private static final String TAG = MicroRaiden.class.getSimpleName();
 
-  private final Web3j web3;
   private final MicroChannel microChannel;
 
-  public MicroRaiden(Web3j web3, MicroChannel microChannel) {
-    this.web3 = web3;
+  public MicroRaiden(MicroChannel microChannel) {
     this.microChannel = microChannel;
   }
 
-  private String signMessage(String msg) {
-    if (!microChannel.isValid()) {
-      throw new IllegalStateException("No valid channelInfo");
-    }
-    byte[] hex = Utils.encodeHex(msg);
-    System.out.println("Signing " + msg);
-
-    try {
-      return web3.ethSign(MY_ADDRESS, Utils.sha3Hash(hex))
-          .send()
-          .getSignature();
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new IllegalArgumentException("Failed to sign " + msg);
-    }
-  }
+  //private String signMessage(String msg) {
+  //  if (!microChannel.isValid()) {
+  //    throw new IllegalStateException("No valid channelInfo");
+  //  }
+  //  byte[] hex = Utils.encodeHex(msg);
+  //  System.out.println("Signing " + msg);
+  //
+  //  try {
+  //    return web3.ethSign(MY_ADDRESS, Utils.sha3Hash(hex))
+  //        .send()
+  //        .getSignature();
+  //  } catch (IOException e) {
+  //    e.printStackTrace();
+  //    throw new IllegalArgumentException("Failed to sign " + msg);
+  //  }
+  //}
 
   private MicroProof signNewProof(@Nullable MicroProof microProof) {
      /* Ask user for signing a channel balance.
