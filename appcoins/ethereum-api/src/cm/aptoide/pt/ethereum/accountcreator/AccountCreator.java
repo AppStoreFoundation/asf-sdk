@@ -1,19 +1,18 @@
-package cm.aptoide.pt.accountcreator;
+package cm.aptoide.pt.ethereum.accountcreator;
 
-import org.ethereum.crypto.ECKey;
-import org.spongycastle.util.encoders.Hex;
-
+import cm.aptoide.pt.ethereumj.crypto.ECKey;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import org.spongycastle.util.encoders.Hex;
 
 public class AccountCreator {
 
 	private static final String FILE_NAME = "generatedAccounts";
-	private static String fundAccountScriptName = "fundAccount.sh";
-	private static String fundAppCoinAccountScriptName = "fundAppCoinAccount.sh";
-	private String sourceAddr;
+  private static final String fundAccountScriptName = "fundAccount.sh";
+  private static final String fundAppCoinAccountScriptName = "fundAppCoinAccount.sh";
+  private String sourceAddr;
 	private String contractAddr;
 
 	public static void main(String[] args) {

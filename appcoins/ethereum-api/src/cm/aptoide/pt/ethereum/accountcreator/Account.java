@@ -1,4 +1,4 @@
-package cm.aptoide.pt.accountcreator;
+package cm.aptoide.pt.ethereum.accountcreator;
 
 public class Account {
 
