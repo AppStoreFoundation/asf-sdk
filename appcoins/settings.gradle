@@ -1,0 +1,6 @@
+rootProject.name = 'appcoins'
+
+include ':ethereum-api'
+include ':ethereumapiexample'
+include ':microraidenj'
+include ':microraidenj-android'
