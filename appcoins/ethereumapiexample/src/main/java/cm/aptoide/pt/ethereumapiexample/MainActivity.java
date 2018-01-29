@@ -15,6 +15,7 @@ import cm.aptoide.pt.ethereumapiexample.NewAccountFragment.OnDeleteAccountConfir
 import cm.aptoide.pt.ethereumapiexample.PaySomethingFragment.OnPaymentConfirmedListener;
 import cm.aptoide.pt.ethereumapiexample.R.id;
 import cm.aptoide.pt.ethereumapiexample.R.layout;
+import cm.aptoide.pt.web3j.abi.datatypes.Address;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.concurrent.Executors;
@@ -22,7 +23,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.spongycastle.util.encoders.Hex;
-import org.web3j.abi.datatypes.Address;
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements OnPaymentConfirme
         .getAddress()));
   }
 
-  private void setBalance(final TextView balanceTextView, final String result) {
+  private void setBalance(TextView balanceTextView, String result) {
     runOnUiThread(new Runnable() {
       @Override public void run() {
         balanceTextView.setText(result);
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements OnPaymentConfirme
                     System.out.println(o);
                   }
                 }, new Action1<Throwable>() {
-                  @Override public void call(final Throwable throwable) {
+                  @Override public void call(Throwable throwable) {
                     runOnUiThread(new Runnable() {
                       @Override public void run() {
                         Toast.makeText(MainActivity.this, throwable.getMessage(),
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements OnPaymentConfirme
 
       int amount = (int) (floatAmount * 100);
 
-      final Erc20Transfer erc20 = new Erc20Transfer(addressTextView.getText()
+      Erc20Transfer erc20 = new Erc20Transfer(addressTextView.getText()
           .toString()
           .substring(2), amount);
 

@@ -11,8 +11,8 @@ import cm.aptoide.pt.ethereum.ws.etherscan.BalanceResponse;
 import cm.aptoide.pt.ethereum.ws.etherscan.EtherscanApi;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
 import cm.aptoide.pt.ethereumj.crypto.ECKey;
+import cm.aptoide.pt.web3j.abi.datatypes.Address;
 import org.spongycastle.util.encoders.Hex;
-import org.web3j.abi.datatypes.Address;
 
 public class Example {
 

@@ -3,8 +3,5 @@ version '0.1'
 dependencies {
   testCompile group: 'junit', name: 'junit', version: '4.12'
 
-  // https://mvnrepository.com/artifact/org.web3j/abi
-  compile group: 'org.web3j', name: 'abi', version: '3.1.1'
-
   compile project(":ethereum-api")
 }

@@ -6,12 +6,12 @@ import cm.aptoide.pt.ethereum.ws.Network;
 import cm.aptoide.pt.ethereumj.crypto.ECKey;
 import cm.aptoide.pt.microraidenj.ChannelManager;
 import cm.aptoide.pt.microraidenj.TokenContract;
+import cm.aptoide.pt.web3j.abi.datatypes.Address;
+import cm.aptoide.pt.web3j.abi.datatypes.generated.Uint192;
+import cm.aptoide.pt.web3j.abi.datatypes.generated.Uint256;
+import cm.aptoide.pt.web3j.abi.datatypes.generated.Uint32;
+import cm.aptoide.pt.web3j.utils.Convert.Unit;
 import org.spongycastle.util.encoders.Hex;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.generated.Uint192;
-import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.abi.datatypes.generated.Uint32;
-import org.web3j.utils.Convert.Unit;
 
 import static cm.aptoide.pt.ethereumj.WorkInProgress.DESTINATION_WALLET;
 

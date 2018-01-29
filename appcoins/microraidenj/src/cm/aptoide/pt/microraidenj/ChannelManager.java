@@ -4,10 +4,10 @@ import cm.aptoide.pt.ethereum.EthereumApi;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
 import cm.aptoide.pt.ethereumj.core.CallTransaction.Function;
 import cm.aptoide.pt.ethereumj.crypto.ECKey;
+import cm.aptoide.pt.web3j.abi.datatypes.Address;
+import cm.aptoide.pt.web3j.abi.datatypes.generated.Uint192;
+import cm.aptoide.pt.web3j.abi.datatypes.generated.Uint32;
 import org.spongycastle.util.encoders.Hex;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.generated.Uint192;
-import org.web3j.abi.datatypes.generated.Uint32;
 
 /**
  * Created by neuro on 06-01-2018.

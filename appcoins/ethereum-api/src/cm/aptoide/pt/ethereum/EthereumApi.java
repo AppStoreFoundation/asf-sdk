@@ -3,8 +3,8 @@ package cm.aptoide.pt.ethereum;
 import cm.aptoide.pt.ethereum.ws.etherscan.BalanceResponse;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
 import cm.aptoide.pt.ethereumj.crypto.ECKey;
+import cm.aptoide.pt.web3j.abi.datatypes.Address;
 import java.math.BigDecimal;
-import org.web3j.abi.datatypes.Address;
 import rx.Observable;
 
 public interface EthereumApi {

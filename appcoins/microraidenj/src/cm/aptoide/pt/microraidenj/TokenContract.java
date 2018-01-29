@@ -5,10 +5,10 @@ import cm.aptoide.pt.ethereum.HexUtils;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
 import cm.aptoide.pt.ethereumj.core.CallTransaction.Function;
 import cm.aptoide.pt.ethereumj.crypto.ECKey;
+import cm.aptoide.pt.web3j.abi.datatypes.Address;
+import cm.aptoide.pt.web3j.abi.datatypes.generated.Uint256;
+import cm.aptoide.pt.web3j.utils.Convert.Unit;
 import org.spongycastle.util.encoders.Hex;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.utils.Convert.Unit;
 
 /**
  * Created by neuro on 18-01-2018.

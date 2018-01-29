@@ -6,8 +6,7 @@ dependencies {
     compile 'com.madgag.spongycastle:pg:1.54.0.0'
     // @Nullable annotatation
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    compile "org.apache.commons:commons-lang3:3.4"
-    compile "com.cedarsoftware:java-util:1.8.0" // for deep equals
+    compile "org.apache.commons:commons-lang3:3.7"
 
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
     compile group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.3.0'

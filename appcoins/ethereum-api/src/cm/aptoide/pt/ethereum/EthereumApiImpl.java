@@ -11,9 +11,9 @@ import cm.aptoide.pt.ethereum.ws.etherscan.TransactionCountResponse;
 import cm.aptoide.pt.ethereum.ws.etherscan.TransactionResultResponse;
 import cm.aptoide.pt.ethereumj.Transaction;
 import cm.aptoide.pt.ethereumj.crypto.ECKey;
+import cm.aptoide.pt.web3j.abi.datatypes.Address;
 import java.math.BigDecimal;
 import org.spongycastle.util.encoders.Hex;
-import org.web3j.abi.datatypes.Address;
 import rx.Observable;
 import rx.functions.Func1;
 
