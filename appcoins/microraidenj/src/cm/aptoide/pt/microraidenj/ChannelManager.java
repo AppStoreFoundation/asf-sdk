@@ -57,7 +57,7 @@ public class ChannelManager {
     String senderAddress = Hex.toHexString(ecKey.getAddress());
 
     TransactionResultResponse first = ethereumApi.getCurrentNonce(senderAddress)
-        .flatMap(nonce -> ethereumApi.call(Math.toIntExact(nonce), ecKey, gasPrice, gasLimit,
+        .flatMap(nonce -> ethereumApi.call(Math7.toIntExact(nonce), ecKey, gasPrice, gasLimit,
             contractAddress,
             encodeUncooperativeCloseMethod(receiverAddress, openBlockNumber, balance)))
         .toBlocking()
@@ -70,7 +70,7 @@ public class ChannelManager {
     String senderAddress = Hex.toHexString(ecKey.getAddress());
 
     TransactionResultResponse first = ethereumApi.getCurrentNonce(senderAddress)
-        .flatMap(nonce -> ethereumApi.call(Math.toIntExact(nonce), ecKey, gasPrice, gasLimit,
+        .flatMap(nonce -> ethereumApi.call(Math7.toIntExact(nonce), ecKey, gasPrice, gasLimit,
             contractAddress, settleMethod(receiverAddress, openBlockNumber)))
         .toBlocking()
         .first();
