@@ -29,9 +29,8 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity implements OnPaymentConfirmedListener,
-    OnDeleteAccountConfirmedListener
-{
+public class MainActivity extends AppCompatActivity
+    implements OnPaymentConfirmedListener, OnDeleteAccountConfirmedListener {
 
   private static final long gasPrice = 24_000_000_000L;
   private static final long gasLimit = 0xfffff;
@@ -42,21 +41,23 @@ public class MainActivity extends AppCompatActivity implements OnPaymentConfirme
 
   private EthereumApi ethereumApi;
   private EtherAccountManager etherAccountManager;
-
   private TextView balanceTextView;
   private TextView yourAddress;
   private TextView addressTextView;
   private TextView amountTextView;
-
+  private TextView paymentAmmountTv;
   private ScheduledExecutorService scheduledExecutorService;
+  private PaymentManager paymentManager;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(layout.activity_main);
 
     scheduledExecutorService = Executors.newScheduledThreadPool(1);
+    paymentManager = new PaymentManager(getIntent());
 
     assignViews();
+    setupViews();
 
     scheduledExecutorService.schedule(new Runnable() {
       @Override public void run() {
@@ -98,6 +99,10 @@ public class MainActivity extends AppCompatActivity implements OnPaymentConfirme
     }, 0, 5, TimeUnit.SECONDS);
   }
 
+  private void setupViews() {
+    setupPaymentAmmount();
+  }
+
   private void setMyAddress() {
     yourAddress.setText(Hex.toHexString(etherAccountManager.getECKey()
         .getAddress()));
@@ -116,41 +121,40 @@ public class MainActivity extends AppCompatActivity implements OnPaymentConfirme
     yourAddress = findViewById(id.your_address);
     addressTextView = findViewById(id.address_text_view);
     amountTextView = findViewById(id.amount);
+    paymentAmmountTv = findViewById(id.payment_ammount);
   }
 
   public void paySomething(View v) {
     new PaySomethingFragment().show(getSupportFragmentManager(), "MyDialog");
   }
 
-  @Override
-  public void onPaymentConfirmed() {
+  @Override public void onPaymentConfirmed() {
     new Thread(new Runnable() {
       @Override public void run() {
         etherAccountManager.getCurrentNonce()
-                .flatMap(new Func1<Long, Observable<TransactionResultResponse>>() {
-                  @Override public Observable<TransactionResultResponse> call(Long nonce) {
-                    return ethereumApi.call(nonce.intValue(), etherAccountManager.getECKey(),
-                        gasPrice, gasLimit, new Address(CONTRACT_ADDRESS),
-                        new Erc20Transfer(RECEIVER_ADDR, 1).encode());
-                  }
-                })
-                //ethereumApi.call(nonce, CONTRACT_ADDRESS, erc20Transfer, etherAccountManager.getECKey())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Action1<Object>() {
-                  @Override public void call(Object o) {
-                    System.out.println(o);
-                  }
-                }, new Action1<Throwable>() {
-                  @Override public void call(Throwable throwable) {
-                    runOnUiThread(new Runnable() {
-                      @Override public void run() {
-                        Toast.makeText(MainActivity.this, throwable.getMessage(),
-                            Toast.LENGTH_SHORT)
-                            .show();
-                      }
-                    });
+            .flatMap(new Func1<Long, Observable<TransactionResultResponse>>() {
+              @Override public Observable<TransactionResultResponse> call(Long nonce) {
+                return ethereumApi.call(nonce.intValue(), etherAccountManager.getECKey(), gasPrice,
+                    gasLimit, new Address(CONTRACT_ADDRESS),
+                    new Erc20Transfer(RECEIVER_ADDR, 1).encode());
+              }
+            })
+            //ethereumApi.call(nonce, CONTRACT_ADDRESS, erc20Transfer, etherAccountManager.getECKey())
+            .subscribeOn(Schedulers.io())
+            .subscribe(new Action1<Object>() {
+              @Override public void call(Object o) {
+                System.out.println(o);
+              }
+            }, new Action1<Throwable>() {
+              @Override public void call(Throwable throwable) {
+                runOnUiThread(new Runnable() {
+                  @Override public void run() {
+                    Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT)
+                        .show();
                   }
                 });
+              }
+            });
       }
     }).start();
   }
@@ -224,10 +228,21 @@ public class MainActivity extends AppCompatActivity implements OnPaymentConfirme
     new NewAccountFragment().show(getSupportFragmentManager(), "NewAccount");
   }
 
-  @Override
-  public void onDeleteAccountConfirmed() {
+  @Override public void onDeleteAccountConfirmed() {
     etherAccountManager.createNewAccount();
     setMyAddress();
     balanceTextView.setText(Integer.toString(0));
+  }
+
+  public void pay(View view) {
+    TextView paymentAmmountTv = findViewById(id.payment_ammount);
+    CharSequence paymentAmmount = paymentAmmountTv.getText();
+
+    // Pay
+  }
+
+  private void setupPaymentAmmount() {
+    double paymentValue = paymentManager.getPaymentAmmount();
+    paymentAmmountTv.setText(Double.toString(paymentValue));
   }
 }

@@ -10,4 +10,5 @@
   <string name="delete_account">Delete Account</string>
   <string name="are_you_sure">Are you sure?</string>
   <string name="buy_something">Buying something</string>
+  <string name="pay">Pay</string>
 </resources>

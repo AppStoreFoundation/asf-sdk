@@ -118,4 +118,22 @@
       android:text="@string/create_wallet"
       />
 
+  <TextView
+      android:id="@+id/payment_ammount"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:layout_marginTop="16dp"
+      android:textSize="16sp"
+      />
+
+  <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:layout_marginTop="16dp"
+      android:onClick="pay"
+      android:text="@string/pay"
+      />
+
 </LinearLayout>
