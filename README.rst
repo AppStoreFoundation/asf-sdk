@@ -20,7 +20,7 @@ AppCoins Protocol
 .. image:: https://cdn-images-1.medium.com/fit/c/72/72/0*FuRTmrw2LLbrau2u.png
     :target: https://join.slack.com/t/appcoinsofficial/shared_invite/enQtMjU1MTM5NzY4ODU1LTMxMjg5YmZhNjVhYjZkM2QxOWFhNTAyMDQyYzRhMjIwNGY3MWIxMDYwZTZmZDJmZGZiMWE2OWNkNWFhMjZiZGU 
     :alt: Join us on Slack 
-   image:: https://cdn-images-1.medium.com/fit/c/72/72/0*FIzAdIy4RhxeX_iK.png
+.. image:: https://cdn-images-1.medium.com/fit/c/72/72/0*FIzAdIy4RhxeX_iK.png
     :target: https://t.me/joinchat/G337zg6z0ACm6QTvUU9_Yw
     :alt: Join us on Telegram
 
