@@ -17,7 +17,7 @@ interface AsfWeb3j {
 
   Observable<BigDecimal> getBalance(Address address);
 
-  Observable<String> sendRawTransaction(byte[] rawData);
+  Observable<String> sendRawTransaction(String rawData);
 
   Observable<Transaction> getTransactionByHash(String txhash);
 }
