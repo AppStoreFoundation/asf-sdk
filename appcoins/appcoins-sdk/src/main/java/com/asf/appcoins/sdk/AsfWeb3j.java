@@ -19,5 +19,5 @@ interface AsfWeb3j {
 
   Observable<String> sendRawTransaction(String rawData);
 
-  Observable<Transaction> getTransactionByHash(String txhash);
+  Observable<Transaction> getTransactionByHash(String txHash);
 }
