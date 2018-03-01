@@ -35,9 +35,11 @@ dependencies {
   androidTestImplementation 'com.android.support.test:runner:1.0.1'
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
+  implementation project(":ethereum-api")
+
   // https://mvnrepository.com/artifact/org.web3j/core
-  compile group: 'org.web3j', name: 'core', version: '3.1.1-android'
+  implementation group: 'org.web3j', name: 'core', version: '3.1.1-android'
 
   // https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxjava
-  compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.10'
+  implementation group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.10'
 }
