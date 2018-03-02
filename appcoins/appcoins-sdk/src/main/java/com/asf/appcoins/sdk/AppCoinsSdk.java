@@ -1,5 +1,6 @@
 package com.asf.appcoins.sdk;
 
+import android.app.Activity;
 import com.asf.appcoins.sdk.entity.Transaction;
 import io.reactivex.Observable;
 
@@ -11,5 +12,5 @@ public interface AppCoinsSdk {
 
   Observable<Transaction> getTransaction(String txhash);
 
-  void buy(String sku);
+  void buy(String sku, Activity activity);
 }
