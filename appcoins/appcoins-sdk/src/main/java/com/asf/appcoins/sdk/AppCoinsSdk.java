@@ -1,6 +1,8 @@
 package com.asf.appcoins.sdk;
 
 import android.app.Activity;
+import android.content.Intent;
+import com.asf.appcoins.sdk.entity.PurchaseResult;
 import com.asf.appcoins.sdk.entity.SKU;
 import com.asf.appcoins.sdk.entity.Transaction;
 import io.reactivex.Observable;
@@ -17,4 +19,6 @@ public interface AppCoinsSdk {
   void buy(String sku, Activity activity);
 
   Collection<SKU> listSkus();
+
+  PurchaseResult onActivityResult(int requestCode, int resultCode, Intent data);
 }
