@@ -3,6 +3,7 @@ package com.asf.appcoins.sdk;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import com.asf.appcoins.sdk.entity.SKU;
 import com.asf.appcoins.sdk.entity.Transaction;
 import com.asf.appcoins.sdk.entity.Transaction.Status;
 import io.reactivex.Observable;
@@ -10,6 +11,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 import java.math.BigDecimal;
 import java.util.Formatter;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,8 +30,8 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   private final SkuManager skuManager;
   private final int networkId;
 
-  AppCoinsSdkImpl(AsfWeb3j asfWeb3j) {
-    this(asfWeb3j, DEFAULT_PERIOD, Schedulers.io(), new SkuManager(), false);
+  AppCoinsSdkImpl(AsfWeb3j asfWeb3j, List<SKU> skuses) {
+    this(asfWeb3j, DEFAULT_PERIOD, Schedulers.io(), new SkuManager(skuses), false);
   }
 
   AppCoinsSdkImpl(AsfWeb3j asfWeb3j, int period, Scheduler scheduler, SkuManager skuManager,
@@ -48,10 +50,10 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
         .takeUntil(transaction -> transaction.getStatus() == Status.PENDING);
   }
 
-  @Override public void buy(String sku, Activity activity) {
+  @Override public void buy(String skuId, Activity activity) {
     Intent intent = new Intent(Intent.ACTION_VIEW);
 
-    BigDecimal amount = skuManager.getSkuAmount(sku);
+    BigDecimal amount = skuManager.getSkuAmount(skuId);
     BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
     intent.setData(buildUri("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3", networkId,

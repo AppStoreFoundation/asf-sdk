@@ -1,14 +1,41 @@
 package com.asf.appcoins.sdk;
 
+import android.support.annotation.NonNull;
+import com.asf.appcoins.sdk.entity.SKU;
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by neuro on 02-03-2018.
  */
+public final class SkuManager {
 
-public class SkuManager {
+  private final Map<String, SKU> skus;
 
-  public BigDecimal getSkuAmount(String sku) {
-    return BigDecimal.ONE;
+  public SkuManager(Collection<SKU> skuList) {
+    this.skus = new HashMap<>(skuList.size());
+
+    for (SKU sku : skuList) {
+      skus.put(sku.getId(), sku);
+    }
+  }
+
+  public BigDecimal getSkuAmount(String skuId) {
+    SKU sku = getSku(skuId);
+
+    return sku.getValue();
+  }
+
+  @NonNull public SKU getSku(String skuId) {
+    SKU sku = skus.get(skuId);
+
+    if (sku == null) {
+      throw new IllegalArgumentException(
+          "Can't find Sku. Did you include in the creation process?");
+    }
+
+    return sku;
   }
 }

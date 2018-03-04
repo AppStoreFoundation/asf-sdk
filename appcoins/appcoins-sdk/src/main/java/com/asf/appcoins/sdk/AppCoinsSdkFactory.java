@@ -1,5 +1,7 @@
 package com.asf.appcoins.sdk;
 
+import com.asf.appcoins.sdk.entity.SKU;
+import java.util.List;
 import okhttp3.OkHttpClient;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jFactory;
@@ -16,9 +18,9 @@ public final class AppCoinsSdkFactory {
     this.httpClient = httpClient;
   }
 
-  public final AppCoinsSdk create(String rpcServerUrl) {
+  public final AppCoinsSdk create(String rpcServerUrl, List<SKU> skus) {
     Web3j web3j = Web3jFactory.build(new HttpService(rpcServerUrl, httpClient, false));
 
-    return new AppCoinsSdkImpl(new AsfWeb3jImpl(web3j));
+    return new AppCoinsSdkImpl(new AsfWeb3jImpl(web3j), skus);
   }
 }
