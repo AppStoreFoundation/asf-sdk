@@ -10,6 +10,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Formatter;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +63,10 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
     intent.setData(
         buildUri("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3", networkId, developerAddress, total));
     activity.startActivityForResult(intent, DEFAULT_REQUEST_CODE);
+  }
+
+  @Override public Collection<SKU> listSkus() {
+    return skuManager.getSkus();
   }
 
   Uri buildUri(String contractAddress, int networkId, String developerAddress, BigDecimal amount) {

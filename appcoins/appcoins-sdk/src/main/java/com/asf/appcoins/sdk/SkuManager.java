@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import com.asf.appcoins.sdk.entity.SKU;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,5 +38,9 @@ public final class SkuManager {
     }
 
     return sku;
+  }
+
+  public Collection<SKU> getSkus() {
+    return Collections.unmodifiableCollection(skus.values());
   }
 }
