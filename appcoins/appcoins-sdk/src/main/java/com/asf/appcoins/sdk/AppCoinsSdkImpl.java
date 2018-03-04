@@ -3,9 +3,10 @@ package com.asf.appcoins.sdk;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import com.asf.appcoins.sdk.entity.PurchaseResult;
+import com.asf.appcoins.sdk.entity.PurchaseResult.Status;
 import com.asf.appcoins.sdk.entity.SKU;
 import com.asf.appcoins.sdk.entity.Transaction;
-import com.asf.appcoins.sdk.entity.Transaction.Status;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
@@ -25,6 +26,9 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   private static final int DECIMALS = 18;
 
   private static final int DEFAULT_REQUEST_CODE = 3423;
+  private static final int SUCCESS_RESULT_CODE = 0;
+  private static final String TX_HASH_KEY = "txHash";
+
   private final int period;
   private final AsfWeb3j asfWeb3j;
   private final Scheduler scheduler;
@@ -51,7 +55,7 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
     return Observable.interval(period, TimeUnit.SECONDS, scheduler)
         .timeInterval()
         .switchMap(scan -> asfWeb3j.getTransactionByHash(txHash))
-        .takeUntil(transaction -> transaction.getStatus() == Status.PENDING);
+        .takeUntil(transaction -> transaction.getStatus() == Transaction.Status.PENDING);
   }
 
   @Override public void buy(String skuId, Activity activity) {
@@ -67,6 +71,19 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
 
   @Override public Collection<SKU> listSkus() {
     return skuManager.getSkus();
+  }
+
+  @Override public PurchaseResult onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == DEFAULT_REQUEST_CODE) {
+      if (resultCode == SUCCESS_RESULT_CODE) {
+        return new PurchaseResult(Status.SUCCESS, data.getStringExtra(TX_HASH_KEY),
+            SUCCESS_RESULT_CODE);
+      } else {
+        return new PurchaseResult(Status.FAIL, resultCode);
+      }
+    }
+
+    return new PurchaseResult(Status.FAIL, null, resultCode);
   }
 
   Uri buildUri(String contractAddress, int networkId, String developerAddress, BigDecimal amount) {
