@@ -29,16 +29,19 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   private final Scheduler scheduler;
   private final SkuManager skuManager;
   private final int networkId;
+  private final String developerAddress;
 
-  AppCoinsSdkImpl(AsfWeb3j asfWeb3j, List<SKU> skuses) {
-    this(asfWeb3j, DEFAULT_PERIOD, Schedulers.io(), new SkuManager(skuses), false);
+  AppCoinsSdkImpl(AsfWeb3j asfWeb3j, String developerAddress, List<SKU> skuses) {
+    this(asfWeb3j, DEFAULT_PERIOD, Schedulers.io(), developerAddress, new SkuManager(skuses),
+        false);
   }
 
-  AppCoinsSdkImpl(AsfWeb3j asfWeb3j, int period, Scheduler scheduler, SkuManager skuManager,
-      boolean debug) {
+  AppCoinsSdkImpl(AsfWeb3j asfWeb3j, int period, Scheduler scheduler, String developerAddress,
+      SkuManager skuManager, boolean debug) {
     this.asfWeb3j = asfWeb3j;
     this.period = period;
     this.scheduler = scheduler;
+    this.developerAddress = developerAddress;
     this.skuManager = skuManager;
     this.networkId = debug ? 3 : 1;
   }
@@ -56,8 +59,8 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
     BigDecimal amount = skuManager.getSkuAmount(skuId);
     BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
-    intent.setData(buildUri("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3", networkId,
-        "0x4fbcc5ce88493c3d9903701c143af65f54481119", total));
+    intent.setData(
+        buildUri("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3", networkId, developerAddress, total));
     activity.startActivityForResult(intent, DEFAULT_REQUEST_CODE);
   }
 
