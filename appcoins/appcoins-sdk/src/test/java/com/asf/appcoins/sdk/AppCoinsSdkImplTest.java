@@ -1,6 +1,10 @@
 package com.asf.appcoins.sdk;
 
+import com.asf.appcoins.sdk.entity.SKU;
+import com.asf.appcoins.sdk.util.UriBuilder;
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -14,18 +18,33 @@ import static org.hamcrest.CoreMatchers.is;
  */
 public class AppCoinsSdkImplTest {
 
+  private final String developerAddress = "0x4fbcc5ce88493c3d9903701c143af65f54481119";
+  private final String oemAddress = "0x4fbcc5ce88493c3d9903701c143af65f54481118";
+  private final String storeAddress = "0x4fbcc5ce88493c3d9903701c143af65f54481117";
   @Mock Web3j web3j;
 
   @Test public void buildUri() throws Exception {
     MockitoAnnotations.initMocks(this);
 
     AsfWeb3j asfWeb3j = new AsfWeb3jImpl(web3j);
-    AppCoinsSdkImpl appCoinsSdk = new AppCoinsSdkImpl(asfWeb3j);
+    AppCoinsSdk appCoinsSdk =
+        new AppCoinsSdkBuilder(developerAddress, oemAddress, storeAddress).setAsfWeb3j(asfWeb3j)
+            .setSkus(buildSkus())
+            .createAppCoinsSdk();
 
-    String uriString = appCoinsSdk.buildUriString("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3", 3,
-        "0x4fbcc5ce88493c3d9903701c143af65f54481119", BigDecimal.ONE);
+    String uriString =
+        UriBuilder.buildUriString("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3", BigDecimal.ONE,
+            developerAddress, oemAddress, storeAddress, 3);
 
     Assert.assertThat(uriString,
-        is("ethereum:0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3@3/transfer?address=0x4fbcc5ce88493c3d9903701c143af65f54481119&uint256=1"));
+        is("ethereum:0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3@3/buy?uint256=1&developerAddress=0x4fbcc5ce88493c3d9903701c143af65f54481119&oemAddress=0x4fbcc5ce88493c3d9903701c143af65f54481118&storeAddress=0x4fbcc5ce88493c3d9903701c143af65f54481117"));
+  }
+
+  private List<SKU> buildSkus() {
+    List<SKU> skus = new LinkedList<>();
+
+    skus.add(new SKU("smallpack", "com.marceloporto.bombastic.smallpack", BigDecimal.ONE));
+
+    return skus;
   }
 }

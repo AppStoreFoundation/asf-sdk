@@ -18,9 +18,16 @@ public final class AppCoinsSdkFactory {
     this.httpClient = httpClient;
   }
 
-  public final AppCoinsSdk create(String rpcServerUrl, String developerAddress, List<SKU> skus) {
+  public AppCoinsSdk create(String rpcServerUrl, String developerAddress, String oemAddress,
+      String storeAddress, List<SKU> skus) {
     Web3j web3j = Web3jFactory.build(new HttpService(rpcServerUrl, httpClient, false));
 
-    return new AppCoinsSdkImpl(new AsfWeb3jImpl(web3j), developerAddress, skus);
+    return new AppCoinsSdkBuilder(developerAddress, oemAddress, storeAddress).setAsfWeb3j(
+        new AsfWeb3jImpl(web3j))
+        .setDeveloperAddress(developerAddress)
+        .setOemAddress(oemAddress)
+        .setStoreAddress(storeAddress)
+        .setSkus(skus)
+        .createAppCoinsSdk();
   }
 }
