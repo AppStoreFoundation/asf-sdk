@@ -27,7 +27,7 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
 
   private static final int DEFAULT_REQUEST_CODE = 3423;
   private static final int SUCCESS_RESULT_CODE = 0;
-  private static final String TX_HASH_KEY = "txHash";
+  private static final String TRANSACTION_HASH = "transaction_hash";
 
   private final int period;
   private final AsfWeb3j asfWeb3j;
@@ -76,7 +76,7 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   @Override public PurchaseResult onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == DEFAULT_REQUEST_CODE) {
       if (resultCode == SUCCESS_RESULT_CODE) {
-        return new PurchaseResult(Status.SUCCESS, data.getStringExtra(TX_HASH_KEY),
+        return new PurchaseResult(Status.SUCCESS, data.getStringExtra(TRANSACTION_HASH),
             SUCCESS_RESULT_CODE);
       } else {
         return new PurchaseResult(Status.FAIL, resultCode);
