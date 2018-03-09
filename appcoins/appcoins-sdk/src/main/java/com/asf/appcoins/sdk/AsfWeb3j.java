@@ -8,8 +8,7 @@ import org.web3j.abi.datatypes.Address;
 /**
  * Created by neuro on 26-02-2018.
  */
-
-interface AsfWeb3j {
+public interface AsfWeb3j {
 
   Observable<Long> getNonce(Address address);
 
