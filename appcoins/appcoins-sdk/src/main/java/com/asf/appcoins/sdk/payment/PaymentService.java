@@ -38,7 +38,7 @@ public final class PaymentService {
     BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
     intent.setData(
-        UriBuilder.buildUri("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3", skuId, networkId, total,
+        UriBuilder.buildUri("0x8dd69259800b37aee1eb60836a18d313965278f6", skuId, networkId, total,
             developerAddress));
     activity.startActivityForResult(intent, defaultRequestCode);
   }
