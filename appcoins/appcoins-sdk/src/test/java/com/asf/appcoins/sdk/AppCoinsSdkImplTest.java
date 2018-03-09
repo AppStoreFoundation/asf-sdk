@@ -19,25 +19,22 @@ import static org.hamcrest.CoreMatchers.is;
 public class AppCoinsSdkImplTest {
 
   private final String developerAddress = "0x4fbcc5ce88493c3d9903701c143af65f54481119";
-  private final String oemAddress = "0x4fbcc5ce88493c3d9903701c143af65f54481118";
-  private final String storeAddress = "0x4fbcc5ce88493c3d9903701c143af65f54481117";
+
   @Mock Web3j web3j;
 
   @Test public void buildUri() throws Exception {
     MockitoAnnotations.initMocks(this);
 
     AsfWeb3j asfWeb3j = new AsfWeb3jImpl(web3j);
-    AppCoinsSdk appCoinsSdk =
-        new AppCoinsSdkBuilder(developerAddress, oemAddress, storeAddress).setAsfWeb3j(asfWeb3j)
-            .setSkus(buildSkus())
+    AppCoinsSdk appCoinsSdk = new AppCoinsSdkBuilder(developerAddress).withSkus(buildSkus())
             .createAppCoinsSdk();
 
     String uriString =
         UriBuilder.buildUriString("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3", BigDecimal.ONE,
-            developerAddress, oemAddress, storeAddress, 3);
+            developerAddress, "com.sku.id", 3);
 
     Assert.assertThat(uriString,
-        is("ethereum:0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3@3/buy?uint256=1&developerAddress=0x4fbcc5ce88493c3d9903701c143af65f54481119&oemAddress=0x4fbcc5ce88493c3d9903701c143af65f54481118&storeAddress=0x4fbcc5ce88493c3d9903701c143af65f54481117"));
+        is("ethereum:0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3@3/transfer?uint256=1&developerAddress=0x4fbcc5ce88493c3d9903701c143af65f54481119&data=0x636f6d2e736b752e6964"));
   }
 
   private List<SKU> buildSkus() {
