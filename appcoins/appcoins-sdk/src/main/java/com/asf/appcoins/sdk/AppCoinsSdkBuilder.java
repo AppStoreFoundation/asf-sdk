@@ -1,80 +1,76 @@
 package com.asf.appcoins.sdk;
 
 import com.asf.appcoins.sdk.entity.SKU;
+import com.asf.appcoins.sdk.payment.PaymentService;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
+import java.util.LinkedList;
 import java.util.List;
 
-public class AppCoinsSdkBuilder {
+public final class AppCoinsSdkBuilder {
+
   private static final int DEFAULT_PERIOD = 5;
 
-  private AsfWeb3j asfWeb3j;
+  private Integer networkId;
   private String developerAddress;
-  private String oemAddress;
-  private String storeAddress;
   private List<SKU> skus;
   private int period = DEFAULT_PERIOD;
-  private Scheduler scheduler = Schedulers.io();
+  private Scheduler scheduler;
   private SkuManager skuManager;
+  private PaymentService paymentService;
   private boolean debug;
 
-  public AppCoinsSdkBuilder(String developerAddress, String oemAddress, String storeAddress) {
+  public AppCoinsSdkBuilder(String developerAddress) {
     this.developerAddress = developerAddress;
-    this.oemAddress = oemAddress;
-    this.storeAddress = storeAddress;
   }
 
-  public AppCoinsSdkBuilder setAsfWeb3j(AsfWeb3j asfWeb3j) {
-    this.asfWeb3j = asfWeb3j;
-    return this;
-  }
-
-  public AppCoinsSdkBuilder setDeveloperAddress(String developerAddress) {
+  public AppCoinsSdkBuilder withDeveloperAddress(String developerAddress) {
     this.developerAddress = developerAddress;
     return this;
   }
 
-  public AppCoinsSdkBuilder setOemAddress(String oemAddress) {
-    this.oemAddress = oemAddress;
+  public AppCoinsSdkBuilder withSkus(List<SKU> skus) {
+    this.skus = new LinkedList<>(skus);
     return this;
   }
 
-  public AppCoinsSdkBuilder setStoreAddress(String storeAddress) {
-    this.storeAddress = storeAddress;
-    return this;
-  }
-
-  public AppCoinsSdkBuilder setSkus(List<SKU> skus) {
-    this.skus = skus;
-    return this;
-  }
-
-  public AppCoinsSdkBuilder setPeriod(int period) {
+  public AppCoinsSdkBuilder withPeriod(int period) {
     this.period = period;
     return this;
   }
 
-  public AppCoinsSdkBuilder setScheduler(Scheduler scheduler) {
+  public AppCoinsSdkBuilder withScheduler(Scheduler scheduler) {
     this.scheduler = scheduler;
     return this;
   }
 
-  public AppCoinsSdkBuilder setSkuManager(SkuManager skuManager) {
+  public AppCoinsSdkBuilder withSkuManager(SkuManager skuManager) {
     this.skuManager = skuManager;
     return this;
   }
 
-  public AppCoinsSdkBuilder setDebug(boolean debug) {
+  public AppCoinsSdkBuilder withDebug(boolean debug) {
     this.debug = debug;
     return this;
   }
 
   public AppCoinsSdk createAppCoinsSdk() {
+    if (networkId == null) {
+      networkId = 1;
+    }
+
+    if (this.scheduler == null) {
+      this.scheduler = Schedulers.io();
+    }
+
     if (this.skuManager == null) {
       this.skuManager = new SkuManager(skus);
     }
 
-    return new AppCoinsSdkImpl(asfWeb3j, period, scheduler, developerAddress, oemAddress,
-        storeAddress, skuManager, debug);
+    if (this.paymentService == null) {
+      this.paymentService = new PaymentService(networkId, skuManager, developerAddress);
+    }
+
+    return new AppCoinsSdkImpl(period, scheduler, skuManager, paymentService, debug);
   }
 }

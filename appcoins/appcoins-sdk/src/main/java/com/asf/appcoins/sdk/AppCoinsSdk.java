@@ -2,9 +2,8 @@ package com.asf.appcoins.sdk;
 
 import android.app.Activity;
 import android.content.Intent;
-import com.asf.appcoins.sdk.entity.PurchaseResult;
 import com.asf.appcoins.sdk.entity.SKU;
-import com.asf.appcoins.sdk.entity.Transaction;
+import com.asf.appcoins.sdk.payment.PaymentStatus;
 import io.reactivex.Observable;
 import java.util.Collection;
 
@@ -14,11 +13,11 @@ import java.util.Collection;
 
 public interface AppCoinsSdk {
 
-  Observable<Transaction> getTransaction(String txhash);
+  Observable<PaymentStatus> getPayment(String skuId);
 
   void buy(String sku, Activity activity);
 
   Collection<SKU> listSkus();
 
-  PurchaseResult onActivityResult(int requestCode, int resultCode, Intent data);
+  boolean onActivityResult(int requestCode, int resultCode, Intent data);
 }
