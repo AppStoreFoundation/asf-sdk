@@ -25,11 +25,9 @@ contract ERC20Interface {
 contract AppCoin is ERC20Interface {
     string public constant symbol = "APPC";
     string public constant name = "AppCoins";
-    uint8 public constant decimals = 2;
+    uint8 public constant decimals = 18;
     uint256 _totalSupply = 1000000 * 10 ** decimals;
     address public owner;
-    address public oem = 0x0000000000000000000000000000000000000000; // Hardcoded address for division
-    address public store = 0x0000000000000000000000000000000000000000; // Hardcoded address for division
     mapping(address => uint256) balances;
     mapping(address => mapping (address => uint256)) allowed;
     
@@ -52,28 +50,13 @@ contract AppCoin is ERC20Interface {
         return balances[_owner];
     }
 
-    function percent(uint numerator, uint denominator, uint precision) public constant returns(uint quotient) {
-         // caution, check safe-to-multiply here
-        uint _numerator  = numerator * 10 ** (precision);
-        // with rounding of last digit
-        uint _quotient =  _numerator / denominator;
-        return _quotient;
-    }
-
     function transfer (address _to, uint256 _amount) returns (bool success) {
         if (balances[msg.sender] >= _amount
                 && _amount > 0
                 && balances[_to] + _amount > balances[_to]) {
-            uint _amount_dev = percent(_amount*85, 100, 0);
-            uint _amount_store = percent(_amount*10, 100, 0);
-            uint _amount_oem = percent(_amount*5, 100, 0);
             balances[msg.sender] -= _amount;
-            balances[_to] += _amount_dev;
-            balances[store] += _amount_store;
-            balances[oem] += _amount_oem;
-            Transfer(msg.sender, _to, _amount_dev);
-            Transfer(msg.sender, store, _amount_store);
-            Transfer(msg.sender, oem, _amount_oem);
+            balances[_to] += _amount;
+            Transfer(msg.sender, _to, _amount);
             return true;
         } else {
             return false;
