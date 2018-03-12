@@ -17,9 +17,12 @@ AppCoins - other repositories:
 AppCoins Protocol
 ==============
 
-.. image:: https://cdn-images-1.medium.com/max/1600/1*fx4P2uSei_VuforSDc-3nQ.png 
+.. image:: https://cdn-images-1.medium.com/fit/c/72/72/0*FuRTmrw2LLbrau2u.png
     :target: https://join.slack.com/t/appcoinsofficial/shared_invite/enQtMjU1MTM5NzY4ODU1LTMxMjg5YmZhNjVhYjZkM2QxOWFhNTAyMDQyYzRhMjIwNGY3MWIxMDYwZTZmZDJmZGZiMWE2OWNkNWFhMjZiZGU 
     :alt: Join us on Slack 
+.. image:: https://cdn-images-1.medium.com/fit/c/72/72/0*FIzAdIy4RhxeX_iK.png
+    :target: https://t.me/joinchat/G337zg6z0ACm6QTvUU9_Yw
+    :alt: Join us on Telegram
 
 AppCoins is a blockchain-based protocol for the App Economy supported by the Aptoide App Store, and the first ICO serving 200 million users. 
 
