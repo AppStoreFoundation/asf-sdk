@@ -20,7 +20,7 @@ public final class UriBuilder {
 
     StringBuilder stringBuilder = new StringBuilder(4);
     try (Formatter formatter = new Formatter(stringBuilder)) {
-      formatter.format("ethereum:%s@%d/buy?uint256=%s&developerAddress=%s&data=%s",
+      formatter.format("ethereum:%s@%d/buy?uint256=%s&address=%s&data=%s",
           contractAddress, networkId, amount.toString(), developerAddress,
           "0x" + Hex.toHexString(skuId.getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {
