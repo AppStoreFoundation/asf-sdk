@@ -62,12 +62,8 @@ public final class PaymentService {
 
   public Observable<PaymentDetails> getPaymentDetails(String skuId) {
     return asfWeb3j.getTransactionByHash(getTransactionHash(skuId))
-        .map(transaction -> {
-          PaymentStatus paymentStatus =
-              ((transaction.getStatus() == Status.ACCEPTED) ? PaymentStatus.SUCCESS
-                  : PaymentStatus.FAIL);
-          return new PaymentDetails(paymentStatus, skuId, transaction);
-        });
+        .map(transaction -> new PaymentDetails(PaymentStatus.from(transaction.getStatus()), skuId,
+            transaction));
   }
 
   private String getTransactionHash(String skuId) {
