@@ -10,16 +10,13 @@ public final class Transaction {
   private final String to;
   private final String value;
   private final Status status;
-  private final String contractAddress;
 
-  public Transaction(String hash, String from, String to, String value, Status status,
-      String contractAddress) {
+  public Transaction(String hash, String from, String to, String value, Status status) {
     this.hash = hash;
     this.from = from;
     this.to = to;
     this.value = value;
     this.status = status;
-    this.contractAddress = contractAddress;
   }
 
   public String getHash() {
@@ -40,10 +37,6 @@ public final class Transaction {
 
   public Status getStatus() {
     return status;
-  }
-
-  public String getContractAddress() {
-    return contractAddress;
   }
 
   public enum Status {

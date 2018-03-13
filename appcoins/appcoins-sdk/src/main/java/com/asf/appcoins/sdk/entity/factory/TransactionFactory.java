@@ -33,7 +33,7 @@ public final class TransactionFactory {
     String contractAddress = ethGetTransactionReceipt.getTransactionReceipt()
         .getTo();
 
-    return new Transaction(hash, from, to, value, status, contractAddress);
+    return new Transaction(hash, from, to, value, status);
   }
 
   public static Transaction fromEthTransaction(EthTransaction ethTransaction, Status status) {
@@ -48,7 +48,7 @@ public final class TransactionFactory {
     String contractAddress = ethTransaction.getTransaction()
         .getTo();
 
-    return new Transaction(hash, from, to, value, status, contractAddress);
+    return new Transaction(hash, from, to, value, status);
   }
 
   private static Status parseStatus(String status) {
