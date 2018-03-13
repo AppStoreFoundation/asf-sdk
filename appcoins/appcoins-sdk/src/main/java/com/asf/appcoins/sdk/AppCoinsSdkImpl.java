@@ -19,7 +19,6 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
 
   private static final int DEFAULT_REQUEST_CODE = 3423;
   private static final int SUCCESS_RESULT_CODE = 0;
-  private static final String TRANSACTION_HASH_KEY = "transaction_hash";
 
   private final int period;
   private final Scheduler scheduler;
@@ -51,6 +50,7 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   }
 
   @Override public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-    return (requestCode == DEFAULT_REQUEST_CODE) && data.hasExtra(TRANSACTION_HASH_KEY);
+    return (requestCode == DEFAULT_REQUEST_CODE) && data.hasExtra(
+        PaymentService.TRANSACTION_HASH_KEY);
   }
 }

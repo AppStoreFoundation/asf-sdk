@@ -8,7 +8,11 @@ import com.asf.appcoins.sdk.entity.Transaction;
 public final class PaymentStatus {
 
   private final String skuId;
-  private final Transaction transaction;
+  private Transaction transaction;
+
+  PaymentStatus(String skuId) {
+    this.skuId = skuId;
+  }
 
   PaymentStatus(String skuId, Transaction transaction) {
     this.skuId = skuId;
@@ -21,5 +25,9 @@ public final class PaymentStatus {
 
   public Transaction getTransaction() {
     return transaction;
+  }
+
+  public void setTransaction(Transaction transaction) {
+    this.transaction = transaction;
   }
 }
