@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import com.asf.appcoins.sdk.entity.SKU;
 import com.asf.appcoins.sdk.entity.Transaction.Status;
+import com.asf.appcoins.sdk.payment.PaymentDetails;
 import com.asf.appcoins.sdk.payment.PaymentService;
-import com.asf.appcoins.sdk.payment.PaymentStatus;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import java.util.Collection;
@@ -33,15 +33,15 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
     this.paymentService = paymentService;
   }
 
-  @Override public Observable<PaymentStatus> getPayment(String skuId) {
+  @Override public Observable<PaymentDetails> getPayment(String skuId) {
     return Observable.interval(period, TimeUnit.SECONDS, scheduler)
         .timeInterval()
         .switchMap(scan -> paymentService.getPaymentStatus(skuId))
-        .takeUntil(paymentStatus -> paymentStatus.getTransaction()
+        .takeUntil(paymentDetails -> paymentDetails.getTransaction()
             .getStatus() == Status.PENDING);
   }
 
-  @Override public Observable<PaymentStatus> getLastPayment() {
+  @Override public Observable<PaymentDetails> getLastPayment() {
     return Observable.fromCallable(paymentService::getLastPayment);
   }
 
@@ -60,7 +60,7 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   @Override public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
     paymentService.onActivityResult(requestCode, resultCode, data);
 
-    return (requestCode == DEFAULT_REQUEST_CODE) && data.hasExtra(
-        PaymentService.TRANSACTION_HASH_KEY);
+    return (requestCode == DEFAULT_REQUEST_CODE) && ((data != null) && data.hasExtra(
+        PaymentService.TRANSACTION_HASH_KEY));
   }
 }

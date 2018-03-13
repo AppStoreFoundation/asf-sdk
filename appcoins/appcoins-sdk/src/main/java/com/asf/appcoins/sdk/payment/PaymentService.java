@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import com.asf.appcoins.sdk.AsfWeb3j;
 import com.asf.appcoins.sdk.SkuManager;
+import com.asf.appcoins.sdk.entity.Transaction.Status;
 import com.asf.appcoins.sdk.util.UriBuilder;
 import io.reactivex.Observable;
 import java.math.BigDecimal;
@@ -22,9 +23,9 @@ public final class PaymentService {
   private final int networkId;
   private final SkuManager skuManager;
   private final String developerAddress;
-  private final Map<String, PaymentStatus> payments;
+  private final Map<String, PaymentDetails> payments;
   private AsfWeb3j asfWeb3j;
-  private PaymentStatus onGoingPayment;
+  private PaymentDetails onGoingPayment;
 
   public PaymentService(int networkId, SkuManager skuManager, String developerAddress) {
     this.networkId = networkId;
@@ -48,16 +49,21 @@ public final class PaymentService {
       throw new IllegalArgumentException(
           "Pending buy action with the same sku found! Did you forget to consume the former?");
     } else {
-      onGoingPayment = new PaymentStatus(skuId);
+      onGoingPayment = new PaymentDetails(PaymentStatus.SUCCESS, skuId);
       payments.put(skuId, onGoingPayment);
 
       activity.startActivityForResult(intent, defaultRequestCode);
     }
   }
 
-  public Observable<PaymentStatus> getPaymentStatus(String skuId) {
+  public Observable<PaymentDetails> getPaymentStatus(String skuId) {
     return asfWeb3j.getTransactionByHash(getTransactionHash(skuId))
-        .map(transaction -> new PaymentStatus(skuId, transaction));
+        .map(transaction -> {
+          PaymentStatus paymentStatus =
+              ((transaction.getStatus() == Status.ACCEPTED) ? PaymentStatus.SUCCESS
+                  : PaymentStatus.FAIL);
+          return new PaymentDetails(paymentStatus, skuId, transaction);
+        });
   }
 
   private String getTransactionHash(String skuId) {
@@ -67,6 +73,14 @@ public final class PaymentService {
   }
 
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+    if (data == null) {
+      onGoingPayment.setPaymentStatus(PaymentStatus.FAIL);
+      payments.put(onGoingPayment.getSkuId(), onGoingPayment);
+
+      return;
+    }
+
     String txHash = data.getStringExtra(TRANSACTION_HASH_KEY);
 
     if (txHash == null) {
@@ -77,10 +91,13 @@ public final class PaymentService {
       throw new IllegalStateException("Catastrofic Failure! No ongoing payment in course!");
     }
 
+    // Everything went well.
+    onGoingPayment.setPaymentStatus(PaymentStatus.SUCCESS);
+
     payments.put(onGoingPayment.getSkuId(), onGoingPayment);
   }
 
-  public PaymentStatus getLastPayment() {
+  public PaymentDetails getLastPayment() {
     return onGoingPayment;
   }
 

@@ -3,7 +3,7 @@ package com.asf.appcoins.sdk;
 import android.app.Activity;
 import android.content.Intent;
 import com.asf.appcoins.sdk.entity.SKU;
-import com.asf.appcoins.sdk.payment.PaymentStatus;
+import com.asf.appcoins.sdk.payment.PaymentDetails;
 import io.reactivex.Observable;
 import java.util.Collection;
 
@@ -13,9 +13,9 @@ import java.util.Collection;
 
 public interface AppCoinsSdk {
 
-  Observable<PaymentStatus> getPayment(String skuId);
+  Observable<PaymentDetails> getPayment(String skuId);
 
-  Observable<PaymentStatus> getLastPayment();
+  Observable<PaymentDetails> getLastPayment();
 
   void consume(String skuId);
 
