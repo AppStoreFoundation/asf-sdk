@@ -5,11 +5,11 @@ package com.asf.appcoins.sdk.entity;
  */
 public final class Transaction {
 
-  private final String hash;
-  private final String from;
   private final String to;
   private final String value;
   private final Status status;
+  private String hash;
+  private String from;
 
   public Transaction(String hash, String from, String to, String value, Status status) {
     this.hash = hash;
@@ -23,8 +23,17 @@ public final class Transaction {
     return hash;
   }
 
+  public void setHash(String hash) {
+    this.hash = hash;
+  }
+
   public String getFrom() {
     return from;
+  }
+
+  public void setFrom(String from) {
+
+    this.from = from;
   }
 
   public String getTo() {

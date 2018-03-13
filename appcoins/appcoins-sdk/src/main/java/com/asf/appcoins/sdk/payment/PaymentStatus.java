@@ -5,5 +5,5 @@ package com.asf.appcoins.sdk.payment;
  */
 
 public enum PaymentStatus {
-  SUCCESS, FAIL
+  SUCCESS, FAIL, PENDING
 }

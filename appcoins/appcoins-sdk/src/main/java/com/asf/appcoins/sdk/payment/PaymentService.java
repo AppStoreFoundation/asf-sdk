@@ -9,7 +9,6 @@ import com.asf.appcoins.sdk.entity.Transaction;
 import com.asf.appcoins.sdk.entity.Transaction.Status;
 import com.asf.appcoins.sdk.util.UriBuilder;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,13 +25,15 @@ public final class PaymentService {
   private final SkuManager skuManager;
   private final String developerAddress;
   private final Map<String, PaymentDetails> payments;
-  private AsfWeb3j asfWeb3j;
+  private final AsfWeb3j asfWeb3j;
   private PaymentDetails onGoingPayment;
 
-  public PaymentService(int networkId, SkuManager skuManager, String developerAddress) {
+  public PaymentService(int networkId, SkuManager skuManager, String developerAddress,
+      AsfWeb3j asfWeb3j) {
     this.networkId = networkId;
     this.skuManager = skuManager;
     this.developerAddress = developerAddress;
+    this.asfWeb3j = asfWeb3j;
     this.payments = new HashMap<>(1);
   }
 
@@ -51,19 +52,15 @@ public final class PaymentService {
       throw new IllegalArgumentException(
           "Pending buy action with the same sku found! Did you forget to consume the former?");
     } else {
-      onGoingPayment =
-          new PaymentDetails(PaymentStatus.FAIL, skuId, buildTransaction(developerAddress));
+      onGoingPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
+          new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
       payments.put(skuId, onGoingPayment);
 
       activity.startActivityForResult(intent, defaultRequestCode);
     }
   }
 
-  private Transaction buildTransaction(String from, String to, BigDecimal value, Status status) {
-    Transaction transaction = new Transaction();
-  }
-
-  public Observable<PaymentDetails> getPaymentStatus(String skuId) {
+  public Observable<PaymentDetails> getPaymentDetails(String skuId) {
     return asfWeb3j.getTransactionByHash(getTransactionHash(skuId))
         .map(transaction -> {
           PaymentStatus paymentStatus =
@@ -82,34 +79,23 @@ public final class PaymentService {
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
     String skuId = onGoingPayment.getSkuId();
-    PaymentStatus paymentStatus = null;
     if (data == null) {
-      paymentStatus = PaymentStatus.FAIL;
     } else {
       String txHash = data.getStringExtra(TRANSACTION_HASH_KEY);
 
       if (txHash == null) {
         throw new IllegalStateException("Failed to get tx hash!");
       } else {
-        onGoingPayment.setTransaction(txHash);
+        onGoingPayment.getTransaction()
+            .setHash(txHash);
       }
 
       if (onGoingPayment == null) {
         throw new IllegalStateException("Catastrofic Failure! No ongoing payment in course!");
       }
 
-      PaymentDetails remotePaymentDetails = getPaymentStatus(skuId).subscribeOn(Schedulers.io())
-          .blockingFirst();
-
-      if (remotePaymentDetails.getPaymentStatus() != PaymentStatus.SUCCESS) {
-        throw new IllegalStateException("Remote Payment Reported failure!");
-      }
-
-      // Everything went well.
-      paymentStatus = PaymentStatus.SUCCESS;
+      onGoingPayment.setPaymentStatus(PaymentStatus.PENDING);
     }
-
-    onGoingPayment.setPaymentStatus(paymentStatus);
   }
 
   public PaymentDetails getLastPayment() {

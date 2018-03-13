@@ -36,7 +36,7 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   @Override public Observable<PaymentDetails> getPayment(String skuId) {
     return Observable.interval(period, TimeUnit.SECONDS, scheduler)
         .timeInterval()
-        .switchMap(scan -> paymentService.getPaymentStatus(skuId))
+        .switchMap(scan -> paymentService.getPaymentDetails(skuId))
         .takeUntil(paymentDetails -> paymentDetails.getTransaction()
             .getStatus() == Status.PENDING);
   }
