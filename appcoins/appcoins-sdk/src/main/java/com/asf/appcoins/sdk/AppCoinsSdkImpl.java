@@ -38,11 +38,12 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
         .timeInterval()
         .switchMap(scan -> paymentService.getPaymentDetails(skuId))
         .takeUntil(paymentDetails -> paymentDetails.getTransaction()
-            .getStatus() == Status.PENDING);
+            .getStatus() == Status.ACCEPTED);
   }
 
   @Override public Observable<PaymentDetails> getLastPayment() {
-    return Observable.fromCallable(paymentService::getLastPayment);
+    return getPayment(paymentService.getLastPayment()
+        .getSkuId());
   }
 
   @Override public void consume(String skuId) {
