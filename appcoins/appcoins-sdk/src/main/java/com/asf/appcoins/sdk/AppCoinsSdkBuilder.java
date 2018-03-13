@@ -55,7 +55,9 @@ public final class AppCoinsSdkBuilder {
   }
 
   public AppCoinsSdk createAppCoinsSdk() {
-    if (networkId == null) {
+    if (debug) {
+      networkId = 3;
+    } else {
       networkId = 1;
     }
 
