@@ -34,7 +34,7 @@ public class AppCoinsSdkImplTest {
             developerAddress, "com.sku.id", 3);
 
     Assert.assertThat(uriString,
-        is("ethereum:0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3@3/transfer?uint256=1&developerAddress=0x4fbcc5ce88493c3d9903701c143af65f54481119&data=0x636f6d2e736b752e6964"));
+        is("ethereum:0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3@3/buy?uint256=1&developerAddress=0x4fbcc5ce88493c3d9903701c143af65f54481119&data=0x636f6d2e736b752e6964"));
   }
 
   private List<SKU> buildSkus() {
