@@ -41,6 +41,14 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
             .getStatus() == Status.PENDING);
   }
 
+  @Override public Observable<PaymentStatus> getLastPayment() {
+    return Observable.fromCallable(paymentService::getLastPayment);
+  }
+
+  @Override public void consume(String skuId) {
+    paymentService.consume(skuId);
+  }
+
   @Override public void buy(String skuId, Activity activity) {
     paymentService.buy(skuId, activity, DEFAULT_REQUEST_CODE);
   }
@@ -50,6 +58,8 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   }
 
   @Override public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+    paymentService.onActivityResult(requestCode, resultCode, data);
+
     return (requestCode == DEFAULT_REQUEST_CODE) && data.hasExtra(
         PaymentService.TRANSACTION_HASH_KEY);
   }

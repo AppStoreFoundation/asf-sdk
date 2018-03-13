@@ -15,6 +15,10 @@ public interface AppCoinsSdk {
 
   Observable<PaymentStatus> getPayment(String skuId);
 
+  Observable<PaymentStatus> getLastPayment();
+
+  void consume(String skuId);
+
   void buy(String skuId, Activity activity);
 
   Collection<SKU> listSkus();

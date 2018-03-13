@@ -76,6 +76,18 @@ public final class PaymentService {
     }
 
     payments.put(onGoingPayment.getSkuId(), onGoingPayment);
-    onGoingPayment = null;
+  }
+
+  public PaymentStatus getLastPayment() {
+    return onGoingPayment;
+  }
+
+  public void consume(String skuId) {
+    if (!payments.containsKey(skuId)) {
+      throw new IllegalArgumentException(
+          "Failed to consume " + skuId + '!' + System.lineSeparator() + "Did you buy it first?");
+    }
+
+    payments.remove(skuId);
   }
 }
