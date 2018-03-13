@@ -2,6 +2,7 @@ package com.asf.appcoins.sdk.payment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import com.asf.appcoins.sdk.AsfWeb3j;
 import com.asf.appcoins.sdk.SkuManager;
 import com.asf.appcoins.sdk.util.UriBuilder;
@@ -38,9 +39,10 @@ public final class PaymentService {
     BigDecimal amount = skuManager.getSkuAmount(skuId);
     BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
-    intent.setData(
-        UriBuilder.buildUri("0x8dd69259800b37aee1eb60836a18d313965278f6", skuId, networkId, total,
-            developerAddress));
+    Uri data =
+        UriBuilder.buildUri("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3", skuId, networkId, total,
+            developerAddress);
+    intent.setData(data);
 
     if (payments.containsKey(skuId)) {
       throw new IllegalArgumentException(
