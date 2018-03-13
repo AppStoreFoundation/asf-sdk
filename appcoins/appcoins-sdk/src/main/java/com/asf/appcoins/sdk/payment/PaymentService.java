@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.net.Uri;
 import com.asf.appcoins.sdk.AsfWeb3j;
 import com.asf.appcoins.sdk.SkuManager;
+import com.asf.appcoins.sdk.entity.Transaction;
 import com.asf.appcoins.sdk.entity.Transaction.Status;
 import com.asf.appcoins.sdk.util.UriBuilder;
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,11 +51,16 @@ public final class PaymentService {
       throw new IllegalArgumentException(
           "Pending buy action with the same sku found! Did you forget to consume the former?");
     } else {
-      onGoingPayment = new PaymentDetails(PaymentStatus.SUCCESS, skuId);
+      onGoingPayment =
+          new PaymentDetails(PaymentStatus.FAIL, skuId, buildTransaction(developerAddress));
       payments.put(skuId, onGoingPayment);
 
       activity.startActivityForResult(intent, defaultRequestCode);
     }
+  }
+
+  private Transaction buildTransaction(String from, String to, BigDecimal value, Status status) {
+    Transaction transaction = new Transaction();
   }
 
   public Observable<PaymentDetails> getPaymentStatus(String skuId) {
@@ -74,27 +81,35 @@ public final class PaymentService {
 
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+    String skuId = onGoingPayment.getSkuId();
+    PaymentStatus paymentStatus = null;
     if (data == null) {
-      onGoingPayment.setPaymentStatus(PaymentStatus.FAIL);
-      payments.put(onGoingPayment.getSkuId(), onGoingPayment);
+      paymentStatus = PaymentStatus.FAIL;
+    } else {
+      String txHash = data.getStringExtra(TRANSACTION_HASH_KEY);
 
-      return;
+      if (txHash == null) {
+        throw new IllegalStateException("Failed to get tx hash!");
+      } else {
+        onGoingPayment.setTransaction(txHash);
+      }
+
+      if (onGoingPayment == null) {
+        throw new IllegalStateException("Catastrofic Failure! No ongoing payment in course!");
+      }
+
+      PaymentDetails remotePaymentDetails = getPaymentStatus(skuId).subscribeOn(Schedulers.io())
+          .blockingFirst();
+
+      if (remotePaymentDetails.getPaymentStatus() != PaymentStatus.SUCCESS) {
+        throw new IllegalStateException("Remote Payment Reported failure!");
+      }
+
+      // Everything went well.
+      paymentStatus = PaymentStatus.SUCCESS;
     }
 
-    String txHash = data.getStringExtra(TRANSACTION_HASH_KEY);
-
-    if (txHash == null) {
-      throw new IllegalStateException("Failed to get tx hash!");
-    }
-
-    if (onGoingPayment == null) {
-      throw new IllegalStateException("Catastrofic Failure! No ongoing payment in course!");
-    }
-
-    // Everything went well.
-    onGoingPayment.setPaymentStatus(PaymentStatus.SUCCESS);
-
-    payments.put(onGoingPayment.getSkuId(), onGoingPayment);
+    onGoingPayment.setPaymentStatus(paymentStatus);
   }
 
   public PaymentDetails getLastPayment() {

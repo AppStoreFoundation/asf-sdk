@@ -52,14 +52,10 @@ public final class TransactionFactory {
   }
 
   private static Status parseStatus(String status) {
-    if (Status.ACCEPTED.getValue()
-        .equals(status)) {
+    if (status.equals("0x1")) {
       return Status.ACCEPTED;
-    } else if (Status.FAILED.getValue()
-        .equals(status)) {
-      return Status.FAILED;
     } else {
-      throw new IllegalArgumentException("Failed to parse status!");
+      return Status.FAILED;
     }
   }
 
