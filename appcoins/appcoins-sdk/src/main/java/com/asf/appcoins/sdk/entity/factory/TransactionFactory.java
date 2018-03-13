@@ -1,8 +1,8 @@
 package com.asf.appcoins.sdk.entity.factory;
 
-import cm.aptoide.pt.ethereumj.solidity.SolidityType.IntType;
 import com.asf.appcoins.sdk.entity.Transaction;
 import com.asf.appcoins.sdk.entity.Transaction.Status;
+import ethereumj.solidity.SolidityType.IntType;
 import java.math.BigInteger;
 import org.spongycastle.util.encoders.Hex;
 import org.web3j.abi.datatypes.Address;
