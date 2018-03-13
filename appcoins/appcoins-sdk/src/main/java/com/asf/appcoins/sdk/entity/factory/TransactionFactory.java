@@ -64,6 +64,10 @@ public final class TransactionFactory {
   }
 
   static String extractValueFromEthGetTransactionReceipt(String data) {
+    if (data.startsWith("0x")) {
+      data = data.substring(2);
+    }
+
     return IntType.decodeInt(Hex.decode(data), 0)
         .toString();
   }
