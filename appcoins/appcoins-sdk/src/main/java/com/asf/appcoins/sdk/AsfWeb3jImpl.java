@@ -52,7 +52,8 @@ final class AsfWeb3jImpl implements AsfWeb3j {
     return Observable.fromCallable(() -> web3j.ethGetTransactionReceipt(txHash)
         .send())
         .flatMap(ethGetTransactionReceipt -> {
-          if (ethGetTransactionReceipt == null) {
+          if ((ethGetTransactionReceipt == null)
+              || (ethGetTransactionReceipt.getTransactionReceipt() == null)) {
             EthTransaction send = web3j.ethGetTransactionByHash(txHash)
                 .send();
             return Observable.just(TransactionFactory.fromEthTransaction(send, Status.PENDING));
