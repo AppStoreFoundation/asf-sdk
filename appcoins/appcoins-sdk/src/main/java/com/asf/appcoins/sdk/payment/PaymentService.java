@@ -121,7 +121,8 @@ public final class PaymentService {
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
     String skuId = onGoingPayment.getSkuId();
-    if (data == null) {
+    if ((data == null) || !data.hasExtra(TRANSACTION_HASH_KEY)) {
+      payments.remove(skuId);
     } else {
       String txHash = data.getStringExtra(TRANSACTION_HASH_KEY);
 

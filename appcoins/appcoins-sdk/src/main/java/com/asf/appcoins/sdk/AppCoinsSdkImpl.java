@@ -61,7 +61,6 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   @Override public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
     paymentService.onActivityResult(requestCode, resultCode, data);
 
-    return (requestCode == DEFAULT_REQUEST_CODE) && ((data != null) && data.hasExtra(
-        PaymentService.TRANSACTION_HASH_KEY));
+    return (requestCode == DEFAULT_REQUEST_CODE);
   }
 }
