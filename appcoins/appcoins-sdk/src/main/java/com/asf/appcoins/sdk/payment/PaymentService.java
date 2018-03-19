@@ -92,7 +92,7 @@ public final class PaymentService {
     return Single.create(emitter -> {
       Builder builder;
       builder = new Builder(context);
-      builder.setTitle("Appc Wallet Missing")
+      builder.setTitle("APPC Wallet Missing")
           .setMessage("Do you want to install the ASF wallet?")
           .setPositiveButton(string.yes, (dialog, which) -> emitter.onSuccess(true))
           .setNegativeButton(string.no, (dialog, which) -> emitter.onSuccess(false))
