@@ -37,7 +37,7 @@ public final class PaymentService {
   private final Map<String, PaymentDetails> payments;
   private final AsfWeb3j asfWeb3j;
 
-  private PaymentDetails onGoingPayment;
+  private PaymentDetails currentPayment;
 
   public PaymentService(int networkId, SkuManager skuManager, String developerAddress,
       AsfWeb3j asfWeb3j) {
@@ -60,9 +60,9 @@ public final class PaymentService {
         throw new IllegalArgumentException(
             "Pending buy action with the same sku found! Did you forget to consume the former?");
       } else {
-        onGoingPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
+        currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
             new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
-        payments.put(skuId, onGoingPayment);
+        payments.put(skuId, currentPayment);
 
         activity.startActivityForResult(intent, defaultRequestCode);
       }
@@ -126,7 +126,7 @@ public final class PaymentService {
 
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-    String skuId = onGoingPayment.getSkuId();
+    String skuId = currentPayment.getSkuId();
     if ((data == null) || !data.hasExtra(TRANSACTION_HASH_KEY)) {
       payments.remove(skuId);
     } else {
@@ -135,20 +135,20 @@ public final class PaymentService {
       if (txHash == null) {
         throw new IllegalStateException("Failed to get tx hash!");
       } else {
-        onGoingPayment.getTransaction()
+        currentPayment.getTransaction()
             .setHash(txHash);
       }
 
-      if (onGoingPayment == null) {
+      if (currentPayment == null) {
         throw new IllegalStateException("Catastrofic Failure! No ongoing payment in course!");
       }
 
-      onGoingPayment.setPaymentStatus(PaymentStatus.PENDING);
+      currentPayment.setPaymentStatus(PaymentStatus.PENDING);
     }
   }
 
-  public PaymentDetails getLastPayment() {
-    return onGoingPayment;
+  public PaymentDetails getCurrentPayment() {
+    return currentPayment;
   }
 
   public void consume(String skuId) {

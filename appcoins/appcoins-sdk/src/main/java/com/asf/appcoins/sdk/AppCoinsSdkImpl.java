@@ -41,9 +41,15 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
             .getStatus() == Status.ACCEPTED);
   }
 
-  @Override public Observable<PaymentDetails> getLastPayment() {
-    return getPayment(paymentService.getLastPayment()
-        .getSkuId());
+  @Override public Observable<PaymentDetails> getCurrentPayment() {
+    String txHash = paymentService.getCurrentPayment()
+        .getTransaction()
+        .getHash();
+
+    boolean hasTxHash = txHash != null;
+
+    return hasTxHash ? getPayment(paymentService.getCurrentPayment()
+        .getSkuId()) : Observable.just(paymentService.getCurrentPayment());
   }
 
   @Override public void consume(String skuId) {
