@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import com.asf.appcoins.sdk.AsfWeb3j;
 import com.asf.appcoins.sdk.SkuManager;
+import com.asf.appcoins.sdk.entity.SKU;
 import com.asf.appcoins.sdk.entity.Transaction;
 import com.asf.appcoins.sdk.entity.Transaction.Status;
 import com.asf.appcoins.sdk.util.UriBuilder;
@@ -27,6 +28,7 @@ import java.util.Map;
 public final class PaymentService {
 
   public static final String TRANSACTION_HASH_KEY = "transaction_hash";
+  public static final String PRODUCT_NAME = "product_name";
 
   private static final int DECIMALS = 18;
   private final int networkId;
@@ -47,10 +49,11 @@ public final class PaymentService {
   }
 
   public void buy(String skuId, Activity activity, int defaultRequestCode) {
+    SKU sku = skuManager.getSku(skuId);
     BigDecimal amount = skuManager.getSkuAmount(skuId);
     BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
-    Intent intent = buildPaymentIntent(skuId, total);
+    Intent intent = buildPaymentIntent(sku, total);
 
     if (AndroidUtils.hasHandlerAvailable(intent, activity)) {
       if (payments.containsKey(skuId)) {
@@ -97,12 +100,15 @@ public final class PaymentService {
     });
   }
 
-  @NonNull private Intent buildPaymentIntent(String skuId, BigDecimal total) {
+  @NonNull private Intent buildPaymentIntent(SKU sku, BigDecimal total) {
     Intent intent = new Intent(Intent.ACTION_VIEW);
     Uri data =
-        UriBuilder.buildUri("0xab949343e6c369c6b17c7ae302c1debd4b7b61c3", skuId, networkId, total,
-            developerAddress);
+        UriBuilder.buildUri("0xab949343e6c369c6b17c7ae302c1debd4b7b61c3", sku.getId(), networkId,
+            total, developerAddress);
     intent.setData(data);
+
+    intent.putExtra(PRODUCT_NAME, sku.getName());
+
     return intent;
   }
 
