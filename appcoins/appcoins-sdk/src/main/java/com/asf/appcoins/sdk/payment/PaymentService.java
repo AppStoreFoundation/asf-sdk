@@ -55,13 +55,14 @@ public final class PaymentService {
 
     Intent intent = buildPaymentIntent(sku, total);
 
+    currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
+        new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
+
     if (AndroidUtils.hasHandlerAvailable(intent, activity)) {
       if (payments.containsKey(skuId)) {
         throw new IllegalArgumentException(
             "Pending buy action with the same sku found! Did you forget to consume the former?");
       } else {
-        currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
-            new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
         payments.put(skuId, currentPayment);
 
         activity.startActivityForResult(intent, defaultRequestCode);
