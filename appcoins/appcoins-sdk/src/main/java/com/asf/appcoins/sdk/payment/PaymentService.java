@@ -77,7 +77,7 @@ public final class PaymentService {
 
   @NonNull private Consumer<Boolean> gotoStore(Activity activity) {
     return aBoolean -> {
-      String appPackageName = "com.asf.wallet";
+      String appPackageName = "com.asfoundation.wallet";
       try {
         activity.startActivity(
             new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
