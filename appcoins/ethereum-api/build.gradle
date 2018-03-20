@@ -19,5 +19,5 @@ dependencies {
 
 
     // https://mvnrepository.com/artifact/org.web3j/abi
-    compile group: 'org.web3j', name: 'abi', version: '3.1.1'
+    compile group: 'org.web3j', name: 'abi', version: '3.3.1'
 }

@@ -45,7 +45,7 @@ dependencies {
   // https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxjava
   api group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.10'
   // https://mvnrepository.com/artifact/org.web3j/core
-  api group: 'org.web3j', name: 'core', version: '3.1.1-android'
+  api group: 'org.web3j', name: 'core', version: '3.3.1-android'
 }
 
 task sourcesJar(type: Jar) {
