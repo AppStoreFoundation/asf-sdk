@@ -93,7 +93,7 @@ public final class PaymentService {
       Builder builder;
       builder = new Builder(context);
       builder.setTitle("APPC Wallet Missing")
-          .setMessage("Do you want to install the ASF wallet?")
+          .setMessage("To complete your purchase, you have to install an AppCoins wallet")
           .setPositiveButton(string.yes, (dialog, which) -> emitter.onSuccess(true))
           .setNegativeButton(string.no, (dialog, which) -> emitter.onSuccess(false))
           .setIcon(drawable.ic_dialog_alert)
