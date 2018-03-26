@@ -23,6 +23,9 @@
 # AppCoins SDK
 -keep class com.asf.appcoins.** { *; }
 
+# Web3j
+-keep class org.web3j.** { *; }
+
 # EthereumJ
 -keep class ethereumj.** { *; }
 
