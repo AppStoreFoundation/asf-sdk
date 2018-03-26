@@ -114,9 +114,13 @@ public final class PaymentService {
   }
 
   public Observable<PaymentDetails> getPaymentDetails(String skuId) {
-    return asfWeb3j.getTransactionByHash(getTransactionHash(skuId))
-        .map(transaction -> new PaymentDetails(PaymentStatus.from(transaction.getStatus()), skuId,
-            transaction));
+    if (payments.get(skuId) != null) {
+      return asfWeb3j.getTransactionByHash(getTransactionHash(skuId))
+          .map(transaction -> new PaymentDetails(PaymentStatus.from(transaction.getStatus()), skuId,
+              transaction));
+    } else {
+      throw new IllegalArgumentException("SkuId not present! " + skuId);
+    }
   }
 
   private String getTransactionHash(String skuId) {
