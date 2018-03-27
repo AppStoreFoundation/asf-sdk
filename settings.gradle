@@ -1,4 +1,3 @@
 rootProject.name = 'appcoins'
 
-include ':ethereum-api'
 include ':appcoins-sdk'
