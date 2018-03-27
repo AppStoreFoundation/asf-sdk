@@ -34,9 +34,7 @@ buildscript {
 // apply the following to all projects, except the
 // Android test project, that one has its own
 // build.gradle file cause Android is special...
-configure(allprojects - project(":microraidenj-android") -
-    project(":ethereumapiexample") -
-    project(":appcoins-sdk")) {
+configure(allprojects - project(":ethereumapiexample") - project(":appcoins-sdk")) {
   apply plugin: "idea"
   apply plugin: 'java-library'
 
