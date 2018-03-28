@@ -414,7 +414,7 @@ public class Transaction {
 
   public Integer getChainId() {
     rlpParse();
-    return chainId == null ? null : chainId;
+    return chainId;
   }
 
   /**

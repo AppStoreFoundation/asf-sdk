@@ -36,7 +36,6 @@ import org.spongycastle.util.encoders.Hex;
 import static ethereumj.crypto.HashUtil.sha3;
 import static ethereumj.solidity.SolidityType.IntType;
 import static ethereumj.util.ByteUtil.longToBytesNoLeadZeroes;
-import static java.lang.String.format;
 import static org.apache.commons.lang3.ArrayUtils.subarray;
 import static org.apache.commons.lang3.StringUtils.stripEnd;
 

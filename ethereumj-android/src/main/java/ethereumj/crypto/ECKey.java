@@ -562,14 +562,13 @@ public class ECKey implements Serializable {
   public static boolean isPubKeyCanonical(byte[] pubkey) {
     if (pubkey[0] == 0x04) {
       // Uncompressed pubkey
-      if (pubkey.length != 65) return false;
+      return pubkey.length == 65;
     } else if (pubkey[0] == 0x02 || pubkey[0] == 0x03) {
       // Compressed pubkey
-      if (pubkey.length != 33) return false;
+      return pubkey.length == 33;
     } else {
       return false;
     }
-    return true;
   }
 
   /**
