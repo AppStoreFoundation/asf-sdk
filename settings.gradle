@@ -1,3 +1,4 @@
 rootProject.name = 'appcoins'
 
 include ':appcoins-sdk'
+include ':toolbox'
