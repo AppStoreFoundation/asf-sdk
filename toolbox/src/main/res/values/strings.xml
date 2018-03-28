@@ -1,3 +1,5 @@
 <resources>
   <string name="app_name">Toolbox</string>
+  <string name="buy_gas">Buy Gas</string>
+  <string name="upgrade_vehicle">Upgrade Vehicle</string>
 </resources>
