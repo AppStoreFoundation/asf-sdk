@@ -2,8 +2,8 @@ package com.asf.appcoins.sdk.entity.factory;
 
 import com.asf.appcoins.sdk.entity.Transaction;
 import com.asf.appcoins.sdk.entity.Transaction.Status;
-import ethereumj.solidity.SolidityType.IntType;
 import java.math.BigInteger;
+import java.util.Arrays;
 import org.spongycastle.util.encoders.Hex;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
@@ -64,20 +64,23 @@ public final class TransactionFactory {
       data = data.substring(2);
     }
 
-    return IntType.decodeInt(Hex.decode(data), 0)
-        .toString();
+    return decodeInt(Hex.decode(data), 0).toString();
   }
 
   static String extractValueFromEthTransaction(String input) {
     String valueHex = input.substring(input.length() - ((256 >> 2)));
-    BigInteger value = IntType.decodeInt(Hex.decode(valueHex), 0);
+    BigInteger value = decodeInt(Hex.decode(valueHex), 0);
     return value.toString();
   }
 
   static String extractToFromEthTransaction(String input) {
     String valueHex = input.substring(10, input.length() - ((256 >> 2)));
-    Address address = new Address(IntType.decodeInt(Hex.decode(valueHex), 0));
+    Address address = new Address(decodeInt(Hex.decode(valueHex), 0));
 
     return address.toString();
+  }
+
+  public static BigInteger decodeInt(byte[] encoded, int offset) {
+    return new BigInteger(Arrays.copyOfRange(encoded, offset, offset + 32));
   }
 }

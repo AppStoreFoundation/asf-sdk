@@ -1,0 +1,22 @@
+ext {
+  lib = [:]
+}
+
+lib.support_annotations = "com.android.support:support-annotations:${ver.support_annotations}"
+
+lib.appcompat_v7 = "com.android.support:appcompat-v7:${ver.appcompat_v7}"
+lib.constraint_layout = "com.android.support.constraint:constraint-layout:${ver.constraint_layout}"
+
+
+lib.junit = "junit:junit:${ver.junit}"
+lib.mockito_core = "org.mockito:mockito-core:${ver.mockito_core}"
+
+lib.rxjava = "io.reactivex.rxjava2:rxjava:${ver.rxjava}"
+lib.web3j = "org.web3j:core:${ver.web3j}"
+
+lib.commons_lang3 = "org.apache.commons:commons-lang3:${ver.commons_lang3}"
+
+lib.spongycastle_prov = "com.madgag.spongycastle:prov:${ver.spongycastle_prov}"
+
+lib.jackson = ["com.fasterxml.jackson.core:jackson-databind:${ver.jackson}",
+               "com.fasterxml.jackson.core:jackson-annotations:${ver.jackson}"]

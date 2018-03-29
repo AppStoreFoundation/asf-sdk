@@ -1,0 +1,40 @@
+ext {
+  ver = [:]
+}
+
+// Gradle
+ver.gradle = '4.6'
+
+// https://mvnrepository.com/artifact/com.android.support/support-annotations
+ver.support_annotations = "27.1.0"
+
+ver.appcompat_v7 = "27.1.0"
+ver.constraint_layout = "1.0.2"
+
+// https://mvnrepository.com/artifact/junit/junit
+ver.junit = "4.12"
+// https://mvnrepository.com/artifact/org.mockito/mockito-core
+ver.mockito_core = "2.16.0"
+
+// https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxjava
+ver.rxjava = "2.1.10"
+// https://mvnrepository.com/artifact/org.web3j/core
+ver.web3j = "3.3.1-android"
+
+// https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15
+ver.spongycastle = "1.46"
+
+// https://mvnrepository.com/artifact/com.madgag.spongycastle/core
+ver.spongycastle = "1.58.0.0"
+
+// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+ver.commons_lang3 = "3.7"
+
+// https://mvnrepository.com/artifact/com.madgag.spongycastle/prov
+ver.spongycastle_prov = "1.58.0.0"
+
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
+ver.jackson = "2.9.5"
+
+

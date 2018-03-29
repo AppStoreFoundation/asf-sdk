@@ -3,8 +3,6 @@ apply plugin: 'com.android.application'
 android {
   compileSdkVersion 27
 
-
-
   defaultConfig {
     applicationId "com.asf.appcoins.toolbox"
     minSdkVersion 23
@@ -21,20 +19,23 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+
   compileOptions {
     targetCompatibility 1.8
     sourceCompatibility 1.8
   }
+
+  lintOptions {
+    warning 'InvalidPackage'
+  }
+
 }
 
 dependencies {
-  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation lib.appcompat_v7
+  implementation lib.constraint_layout
 
-  implementation 'com.android.support:appcompat-v7:27.1.0'
-  implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-  testImplementation 'junit:junit:4.12'
-  androidTestImplementation 'com.android.support.test:runner:1.0.1'
-  androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+  testImplementation lib.junit
 
   api project(':appcoins-sdk')
 }

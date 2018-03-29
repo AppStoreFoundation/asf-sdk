@@ -27,33 +27,24 @@ android {
     }
   }
 
-  compileOptions {
-    sourceCompatibility 1.8
-    targetCompatibility 1.8
-  }
-
   lintOptions {
     warning 'InvalidPackage'
+  }
+
+  compileOptions {
+    targetCompatibility 1.8
+    sourceCompatibility 1.8
   }
 }
 
 dependencies {
-  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  testImplementation lib.junit
+  testImplementation lib.mockito_core
 
-  // https://mvnrepository.com/artifact/junit/junit
-  testImplementation group: 'junit', name: 'junit', version: '4.12'
-  // https://mvnrepository.com/artifact/org.mockito/mockito-core
-  testImplementation 'org.mockito:mockito-core:2.16.0'
+  implementation lib.support_annotations
 
-  // https://mvnrepository.com/artifact/com.android.support/support-annotations
-  implementation group: 'com.android.support', name: 'support-annotations', version: '27.1.0'
-
-  api "org.apache.commons:commons-lang3:3.7"
-
-  // https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxjava
-  api group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.10'
-  // https://mvnrepository.com/artifact/org.web3j/core
-  api group: 'org.web3j', name: 'core', version: '3.3.1-android'
+  api lib.rxjava
+  api lib.web3j
 }
 
 task sourcesJar(type: Jar) {

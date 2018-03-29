@@ -3,8 +3,6 @@ apply plugin: 'com.android.library'
 android {
   compileSdkVersion 27
 
-
-
   defaultConfig {
     minSdkVersion 21
     targetSdkVersion 27
@@ -20,13 +18,23 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+
+  compileOptions {
+    targetCompatibility 1.8
+    sourceCompatibility 1.8
+  }
+
+  lintOptions {
+    warning 'InvalidPackage'
+  }
 }
 
 dependencies {
-  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  testImplementation lib.junit
+  testImplementation lib.mockito_core
 
-  implementation 'com.android.support:appcompat-v7:27.1.0'
-  testImplementation 'junit:junit:4.12'
-  androidTestImplementation 'com.android.support.test:runner:1.0.1'
-  androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+  implementation lib.support_annotations
+  implementation lib.commons_lang3
+  implementation lib.spongycastle_prov
+  implementation lib.jackson
 }

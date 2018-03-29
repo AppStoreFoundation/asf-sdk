@@ -30,3 +30,13 @@ buildscript {
     classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
   }
 }
+
+configure(allprojects) {
+  apply from: "${rootProject.projectDir}/gradle/versions.gradle"
+  apply from: "${rootProject.projectDir}/gradle/libraries.gradle"
+
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+}
