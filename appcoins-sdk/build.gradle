@@ -48,8 +48,6 @@ dependencies {
   // https://mvnrepository.com/artifact/com.android.support/support-annotations
   implementation group: 'com.android.support', name: 'support-annotations', version: '27.1.0'
 
-  api "org.apache.commons:commons-lang3:3.7"
-
   // https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxjava
   api group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.10'
   // https://mvnrepository.com/artifact/org.web3j/core
