@@ -1,8 +1,8 @@
 package com.asf.appcoins.toolbox;
 
-import com.asf.appcoins.sdk.AppCoinsSdk;
-import com.asf.appcoins.sdk.AppCoinsSdkBuilder;
-import com.asf.appcoins.sdk.entity.SKU;
+import com.asf.appcoins.sdk.iab.AppCoinsSdk;
+import com.asf.appcoins.sdk.iab.AppCoinsSdkBuilder;
+import com.asf.appcoins.sdk.iab.entity.SKU;
 import java.util.List;
 
 public class AppCoinsSdkSingleton {

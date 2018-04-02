@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
-import com.asf.appcoins.sdk.AppCoinsSdk;
-import com.asf.appcoins.sdk.payment.PaymentDetails;
-import com.asf.appcoins.sdk.payment.PaymentStatus;
+import com.asf.appcoins.sdk.iab.AppCoinsSdk;
+import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
+import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class MainActivity extends AppCompatActivity {
