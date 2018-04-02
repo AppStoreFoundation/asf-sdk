@@ -39,6 +39,5 @@ dependencies {
 
   testImplementation lib.junit
 
-  api project(':appcoins-sdk-iab')
-  api project(':appcoins-sdk-ads')
+  api project(':appcoins-sdk')
 }
