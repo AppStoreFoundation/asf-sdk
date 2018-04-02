@@ -9,7 +9,7 @@ android {
 
   defaultConfig {
     minSdkVersion MIN_SDK_VERSION
-    targetSdkVersion
+    targetSdkVersion TARGET_SDK_VERSION
 
     versionCode 2
     versionName "0.2.0a"
