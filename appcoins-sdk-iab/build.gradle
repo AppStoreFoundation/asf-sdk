@@ -11,8 +11,8 @@ android {
     minSdkVersion MIN_SDK_VERSION
     targetSdkVersion TARGET_SDK_VERSION
 
-    versionCode 2
-    versionName "0.2.0a"
+    versionCode VERSION_CODE
+    versionName VERSION_NAME
 
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 

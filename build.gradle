@@ -35,6 +35,7 @@ configure(allprojects) {
   apply from: "${rootProject.projectDir}/gradle/versions.gradle"
   apply from: "${rootProject.projectDir}/gradle/libraries.gradle"
   apply from: "${rootProject.projectDir}/gradle/android.gradle"
+  apply from: "${rootProject.projectDir}/gradle/publish.gradle"
 
   repositories {
     mavenCentral()
