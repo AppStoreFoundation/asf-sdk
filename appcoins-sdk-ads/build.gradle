@@ -1,11 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-  compileSdkVersion 27
+  compileSdkVersion COMPILE_SDK_VERSION
 
   defaultConfig {
-    minSdkVersion 21
-    targetSdkVersion 27
+    minSdkVersion MIN_SDK_VERSION
+    targetSdkVersion TARGET_SDK_VERSION
+
     versionCode 1
     versionName "1.0"
 
@@ -18,6 +19,11 @@ android {
     release {
       minifyEnabled false
     }
+  }
+
+  compileOptions {
+    targetCompatibility TARGET_COMPATIBILITY
+    sourceCompatibility SOURCE_COMPATIBILITY
   }
 }
 

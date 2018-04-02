@@ -5,11 +5,12 @@ apply plugin: 'com.jfrog.bintray'
 version = '0.2.0a'
 
 android {
-  compileSdkVersion 27
+  compileSdkVersion COMPILE_SDK_VERSION
 
   defaultConfig {
-    minSdkVersion 21
-    targetSdkVersion 27
+    minSdkVersion MIN_SDK_VERSION
+    targetSdkVersion
+
     versionCode 2
     versionName "0.2.0a"
 
@@ -32,8 +33,8 @@ android {
   }
 
   compileOptions {
-    targetCompatibility 1.8
-    sourceCompatibility 1.8
+    targetCompatibility TARGET_COMPATIBILITY
+    sourceCompatibility SOURCE_COMPATIBILITY
   }
 }
 

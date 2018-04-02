@@ -34,6 +34,7 @@ buildscript {
 configure(allprojects) {
   apply from: "${rootProject.projectDir}/gradle/versions.gradle"
   apply from: "${rootProject.projectDir}/gradle/libraries.gradle"
+  apply from: "${rootProject.projectDir}/gradle/android.gradle"
 
   repositories {
     mavenCentral()
