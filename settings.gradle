@@ -1,5 +1,6 @@
 rootProject.name = 'appcoins'
 
+include ':appcoins-sdk'
 include ':appcoins-sdk-iab'
 include ':appcoins-sdk-ads'
 include ':ethereumj-android'
