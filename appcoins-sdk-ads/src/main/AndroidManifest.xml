@@ -2,7 +2,7 @@
     package="com.asf.appcoins.sdk.ads">
     <application>
         <service
-            android:name="com.asf.appcoins.sdk.ads.SDKPoAService"
+            android:name="com.asf.appcoins.sdk.ads.poa.SDKPoAService"
             android:enabled="true"
             android:exported="true"
             android:process="com.asf.appcoins.sdk.advertisement">

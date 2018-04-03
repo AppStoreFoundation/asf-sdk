@@ -40,23 +40,6 @@ public interface PoAServiceConnector {
      */
     String PARAM_APP_SERVICE_NAME = "PARAM_APP_SERVICE_NAME";
 
-    /** WARNING: The values for the messages are used on both, sdk and wallet side. So when a new is
-     * message value is added on any side please replicate that change of the interface that is
-     * missing it.
-     */
-    /**
-     * Command to the service to register the Ad campaign
-     */
-    int MSG_REGISTER_CAMPAIGN = 1;
-    /**
-     * Command to the service to send a proof of attention (PoA)
-     */
-    int MSG_SEND_PROOF = 2;
-    /**
-     * Command to the service to send the complete proof to be signed by the App
-     */
-    int MSG_SIGN_PROOF = 3;
-
     /**
      * Method that starts the handshake process, that obtains the wallet that is listening to our
      * broadcast and that manages the PoA process.
@@ -70,11 +53,9 @@ public interface PoAServiceConnector {
      * action of the intent filter.
      *
      * @param context     The context where this connector is being used.
-     * @param action      The action that the service should be listening to.
-     * @param packageName The package name where the service is located.
      * @retun true if the bind was successful, false otherwise.
      */
-    boolean connectToService(Context context, String action, String packageName);
+    boolean connectToService(Context context);
 
     /**
      * Method to unbind with the service that handles the PoA process.

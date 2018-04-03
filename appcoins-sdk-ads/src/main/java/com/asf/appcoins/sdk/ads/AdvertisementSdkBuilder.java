@@ -12,7 +12,7 @@ public final class AdvertisementSdkBuilder {
 
   public AdvertisementSdk createAdvertisementSdk() {
     if (this.poaConnector == null) {
-      this.poaConnector = PoAServiceConnectorImpl.getInstance();
+      this.poaConnector = new PoAServiceConnectorImpl(null);
     }
 
     return new AdvertisementSdkImpl(poaConnector);

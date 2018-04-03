@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -17,177 +19,169 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
-    static final String TAG = "PoAServiceConnectorImpl";
+  static final String TAG = "PoAServiceConnectorImpl";
 
-    /** The instance for this singleton */
-    private static PoAServiceConnectorImpl instance;
+  /** Messenger for sending messages to the service. */
+  Messenger serviceMessenger = null;
+  /** Messenger for receiving messages from the service. */
+  Messenger clientMessenger = null;
 
-    /** Messenger for sending messages to the service. */
-    Messenger serviceMessenger = null;
-    /** Messenger for receiving messages from the service. */
-    Messenger clientMessenger = null;
+  /**
+   * Target we publish for clients to send messages to IncomingHandler. Note
+   * that calls to its binder are sequential!
+   */
+  private final IncomingHandler handler;
 
-    /**
-     * Target we publish for clients to send messages to IncomingHandler. Note
-     * that calls to its binder are sequential!
-     */
-    private final IncomingHandler handler;
+  /**
+   * Handler thread to avoid running on the main thread (UI)
+   */
+  private final HandlerThread handlerThread;
 
-    /**
-     * Handler thread to avoid running on the main thread (UI)
-     */
-    private final HandlerThread handlerThread;
+  /** Flag indicating whether the connector is bound to the service. */
+  static boolean isBound;
 
-    /** Flag indicating whether the connector is bound to the service. */
-    static boolean isBound;
+  /** Message that to be send as soon has we have the service bound */
+  private static Message pendingMsg;
 
-    /** Message that to be send as soon has we have the service bound */
-    private static Message pendingMsg;
+  /**
+   * Handler of incoming messages from service.
+   */
+  class IncomingHandler extends Handler {
 
-    /**
-     * Handler of incoming messages from service.
-     */
-    class IncomingHandler extends Handler {
+    ArrayList<MessageListener> listeners;
 
-        public IncomingHandler(HandlerThread thr) {
-            super(thr.getLooper());
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            Log.d(TAG, "Message received: ");
-
-            switch (msg.what) {
-                case MSG_REGISTER_CAMPAIGN:
-                    Log.d(TAG, "MSG_REGISTER_CAMPAIGN");
-                    break;
-                case MSG_SEND_PROOF:
-                    Log.d(TAG, "MSG_SEND_PROOF");
-                    break;
-                case MSG_SIGN_PROOF:
-                    Log.d(TAG, "MSG_SIGN_PROOF");
-
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
-
-    /**
-     * Class for interacting with the main interface of the service.
-     */
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            serviceMessenger = new Messenger(service);
-
-            isBound = true;
-
-            if (pendingMsg != null) {
-                try {
-                    serviceMessenger.send(pendingMsg);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            serviceMessenger = null;
-            isBound = false;
-        }
-    };
-
-    /**
-     * Method to get the instance of the connector
-     */
-    public static PoAServiceConnectorImpl getInstance() {
-        if (instance == null) {
-            instance = new PoAServiceConnectorImpl();
-        }
-        return instance;
-    }
-
-    /**
-     * The constructor for the connector implementation.
-     */
-    private PoAServiceConnectorImpl() {
-        handlerThread = new HandlerThread("HandlerThread");
-        handlerThread.start();
-        handler = new IncomingHandler(handlerThread);
-        clientMessenger = new Messenger(handler);
+    public IncomingHandler(HandlerThread thr, ArrayList<MessageListener> listeners) {
+      super(thr.getLooper());
+      this.listeners = listeners;
     }
 
     @Override
-    public boolean connectToService(Context context, String action, String packageName) {
-        // Note that this is an implicit Intent that must be defined in the Android Manifest.
-        Intent i = new Intent(action);
-        i.setPackage(packageName);
-
-        return context.getApplicationContext().bindService(i, mConnection,
-                Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void disconnectFromService(Context context) {
-        if (isBound) {
-            context.getApplicationContext().unbindService(mConnection);
-            isBound = false;
+    public void handleMessage(Message msg) {
+      Log.d(TAG, "Message received: ");
+      if (listeners != null) {
+        for (MessageListener listener : listeners) {
+          listener.handle(msg);
         }
+      }
+    }
+  }
+
+  /**
+   * Class for interacting with the main interface of the service.
+   */
+  private ServiceConnection mConnection = new ServiceConnection() {
+    public void onServiceConnected(ComponentName className, IBinder service) {
+      serviceMessenger = new Messenger(service);
+      isBound = true;
     }
 
-    @Override
-    public void sendMessage(Context context, int type, Bundle bundle) {
-        // Create a message to be sent to the service, using a supported 'what/type' value
-        Message msg = Message.obtain(null, type, 0, 0);
-        msg.setData(bundle);
-        msg.replyTo = clientMessenger;
+    public void onServiceDisconnected(ComponentName className) {
+      // This is called when the connection with the service has been
+      // unexpectedly disconnected -- that is, its process crashed.
+      serviceMessenger = null;
+      isBound = false;
+    }
+  };
 
-        // validate if the service is bound
-        if (!isBound) {
-            getService(context);
-            pendingMsg = msg;
-        } else {
-            try {
-                serviceMessenger.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
+  /**
+   * The constructor for the connector implementation.
+   */
+  public PoAServiceConnectorImpl(ArrayList<MessageListener> listeners) {
+    handlerThread = new HandlerThread("HandlerThread");
+    handlerThread.start();
+    handler = new IncomingHandler(handlerThread, listeners);
+    clientMessenger = new Messenger(handler);
+  }
+
+  @Override
+  public boolean connectToService(Context context) {
+    if (isBound) {
+      return true;
+    }
+    // Note that this is an implicit Intent that must be defined in the Android Manifest.
+    SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+    String packageName = preferences.getString(PREFERENCE_WALLET_PCKG_NAME, null);
+    Intent i = new Intent(ACTION_BIND);
+    i.setPackage(packageName);
+
+    boolean result = context.getApplicationContext()
+        .bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+
+    if (!result) {
+      context.getApplicationContext()
+          .unbindService(mConnection);
     }
 
-    @Override
-    public void startHandshake(Context context) {
-        // send broadcast intent to start the handshake
-        Intent broadcastIntent = new Intent(ACTION_START_HANDSHAKE);
-        broadcastIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
-        broadcastIntent.putExtra(PARAM_APP_SERVICE_NAME, SDKPoAService.class.getName());
-        context.sendBroadcast(broadcastIntent);
+    return result;
+  }
+
+  @Override
+  public void disconnectFromService(Context context) {
+    if (isBound) {
+      context.getApplicationContext().unbindService(mConnection);
+      isBound = false;
+    }
+  }
+
+  @Override
+  public void sendMessage(Context context, int type, Bundle bundle) {
+    // validate if the service is bound
+    if (!isBound) {
+      return;
     }
 
-    /**
-     *  Method to get the service, by getting the wallet service package name obtained on the
-     *  handshake.
-     *
-     *  @param context The context of the application.
-     */
-    private void getService(Context context) {
-        if (!isBound) {
-            Log.d(TAG, "Service no yet bound, getting package name fo the service. ");
-            SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-            String packageName = preferences.getString(PREFERENCE_WALLET_PCKG_NAME, null);
+    // Create and send a message to the service, using a supported 'what'
+    // value
+    Message msg = Message.obtain(null, type, 0, 0);
+    msg.setData(bundle);
+    msg.replyTo = clientMessenger;
 
-            Log.e(TAG, "Connecting to service on package: " + packageName);
-            if (packageName != null) {
-                connectToService(context, ACTION_BIND, packageName);
-            }
-        }
+    try {
+      serviceMessenger.send(msg);
+    } catch (RemoteException e) {
+      Log.e(TAG, "Failed to send message: " + e.getMessage(), e);
     }
+  }
+
+  @Override
+  public void startHandshake(Context context) {
+    // send broadcast intent to start the handshake
+    Intent broadcastIntent = new Intent(ACTION_START_HANDSHAKE);
+    broadcastIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
+    broadcastIntent.putExtra(PARAM_APP_SERVICE_NAME, SDKPoAService.class.getName());
+    // We need to start the handshake with the implicit broadcast, instead of a generic one due to a
+    // 'ban' on the implicit broadcast when targeting Android 8.0 sdk (targetSdkVersion). Meaning
+    // that only explicit broadcast will work. For that reason we search for the packages that can
+    // listen to the intent that we intend to send and sent an explicit broadcast for it.
+    sendImplicitBroadcast(context, broadcastIntent);
+  }
+
+  /**
+   * Method to send implicit broadcast of the given intent. This method will check which packages
+   * are ready to receive the broadcasts for the given intent and then send a explicit broadcast.
+   *
+   * @param context The application context
+   * @param intent The intent to broadcast
+   */
+  private static void sendImplicitBroadcast(Context context, Intent intent) {
+    PackageManager pm=context.getPackageManager();
+    List<ResolveInfo> matches=pm.queryBroadcastReceivers(intent, 0);
+
+    for (ResolveInfo resolveInfo : matches) {
+      Intent explicit=new Intent(intent);
+      ComponentName cn=
+          new ComponentName(resolveInfo.activityInfo.applicationInfo.packageName,
+              resolveInfo.activityInfo.name);
+
+      explicit.setComponent(cn);
+      context.sendBroadcast(explicit);
+    }
+  }
 
 }
 
