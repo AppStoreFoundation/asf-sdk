@@ -1,5 +1,7 @@
 package com.asf.appcoins.sdk;
 
+import com.asf.appcoins.sdk.advertisement.PoAServiceConnectorImpl;
+import com.asf.appcoins.sdk.advertisement.PoAServiceConnector;
 import com.asf.appcoins.sdk.entity.SKU;
 import com.asf.appcoins.sdk.payment.PaymentService;
 import io.reactivex.Scheduler;
@@ -21,6 +23,7 @@ public final class AppCoinsSdkBuilder {
   private Scheduler scheduler;
   private SkuManager skuManager;
   private PaymentService paymentService;
+  private PoAServiceConnector poaConnector;
   private boolean debug;
   private AsfWeb3j asfWeb3j;
 
@@ -85,6 +88,10 @@ public final class AppCoinsSdkBuilder {
       this.paymentService = new PaymentService(networkId, skuManager, developerAddress, asfWeb3j);
     }
 
-    return new AppCoinsSdkImpl(period, scheduler, skuManager, paymentService, debug);
+    if (this.poaConnector == null) {
+      this.poaConnector = PoAServiceConnectorImpl.getInstance();
+    }
+
+    return new AppCoinsSdkImpl(period, scheduler, skuManager, paymentService, poaConnector, debug);
   }
 }

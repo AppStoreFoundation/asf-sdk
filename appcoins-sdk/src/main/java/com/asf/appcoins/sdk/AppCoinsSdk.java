@@ -21,6 +21,10 @@ public interface AppCoinsSdk {
 
   void buy(String skuId, Activity activity);
 
+  void handshake(Activity activity);
+
+  void sendProof(Activity activity);
+
   Collection<SKU> listSkus();
 
   boolean onActivityResult(int requestCode, int resultCode, Intent data);

@@ -2,6 +2,9 @@ package com.asf.appcoins.sdk;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+
+import com.asf.appcoins.sdk.advertisement.PoAServiceConnector;
 import com.asf.appcoins.sdk.entity.SKU;
 import com.asf.appcoins.sdk.entity.Transaction.Status;
 import com.asf.appcoins.sdk.payment.PaymentDetails;
@@ -10,6 +13,8 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+
+import static com.asf.appcoins.sdk.advertisement.PoAServiceConnector.MSG_SEND_PROOF;
 
 /**
  * Created by neuro on 01-03-2018.
@@ -24,13 +29,15 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   private final Scheduler scheduler;
   private final PaymentService paymentService;
   private final SkuManager skuManager;
+  private final PoAServiceConnector poaConnector;
 
   AppCoinsSdkImpl(int period, Scheduler scheduler, SkuManager skuManager,
-      PaymentService paymentService, boolean debug) {
+                  PaymentService paymentService, PoAServiceConnector poaConnector, boolean debug) {
     this.period = period;
     this.scheduler = scheduler;
     this.skuManager = skuManager;
     this.paymentService = paymentService;
+    this.poaConnector = poaConnector;
   }
 
   @Override public Observable<PaymentDetails> getPayment(String skuId) {
@@ -58,6 +65,14 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
 
   @Override public void buy(String skuId, Activity activity) {
     paymentService.buy(skuId, activity, DEFAULT_REQUEST_CODE);
+  }
+
+  @Override public void handshake(Activity activity) {
+    poaConnector.startHandshake(activity);
+  }
+
+  @Override public void sendProof(Activity activity) {
+    poaConnector.sendMessage(activity, MSG_SEND_PROOF, new Bundle());
   }
 
   @Override public Collection<SKU> listSkus() {

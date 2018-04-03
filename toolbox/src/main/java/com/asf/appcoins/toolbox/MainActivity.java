@@ -66,4 +66,13 @@ public class MainActivity extends AppCompatActivity {
   public void onUpgradeAppButtonClicked(View arg0) {
     appCoinsSdk.buy(Skus.SKU_PREMIUM_ID, this);
   }
+
+  public void onHandshakeButtonClick(View arg0) {
+    appCoinsSdk.handshake( this);
+  }
+
+  public void onSendProofButtonClick(View arg0) {
+    appCoinsSdk.sendProof( this);
+  }
+
 }

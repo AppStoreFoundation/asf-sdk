@@ -2,4 +2,6 @@
   <string name="app_name">Toolbox</string>
   <string name="buy_gas">Buy Gas</string>
   <string name="upgrade_vehicle">Upgrade Vehicle</string>
+  <string name="handshake">Handshake</string>
+  <string name="send_proof">Send Proof</string>
 </resources>
