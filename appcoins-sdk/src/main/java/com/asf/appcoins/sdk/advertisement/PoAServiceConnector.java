@@ -23,7 +23,7 @@ public interface PoAServiceConnector {
     /**
      * Actions used to communicate with the service on the wallet side, for the bind.
      */
-    String ACTION_BIND = "com.asf.appcoins.service.ACTION_BIND";q
+    String ACTION_BIND = "com.asf.appcoins.service.ACTION_BIND";
 
     /**
      * Intent parameter for the wallet package name, that was obtained on the handshake.
