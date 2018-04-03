@@ -1,122 +1,25 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
-
-version = '0.2.0a'
 
 android {
-  compileSdkVersion 27
+  compileSdkVersion COMPILE_SDK_VERSION
 
   defaultConfig {
-    minSdkVersion 21
-    targetSdkVersion 27
-    versionCode 2
-    versionName "0.2.0a"
+    minSdkVersion MIN_SDK_VERSION
+    targetSdkVersion TARGET_SDK_VERSION
+
+    versionCode VERSION_CODE
+    versionName VERSION_NAME
 
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-    consumerProguardFiles 'proguard-rules.pro'
-  }
-
-  buildTypes {
-    debug {
-      minifyEnabled false
-    }
-    release {
-      minifyEnabled false
-    }
   }
 
   compileOptions {
-    sourceCompatibility 1.8
-    targetCompatibility 1.8
-  }
-
-  lintOptions {
-    warning 'InvalidPackage'
+    targetCompatibility TARGET_COMPATIBILITY
+    sourceCompatibility SOURCE_COMPATIBILITY
   }
 }
 
 dependencies {
-  implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-  // https://mvnrepository.com/artifact/junit/junit
-  testImplementation group: 'junit', name: 'junit', version: '4.12'
-  // https://mvnrepository.com/artifact/org.mockito/mockito-core
-  testImplementation 'org.mockito:mockito-core:2.16.0'
-
-  // https://mvnrepository.com/artifact/com.android.support/support-annotations
-  implementation group: 'com.android.support', name: 'support-annotations', version: '27.1.0'
-
-  api "org.apache.commons:commons-lang3:3.7"
-
-  // https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxjava
-  api group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.10'
-  // https://mvnrepository.com/artifact/org.web3j/core
-  api group: 'org.web3j', name: 'core', version: '3.3.1-android'
+  api project(':appcoins-sdk-iab')
+  api project(':appcoins-sdk-ads')
 }
-
-task sourcesJar(type: Jar) {
-  from android.sourceSets.main.java.srcDirs
-  classifier "sources"
-}
-
-task javadoc(type: Javadoc) {
-  source = android.sourceSets.main.java.srcDirs
-  classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-
-  failOnError = false
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
-  from javadoc.destinationDir
-}
-
-publishing {
-  publications {
-    MyPublication(MavenPublication) {
-      groupId 'com.asfoundation'
-      artifactId 'sdk-android'
-      version project.version
-      artifact(sourcesJar)
-      artifact(javadocJar)
-      artifact("$buildDir/outputs/aar/appcoins-sdk-release.aar")
-
-      //The publication doesn't know about our dependencies, so we have to manually add them to the pom
-      pom.withXml {
-        def dependenciesNode = asNode().appendNode('dependencies')
-
-        //Iterate over the api dependencies (we don't want the test ones), adding a <dependency> node for each
-        configurations.api.allDependencies.each {
-          def dependencyNode = dependenciesNode.appendNode('dependency')
-          dependencyNode.appendNode('groupId', it.group)
-          dependencyNode.appendNode('artifactId', it.name)
-          dependencyNode.appendNode('version', it.version)
-        }
-      }
-    }
-  }
-  repositories {
-    maven {
-      url "$buildDir/repo"
-    }
-  }
-}
-
-bintray {
-  user = "${ASF_BINTRAY_USER}"
-  key = "${ASF_BINTRAY_KEY}"
-  publications = ['MyPublication']
-  pkg {
-    repo = 'asf'
-    name = 'appcoins-sdk'
-    licenses = ['GPL-3.0']
-    vcsUrl = 'https://github.com/Aptoide/AppCoins-ethereumj.git'
-
-    version {
-      name = project.version
-    }
-  }
-}
-
