@@ -47,13 +47,9 @@ import org.spongycastle.asn1.sec.SECNamedCurves;
 import org.spongycastle.asn1.x9.X9ECParameters;
 import org.spongycastle.asn1.x9.X9IntegerConverter;
 import org.spongycastle.crypto.digests.SHA256Digest;
-import org.spongycastle.crypto.engines.AESFastEngine;
-import org.spongycastle.crypto.modes.SICBlockCipher;
 import org.spongycastle.crypto.params.ECDomainParameters;
 import org.spongycastle.crypto.params.ECPrivateKeyParameters;
 import org.spongycastle.crypto.params.ECPublicKeyParameters;
-import org.spongycastle.crypto.params.KeyParameter;
-import org.spongycastle.crypto.params.ParametersWithIV;
 import org.spongycastle.crypto.signers.ECDSASigner;
 import org.spongycastle.crypto.signers.HMacDSAKCalculator;
 import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
@@ -64,7 +60,6 @@ import org.spongycastle.math.ec.ECAlgorithms;
 import org.spongycastle.math.ec.ECCurve;
 import org.spongycastle.math.ec.ECPoint;
 import org.spongycastle.math.ec.ECPoint.Fp;
-import org.spongycastle.util.BigIntegers;
 import org.spongycastle.util.encoders.Base64;
 import org.spongycastle.util.encoders.Hex;
 
@@ -248,34 +243,6 @@ public class ECKey implements Serializable {
         throw new AssertionError("Assumed correct key spec statically");
       }
     }
-  }
-
-  /**
-   * Utility for compressing an elliptic curve point. Returns the same point if it's already compressed.
-   * See the ECKey class docs for a discussion of point compression.
-   *
-   * @param uncompressed -
-   *
-   * @return -
-   * @deprecated per-point compression property will be removed in Bouncy Castle
-   */
-  public static ECPoint compressPoint(ECPoint uncompressed) {
-    return CURVE.getCurve()
-        .decodePoint(uncompressed.getEncoded(true));
-  }
-
-  /**
-   * Utility for decompressing an elliptic curve point. Returns the same point if it's already compressed.
-   * See the ECKey class docs for a discussion of point compression.
-   *
-   * @param compressed -
-   *
-   * @return  -
-   * @deprecated per-point compression property will be removed in Bouncy Castle
-   */
-  public static ECPoint decompressPoint(ECPoint compressed) {
-    return CURVE.getCurve()
-        .decodePoint(compressed.getEncoded(false));
   }
 
   /**
@@ -708,32 +675,6 @@ public class ECKey implements Serializable {
   }
 
   /**
-   * Returns a copy of this key, but with the public point represented in uncompressed form. Normally you would
-   * never need this: it's for specialised scenarios or when backwards compatibility in encoded form is necessary.
-   *
-   * @return  -
-   * @deprecated per-point compression property will be removed in Bouncy Castle
-   */
-  public ECKey decompress() {
-    if (!pub.isCompressed()) {
-      return this;
-    } else {
-      return new ECKey(this.provider, this.privKey, decompressPoint(pub));
-    }
-  }
-
-  /**
-   * @deprecated per-point compression property will be removed in Bouncy Castle
-   */
-  public ECKey compress() {
-    if (pub.isCompressed()) {
-      return this;
-    } else {
-      return new ECKey(this.provider, this.privKey, compressPoint(pub));
-    }
-  }
-
-  /**
    * Returns true if this key doesn't have access to private key bytes. This may be because it was never
    * given any private key bytes to begin with (a watching key).
    *
@@ -810,16 +751,6 @@ public class ECKey implements Serializable {
     } else {
       throw new MissingPrivateKeyException();
     }
-  }
-
-  /**
-   * Returns whether this key is using the compressed form or not. Compressed pubkeys are only 33 bytes, not 64.
-   *
-   *
-   * @return  -
-   */
-  public boolean isCompressed() {
-    return pub.isCompressed();
   }
 
   /**
@@ -900,50 +831,6 @@ public class ECKey implements Serializable {
     }
     sig.v = (byte) (recId + 27);
     return sig;
-  }
-
-  /**
-   * Decrypt cipher by AES in SIC(also know as CTR) mode
-   *
-   * @param cipher -proper cipher
-   * @return decrypted cipher, equal length to the cipher.
-   * @deprecated should not use EC private scalar value as an AES key
-   */
-  public byte[] decryptAES(byte[] cipher) {
-
-    if (privKey == null) {
-      throw new MissingPrivateKeyException();
-    }
-    if (!(privKey instanceof BCECPrivateKey)) {
-      throw new UnsupportedOperationException("Cannot use the private key as an AES key");
-    }
-
-    AESFastEngine engine = new AESFastEngine();
-    SICBlockCipher ctrEngine = new SICBlockCipher(engine);
-
-    KeyParameter key =
-        new KeyParameter(BigIntegers.asUnsignedByteArray(((BCECPrivateKey) privKey).getD()));
-    ParametersWithIV params = new ParametersWithIV(key, new byte[16]);
-
-    ctrEngine.init(false, params);
-
-    int i = 0;
-    byte[] out = new byte[cipher.length];
-    while (i < cipher.length) {
-      ctrEngine.processBlock(cipher, i, out, i);
-      i += engine.getBlockSize();
-      if (cipher.length - i < engine.getBlockSize()) break;
-    }
-
-    // process left bytes
-    if (cipher.length - i > 0) {
-      byte[] tmpBlock = new byte[16];
-      System.arraycopy(cipher, i, tmpBlock, 0, cipher.length - i);
-      ctrEngine.processBlock(tmpBlock, 0, tmpBlock, 0);
-      System.arraycopy(tmpBlock, 0, out, i, cipher.length - i);
-    }
-
-    return out;
   }
 
   /**

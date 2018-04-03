@@ -5,16 +5,21 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
-import com.asf.appcoins.sdk.AppCoinsSdk;
-import com.asf.appcoins.sdk.payment.PaymentDetails;
-import com.asf.appcoins.sdk.payment.PaymentStatus;
+
+import com.asf.appcoins.sdk.ads.AdvertisementSdk;
+import com.asf.appcoins.sdk.iab.AppCoinsSdk;
+import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
+import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class MainActivity extends AppCompatActivity {
 
   private final CompositeDisposable compositeDisposable;
 
+  private AdvertisementSdk adsSdk;
+
   private AppCoinsSdk appCoinsSdk;
+
 
   public MainActivity() {
     this.compositeDisposable = new CompositeDisposable();
@@ -25,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
 
     appCoinsSdk = AppCoinsSdkSingleton.getAppCoinsSdk();
+    adsSdk = AdvertisementSdkSingleton.getAdsSdk();
   }
 
   @Override protected void onDestroy() {
@@ -68,11 +74,11 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void onHandshakeButtonClick(View arg0) {
-    appCoinsSdk.handshake( this);
+    adsSdk.handshake( this);
   }
 
   public void onSendProofButtonClick(View arg0) {
-    appCoinsSdk.sendProof( this);
+    adsSdk.sendProof( this);
   }
 
 }
