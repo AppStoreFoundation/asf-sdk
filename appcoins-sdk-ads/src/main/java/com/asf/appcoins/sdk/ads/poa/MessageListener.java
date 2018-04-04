@@ -20,10 +20,6 @@ public interface MessageListener {
    * Command to the service to send a proof of attention (PoA)
    */
   int MSG_SEND_PROOF = 2;
-  /**
-   * Command to the service to send the complete proof to be signed by the App
-   */
-  int MSG_SIGN_PROOF = 3;
 
   void handle(Message message);
 }
