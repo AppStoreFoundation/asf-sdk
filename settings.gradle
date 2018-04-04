@@ -1,4 +1,4 @@
-rootProject.name = 'com.asfoundation'
+rootProject.name = 'asf-sdk'
 
 include ':appcoins-sdk'
 include ':appcoins-sdk-iab'
