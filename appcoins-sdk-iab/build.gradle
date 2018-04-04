@@ -2,8 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-version = '0.1.0a'
-
 android {
   compileSdkVersion COMPILE_SDK_VERSION
 
@@ -48,6 +46,7 @@ dependencies {
   api lib.web3j
 }
 
+//region Publishing
 task sourcesJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
   classifier "sources"
@@ -69,11 +68,11 @@ publishing {
   publications {
     MyPublication(MavenPublication) {
       groupId 'com.asfoundation'
-      artifactId 'sdk-android'
+      artifactId project.name
       version project.version
       artifact(sourcesJar)
       artifact(javadocJar)
-      artifact("$buildDir/outputs/aar/appcoins-sdk-release.aar")
+      artifact("$buildDir/outputs/aar/${project.name}-release.aar")
 
       //The publication doesn't know about our dependencies, so we have to manually add them to the pom
       pom.withXml {
@@ -102,13 +101,14 @@ bintray {
   publications = ['MyPublication']
   pkg {
     repo = 'asf'
-    name = 'appcoins-sdk'
+    name = "${project.name}"
     licenses = ['GPL-3.0']
-    vcsUrl = 'https://github.com/Aptoide/AppCoins-ethereumj.git'
+    vcsUrl = 'https://github.com/AppStoreFoundation/AppCoins-ethereumj'
 
     version {
       name = project.version
     }
   }
 }
+//endregion
 

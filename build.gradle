@@ -1,7 +1,7 @@
 allprojects {
   apply from: "${rootProject.projectDir}/gradle/publish.gradle"
 
-  group 'appcoin'
+  group GROUP
   version VERSION
 
   buildscript {
