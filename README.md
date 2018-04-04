@@ -112,3 +112,13 @@ Below we provide a good pattern to follow:
 
 First we check if it was the ASF SDK who made us leave the current activity. If so, we will react to the purchase result.
 In order to complete the purchase flow, we must consume the purchase.
+
+## Size
+As of version [0.1.1a](https://bintray.com/asf/asf/appcoins-sdk/0.1.1a), SDK weight is approximately as follows:
+
+- SDK aar only (without dependencies) - 24KB.
+
+App size increment after adding sdk (assuming no dependencies in common):
+
+- Without Proguard: 4.5MB.
+- With Proguard: 3.5MB.
