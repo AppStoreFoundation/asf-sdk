@@ -1,0 +1,46 @@
+allprojects {
+  apply from: "${rootProject.projectDir}/gradle/publish.gradle"
+
+  group 'appcoin'
+  version VERSION
+
+  buildscript {
+    repositories {
+      mavenCentral()
+      jcenter()
+      maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    }
+  }
+
+  repositories {
+    mavenCentral()
+    jcenter()
+    google()
+  }
+}
+
+buildscript {
+  repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    google()
+  }
+
+  dependencies {
+    classpath 'com.android.tools.build:gradle:3.1.0'
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+  }
+}
+
+configure(allprojects) {
+  apply from: "${rootProject.projectDir}/gradle/versions.gradle"
+  apply from: "${rootProject.projectDir}/gradle/libraries.gradle"
+  apply from: "${rootProject.projectDir}/gradle/android.gradle"
+  apply from: "${rootProject.projectDir}/gradle/publish.gradle"
+
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+}

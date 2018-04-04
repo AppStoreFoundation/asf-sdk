@@ -1,0 +1,43 @@
+apply plugin: 'com.android.application'
+
+android {
+  compileSdkVersion COMPILE_SDK_VERSION
+
+  defaultConfig {
+    applicationId "com.asf.appcoins.toolbox"
+
+    minSdkVersion MIN_SDK_VERSION
+    targetSdkVersion TARGET_SDK_VERSION
+
+    versionCode 1
+    versionName "1.0"
+
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+
+  compileOptions {
+    targetCompatibility TARGET_COMPATIBILITY
+    sourceCompatibility SOURCE_COMPATIBILITY
+  }
+
+  lintOptions {
+    warning 'InvalidPackage'
+  }
+
+}
+
+dependencies {
+  implementation lib.appcompat_v7
+  implementation lib.constraint_layout
+
+  testImplementation lib.junit
+
+  api project(':appcoins-sdk')
+}
