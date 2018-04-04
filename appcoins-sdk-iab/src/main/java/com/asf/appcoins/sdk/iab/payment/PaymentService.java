@@ -17,6 +17,7 @@ import com.asf.appcoins.sdk.iab.util.UriBuilder;
 import com.asf.appcoins.sdk.iab.wallet.AndroidUtils;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -68,7 +69,7 @@ public final class PaymentService {
         activity.startActivityForResult(intent, defaultRequestCode);
       }
     } else {
-      showWalletInstallDialog(activity).filter(aBoolean -> aBoolean)
+      Disposable subscribe = showWalletInstallDialog(activity).filter(aBoolean -> aBoolean)
           .doOnSuccess(gotoStore(activity))
           .subscribe(aBoolean -> {
           }, Throwable::printStackTrace);
