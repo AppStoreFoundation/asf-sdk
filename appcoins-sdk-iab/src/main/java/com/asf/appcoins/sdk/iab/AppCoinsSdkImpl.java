@@ -26,7 +26,7 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   private final SkuManager skuManager;
 
   AppCoinsSdkImpl(int period, Scheduler scheduler, SkuManager skuManager,
-      PaymentService paymentService, boolean debug) {
+                  PaymentService paymentService, boolean debug) {
     this.period = period;
     this.scheduler = scheduler;
     this.skuManager = skuManager;
