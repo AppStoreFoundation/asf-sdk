@@ -1,6 +1,8 @@
 allprojects {
+  apply from: "${rootProject.projectDir}/gradle/publish.gradle"
+
   group 'appcoin'
-  version '1.0-SNAPSHOT'
+  version VERSION
 
   buildscript {
     repositories {

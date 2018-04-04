@@ -2,8 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-version = '0.2.0a'
-
 android {
   compileSdkVersion COMPILE_SDK_VERSION
 
