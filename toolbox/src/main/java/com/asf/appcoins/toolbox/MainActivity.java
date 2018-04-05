@@ -81,4 +81,7 @@ public class MainActivity extends AppCompatActivity {
     adsSdk.sendProof( this);
   }
 
+  public void onRegisterCampaignButtonClick(View arg0) {
+    adsSdk.registerCampaign( this);
+  }
 }
