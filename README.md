@@ -8,7 +8,8 @@ This tutorial will guide through the process of integrating the ASF SDK.
 The integration should be simple enough to be done in under 10 minutes.
 If this is not the case for you, let us know. **At the moment, the SDK is working
 with the Ropsten test network, meaning that APPC earned from in-app purchases
-do not have real monetary value, they are used solely for testing purposes.**
+do not have real monetary value, they are used solely for testing purposes. After 
+the 23rd of April the SDK will already be able to work in the mainnet.**
 
 
 
@@ -74,7 +75,7 @@ For the sake of simplicity, in the sample code we just hold a static referecence
 
 Here we use a convenient builder to create our AppCoinsSDK instance with a list consisting of two products.
 The debug flag will set the ASF SDK to use the Ropsten testnet instead of the mainnet. **Please set the debug flag
-since the SDK is working solely in the Ropsten testnet at the moment.**
+since the SDK is working solely in the Ropsten testnet until the 23rd of April.**
 
 Given the Android architecture, you will have to let the SDK know each time a Purchase Flow is finished. For that, just inform the sdk:
 
