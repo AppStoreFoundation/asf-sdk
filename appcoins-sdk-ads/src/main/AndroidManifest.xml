@@ -1,15 +1,15 @@
 <manifest  xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.asf.appcoins.sdk.ads">
-    <application>
-        <service
-            android:name="com.asf.appcoins.sdk.ads.poa.SDKPoAService"
-            android:enabled="true"
-            android:exported="true"
-            android:process="com.asf.appcoins.sdk.advertisement">
-            <intent-filter>
-                <action android:name="com.asf.appcoins.service.ACTION_BIND" />
-                <action android:name="com.asf.appcoins.service.ACTION_ACK_BROADCAST" />
-            </intent-filter>
-        </service>
-    </application>
+  <application>
+    <service
+        android:name="com.asf.appcoins.sdk.ads.poa.SDKPoAService"
+        android:enabled="true"
+        android:exported="true"
+        android:process="com.asf.appcoins.sdk.advertisement">
+      <intent-filter>
+        <action android:name="com.asf.appcoins.service.ACTION_BIND" />
+        <action android:name="com.asf.appcoins.service.ACTION_ACK_BROADCAST" />
+      </intent-filter>
+    </service>
+  </application>
 </manifest>

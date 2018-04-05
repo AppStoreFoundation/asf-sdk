@@ -24,12 +24,12 @@ import java.util.List;
 
 public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
-  static final String TAG = "PoAServiceConnectorImpl";
+  private static final String TAG = PoAServiceConnectorImpl.class.getSimpleName();
 
   /** Messenger for sending messages to the service. */
-  Messenger serviceMessenger = null;
+  private Messenger serviceMessenger = null;
   /** Messenger for receiving messages from the service. */
-  Messenger clientMessenger = null;
+  private Messenger clientMessenger = null;
 
   /**
    * Target we publish for clients to send messages to IncomingHandler. Note
@@ -43,10 +43,10 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   private final HandlerThread handlerThread;
 
   /** Flag indicating whether the connector is bound to the service. */
-  static boolean isBound;
+  private static boolean isBound;
 
-  /** Message that to be send as soon has we have the service bound */
-  private static Message pendingMsg;
+  /** Lists of messages that are pending to be send */
+  private ArrayList<Message> pendingMsgsList = new ArrayList<>();
 
   /**
    * Handler of incoming messages from service.
@@ -75,11 +75,16 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
    * Class for interacting with the main interface of the service.
    */
   private ServiceConnection mConnection = new ServiceConnection() {
+    @Override
     public void onServiceConnected(ComponentName className, IBinder service) {
       serviceMessenger = new Messenger(service);
       isBound = true;
+
+      // send the pending messages that may have been added to the list before the bind was complete
+      sendPendingMessages();
     }
 
+    @Override
     public void onServiceDisconnected(ComponentName className) {
       // This is called when the connection with the service has been
       // unexpectedly disconnected -- that is, its process crashed.
@@ -130,21 +135,31 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
   @Override
   public void sendMessage(Context context, int type, Bundle bundle) {
-    // validate if the service is bound
-    if (!isBound) {
-      return;
-    }
-
     // Create and send a message to the service, using a supported 'what'
     // value
     Message msg = Message.obtain(null, type, 0, 0);
     msg.setData(bundle);
     msg.replyTo = clientMessenger;
 
-    try {
-      serviceMessenger.send(msg);
-    } catch (RemoteException e) {
-      Log.e(TAG, "Failed to send message: " + e.getMessage(), e);
+
+    synchronized (pendingMsgsList) {
+      // validate if the service is bound
+      if (!isBound) {
+        connectToService(context);
+        pendingMsgsList.add(msg);
+      } else {
+        if (pendingMsgsList.isEmpty()) {
+          try {
+            serviceMessenger.send(msg);
+          } catch (RemoteException e) {
+            Log.e(TAG, "Failed to send message: " + e.getMessage(), e);
+          }
+        } else {
+          pendingMsgsList.add(msg);
+          sendPendingMessages();
+        }
+      }
+
     }
   }
 
@@ -169,17 +184,35 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
    * @param intent The intent to broadcast
    */
   private static void sendImplicitBroadcast(Context context, Intent intent) {
-    PackageManager pm=context.getPackageManager();
-    List<ResolveInfo> matches=pm.queryBroadcastReceivers(intent, 0);
+    PackageManager pm = context.getPackageManager();
+    List<ResolveInfo> matches = pm.queryBroadcastReceivers(intent, 0);
 
     for (ResolveInfo resolveInfo : matches) {
-      Intent explicit=new Intent(intent);
-      ComponentName cn=
+      Intent explicit = new Intent(intent);
+      ComponentName cn =
           new ComponentName(resolveInfo.activityInfo.applicationInfo.packageName,
               resolveInfo.activityInfo.name);
 
       explicit.setComponent(cn);
       context.sendBroadcast(explicit);
+    }
+  }
+
+  /**
+   * Method to send all messages that are pending.
+   */
+  private void sendPendingMessages() {
+    synchronized (pendingMsgsList) {
+      if (!pendingMsgsList.isEmpty()) {
+        for (int i = 0; i < pendingMsgsList.size(); i++) {
+          Message msg = pendingMsgsList.remove(0);
+          try {
+            serviceMessenger.send(msg);
+          } catch (RemoteException e) {
+            Log.e(TAG, "Failed to send message: " + e.getMessage(), e);
+          }
+        }
+      }
     }
   }
 
