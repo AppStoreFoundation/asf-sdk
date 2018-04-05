@@ -1,5 +1,7 @@
-package com.asf.appcoins.sdk.ads.campaign;
+package com.asf.appcoins.sdk.ads.campaign.manager;
 
+import com.asf.appcoins.sdk.ads.campaign.Campaign;
+import com.asf.appcoins.sdk.ads.campaign.contract.CampaignContract;
 import java.util.List;
 
 public class CampaignManager {
