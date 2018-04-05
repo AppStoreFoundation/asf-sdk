@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 
+import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
 
 /**
@@ -28,6 +29,12 @@ final class AdvertisementSdkImpl implements AdvertisementSdk {
   @Override public void sendProof(Context context) {
     if (poaConnector.connectToService(context)) {
       poaConnector.sendMessage(context, MSG_SEND_PROOF, new Bundle());
+    }
+  }
+
+  @Override public void registerCampaign(Context context) {
+    if (poaConnector.connectToService(context)) {
+      poaConnector.sendMessage(context, MSG_REGISTER_CAMPAIGN, new Bundle());
     }
   }
 }

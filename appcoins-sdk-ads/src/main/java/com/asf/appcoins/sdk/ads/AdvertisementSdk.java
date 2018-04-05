@@ -22,4 +22,10 @@ public interface AdvertisementSdk {
    */
   void sendProof(Context context);
 
+  /**
+   * Method that send the campaign id used for the PoA process.
+   * @param context The context of the instance calling the sdk.
+   */
+  void registerCampaign(Context context);
+
 }
