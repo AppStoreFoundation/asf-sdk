@@ -34,6 +34,8 @@ android {
 dependencies {
   testImplementation lib.junit
   testImplementation lib.mockito_core
+
+  api lib.web3j
 }
 
 //region Publishing
