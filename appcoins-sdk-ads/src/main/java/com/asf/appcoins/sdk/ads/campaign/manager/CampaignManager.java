@@ -7,13 +7,15 @@ import java.util.List;
 public class CampaignManager {
 
   private final CampaignContract campaignContract;
+  private final String country;
 
   public CampaignManager() {
-    this(new DummyContract());
+    this(new DummyContract(), "PT");
   }
 
-  public CampaignManager(CampaignContract campaignContract) {
+  public CampaignManager(CampaignContract campaignContract, String country) {
     this.campaignContract = campaignContract;
+    this.country = country;
   }
 
   public List<Campaign> getActiveCampaings(String packageName) {

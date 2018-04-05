@@ -1,12 +1,8 @@
 package com.asf.appcoins.toolbox;
 
+import android.content.Context;
 import com.asf.appcoins.sdk.ads.AdvertisementSdk;
 import com.asf.appcoins.sdk.ads.AdvertisementSdkBuilder;
-import com.asf.appcoins.sdk.iab.AppCoinsSdk;
-import com.asf.appcoins.sdk.iab.AppCoinsSdkBuilder;
-import com.asf.appcoins.sdk.iab.entity.SKU;
-
-import java.util.List;
 
 public class AdvertisementSdkSingleton {
   private static AdvertisementSdk adsSdk;
@@ -14,8 +10,8 @@ public class AdvertisementSdkSingleton {
   private AdvertisementSdkSingleton() {
   }
 
-  public static void create() {
-    adsSdk = new AdvertisementSdkBuilder().createAdvertisementSdk();
+  public static void create(Context context) {
+    adsSdk = new AdvertisementSdkBuilder().createAdvertisementSdk(context);
   }
 
   public static AdvertisementSdk getAdsSdk() {
