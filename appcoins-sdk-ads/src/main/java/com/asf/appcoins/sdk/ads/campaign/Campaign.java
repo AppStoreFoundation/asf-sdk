@@ -4,6 +4,9 @@ public class Campaign {
 
   private final long id;
   private final long vercode;
+  /**
+   * An uppercase ISO 3166-1 3-letter code representing the current country.
+   */
   private final String country;
 
   public Campaign(long id, long vercode, String country) {
