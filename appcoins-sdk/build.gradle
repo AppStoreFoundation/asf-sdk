@@ -82,7 +82,6 @@ bintray {
   pkg {
     repo = 'asf'
     name = "${project.name}"
-    println("Car: " + name)
     licenses = ['GPL-3.0']
     vcsUrl = 'https://github.com/AppStoreFoundation/AppCoins-ethereumj'
 
