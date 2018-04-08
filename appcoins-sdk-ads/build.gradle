@@ -25,6 +25,10 @@ android {
     }
   }
 
+  lintOptions {
+    warning 'InvalidPackage'
+  }
+
   compileOptions {
     targetCompatibility TARGET_COMPATIBILITY
     sourceCompatibility SOURCE_COMPATIBILITY
