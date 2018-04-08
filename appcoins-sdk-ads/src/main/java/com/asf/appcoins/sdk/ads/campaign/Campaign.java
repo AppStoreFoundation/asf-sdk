@@ -1,26 +1,29 @@
 package com.asf.appcoins.sdk.ads.campaign;
 
+import java.math.BigInteger;
+import java.util.List;
+
 public class Campaign {
 
-  private final long id;
-  private final long vercode;
+  private final BigInteger id;
+  private final List<BigInteger> vercodes;
   /**
    * An uppercase ISO 3166-1 3-letter code representing the current country.
    */
   private final String country;
 
-  public Campaign(long id, long vercode, String country) {
+  public Campaign(BigInteger id, List<BigInteger> vercodes, String country) {
     this.id = id;
-    this.vercode = vercode;
+    this.vercodes = vercodes;
     this.country = country;
   }
 
-  public long getId() {
+  public BigInteger getId() {
     return id;
   }
 
-  public long getVercode() {
-    return vercode;
+  public List<BigInteger> getVercodes() {
+    return vercodes;
   }
 
   public String getCountry() {
