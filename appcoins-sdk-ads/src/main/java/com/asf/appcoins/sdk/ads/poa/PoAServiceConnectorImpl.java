@@ -122,6 +122,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
           .unbindService(mConnection);
     }
 
+
     return result;
   }
 
@@ -140,7 +141,6 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     Message msg = Message.obtain(null, type, 0, 0);
     msg.setData(bundle);
     msg.replyTo = clientMessenger;
-
 
     synchronized (pendingMsgsList) {
       // validate if the service is bound
@@ -204,7 +204,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   private void sendPendingMessages() {
     synchronized (pendingMsgsList) {
       if (!pendingMsgsList.isEmpty()) {
-        for (int i = 0; i < pendingMsgsList.size(); i++) {
+        while (pendingMsgsList.size() > 0) {
           Message msg = pendingMsgsList.remove(0);
           try {
             serviceMessenger.send(msg);

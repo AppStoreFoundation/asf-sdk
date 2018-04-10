@@ -1,6 +1,8 @@
 package com.asf.appcoins.sdk.ads;
 
+import android.app.Application;
 import android.content.Context;
+import android.os.Bundle;
 
 /**
  * Created by Joao Raimundo on 01-03-2018.
@@ -12,20 +14,24 @@ public interface AdvertisementSdk {
   /**
    * Method that starts the handshake that will find the service/wallet that can handle the PoA
    * process.
-   * @param context The context of the instance calling the sdk.
    */
-  void handshake(Context context);
+  void handshake();
 
   /**
    * Method that send a proof the wallet that is listening to our PoA process.
-   * @param context The context of the instance calling the sdk.
    */
-  void sendProof(Context context);
+  void sendProof();
 
   /**
-   * Method that send the campaign id used for the PoA process.
-   * @param context The context of the instance calling the sdk.
+   * Method to register the campaign for the proof of attention.
+   * @param campaignId The campaign id to be added to the message bundle.
    */
-  void registerCampaign(Context context);
+  void registerCampaign(String campaignId);
+
+  /**
+   * Method to initialize the Advertisement SDK.
+   * @param application The application instance of the app.
+   */
+  void init(Application application);
 
 }
