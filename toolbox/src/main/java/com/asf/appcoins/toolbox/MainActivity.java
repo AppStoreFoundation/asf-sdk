@@ -16,8 +16,6 @@ public class MainActivity extends AppCompatActivity {
 
   private final CompositeDisposable compositeDisposable;
 
-  private AdvertisementSdk adsSdk;
-
   private AppCoinsSdk appCoinsSdk;
 
 
@@ -30,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
 
     appCoinsSdk = AppCoinsSdkSingleton.getAppCoinsSdk();
-    adsSdk = AdvertisementSdkSingleton.getAdsSdk();
   }
 
   @Override protected void onDestroy() {
@@ -71,14 +68,6 @@ public class MainActivity extends AppCompatActivity {
 
   public void onUpgradeAppButtonClicked(View arg0) {
     appCoinsSdk.buy(Skus.SKU_PREMIUM_ID, this);
-  }
-
-  public void onHandshakeButtonClick(View arg0) {
-    adsSdk.handshake( this);
-  }
-
-  public void onSendProofButtonClick(View arg0) {
-    adsSdk.sendProof( this);
   }
 
 }
