@@ -29,14 +29,21 @@ final class AdvertisementSdkImpl implements AdvertisementSdk {
     poaConnector.startHandshake(context);
   }
 
-  @Override public void sendProof(Bundle bundle) {
+  @Override public void sendProof() {
     if (poaConnector.connectToService(context)) {
+      long timestamp = System.currentTimeMillis();
+      Bundle bundle = new Bundle();
+      bundle.putString("packageName", context.getPackageName());
+      bundle.putLong("timeStamp", timestamp);
       poaConnector.sendMessage(context, MSG_SEND_PROOF, bundle);
     }
   }
 
-  @Override public void registerCampaign(Bundle bundle) {
+  @Override public void registerCampaign(String campaignId) {
     if (poaConnector.connectToService(context)) {
+      Bundle bundle = new Bundle();
+      bundle.putString("packageName", context.getPackageName());
+      bundle.putString("campaignId", campaignId);
       poaConnector.sendMessage(context, MSG_REGISTER_CAMPAIGN, bundle);
     }
   }

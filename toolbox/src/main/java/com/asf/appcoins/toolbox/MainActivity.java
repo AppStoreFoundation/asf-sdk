@@ -69,5 +69,4 @@ public class MainActivity extends AppCompatActivity {
   public void onUpgradeAppButtonClicked(View arg0) {
     appCoinsSdk.buy(Skus.SKU_PREMIUM_ID, this);
   }
-
 }

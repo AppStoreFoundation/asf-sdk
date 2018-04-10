@@ -19,15 +19,14 @@ public interface AdvertisementSdk {
 
   /**
    * Method that send a proof the wallet that is listening to our PoA process.
-   * @param bundle The bundle with the content needed for the send proof message
    */
-  void sendProof(Bundle bundle);
+  void sendProof();
 
   /**
    * Method to register the campaign for the proof of attention.
-   * @param bundle The bundle with the content needed for the register campaign message.
+   * @param campaignId The campaign id to be added to the message bundle.
    */
-  void registerCampaign(Bundle bundle);
+  void registerCampaign(String campaignId);
 
   /**
    * Method to initialize the Advertisement SDK.
