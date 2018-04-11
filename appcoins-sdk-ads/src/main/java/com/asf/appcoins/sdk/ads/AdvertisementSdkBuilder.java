@@ -11,6 +11,12 @@ public final class AdvertisementSdkBuilder {
 
   private PoAServiceConnector poaConnector;
   private String country;
+  private boolean debug;
+
+  public AdvertisementSdkBuilder withDebug(boolean debug) {
+    this.debug = debug;
+    return this;
+  }
 
   public AdvertisementSdk createAdvertisementSdk(Context context) {
     if (this.poaConnector == null) {
@@ -22,6 +28,6 @@ public final class AdvertisementSdkBuilder {
           .getConfiguration().locale.getDisplayCountry();
     }
 
-    return new AdvertisementSdkImpl(poaConnector);
+    return new AdvertisementSdkImpl(poaConnector, debug);
   }
 }

@@ -7,6 +7,7 @@ import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
+import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SET_NETWORK;
 
 /**
  * Class that will manage the PoA process, by sending the proofs on the correct time. By handling
@@ -25,13 +26,15 @@ public class PoAManager implements LifeCycleListener.Listener {
   private static PoAServiceConnector poaConnector;
   /** The application context */
   private static Context appContext;
+  /** integer used to identify the network to wich we are connected */
+  private static int network = 0;
   /** boolean indicating if we are already processing a PoA*/
   private boolean processing;
   /** The handle to keep the runnable tasks that we be running within a certain period */
   private Handler handler = new Handler();
   /** The runnnable taks that will be trigger periodically */
   private Runnable sendProof;
-  /** integer used to track how many proof were already sent*/
+  /** integer used to track how many proof were already sent */
   private int proofsSent = 0;
 
   /**
@@ -39,11 +42,12 @@ public class PoAManager implements LifeCycleListener.Listener {
    *  @param context The context of the application.
    *  @param connector The PoA service connector used on the communication of the proof of attention.
    */
-  public static PoAManager init(Context context, PoAServiceConnector connector){
+  public static PoAManager init(Context context, PoAServiceConnector connector, int networkId){
     if (instance == null) {
       instance = new PoAManager();
       poaConnector = connector;
       appContext = context;
+      network = networkId;
     }
     return instance;
   }
@@ -53,9 +57,9 @@ public class PoAManager implements LifeCycleListener.Listener {
    * @param context The application context
    * @param connector The onnector to the wallet service.
    */
-  public static PoAManager get(Context context, PoAServiceConnector connector){
+  public static PoAManager get(Context context, PoAServiceConnector connector, int networkId){
     if (instance == null) {
-      init(context, connector);
+      init(context, connector, networkId);
     }
     return instance;
   }
@@ -71,6 +75,11 @@ public class PoAManager implements LifeCycleListener.Listener {
       processing = true;
       poaConnector.startHandshake(appContext);
     }
+    // set the network being used
+    Bundle bundle = new Bundle();
+    bundle.putInt("networkId", network);
+    poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
+
     sendProof();
   }
 

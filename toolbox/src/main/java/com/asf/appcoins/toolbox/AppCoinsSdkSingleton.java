@@ -13,7 +13,13 @@ public class AppCoinsSdkSingleton {
 
   public static void create(String developerAddress, List<SKU> skusList) {
     appCoinsSdk = new AppCoinsSdkBuilder(developerAddress).withSkus(skusList)
-        .withDebug(true)
+        .withDebug(false)
+        .createAppCoinsSdk();
+  }
+
+  public static void create(String developerAddress, List<SKU> skusList, boolean debug) {
+    appCoinsSdk = new AppCoinsSdkBuilder(developerAddress).withSkus(skusList)
+        .withDebug(debug)
         .createAppCoinsSdk();
   }
 

@@ -20,8 +20,12 @@ final class AdvertisementSdkImpl implements AdvertisementSdk {
 
   private Context context;
 
-  AdvertisementSdkImpl(PoAServiceConnector poaConnector) {
+  private int networkId;
+
+
+  AdvertisementSdkImpl(PoAServiceConnector poaConnector, boolean debug) {
     this.poaConnector = poaConnector;
+    this.networkId = debug ? NETWORK_ROPSTEN : NETWORK_MAIN;
   }
 
 
@@ -48,8 +52,16 @@ final class AdvertisementSdkImpl implements AdvertisementSdk {
     }
   }
 
+  @Override public void setNetwork(int networkId) {
+    if (poaConnector.connectToService(context)) {
+      Bundle bundle = new Bundle();
+      bundle.putInt("networkId", networkId);
+      poaConnector.sendMessage(context, MSG_REGISTER_CAMPAIGN, bundle);
+    }
+  }
+
   @Override public void init(Application application) {
     this.context = application;
-    LifeCycleListener.get(application).setListener(PoAManager.get(application, poaConnector));
+    LifeCycleListener.get(application).setListener(PoAManager.get(application, poaConnector, networkId));
   }
 }

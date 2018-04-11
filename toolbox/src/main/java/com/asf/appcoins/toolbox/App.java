@@ -13,8 +13,8 @@ public class App extends Application {
   @Override public void onCreate() {
     super.onCreate();
 
-    AppCoinsSdkSingleton.create(DEVELOPER_ADDRESS, buildSkus());
-    AdvertisementSdkSingleton.create();
+    AppCoinsSdkSingleton.create(DEVELOPER_ADDRESS, buildSkus(), true);
+    AdvertisementSdkSingleton.create(this, true);
     AdvertisementSdkSingleton.getAdsSdk().init(this);
   }
 

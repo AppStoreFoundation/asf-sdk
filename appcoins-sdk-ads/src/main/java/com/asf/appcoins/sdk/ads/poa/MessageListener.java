@@ -20,6 +20,10 @@ public interface MessageListener {
    * Command to the service to send a proof of attention (PoA)
    */
   int MSG_SEND_PROOF = 2;
+  /**
+   * Command to the service to define the network that is working in
+   */
+  int MSG_SET_NETWORK = 3;
 
   void handle(Message message);
 }

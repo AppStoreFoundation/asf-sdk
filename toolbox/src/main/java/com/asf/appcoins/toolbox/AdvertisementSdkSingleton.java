@@ -10,6 +10,12 @@ public class AdvertisementSdkSingleton {
   private AdvertisementSdkSingleton() {
   }
 
+  public static void create(Context context, boolean debug) {
+    adsSdk = new AdvertisementSdkBuilder()
+        .withDebug(false)
+        .createAdvertisementSdk(context);
+  }
+
   public static void create(Context context) {
     adsSdk = new AdvertisementSdkBuilder().createAdvertisementSdk(context);
   }
