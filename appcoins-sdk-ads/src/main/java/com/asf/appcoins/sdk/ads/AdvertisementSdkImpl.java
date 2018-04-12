@@ -22,10 +22,13 @@ final class AdvertisementSdkImpl implements AdvertisementSdk {
 
   private int networkId;
 
+  private String contractAddress;
 
-  AdvertisementSdkImpl(PoAServiceConnector poaConnector, boolean debug) {
+
+  AdvertisementSdkImpl(PoAServiceConnector poaConnector, int networkId, String contractAddress) {
     this.poaConnector = poaConnector;
-    this.networkId = debug ? NETWORK_ROPSTEN : NETWORK_MAIN;
+    this.networkId = networkId;
+    this.contractAddress = contractAddress;
   }
 
 

@@ -22,7 +22,7 @@ public class PoAManager implements LifeCycleListener.Listener {
 
   /** The instance of the manager*/
   private static PoAManager instance;
-  /** The connector with the wallet service, receiver of the messaages of the PoA. */
+  /** The connector with the wallet service, receiver of the messages of the PoA. */
   private static PoAServiceConnector poaConnector;
   /** The application context */
   private static Context appContext;

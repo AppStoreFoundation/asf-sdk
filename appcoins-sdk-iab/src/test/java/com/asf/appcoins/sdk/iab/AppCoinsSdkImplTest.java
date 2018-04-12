@@ -29,7 +29,8 @@ public class AppCoinsSdkImplTest {
     AppCoinsSdk appCoinsSdk = new AppCoinsSdkBuilder(developerAddress).withSkus(buildSkus())
         .createAppCoinsSdk();
 
-    String uriString = UriBuilder.buildUriString("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3",
+    String uriString = UriBuilder.
+        buildUriString("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3",
         new BigDecimal("1000000000000000000"), developerAddress, "com.cenas.product", 3);
 
     Assert.assertThat(uriString,

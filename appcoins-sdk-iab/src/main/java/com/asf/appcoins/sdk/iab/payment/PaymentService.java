@@ -37,16 +37,18 @@ public final class PaymentService {
   private final String developerAddress;
   private final Map<String, PaymentDetails> payments;
   private final AsfWeb3j asfWeb3j;
+  private final String contractAddress;
 
   private PaymentDetails currentPayment;
 
   public PaymentService(int networkId, SkuManager skuManager, String developerAddress,
-      AsfWeb3j asfWeb3j) {
+      AsfWeb3j asfWeb3j, String contractAddress) {
     this.networkId = networkId;
     this.skuManager = skuManager;
     this.developerAddress = developerAddress;
     this.asfWeb3j = asfWeb3j;
     this.payments = new HashMap<>(1);
+    this.contractAddress = contractAddress;
   }
 
   public void buy(String skuId, Activity activity, int defaultRequestCode) {
@@ -54,7 +56,7 @@ public final class PaymentService {
     BigDecimal amount = skuManager.getSkuAmount(skuId);
     BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
-    Intent intent = buildPaymentIntent(sku, total);
+    Intent intent = buildPaymentIntent(sku, total, contractAddress);
 
     currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
         new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
@@ -102,10 +104,10 @@ public final class PaymentService {
     });
   }
 
-  @NonNull private Intent buildPaymentIntent(SKU sku, BigDecimal total) {
+  @NonNull private Intent buildPaymentIntent(SKU sku, BigDecimal total, String contractAddress) {
     Intent intent = new Intent(Intent.ACTION_VIEW);
     Uri data =
-        UriBuilder.buildUri("0xab949343e6c369c6b17c7ae302c1debd4b7b61c3", sku.getId(), networkId,
+        UriBuilder.buildUri(contractAddress, sku.getId(), networkId,
             total, developerAddress);
     intent.setData(data);
 

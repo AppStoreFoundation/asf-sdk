@@ -23,6 +23,7 @@ public final class AppCoinsSdkBuilder {
   private PaymentService paymentService;
   private boolean debug;
   private AsfWeb3j asfWeb3j;
+  private String contractAddress = "0xab949343e6c369c6b17c7ae302c1debd4b7b61c3";
 
   public AppCoinsSdkBuilder(String developerAddress) {
     this.developerAddress = developerAddress;
@@ -64,9 +65,11 @@ public final class AppCoinsSdkBuilder {
     if (debug) {
       networkId = 3;
       web3 = Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
+      contractAddress = "0xab949343e6c369c6b17c7ae302c1debd4b7b61c3";
     } else {
       networkId = 1;
       web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));
+      contractAddress = "0xab949343e6c369c6b17c7ae302c1debd4b7b61c3";
     }
 
     if (this.scheduler == null) {
@@ -82,7 +85,7 @@ public final class AppCoinsSdkBuilder {
     }
 
     if (this.paymentService == null) {
-      this.paymentService = new PaymentService(networkId, skuManager, developerAddress, asfWeb3j);
+      this.paymentService = new PaymentService(networkId, skuManager, developerAddress, asfWeb3j, contractAddress);
     }
 
     return new AppCoinsSdkImpl(period, scheduler, skuManager, paymentService, debug);
