@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthCall;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.EthTransaction;
 
@@ -62,5 +63,13 @@ final class AsfWeb3jImpl implements AsfWeb3j {
                 TransactionFactory.fromEthGetTransactionReceipt(ethGetTransactionReceipt));
           }
         });
+  }
+
+  @Override
+  public Observable<String> call(org.web3j.protocol.core.methods.request.Transaction transaction) {
+    return Observable.fromCallable(
+        () -> web3j.ethCall(transaction, DefaultBlockParameterName.LATEST)
+            .send())
+        .map(EthCall::getValue);
   }
 }

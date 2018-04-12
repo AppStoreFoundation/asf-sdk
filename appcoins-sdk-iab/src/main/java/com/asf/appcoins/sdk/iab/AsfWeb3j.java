@@ -19,4 +19,6 @@ public interface AsfWeb3j {
   Observable<String> sendRawTransaction(String rawData);
 
   Observable<Transaction> getTransactionByHash(String txHash);
+
+  Observable<String> call(org.web3j.protocol.core.methods.request.Transaction transaction);
 }
