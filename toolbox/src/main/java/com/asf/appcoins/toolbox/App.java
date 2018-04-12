@@ -14,7 +14,7 @@ public class App extends Application {
     super.onCreate();
 
     AppCoinsSdkSingleton.create(DEVELOPER_ADDRESS, buildSkus());
-    AdvertisementSdkSingleton.create();
+    AdvertisementSdkSingleton.create(this);
     AdvertisementSdkSingleton.getAdsSdk().init(this);
   }
 
