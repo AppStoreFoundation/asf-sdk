@@ -1,13 +1,15 @@
 package com.asf.appcoins.sdk.iab;
 
-import com.asf.appcoins.sdk.iab.entity.Transaction;
-import com.asf.appcoins.sdk.iab.entity.Transaction.Status;
+import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
+import com.asf.appcoins.sdk.core.web3.Transaction;
+import com.asf.appcoins.sdk.core.web3.Transaction.Status;
 import com.asf.appcoins.sdk.iab.entity.factory.TransactionFactory;
 import io.reactivex.Observable;
 import java.math.BigDecimal;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthCall;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.EthTransaction;
 
@@ -62,5 +64,13 @@ final class AsfWeb3jImpl implements AsfWeb3j {
                 TransactionFactory.fromEthGetTransactionReceipt(ethGetTransactionReceipt));
           }
         });
+  }
+
+  @Override
+  public Observable<String> call(org.web3j.protocol.core.methods.request.Transaction transaction) {
+    return Observable.fromCallable(
+        () -> web3j.ethCall(transaction, DefaultBlockParameterName.LATEST)
+            .send())
+        .map(EthCall::getValue);
   }
 }

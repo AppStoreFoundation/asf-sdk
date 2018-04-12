@@ -2,20 +2,20 @@ package com.asf.appcoins.sdk.ads.campaign.manager;
 
 import com.asf.appcoins.sdk.ads.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.campaign.contract.CampaignContract;
+import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 import org.web3j.abi.datatypes.Address;
-import org.web3j.protocol.Web3j;
 
 public class CampaignManager {
 
   private final CampaignContract campaignContract;
   private final String country;
 
-  public CampaignManager(Web3j web3j, Address contractAddress) {
-    this(new CampaignContractImpl(web3j, contractAddress), "PT");
+  public CampaignManager(AsfWeb3j asfWeb3j, Address contractAddress) {
+    this(new CampaignContractImpl(asfWeb3j, contractAddress), "PT");
   }
 
   public CampaignManager(CampaignContract campaignContract, String country) {

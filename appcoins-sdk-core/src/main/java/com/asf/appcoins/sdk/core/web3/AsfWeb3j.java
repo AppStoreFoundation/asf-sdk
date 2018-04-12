@@ -1,6 +1,5 @@
-package com.asf.appcoins.sdk.iab;
+package com.asf.appcoins.sdk.core.web3;
 
-import com.asf.appcoins.sdk.iab.entity.Transaction;
 import io.reactivex.Observable;
 import java.math.BigDecimal;
 import org.web3j.abi.datatypes.Address;
@@ -19,4 +18,6 @@ public interface AsfWeb3j {
   Observable<String> sendRawTransaction(String rawData);
 
   Observable<Transaction> getTransactionByHash(String txHash);
+
+  Observable<String> call(org.web3j.protocol.core.methods.request.Transaction transaction);
 }

@@ -1,7 +1,7 @@
 package com.asf.appcoins.sdk.iab.entity.factory;
 
-import com.asf.appcoins.sdk.iab.entity.Transaction;
-import com.asf.appcoins.sdk.iab.entity.Transaction.Status;
+import com.asf.appcoins.sdk.core.web3.Transaction;
+import com.asf.appcoins.sdk.core.web3.Transaction.Status;
 import java.math.BigInteger;
 import java.util.Arrays;
 import org.spongycastle.util.encoders.Hex;

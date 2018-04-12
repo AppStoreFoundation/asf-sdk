@@ -1,6 +1,7 @@
 package com.asf.appcoins.sdk.ads.campaign.manager;
 
 import com.asf.appcoins.sdk.ads.campaign.contract.CampaignContract;
+import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -17,19 +18,16 @@ import org.web3j.abi.datatypes.Uint;
 import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.datatypes.generated.Bytes2;
 import org.web3j.abi.datatypes.generated.Bytes32;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthCall;
 
 import static org.web3j.protocol.core.methods.request.Transaction.createEthCallTransaction;
 
 class CampaignContractImpl implements CampaignContract {
 
-  private final Web3j web3j;
+  private final AsfWeb3j asfWeb3j;
   private final Address address;
 
-  CampaignContractImpl(Web3j web3j, Address contractAddress) {
-    this.web3j = web3j;
+  CampaignContractImpl(AsfWeb3j asfWeb3j, Address contractAddress) {
+    this.asfWeb3j = asfWeb3j;
     this.address = contractAddress;
   }
 
@@ -112,13 +110,12 @@ class CampaignContractImpl implements CampaignContract {
   }
 
   private String callSmartContractFunction(Function function, String contractAddress,
-      String walletAddress) throws IOException {
+      String walletAddress) {
     String encodedFunction = FunctionEncoder.encode(function);
     org.web3j.protocol.core.methods.request.Transaction transaction =
         createEthCallTransaction(walletAddress, contractAddress, encodedFunction);
-    EthCall response = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST)
-        .send();
 
-    return response.getValue();
+    return asfWeb3j.call(transaction)
+        .blockingFirst();
   }
 }
