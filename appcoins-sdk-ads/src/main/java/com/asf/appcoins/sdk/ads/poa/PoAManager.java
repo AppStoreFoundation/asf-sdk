@@ -93,22 +93,24 @@ public class PoAManager implements LifeCycleListener.Listener {
    * If all proofs were sent, it stops the process.
    */
   private void sendProof() {
+    // Connection to service may already been done, but we still need to make sure that it is
+    // connected. In case no connection is not yet done, the message is stored to be sent as soon as
+    // the connection is done.
+    poaConnector.connectToService(appContext);
     // send proof
-    if (poaConnector.connectToService(appContext)) {
-      long timestamp = System.currentTimeMillis();
-      Bundle bundle = new Bundle();
-      bundle.putString("packageName", appContext.getPackageName());
-      bundle.putLong("timeStamp", timestamp);
-      poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
-      proofsSent++;
-      // schedule the next proof sending
-      if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
-        handler.postDelayed(sendProof = this::sendProof, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
-      } else {
-        // or stop the process
-        processing = false;
-        stopProcess();
-      }
+    long timestamp = System.currentTimeMillis();
+    Bundle bundle = new Bundle();
+    bundle.putString("packageName", appContext.getPackageName());
+    bundle.putLong("timeStamp", timestamp);
+    poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
+    proofsSent++;
+    // schedule the next proof sending
+    if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+      handler.postDelayed(sendProof = this::sendProof, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
+    } else {
+      // or stop the process
+      processing = false;
+      stopProcess();
     }
   }
 
