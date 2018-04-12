@@ -1,7 +1,8 @@
 package com.asf.appcoins.sdk.iab;
 
-import com.asf.appcoins.sdk.iab.entity.Transaction;
-import com.asf.appcoins.sdk.iab.entity.Transaction.Status;
+import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
+import com.asf.appcoins.sdk.core.web3.Transaction;
+import com.asf.appcoins.sdk.core.web3.Transaction.Status;
 import com.asf.appcoins.sdk.iab.entity.factory.TransactionFactory;
 import io.reactivex.Observable;
 import java.math.BigDecimal;

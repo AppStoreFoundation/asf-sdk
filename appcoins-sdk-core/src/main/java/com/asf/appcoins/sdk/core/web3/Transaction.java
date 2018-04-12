@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.iab.entity;
+package com.asf.appcoins.sdk.core.web3;
 
 /**
  * Created by neuro on 26-02-2018.

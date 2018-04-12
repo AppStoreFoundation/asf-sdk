@@ -42,8 +42,7 @@ dependencies {
 
   implementation lib.support_annotations
 
-  api lib.rxjava
-  api lib.web3j
+  api project(":appcoins-sdk-core")
 }
 
 //region Publishing
