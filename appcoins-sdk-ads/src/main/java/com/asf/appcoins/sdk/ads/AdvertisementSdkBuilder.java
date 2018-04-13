@@ -1,8 +1,15 @@
 package com.asf.appcoins.sdk.ads;
 
 import android.content.Context;
+import com.asf.appcoins.sdk.ads.campaign.manager.CampaignManager;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnectorImpl;
+import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
+import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
+import org.web3j.abi.datatypes.Address;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jFactory;
+import org.web3j.protocol.http.HttpService;
 
 import static com.asf.appcoins.sdk.ads.AdvertisementSdk.NETWORK_MAIN;
 import static com.asf.appcoins.sdk.ads.AdvertisementSdk.NETWORK_ROPSTEN;
@@ -15,6 +22,7 @@ public final class AdvertisementSdkBuilder {
   private PoAServiceConnector poaConnector;
   private String country;
   private boolean debug;
+  private AsfWeb3j asfWeb3j;
 
   public AdvertisementSdkBuilder withDebug(boolean debug) {
     this.debug = debug;
@@ -32,15 +40,23 @@ public final class AdvertisementSdkBuilder {
     }
 
     int networkId;
-    String contractAddress;
+    Address contractAddress;
+    Web3j web3;
     if (debug) {
       networkId = NETWORK_ROPSTEN;
-      contractAddress = "0xab949343e6c369c6b17c7ae302c1debd4b7b61c3";
+      web3 = Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
+      contractAddress = new Address("0xab949343e6c369c6b17c7ae302c1debd4b7b61c3");
     } else {
       networkId = NETWORK_MAIN;
-      contractAddress = "0xab949343e6c369c6b17c7ae302c1debd4b7b61c3";
+      web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));
+      contractAddress = new Address("0xab949343e6c369c6b17c7ae302c1debd4b7b61c3");
     }
 
-    return new AdvertisementSdkImpl(poaConnector, networkId, contractAddress);
+    if (this.asfWeb3j == null) {
+      this.asfWeb3j = new AsfWeb3jImpl(web3);
+    }
+
+    return new AdvertisementSdkImpl(poaConnector, networkId,
+        new CampaignManager(asfWeb3j, contractAddress));
   }
 }

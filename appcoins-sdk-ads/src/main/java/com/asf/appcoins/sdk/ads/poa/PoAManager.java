@@ -87,7 +87,7 @@ public class PoAManager implements LifeCycleListener.Listener {
    * Method that stops the process. It will remove any running tasks and disconnect from the waller
    * service.
    */
-  private void stopProcess(){
+  public void stopProcess() {
     processing = false;
 
     if (sendProof != null) {
