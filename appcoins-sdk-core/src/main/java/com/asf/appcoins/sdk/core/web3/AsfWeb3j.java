@@ -1,5 +1,6 @@
 package com.asf.appcoins.sdk.core.web3;
 
+import com.asf.appcoins.sdk.core.transaction.Transaction;
 import io.reactivex.Observable;
 import java.math.BigDecimal;
 import org.web3j.abi.datatypes.Address;

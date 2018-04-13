@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.iab.entity.factory;
+package com.asf.appcoins.sdk.core.factory;
 
 import org.junit.Test;
 

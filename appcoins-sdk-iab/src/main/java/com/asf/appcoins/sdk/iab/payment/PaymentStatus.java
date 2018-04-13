@@ -1,6 +1,6 @@
 package com.asf.appcoins.sdk.iab.payment;
 
-import com.asf.appcoins.sdk.core.web3.Transaction.Status;
+import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 
 /**
  * Created by neuro on 13-03-2018.

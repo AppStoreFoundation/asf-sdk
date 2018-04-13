@@ -1,9 +1,8 @@
-package com.asf.appcoins.sdk.iab;
+package com.asf.appcoins.sdk.core.web3;
 
-import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
-import com.asf.appcoins.sdk.core.web3.Transaction;
-import com.asf.appcoins.sdk.core.web3.Transaction.Status;
-import com.asf.appcoins.sdk.iab.entity.factory.TransactionFactory;
+import com.asf.appcoins.sdk.core.factory.TransactionFactory;
+import com.asf.appcoins.sdk.core.transaction.Transaction;
+import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 import io.reactivex.Observable;
 import java.math.BigDecimal;
 import org.web3j.abi.datatypes.Address;
@@ -17,11 +16,11 @@ import org.web3j.protocol.core.methods.response.EthTransaction;
  * Created by neuro on 26-02-2018.
  */
 
-final class AsfWeb3jImpl implements AsfWeb3j {
+public final class AsfWeb3jImpl implements AsfWeb3j {
 
   private final Web3j web3j;
 
-  AsfWeb3jImpl(Web3j web3j) {
+  public AsfWeb3jImpl(Web3j web3j) {
     this.web3j = web3j;
   }
 

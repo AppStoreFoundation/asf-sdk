@@ -1,6 +1,6 @@
 package com.asf.appcoins.sdk.iab.payment;
 
-import com.asf.appcoins.sdk.core.web3.Transaction;
+import com.asf.appcoins.sdk.core.transaction.Transaction;
 
 /**
  * Created by neuro on 08-03-2018.
