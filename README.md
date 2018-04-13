@@ -11,7 +11,7 @@ Then for each separate component of the SDK you can check our wiki pages [IAB SD
 and [Advertisement SDK](https://github.com/AppStoreFoundation/asf-sdk/wiki/Advertisement-SDK).
 
 The integration should be simple enough to be done in under 10 minutes. If this is not the case for 
-you, let us know. The SDK is able to work in the mainnet. You can still use the Ropsten test 
+you, let us know. **The SDK is able to work in the mainnet**. You can still use the Ropsten test 
 network, meaning that APPC of all transactions do not have real monetary value, they are used solely 
 for testing purposes.
 
