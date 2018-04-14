@@ -18,6 +18,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,17 +112,19 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     // Note that this is an implicit Intent that must be defined in the Android Manifest.
     SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     String packageName = preferences.getString(PREFERENCE_WALLET_PCKG_NAME, null);
-    Intent i = new Intent(ACTION_BIND);
-    i.setPackage(packageName);
+    boolean result = false;
+    if (!TextUtils.isEmpty(packageName)) {
+      Intent i = new Intent(ACTION_BIND);
+      i.setPackage(packageName);
 
-    boolean result = context.getApplicationContext()
-        .bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+      result = context.getApplicationContext()
+          .bindService(i, mConnection, Context.BIND_AUTO_CREATE);
 
-    if (!result) {
-      context.getApplicationContext()
-          .unbindService(mConnection);
+      if (!result) {
+        context.getApplicationContext()
+            .unbindService(mConnection);
+      }
     }
-
 
     return result;
   }
@@ -131,6 +134,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     if (isBound) {
       context.getApplicationContext().unbindService(mConnection);
       isBound = false;
+      pendingMsgsList = new ArrayList<>();
     }
   }
 
