@@ -45,7 +45,7 @@ public final class AdvertisementSdkBuilder {
     if (debug) {
       networkId = NETWORK_ROPSTEN;
       web3 = Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      contractAddress = new Address("0xab949343e6c369c6b17c7ae302c1debd4b7b61c3");
+      contractAddress = new Address("0xd95c64c6eee9164539d679354f349779a04f57cb");
     } else {
       networkId = NETWORK_MAIN;
       web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));
