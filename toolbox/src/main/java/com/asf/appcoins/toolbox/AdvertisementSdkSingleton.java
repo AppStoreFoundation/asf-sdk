@@ -11,8 +11,7 @@ public class AdvertisementSdkSingleton {
   }
 
   public static void create(Context context, boolean debug) {
-    adsSdk = new AdvertisementSdkBuilder()
-        .withDebug(false)
+    adsSdk = new AdvertisementSdkBuilder().withDebug(debug)
         .createAdvertisementSdk(context);
   }
 
