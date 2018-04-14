@@ -2,8 +2,9 @@ package com.asf.appcoins.sdk.ads.campaign.manager;
 
 import com.asf.appcoins.sdk.ads.campaign.contract.CampaignContract;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
-import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,14 +32,14 @@ class CampaignContractImpl implements CampaignContract {
     this.address = contractAddress;
   }
 
-  @Override public String getPackageNameOfCampaign(BigInteger bidId) throws IOException {
+  @Override public String getPackageNameOfCampaign(BigInteger bidId) {
     Function function = new Function("getPackageNameOfCampaign",
-        Collections.singletonList(new Bytes32(bidId.toByteArray())),
+        Collections.singletonList(new Bytes32(Arrays.copyOf(bidId.toByteArray(), 32))),
         Collections.singletonList(new TypeReference<Utf8String>() {
         }));
 
-    String result = callSmartContractFunction(function, address.getTypeAsString(),
-        Address.DEFAULT.getTypeAsString());
+    String result =
+        callSmartContractFunction(function, address.getValue(), Address.DEFAULT.getValue());
     List<Type> response = FunctionReturnDecoder.decode(result, function.getOutputParameters());
     if (!response.isEmpty()) {
       return String.valueOf(response.get(0));
@@ -47,20 +48,22 @@ class CampaignContractImpl implements CampaignContract {
     }
   }
 
-  @Override public List<BigInteger> getCampaignsByCountry(String countryId) throws IOException {
+  @Override public List<BigInteger> getCampaignsByCountry(String countryId) {
     Function function =
         new Function("getCampaignsByCountry", Collections.singletonList(new Utf8String(countryId)),
             Collections.singletonList(new TypeReference<DynamicArray<Bytes32>>() {
             }));
 
-    String result = callSmartContractFunction(function, address.getTypeAsString(),
-        Address.DEFAULT.getTypeAsString());
+    String result =
+        callSmartContractFunction(function, address.getValue(), Address.DEFAULT.getValue());
     List<Type> response = FunctionReturnDecoder.decode(result, function.getOutputParameters());
 
     if (!response.isEmpty()) {
       List<BigInteger> ids = new LinkedList<>();
       for (Type type : response) {
-        ids.add(new BigInteger(((Bytes32) type).getValue()));
+        BigInteger campaingId =
+            new BigInteger(((Bytes32) ((List) type.getValue()).get(0)).getValue());
+        ids.add(campaingId);
       }
       return ids;
     } else {
@@ -68,19 +71,21 @@ class CampaignContractImpl implements CampaignContract {
     }
   }
 
-  @Override public List<String> getCountryList() throws IOException {
+  @Override public List<String> getCountryList() {
     Function function = new Function("getCountryList", Collections.emptyList(),
         Collections.singletonList(new TypeReference<DynamicArray<Bytes2>>() {
         }));
 
-    String result = callSmartContractFunction(function, address.getTypeAsString(),
-        Address.DEFAULT.getTypeAsString());
+    String result =
+        callSmartContractFunction(function, address.getValue(), Address.DEFAULT.getValue());
     List<Type> response = FunctionReturnDecoder.decode(result, function.getOutputParameters());
 
     if (!response.isEmpty()) {
       List<String> countries = new LinkedList<>();
       for (Type type : response) {
-        countries.add(String.valueOf(type));
+        String country =
+            String.valueOf(new String(((Bytes2) ((ArrayList) type.getValue()).get(0)).getValue()));
+        countries.add(country);
       }
       return countries;
     } else {
@@ -88,20 +93,21 @@ class CampaignContractImpl implements CampaignContract {
     }
   }
 
-  @Override public List<BigInteger> getVercodesOfCampaign(BigInteger bidId) throws IOException {
+  @Override public List<BigInteger> getVercodesOfCampaign(BigInteger bidId) {
     Function function = new Function("getVercodesOfCampaign",
-        Collections.singletonList(new Bytes32(bidId.toByteArray())),
+        Collections.singletonList(new Bytes32(Arrays.copyOf(bidId.toByteArray(), 32))),
         Collections.singletonList(new TypeReference<DynamicArray<Uint>>() {
         }));
 
-    String result = callSmartContractFunction(function, address.getTypeAsString(),
-        Address.DEFAULT.getTypeAsString());
+    String result =
+        callSmartContractFunction(function, address.getValue(), Address.DEFAULT.getValue());
     List<Type> response = FunctionReturnDecoder.decode(result, function.getOutputParameters());
 
     if (!response.isEmpty()) {
       List<BigInteger> vercodes = new LinkedList<>();
       for (Type type : response) {
-        vercodes.add(((Uint) type).getValue());
+        BigInteger vercode = ((Uint) ((ArrayList) type.getValue()).get(0)).getValue();
+        vercodes.add(vercode);
       }
       return vercodes;
     } else {
