@@ -18,7 +18,7 @@ import static org.hamcrest.CoreMatchers.is;
 /**
  * Created by neuro on 02-03-2018.
  */
-public class AppCoinsSdkImplTest {
+public class AppCoinsIabImplTest {
 
   private final String developerAddress = "0x4fbcc5ce88493c3d9903701c143af65f54481119";
 
@@ -28,7 +28,7 @@ public class AppCoinsSdkImplTest {
     MockitoAnnotations.initMocks(this);
 
     AsfWeb3j asfWeb3j = new AsfWeb3jImpl(web3j);
-    AppCoinsSdk appCoinsSdk = new AppCoinsSdkBuilder(developerAddress).withSkus(buildSkus())
+    AppCoinsIab appCoinsIab = new AppCoinsSdkBuilder(developerAddress).withSkus(buildSkus())
         .createAppCoinsSdk();
 
     String uriString = UriBuilder.

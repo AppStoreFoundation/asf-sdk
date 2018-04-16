@@ -61,7 +61,7 @@ public final class AppCoinsSdkBuilder {
     return this;
   }
 
-  public AppCoinsSdk createAppCoinsSdk() {
+  public AppCoinsIab createAppCoinsSdk() {
     Web3j web3;
 
     if (debug) {
@@ -90,6 +90,6 @@ public final class AppCoinsSdkBuilder {
       this.paymentService = new PaymentService(networkId, skuManager, developerAddress, asfWeb3j, contractAddress);
     }
 
-    return new AppCoinsSdkImpl(period, scheduler, skuManager, paymentService, debug);
+    return new AppCoinsIabImpl(period, scheduler, skuManager, paymentService, debug);
   }
 }

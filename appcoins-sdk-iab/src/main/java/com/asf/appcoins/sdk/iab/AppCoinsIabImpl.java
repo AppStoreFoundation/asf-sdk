@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * Created by neuro on 01-03-2018.
  */
 
-final class AppCoinsSdkImpl implements AppCoinsSdk {
+final class AppCoinsIabImpl implements AppCoinsIab {
 
   private static final int DEFAULT_REQUEST_CODE = 3423;
   private static final int SUCCESS_RESULT_CODE = 0;
@@ -25,7 +25,7 @@ final class AppCoinsSdkImpl implements AppCoinsSdk {
   private final PaymentService paymentService;
   private final SkuManager skuManager;
 
-  AppCoinsSdkImpl(int period, Scheduler scheduler, SkuManager skuManager,
+  AppCoinsIabImpl(int period, Scheduler scheduler, SkuManager skuManager,
                   PaymentService paymentService, boolean debug) {
     this.period = period;
     this.scheduler = scheduler;

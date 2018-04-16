@@ -11,7 +11,7 @@ import java.util.Collection;
  * Created by neuro on 26-02-2018.
  */
 
-public interface AppCoinsSdk {
+public interface AppCoinsIab {
 
   Observable<PaymentDetails> getPayment(String skuId);
 
