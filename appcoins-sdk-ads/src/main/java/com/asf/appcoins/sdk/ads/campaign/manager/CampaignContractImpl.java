@@ -61,9 +61,11 @@ class CampaignContractImpl implements CampaignContract {
     if (!response.isEmpty()) {
       List<BigInteger> ids = new LinkedList<>();
       for (Type type : response) {
-        BigInteger campaingId =
-            new BigInteger(((Bytes32) ((List) type.getValue()).get(0)).getValue());
-        ids.add(campaingId);
+        if (!((List) type.getValue()).isEmpty()) {
+          BigInteger campaingId =
+              new BigInteger(((Bytes32) ((List) type.getValue()).get(0)).getValue());
+          ids.add(campaingId);
+        }
       }
       return ids;
     } else {
