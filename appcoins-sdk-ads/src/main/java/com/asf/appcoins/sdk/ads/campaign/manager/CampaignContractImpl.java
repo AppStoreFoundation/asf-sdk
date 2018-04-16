@@ -3,7 +3,6 @@ package com.asf.appcoins.sdk.ads.campaign.manager;
 import com.asf.appcoins.sdk.ads.campaign.contract.CampaignContract;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -85,9 +84,11 @@ class CampaignContractImpl implements CampaignContract {
     if (!response.isEmpty()) {
       List<String> countries = new LinkedList<>();
       for (Type type : response) {
-        String country =
-            String.valueOf(new String(((Bytes2) ((ArrayList) type.getValue()).get(0)).getValue()));
-        countries.add(country);
+        if (!((List) type.getValue()).isEmpty()) {
+          String country =
+              String.valueOf(new String(((Bytes2) ((List) type.getValue()).get(0)).getValue()));
+          countries.add(country);
+        }
       }
       return countries;
     } else {
@@ -108,8 +109,10 @@ class CampaignContractImpl implements CampaignContract {
     if (!response.isEmpty()) {
       List<BigInteger> vercodes = new LinkedList<>();
       for (Type type : response) {
-        BigInteger vercode = ((Uint) ((ArrayList) type.getValue()).get(0)).getValue();
-        vercodes.add(vercode);
+        if (!((List) type.getValue()).isEmpty()) {
+          BigInteger vercode = ((Uint) ((List) type.getValue()).get(0)).getValue();
+          vercodes.add(vercode);
+        }
       }
       return vercodes;
     } else {
