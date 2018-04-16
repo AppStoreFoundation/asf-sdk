@@ -61,7 +61,7 @@ public final class AppCoinsIabBuilder {
     return this;
   }
 
-  public AppCoinsIab createAppCoinsSdk() {
+  public AppCoinsIab createAppCoinsIab() {
     Web3j web3;
 
     if (debug) {

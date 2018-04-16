@@ -29,7 +29,7 @@ public class AppCoinsIabImplTest {
 
     AsfWeb3j asfWeb3j = new AsfWeb3jImpl(web3j);
     AppCoinsIab appCoinsIab = new AppCoinsIabBuilder(developerAddress).withSkus(buildSkus())
-        .createAppCoinsSdk();
+        .createAppCoinsIab();
 
     String uriString = UriBuilder.
         buildUriString("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3",

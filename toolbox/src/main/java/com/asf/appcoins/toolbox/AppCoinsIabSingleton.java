@@ -14,13 +14,13 @@ public class AppCoinsIabSingleton {
   public static void create(String developerAddress, List<SKU> skusList) {
     appCoinsIab = new AppCoinsIabBuilder(developerAddress).withSkus(skusList)
         .withDebug(false)
-        .createAppCoinsSdk();
+        .createAppCoinsIab();
   }
 
   public static void create(String developerAddress, List<SKU> skusList, boolean debug) {
     appCoinsIab = new AppCoinsIabBuilder(developerAddress).withSkus(skusList)
         .withDebug(debug)
-        .createAppCoinsSdk();
+        .createAppCoinsIab();
   }
 
   public static AppCoinsIab getAppCoinsIab() {
