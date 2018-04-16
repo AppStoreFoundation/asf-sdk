@@ -1,15 +1,13 @@
 package com.asf.appcoins.sdk.ads;
 
 import android.app.Application;
-import android.content.Context;
-import android.os.Bundle;
 
 /**
  * Created by Joao Raimundo on 01-03-2018.
  */
 
 /** The interface for the Advertisement sdk */
-public interface AdvertisementSdk {
+public interface AppCoinsAds {
 
   int NETWORK_MAIN = 1;
   int NETWORK_ROPSTEN = 3;

@@ -19,7 +19,7 @@ import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
  * Created by Joao Raimundo on 01-03-2018.
  */
 
-final class AdvertisementSdkImpl implements AdvertisementSdk {
+final class AppCoinsAdsImpl implements AppCoinsAds {
 
   private final PoAServiceConnector poaConnector;
   private final CampaignManager campaignManager;
@@ -28,7 +28,7 @@ final class AdvertisementSdkImpl implements AdvertisementSdk {
 
   private int networkId;
 
-  AdvertisementSdkImpl(PoAServiceConnector poaConnector, int networkId,
+  AppCoinsAdsImpl(PoAServiceConnector poaConnector, int networkId,
       CampaignManager campaignManager) {
     this.poaConnector = poaConnector;
     this.networkId = networkId;
