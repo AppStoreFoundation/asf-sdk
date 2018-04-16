@@ -26,7 +26,7 @@ android {
 }
 
 dependencies {
-  api project(':appcoins-sdk-iab')
+  api project(':appcoins-iab')
   api project(':appcoins-ads')
 }
 
