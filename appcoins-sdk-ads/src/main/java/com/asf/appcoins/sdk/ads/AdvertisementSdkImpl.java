@@ -80,7 +80,7 @@ final class AdvertisementSdkImpl implements AdvertisementSdk {
     Disposable subscribe = Single.fromCallable(() -> getVerCode(context, packageName))
         .subscribeOn(Schedulers.io())
         .map(
-            verCode -> campaignManager.getActiveCampaings(packageName, BigInteger.valueOf(verCode)))
+            verCode -> campaignManager.getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
         .subscribe(campaigns -> {
           if (campaigns.isEmpty()) {
             poAManager.stopProcess();

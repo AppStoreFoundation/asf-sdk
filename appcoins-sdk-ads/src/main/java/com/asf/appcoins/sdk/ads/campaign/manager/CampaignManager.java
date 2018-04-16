@@ -23,20 +23,20 @@ public class CampaignManager {
     this.country = country;
   }
 
-  public List<Campaign> getActiveCampaings(String packageName, BigInteger vercode)
+  public List<Campaign> getActiveCampaigns(String packageName, BigInteger vercode)
       throws IOException {
     List<BigInteger> campaignsIdsByCountry = campaignContract.getCampaignsByCountry(country);
-    List<Campaign> campaings = new LinkedList<>();
+    List<Campaign> campaign = new LinkedList<>();
 
     for (BigInteger bidId : campaignsIdsByCountry) {
       String campaignPackageName = campaignContract.getPackageNameOfCampaign(bidId);
       List<BigInteger> vercodes = campaignContract.getVercodesOfCampaign(bidId);
 
       if (campaignPackageName.equals(packageName) && vercodes.contains(vercode)) {
-        campaings.add(new Campaign(bidId, vercodes, country));
+        campaign.add(new Campaign(bidId, vercodes, country));
       }
     }
 
-    return campaings;
+    return campaign;
   }
 }
