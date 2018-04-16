@@ -3,6 +3,8 @@ package com.asf.appcoins.sdk.ads;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import com.asf.appcoins.sdk.ads.campaign.manager.CampaignManager;
 import com.asf.appcoins.sdk.ads.poa.PoAManager;
@@ -36,7 +38,6 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
     this.campaignManager = campaignManager;
   }
 
-
   @Override public void handshake() {
     poaConnector.startHandshake(context);
   }
@@ -69,27 +70,35 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
 
   @Override public void init(Application application) {
     this.context = application;
-    LifeCycleListener.get(application).setListener(PoAManager.get(application, poaConnector, networkId));
+    LifeCycleListener.get(application)
+        .setListener(PoAManager.get(application, poaConnector, networkId));
 
     handleCampaign(application, PoAManager.get(application, poaConnector, networkId));
   }
 
   private void handleCampaign(Context context, PoAManager poAManager) {
+    if (hasNetwork()) {
+      String packageName = context.getPackageName();
+      Disposable subscribe = Single.fromCallable(() -> getVerCode(context, packageName))
+          .subscribeOn(Schedulers.io())
+          .map(verCode -> campaignManager.getActiveCampaigns(packageName,
+              BigInteger.valueOf(verCode)))
+          .subscribe(campaigns -> {
+            if (campaigns.isEmpty()) {
+              poAManager.stopProcess();
+            } else {
+              registerCampaign(campaigns.get(0)
+                  .getId()
+                  .toString());
+            }
+          });
+    }
+  }
 
-    String packageName = context.getPackageName();
-    Disposable subscribe = Single.fromCallable(() -> getVerCode(context, packageName))
-        .subscribeOn(Schedulers.io())
-        .map(
-            verCode -> campaignManager.getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
-        .subscribe(campaigns -> {
-          if (campaigns.isEmpty()) {
-            poAManager.stopProcess();
-          } else {
-            registerCampaign(campaigns.get(0)
-                .getId()
-                .toString());
-          }
-        });
+  private boolean hasNetwork() {
+    NetworkInfo activeNetworkInfo = ((ConnectivityManager) context.getSystemService(
+        Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
   }
 
   private int getVerCode(Context context, String packageName)
