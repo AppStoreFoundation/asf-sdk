@@ -1,7 +1,8 @@
 rootProject.name = 'asf-sdk'
 
-include ':appcoins-sdk'
-include ':appcoins-sdk-iab'
-include ':appcoins-sdk-ads'
+include ':appcoins'
+include ':appcoins-core'
+include ':appcoins-iab'
+include ':appcoins-ads'
 include ':ethereumj-android'
 include ':toolbox'

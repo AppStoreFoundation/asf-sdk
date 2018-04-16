@@ -39,5 +39,5 @@ dependencies {
 
   testImplementation lib.junit
 
-  api project(':appcoins-sdk')
+  api project(':appcoins')
 }
