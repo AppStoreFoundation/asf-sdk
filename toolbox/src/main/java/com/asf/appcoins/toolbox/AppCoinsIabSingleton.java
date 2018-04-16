@@ -5,10 +5,10 @@ import com.asf.appcoins.sdk.iab.AppCoinsIabBuilder;
 import com.asf.appcoins.sdk.iab.entity.SKU;
 import java.util.List;
 
-public class AppCoinsSdkSingleton {
+public class AppCoinsIabSingleton {
   private static AppCoinsIab appCoinsIab;
 
-  private AppCoinsSdkSingleton() {
+  private AppCoinsIabSingleton() {
   }
 
   public static void create(String developerAddress, List<SKU> skusList) {

@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    appCoinsIab = AppCoinsSdkSingleton.getAppCoinsIab();
+    appCoinsIab = AppCoinsIabSingleton.getAppCoinsIab();
   }
 
   @Override protected void onDestroy() {
