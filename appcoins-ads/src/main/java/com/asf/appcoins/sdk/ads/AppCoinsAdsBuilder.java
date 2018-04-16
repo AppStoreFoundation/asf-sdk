@@ -1,6 +1,7 @@
 package com.asf.appcoins.sdk.ads;
 
 import android.content.Context;
+import android.util.Log;
 import com.asf.appcoins.sdk.ads.campaign.manager.CampaignManager;
 import com.asf.appcoins.sdk.ads.ip.IpApi;
 import com.asf.appcoins.sdk.ads.ip.IpResponse;
@@ -21,6 +22,8 @@ import static com.asf.appcoins.sdk.ads.AppCoinsAds.NETWORK_ROPSTEN;
  * Created by Joao Raimundo on 01-03-2018.
  */
 public final class AppCoinsAdsBuilder {
+
+  private static final String TAG = AppCoinsAdsBuilder.class.getSimpleName();
 
   private PoAServiceConnector poaConnector;
   private String country;
@@ -63,6 +66,9 @@ public final class AppCoinsAdsBuilder {
         .myIp()
         .map(IpResponse::getCountryCode)
         .subscribeOn(Schedulers.io())
+        .doOnError(throwable -> Log.w(TAG, "createAdvertisementSdk: Failed to get country code!",
+            throwable))
+        .onErrorReturn(throwable -> "")
         .blockingFirst();
 
     return new AppCoinsAdsImpl(poaConnector, networkId,
