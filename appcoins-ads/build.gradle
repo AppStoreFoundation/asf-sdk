@@ -39,7 +39,7 @@ dependencies {
   testImplementation lib.junit
   testImplementation lib.mockito_core
 
-  api project(":appcoins-sdk-core")
+  api project(':appcoins-core')
 }
 
 //region Publishing
