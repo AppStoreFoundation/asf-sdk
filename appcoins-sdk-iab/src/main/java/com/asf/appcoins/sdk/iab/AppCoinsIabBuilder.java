@@ -12,7 +12,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jFactory;
 import org.web3j.protocol.http.HttpService;
 
-public final class AppCoinsSdkBuilder {
+public final class AppCoinsIabBuilder {
 
   private static final int DEFAULT_PERIOD = 5;
 
@@ -27,36 +27,36 @@ public final class AppCoinsSdkBuilder {
   private AsfWeb3j asfWeb3j;
   private String contractAddress = "0xab949343e6c369c6b17c7ae302c1debd4b7b61c3";
 
-  public AppCoinsSdkBuilder(String developerAddress) {
+  public AppCoinsIabBuilder(String developerAddress) {
     this.developerAddress = developerAddress;
   }
 
-  public AppCoinsSdkBuilder withDeveloperAddress(String developerAddress) {
+  public AppCoinsIabBuilder withDeveloperAddress(String developerAddress) {
     this.developerAddress = developerAddress;
     return this;
   }
 
-  public AppCoinsSdkBuilder withSkus(List<SKU> skus) {
+  public AppCoinsIabBuilder withSkus(List<SKU> skus) {
     this.skus = new LinkedList<>(skus);
     return this;
   }
 
-  public AppCoinsSdkBuilder withPeriod(int period) {
+  public AppCoinsIabBuilder withPeriod(int period) {
     this.period = period;
     return this;
   }
 
-  public AppCoinsSdkBuilder withScheduler(Scheduler scheduler) {
+  public AppCoinsIabBuilder withScheduler(Scheduler scheduler) {
     this.scheduler = scheduler;
     return this;
   }
 
-  public AppCoinsSdkBuilder withSkuManager(SkuManager skuManager) {
+  public AppCoinsIabBuilder withSkuManager(SkuManager skuManager) {
     this.skuManager = skuManager;
     return this;
   }
 
-  public AppCoinsSdkBuilder withDebug(boolean debug) {
+  public AppCoinsIabBuilder withDebug(boolean debug) {
     this.debug = debug;
     return this;
   }

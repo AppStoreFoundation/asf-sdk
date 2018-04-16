@@ -28,7 +28,7 @@ public class AppCoinsIabImplTest {
     MockitoAnnotations.initMocks(this);
 
     AsfWeb3j asfWeb3j = new AsfWeb3jImpl(web3j);
-    AppCoinsIab appCoinsIab = new AppCoinsSdkBuilder(developerAddress).withSkus(buildSkus())
+    AppCoinsIab appCoinsIab = new AppCoinsIabBuilder(developerAddress).withSkus(buildSkus())
         .createAppCoinsSdk();
 
     String uriString = UriBuilder.
