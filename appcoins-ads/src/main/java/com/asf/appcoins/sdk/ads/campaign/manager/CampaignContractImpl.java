@@ -32,8 +32,11 @@ class CampaignContractImpl implements CampaignContract {
   }
 
   @Override public String getPackageNameOfCampaign(BigInteger bidId) {
+    byte[] value = new byte[32];
+    System.arraycopy(bidId.toByteArray(), 0, value, value.length-bidId.toByteArray().length, bidId.toByteArray().length);
+
     Function function = new Function("getPackageNameOfCampaign",
-        Collections.singletonList(new Bytes32(Arrays.copyOf(bidId.toByteArray(), 32))),
+        Collections.singletonList(new Bytes32(value)),
         Collections.singletonList(new TypeReference<Utf8String>() {
         }));
 
@@ -97,8 +100,11 @@ class CampaignContractImpl implements CampaignContract {
   }
 
   @Override public List<BigInteger> getVercodesOfCampaign(BigInteger bidId) {
+    byte[] value = new byte[32];
+    System.arraycopy(bidId.toByteArray(), 0, value, value.length-bidId.toByteArray().length, bidId.toByteArray().length);
+
     Function function = new Function("getVercodesOfCampaign",
-        Collections.singletonList(new Bytes32(Arrays.copyOf(bidId.toByteArray(), 32))),
+        Collections.singletonList(new Bytes32(Arrays.copyOf(value, 32))),
         Collections.singletonList(new TypeReference<DynamicArray<Uint>>() {
         }));
 
