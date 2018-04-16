@@ -14,6 +14,7 @@ import java.math.BigInteger;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
+import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SET_NETWORK;
 
 /**
  * Created by Joao Raimundo on 01-03-2018.
@@ -60,8 +61,9 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   @Override public void setNetwork(int networkId) {
     if (poaConnector.connectToService(context)) {
       Bundle bundle = new Bundle();
+      bundle.putString("packageName", context.getPackageName());
       bundle.putInt("networkId", networkId);
-      poaConnector.sendMessage(context, MSG_REGISTER_CAMPAIGN, bundle);
+      poaConnector.sendMessage(context, MSG_SET_NETWORK, bundle);
     }
   }
 

@@ -77,6 +77,7 @@ public class PoAManager implements LifeCycleListener.Listener {
     }
     // set the network being used
     Bundle bundle = new Bundle();
+    bundle.putString("packageName", appContext.getPackageName());
     bundle.putInt("networkId", network);
     poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
 
