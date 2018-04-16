@@ -14,8 +14,8 @@ public class CampaignManager {
   private final CampaignContract campaignContract;
   private final String country;
 
-  public CampaignManager(AsfWeb3j asfWeb3j, Address contractAddress) {
-    this(new CampaignContractImpl(asfWeb3j, contractAddress), "PT");
+  public CampaignManager(AsfWeb3j asfWeb3j, Address contractAddress, String countryId) {
+    this(new CampaignContractImpl(asfWeb3j, contractAddress), countryId);
   }
 
   public CampaignManager(CampaignContract campaignContract, String country) {

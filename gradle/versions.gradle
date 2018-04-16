@@ -37,4 +37,5 @@ ver.spongycastle_prov = "1.58.0.0"
 // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
 ver.jackson = "2.9.5"
 
-
+// https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
+ver.retrofit2 = "2.4.0"

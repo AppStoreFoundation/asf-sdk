@@ -39,6 +39,8 @@ dependencies {
   testImplementation lib.junit
   testImplementation lib.mockito_core
 
+  api lib.retrofit2
+
   api project(':appcoins-core')
 }
 
