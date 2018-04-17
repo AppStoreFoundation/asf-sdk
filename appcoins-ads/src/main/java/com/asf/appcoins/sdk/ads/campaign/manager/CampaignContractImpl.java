@@ -62,12 +62,13 @@ class CampaignContractImpl implements CampaignContract {
 
     if (!response.isEmpty()) {
       List<BigInteger> ids = new LinkedList<>();
-      for (Type type : response) {
-        if (!((List) type.getValue()).isEmpty()) {
-          BigInteger campaignId =
-              new BigInteger(((Bytes32) ((List) type.getValue()).get(0)).getValue());
-          ids.add(campaignId);
-        }
+
+      Type type = response.get(0);
+      List<Bytes32> values = (List<Bytes32>) type.getValue();
+
+      for (Bytes32 bytes32 : values) {
+        BigInteger campaignId = new BigInteger((bytes32).getValue());
+        ids.add(campaignId);
       }
       return ids;
     } else {
@@ -86,12 +87,13 @@ class CampaignContractImpl implements CampaignContract {
 
     if (!response.isEmpty()) {
       List<String> countries = new LinkedList<>();
-      for (Type type : response) {
-        if (!((List) type.getValue()).isEmpty()) {
-          String country =
-              String.valueOf(new String(((Bytes2) ((List) type.getValue()).get(0)).getValue()));
-          countries.add(country);
-        }
+
+      Type type = response.get(0);
+      List<Bytes2> value = (List<Bytes2>) type.getValue();
+
+      for (Bytes2 bytes2 : value) {
+        String country = String.valueOf(new String((bytes2).getValue()));
+        countries.add(country);
       }
       return countries;
     } else {
@@ -114,11 +116,12 @@ class CampaignContractImpl implements CampaignContract {
 
     if (!response.isEmpty()) {
       List<BigInteger> vercodes = new LinkedList<>();
-      for (Type type : response) {
-        if (!((List) type.getValue()).isEmpty()) {
-          BigInteger vercode = ((Uint) ((List) type.getValue()).get(0)).getValue();
-          vercodes.add(vercode);
-        }
+
+      Type type = response.get(0);
+      List<Uint> values = (List<Uint>) type.getValue();
+
+      for (Uint uint : values) {
+        vercodes.add(uint.getValue());
       }
       return vercodes;
     } else {
