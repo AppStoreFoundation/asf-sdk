@@ -106,12 +106,16 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
   @Override
   public boolean connectToService(Context context) {
+    Log.e(TAG, "connectToService : isBound " + isBound );
+
     if (isBound) {
       return true;
     }
     // Note that this is an implicit Intent that must be defined in the Android Manifest.
     SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     String packageName = preferences.getString(PREFERENCE_WALLET_PCKG_NAME, null);
+    Log.e(TAG, "PREFERENCE_WALLET_PCKG_NAME " + packageName );
+
     boolean result = false;
     if (!TextUtils.isEmpty(packageName)) {
       Intent i = new Intent(ACTION_BIND);
