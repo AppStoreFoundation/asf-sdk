@@ -78,6 +78,8 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   private ServiceConnection mConnection = new ServiceConnection() {
     @Override
     public void onServiceConnected(ComponentName className, IBinder service) {
+      Log.e(TAG, "onServiceConnected" );
+
       serviceMessenger = new Messenger(service);
       isBound = true;
 
@@ -214,6 +216,8 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
    * Method to send all messages that are pending.
    */
   private void sendPendingMessages() {
+    Log.e(TAG, "sendPendingMessages with size: " + pendingMsgsList.size() );
+
     synchronized (pendingMsgsList) {
       if (!pendingMsgsList.isEmpty()) {
         while (pendingMsgsList.size() > 0) {
