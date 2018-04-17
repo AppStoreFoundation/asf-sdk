@@ -102,6 +102,7 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void finishProcess() {
     processing = false;
+    proofsSent = 0;
 
     if (sendProof != null) {
       handler.removeCallbacks(sendProof);
