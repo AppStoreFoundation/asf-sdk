@@ -3,7 +3,6 @@ package com.asf.appcoins.sdk.ads.campaign.manager;
 import com.asf.appcoins.sdk.ads.campaign.contract.CampaignContract;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +10,7 @@ import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Address;
+import org.web3j.abi.datatypes.Bool;
 import org.web3j.abi.datatypes.DynamicArray;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
@@ -103,10 +103,10 @@ class CampaignContractImpl implements CampaignContract {
     byte[] value = new byte[32];
     System.arraycopy(bidId.toByteArray(), 0, value, value.length-bidId.toByteArray().length, bidId.toByteArray().length);
 
-    Function function = new Function("getVercodesOfCampaign",
-        Collections.singletonList(new Bytes32(Arrays.copyOf(value, 32))),
-        Collections.singletonList(new TypeReference<DynamicArray<Uint>>() {
-        }));
+    Function function =
+        new Function("getVercodesOfCampaign", Collections.singletonList(new Bytes32(value)),
+            Collections.singletonList(new TypeReference<DynamicArray<Uint>>() {
+            }));
 
     String result =
         callSmartContractFunction(function, address.getValue(), Address.DEFAULT.getValue());
@@ -124,6 +124,28 @@ class CampaignContractImpl implements CampaignContract {
     } else {
       throw new IllegalArgumentException("Failed to getVercodesOfCampaign!");
     }
+  }
+
+  @Override public boolean getCampaignValidity(BigInteger bidId) {
+    byte[] value = new byte[32];
+    System.arraycopy(bidId.toByteArray(), 0, value, value.length - bidId.toByteArray().length,
+        bidId.toByteArray().length);
+
+    Function function =
+        new Function("getCampaignValidity", Collections.singletonList(new Bytes32(value)),
+            Collections.singletonList(new TypeReference<Bool>() {
+            }));
+
+    String result =
+        callSmartContractFunction(function, address.getValue(), Address.DEFAULT.getValue());
+    List<Type> response = FunctionReturnDecoder.decode(result, function.getOutputParameters());
+
+    if (!response.isEmpty()) {
+      for (Type type : response) {
+        return ((Bool) type).getValue();
+      }
+    }
+    throw new IllegalArgumentException("Failed to getCampaignValidity!");
   }
 
   private String callSmartContractFunction(Function function, String contractAddress,

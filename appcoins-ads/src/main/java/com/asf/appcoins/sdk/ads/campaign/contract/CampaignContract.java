@@ -13,4 +13,6 @@ public interface CampaignContract {
   List<String> getCountryList() throws IOException;
 
   List<BigInteger> getVercodesOfCampaign(BigInteger bidId) throws IOException;
+
+  boolean getCampaignValidity(BigInteger bidId) throws IOException;
 }
