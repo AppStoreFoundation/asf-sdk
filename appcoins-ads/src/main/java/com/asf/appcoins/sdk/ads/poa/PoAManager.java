@@ -78,13 +78,10 @@ public class PoAManager implements LifeCycleListener.Listener {
       poaConnector.startHandshake(appContext);
     }
 
-    Log.e(TAG, " Start process!");
-
     // set the network being used
     Bundle bundle = new Bundle();
     bundle.putString("packageName", appContext.getPackageName());
     bundle.putInt("networkId", network);
-    Log.e(TAG, "Send network id");
 
     poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
 
@@ -134,7 +131,6 @@ public class PoAManager implements LifeCycleListener.Listener {
     bundle.putLong("timeStamp", timestamp);
     poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
     proofsSent++;
-    Log.e(TAG, "Send proof " + proofsSent);
 
     // schedule the next proof sending
     if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {

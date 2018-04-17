@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
+import net.grandcentrix.tray.AppPreferences;
 
 public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
@@ -78,7 +79,6 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   private ServiceConnection mConnection = new ServiceConnection() {
     @Override
     public void onServiceConnected(ComponentName className, IBinder service) {
-      Log.e(TAG, "onServiceConnected" );
 
       serviceMessenger = new Messenger(service);
       isBound = true;
@@ -108,15 +108,12 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
   @Override
   public boolean connectToService(Context context) {
-    Log.e(TAG, "connectToService : isBound " + isBound );
-
     if (isBound) {
       return true;
     }
     // Note that this is an implicit Intent that must be defined in the Android Manifest.
-    SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-    String packageName = preferences.getString(PREFERENCE_WALLET_PCKG_NAME, null);
-    Log.e(TAG, "PREFERENCE_WALLET_PCKG_NAME " + packageName );
+    final AppPreferences appPreferences = new AppPreferences(context); // this Preference comes for free from the library
+    final String packageName = appPreferences.getString(PREFERENCE_WALLET_PCKG_NAME, null);
 
     boolean result = false;
     if (!TextUtils.isEmpty(packageName)) {
@@ -146,10 +143,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
   @Override
   public void sendMessage(Context context, int type, Bundle bundle) {
-    // Create and send a message to the service, using a supported 'what'
-    // value
-    Log.e(TAG, "sendMessage : isBound " + isBound + " bundle " + bundle);
-
+    // Create and send a message to the service, using a supported 'what' value
     Message msg = Message.obtain(null, type, 0, 0);
     msg.setData(bundle);
     msg.replyTo = clientMessenger;
@@ -177,8 +171,6 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
   @Override
   public void startHandshake(Context context) {
-    Log.e(TAG, " Start handshake!");
-
     // send broadcast intent to start the handshake
     Intent broadcastIntent = new Intent(ACTION_START_HANDSHAKE);
     broadcastIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
@@ -216,8 +208,6 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
    * Method to send all messages that are pending.
    */
   private void sendPendingMessages() {
-    Log.e(TAG, "sendPendingMessages with size: " + pendingMsgsList.size() );
-
     synchronized (pendingMsgsList) {
       if (!pendingMsgsList.isEmpty()) {
         while (pendingMsgsList.size() > 0) {

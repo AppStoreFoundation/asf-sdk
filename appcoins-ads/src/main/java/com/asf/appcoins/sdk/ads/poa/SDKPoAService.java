@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.util.Log;
+import net.grandcentrix.tray.AppPreferences;
 
 import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PARAM_WALLET_PACKAGE_NAME;
 import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PREFERENCE_WALLET_PCKG_NAME;
@@ -27,10 +29,9 @@ public class SDKPoAService extends Service {
       if (intent.hasExtra(PARAM_WALLET_PACKAGE_NAME)) {
         // intent received that contains the wallet that answered to our broadcast
         // TODO Add logic to handle possible multiple intents received.
-        SharedPreferences preferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(PREFERENCE_WALLET_PCKG_NAME, intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME));
-        editor.commit();
+        // create a preference accessor. This is for global app preferences.
+        final AppPreferences appPreferences = new AppPreferences(getApplicationContext()); // this Preference comes for free from the library
+        appPreferences.put(PREFERENCE_WALLET_PCKG_NAME, intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME));
         stopSelf(startId);
       }
     }

@@ -51,11 +51,11 @@ public final class AppCoinsAdsBuilder {
     if (debug) {
       networkId = NETWORK_ROPSTEN;
       web3 = Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      contractAddress = new Address("0x49aa0da695553c1af7d341275536cb38a1b53cde");
+      contractAddress = new Address("0xf2e45dc350fa2d0a210c691f30cd58394cee1aa3");
     } else {
       networkId = NETWORK_MAIN;
       web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      contractAddress = new Address("0x5e9182B4954dBC43A2B080754017A2b0c40F9EE6");
+      contractAddress = new Address("0xEb907A50921E052CbeE233811BEAf0839d2A98FD");
     }
 
     if (this.asfWeb3j == null) {
