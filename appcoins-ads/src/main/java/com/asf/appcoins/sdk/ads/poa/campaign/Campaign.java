@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.campaign;
+package com.asf.appcoins.sdk.ads.poa.campaign;
 
 import java.math.BigInteger;
 import java.util.List;
