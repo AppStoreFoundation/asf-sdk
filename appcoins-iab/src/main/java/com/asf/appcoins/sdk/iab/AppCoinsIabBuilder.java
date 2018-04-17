@@ -67,7 +67,7 @@ public final class AppCoinsIabBuilder {
     if (debug) {
       networkId = 3;
       web3 = Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      contractAddress = "0xab949343e6c369c6b17c7ae302c1debd4b7b61c3";
+      contractAddress = "0xB040e69BD4b1025EF6dA958CAc7464730933dB71";
     } else {
       networkId = 1;
       web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));

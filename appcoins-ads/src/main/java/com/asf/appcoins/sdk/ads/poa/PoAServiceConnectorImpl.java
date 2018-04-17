@@ -142,6 +142,8 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   public void sendMessage(Context context, int type, Bundle bundle) {
     // Create and send a message to the service, using a supported 'what'
     // value
+    Log.e(TAG, "sendMessage : isBound " + isBound + " bundle " + bundle);
+
     Message msg = Message.obtain(null, type, 0, 0);
     msg.setData(bundle);
     msg.replyTo = clientMessenger;
@@ -169,6 +171,8 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
   @Override
   public void startHandshake(Context context) {
+    Log.e(TAG, " Start handshake!");
+
     // send broadcast intent to start the handshake
     Intent broadcastIntent = new Intent(ACTION_START_HANDSHAKE);
     broadcastIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());

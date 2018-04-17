@@ -3,6 +3,7 @@ package com.asf.appcoins.sdk.ads.poa;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
 
@@ -76,10 +77,15 @@ public class PoAManager implements LifeCycleListener.Listener {
       processing = true;
       poaConnector.startHandshake(appContext);
     }
+
+    Log.e(TAG, " Start process!");
+
     // set the network being used
     Bundle bundle = new Bundle();
     bundle.putString("packageName", appContext.getPackageName());
     bundle.putInt("networkId", network);
+    Log.e(TAG, "Send network id");
+
     poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
 
     sendProof();
@@ -128,6 +134,8 @@ public class PoAManager implements LifeCycleListener.Listener {
     bundle.putLong("timeStamp", timestamp);
     poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
     proofsSent++;
+    Log.e(TAG, "Send proof " + proofsSent);
+
     // schedule the next proof sending
     if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
       handler.postDelayed(sendProof = this::sendProof, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
