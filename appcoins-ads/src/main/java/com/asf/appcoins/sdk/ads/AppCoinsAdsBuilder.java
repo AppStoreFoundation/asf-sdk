@@ -2,7 +2,6 @@ package com.asf.appcoins.sdk.ads;
 
 import android.content.Context;
 import android.util.Log;
-import com.asf.appcoins.sdk.ads.campaign.manager.CampaignManager;
 import com.asf.appcoins.sdk.ads.ip.IpApi;
 import com.asf.appcoins.sdk.ads.ip.IpResponse;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
@@ -52,6 +51,7 @@ public final class AppCoinsAdsBuilder {
       networkId = NETWORK_ROPSTEN;
       web3 = Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
       contractAddress = new Address("0xf2e45dc350fa2d0a210c691f30cd58394cee1aa3");
+
     } else {
       networkId = NETWORK_MAIN;
       web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));
@@ -71,7 +71,6 @@ public final class AppCoinsAdsBuilder {
         .onErrorReturn(throwable -> "")
         .blockingFirst();
 
-    return new AppCoinsAdsImpl(poaConnector, networkId,
-        new CampaignManager(asfWeb3j, contractAddress, countryId));
+    return new AppCoinsAdsImpl(poaConnector, networkId, asfWeb3j, contractAddress, countryId);
   }
 }
