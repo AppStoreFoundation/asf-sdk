@@ -11,6 +11,8 @@ import org.web3j.abi.datatypes.Address;
 
 public class CampaignManager {
 
+  private static final String TAG = CampaignManager.class.getSimpleName();
+
   private final CampaignContract campaignContract;
   private final String country;
 
@@ -31,8 +33,12 @@ public class CampaignManager {
     for (BigInteger bidId : campaignsIdsByCountry) {
       String campaignPackageName = campaignContract.getPackageNameOfCampaign(bidId);
       List<BigInteger> vercodes = campaignContract.getVercodesOfCampaign(bidId);
+      boolean campaignValidity = campaignContract.getCampaignValidity(bidId);
 
-      if (campaignPackageName.equals(packageName) && vercodes.contains(vercode)) {
+      boolean addCampaign =
+          campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValidity;
+
+      if (addCampaign) {
         campaign.add(new Campaign(bidId, vercodes, country));
       }
     }
