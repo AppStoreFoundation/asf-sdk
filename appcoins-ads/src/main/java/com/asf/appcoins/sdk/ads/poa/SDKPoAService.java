@@ -31,6 +31,7 @@ public class SDKPoAService extends Service {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(PREFERENCE_WALLET_PCKG_NAME, intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME));
         editor.commit();
+        stopSelf(startId);
       }
     }
     return super.onStartCommand(intent, flags, startId);

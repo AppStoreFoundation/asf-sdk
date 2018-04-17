@@ -8,6 +8,7 @@ import com.asf.appcoins.sdk.ads.LifeCycleListener;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SET_NETWORK;
+import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_STOP_PROCESS;
 
 /**
  * Class that will manage the PoA process, by sending the proofs on the correct time. By handling
@@ -85,15 +86,27 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   /**
-   * Method that stops the process. It will remove any running tasks and disconnect from the waller
-   * service.
+   * Method that stops the process. It will send a message to the listening wallet to stop the
+   * process and call the finish process method.
    */
   public void stopProcess() {
+    Bundle bundle = new Bundle();
+    bundle.putString("packageName", appContext.getPackageName());
+    poaConnector.sendMessage(appContext, MSG_STOP_PROCESS, bundle);
+    finishProcess();
+  }
+
+  /**
+   * Method that finish the process. It will remove any running tasks and disconnect from the wallet
+   * service.
+   */
+  public void finishProcess() {
     processing = false;
 
     if (sendProof != null) {
       handler.removeCallbacks(sendProof);
     }
+
     poaConnector.disconnectFromService(appContext);
   }
 
@@ -120,7 +133,7 @@ public class PoAManager implements LifeCycleListener.Listener {
     } else {
       // or stop the process
       processing = false;
-      stopProcess();
+      finishProcess();
     }
   }
 
