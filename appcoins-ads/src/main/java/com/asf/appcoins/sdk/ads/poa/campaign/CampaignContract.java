@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.campaign.contract;
+package com.asf.appcoins.sdk.ads.poa.campaign;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -13,4 +13,6 @@ public interface CampaignContract {
   List<String> getCountryList() throws IOException;
 
   List<BigInteger> getVercodesOfCampaign(BigInteger bidId) throws IOException;
+
+  boolean getCampaignValidity(BigInteger bidId) throws IOException;
 }

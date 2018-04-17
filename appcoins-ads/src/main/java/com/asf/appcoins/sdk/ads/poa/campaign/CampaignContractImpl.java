@@ -1,6 +1,5 @@
-package com.asf.appcoins.sdk.ads.campaign.manager;
+package com.asf.appcoins.sdk.ads.poa.campaign;
 
-import com.asf.appcoins.sdk.ads.campaign.contract.CampaignContract;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -11,6 +10,7 @@ import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Address;
+import org.web3j.abi.datatypes.Bool;
 import org.web3j.abi.datatypes.DynamicArray;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
@@ -21,12 +21,12 @@ import org.web3j.abi.datatypes.generated.Bytes32;
 
 import static org.web3j.protocol.core.methods.request.Transaction.createEthCallTransaction;
 
-class CampaignContractImpl implements CampaignContract {
+public class CampaignContractImpl implements CampaignContract {
 
   private final AsfWeb3j asfWeb3j;
   private final Address address;
 
-  CampaignContractImpl(AsfWeb3j asfWeb3j, Address contractAddress) {
+  public CampaignContractImpl(AsfWeb3j asfWeb3j, Address contractAddress) {
     this.asfWeb3j = asfWeb3j;
     this.address = contractAddress;
   }
@@ -62,12 +62,13 @@ class CampaignContractImpl implements CampaignContract {
 
     if (!response.isEmpty()) {
       List<BigInteger> ids = new LinkedList<>();
-      for (Type type : response) {
-        if (!((List) type.getValue()).isEmpty()) {
-          BigInteger campaignId =
-              new BigInteger(((Bytes32) ((List) type.getValue()).get(0)).getValue());
-          ids.add(campaignId);
-        }
+
+      Type type = response.get(0);
+      List<Bytes32> values = (List<Bytes32>) type.getValue();
+
+      for (Bytes32 bytes32 : values) {
+        BigInteger campaignId = new BigInteger((bytes32).getValue());
+        ids.add(campaignId);
       }
       return ids;
     } else {
@@ -86,12 +87,13 @@ class CampaignContractImpl implements CampaignContract {
 
     if (!response.isEmpty()) {
       List<String> countries = new LinkedList<>();
-      for (Type type : response) {
-        if (!((List) type.getValue()).isEmpty()) {
-          String country =
-              String.valueOf(new String(((Bytes2) ((List) type.getValue()).get(0)).getValue()));
-          countries.add(country);
-        }
+
+      Type type = response.get(0);
+      List<Bytes2> value = (List<Bytes2>) type.getValue();
+
+      for (Bytes2 bytes2 : value) {
+        String country = String.valueOf(new String((bytes2).getValue()));
+        countries.add(country);
       }
       return countries;
     } else {
@@ -104,7 +106,7 @@ class CampaignContractImpl implements CampaignContract {
     System.arraycopy(bidId.toByteArray(), 0, value, value.length-bidId.toByteArray().length, bidId.toByteArray().length);
 
     Function function = new Function("getVercodesOfCampaign",
-        Collections.singletonList(new Bytes32(Arrays.copyOf(value, 32))),
+        Collections.singletonList(new Bytes32(value)),
         Collections.singletonList(new TypeReference<DynamicArray<Uint>>() {
         }));
 
@@ -114,16 +116,39 @@ class CampaignContractImpl implements CampaignContract {
 
     if (!response.isEmpty()) {
       List<BigInteger> vercodes = new LinkedList<>();
-      for (Type type : response) {
-        if (!((List) type.getValue()).isEmpty()) {
-          BigInteger vercode = ((Uint) ((List) type.getValue()).get(0)).getValue();
-          vercodes.add(vercode);
-        }
+
+      Type type = response.get(0);
+      List<Uint> values = (List<Uint>) type.getValue();
+
+      for (Uint uint : values) {
+        vercodes.add(uint.getValue());
       }
       return vercodes;
     } else {
       throw new IllegalArgumentException("Failed to getVercodesOfCampaign!");
     }
+  }
+
+  @Override public boolean getCampaignValidity(BigInteger bidId) {
+    byte[] value = new byte[32];
+    System.arraycopy(bidId.toByteArray(), 0, value, value.length - bidId.toByteArray().length,
+        bidId.toByteArray().length);
+
+    Function function =
+        new Function("getCampaignValidity", Collections.singletonList(new Bytes32(value)),
+            Collections.singletonList(new TypeReference<Bool>() {
+            }));
+
+    String result =
+        callSmartContractFunction(function, address.getValue(), Address.DEFAULT.getValue());
+    List<Type> response = FunctionReturnDecoder.decode(result, function.getOutputParameters());
+
+    if (!response.isEmpty()) {
+      for (Type type : response) {
+        return ((Bool) type).getValue();
+      }
+    }
+    throw new IllegalArgumentException("Failed to getCampaignValidity!");
   }
 
   private String callSmartContractFunction(Function function, String contractAddress,

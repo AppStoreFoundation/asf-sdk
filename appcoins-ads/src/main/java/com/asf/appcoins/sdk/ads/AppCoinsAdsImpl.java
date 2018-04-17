@@ -6,13 +6,15 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import com.asf.appcoins.sdk.ads.campaign.manager.CampaignManager;
-import com.asf.appcoins.sdk.ads.poa.PoAManager;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
+import com.asf.appcoins.sdk.ads.poa.manager.PoAManager;
+import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import java.math.BigInteger;
+import org.web3j.abi.datatypes.Address;
+import org.web3j.protocol.Web3j;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -25,17 +27,24 @@ import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SET_NETWORK;
 final class AppCoinsAdsImpl implements AppCoinsAds {
 
   private final PoAServiceConnector poaConnector;
-  private final CampaignManager campaignManager;
 
   private Context context;
 
   private int networkId;
 
-  AppCoinsAdsImpl(PoAServiceConnector poaConnector, int networkId,
-      CampaignManager campaignManager) {
+  Address contractAddress;
+
+  AsfWeb3j web3j;
+
+  String countryId;
+
+  AppCoinsAdsImpl(PoAServiceConnector poaConnector, int networkId, AsfWeb3j asfWeb3j,
+      Address contractAddress, String countryId) {
     this.poaConnector = poaConnector;
     this.networkId = networkId;
-    this.campaignManager = campaignManager;
+    this.contractAddress = contractAddress;
+    this.web3j = asfWeb3j;
+    this.countryId = countryId;
   }
 
   @Override public void handshake() {
@@ -71,39 +80,11 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   @Override public void init(Application application) {
     this.context = application;
     LifeCycleListener.get(application)
-        .setListener(PoAManager.get(application, poaConnector, networkId));
-
-    handleCampaign(application, PoAManager.get(application, poaConnector, networkId));
+        .setListener(PoAManager.get(application, poaConnector, networkId, web3j, contractAddress,
+            countryId));
   }
 
-  private void handleCampaign(Context context, PoAManager poAManager) {
-    if (hasNetwork()) {
-      String packageName = context.getPackageName();
-      Disposable subscribe = Single.fromCallable(() -> getVerCode(context, packageName))
-          .subscribeOn(Schedulers.io())
-          .map(verCode -> campaignManager.getActiveCampaigns(packageName,
-              BigInteger.valueOf(verCode)))
-          .subscribe(campaigns -> {
-            if (campaigns.isEmpty()) {
-              poAManager.stopProcess();
-            } else {
-              registerCampaign(campaigns.get(0)
-                  .getId()
-                  .toString());
-            }
-          });
-    }
-  }
 
-  private boolean hasNetwork() {
-    NetworkInfo activeNetworkInfo = ((ConnectivityManager) context.getSystemService(
-        Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-  }
 
-  private int getVerCode(Context context, String packageName)
-      throws PackageManager.NameNotFoundException {
-    return context.getPackageManager()
-        .getPackageInfo(packageName, 0).versionCode;
-  }
+
 }
