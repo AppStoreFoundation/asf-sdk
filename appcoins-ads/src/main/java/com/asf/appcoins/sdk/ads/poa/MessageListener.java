@@ -24,6 +24,11 @@ public interface MessageListener {
    * Command to the service to define the network that is working in
    */
   int MSG_SET_NETWORK = 3;
+  /**
+   * Command to the service to stop the PoA process on the wallet side
+   */
+  int MSG_STOP_PROCESS = 4;
+
 
   void handle(Message message);
 }
