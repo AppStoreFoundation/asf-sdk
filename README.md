@@ -18,6 +18,8 @@ for testing purposes.
 ### Prerequisites
 
 + In order for the ASF SDK to work, you must have an [AppCoins compliant wallet](https://github.com/Aptoide/asf-wallet-android/tree/dev) installed.
++ Minimum gradle plugin version is 3.0.1.
++ Minimum build tools version is 26.0.1.
 + The Android minimum API Level to use ASF SDK is 21 (Android 5.0).
 + Basic understanding of RxJava is advised but now required.
 
@@ -26,12 +28,25 @@ for testing purposes.
 In your **project's buildscript**, make sure you have the following:
 
 ```
+buildscript {
+  repositories {
+    jcenter()
+    google()
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:3.1.0'
+
+    // NOTE: Do not place your application dependencies here; they belong
+    // in the individual module build.gradle files
+  }
+}
+
 allprojects {
-    repositories {
-        google()
-        jcenter()
-        maven { url "https://dl.bintray.com/asf/asf" }
-    }
+  repositories {
+    jcenter()
+    google()
+    maven { url "https://dl.bintray.com/asf/asf" }
+  }
 }
 ```
 And in your **app's buildscript**, add the following dependency:
