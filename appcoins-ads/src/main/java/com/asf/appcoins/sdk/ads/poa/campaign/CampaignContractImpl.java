@@ -2,7 +2,6 @@ package com.asf.appcoins.sdk.ads.poa.campaign;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
