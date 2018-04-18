@@ -67,11 +67,11 @@ public final class AppCoinsIabBuilder {
     if (debug) {
       networkId = 3;
       web3 = Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      contractAddress = "0xB040e69BD4b1025EF6dA958CAc7464730933dB71";
+      contractAddress = "0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3";
     } else {
       networkId = 1;
       web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      contractAddress = "0xb015D9bBabc472BBfC990ED6A0C961a90a482C57";
+      contractAddress = "0x1a7a8bd9106f2b8d977e08582dc7d24c723ab0db";
     }
 
     if (this.scheduler == null) {
