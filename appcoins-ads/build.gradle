@@ -42,7 +42,7 @@ dependencies {
   api lib.retrofit2
 
   api project(':appcoins-core')
-  implementation 'net.grandcentrix.tray:tray:0.12.0'
+  api 'net.grandcentrix.tray:tray:0.12.0'
 }
 
 //region Publishing
