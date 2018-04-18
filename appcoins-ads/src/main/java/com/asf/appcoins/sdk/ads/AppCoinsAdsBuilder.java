@@ -50,11 +50,12 @@ public final class AppCoinsAdsBuilder {
     if (debug) {
       networkId = NETWORK_ROPSTEN;
       web3 = Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      contractAddress = new Address("0xe8f3c5d390e3dfe1990c7ac5968f9aa5c5c808cd");
+      contractAddress = new Address("0xf2e45dc350fa2d0a210c691f30cd58394cee1aa3");
+
     } else {
       networkId = NETWORK_MAIN;
       web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      contractAddress = new Address("0xab949343e6c369c6b17c7ae302c1debd4b7b61c3");
+      contractAddress = new Address("0xEb907A50921E052CbeE233811BEAf0839d2A98FD");
     }
 
     if (this.asfWeb3j == null) {

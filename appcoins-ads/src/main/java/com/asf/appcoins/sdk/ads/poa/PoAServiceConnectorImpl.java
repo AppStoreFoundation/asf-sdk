@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
+import net.grandcentrix.tray.AppPreferences;
 
 public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
@@ -78,6 +79,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   private ServiceConnection mConnection = new ServiceConnection() {
     @Override
     public void onServiceConnected(ComponentName className, IBinder service) {
+
       serviceMessenger = new Messenger(service);
       isBound = true;
 
@@ -110,8 +112,9 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
       return true;
     }
     // Note that this is an implicit Intent that must be defined in the Android Manifest.
-    SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-    String packageName = preferences.getString(PREFERENCE_WALLET_PCKG_NAME, null);
+    final AppPreferences appPreferences = new AppPreferences(context); // this Preference comes for free from the library
+    final String packageName = appPreferences.getString(PREFERENCE_WALLET_PCKG_NAME, null);
+
     boolean result = false;
     if (!TextUtils.isEmpty(packageName)) {
       Intent i = new Intent(ACTION_BIND);
@@ -140,8 +143,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
   @Override
   public void sendMessage(Context context, int type, Bundle bundle) {
-    // Create and send a message to the service, using a supported 'what'
-    // value
+    // Create and send a message to the service, using a supported 'what' value
     Message msg = Message.obtain(null, type, 0, 0);
     msg.setData(bundle);
     msg.replyTo = clientMessenger;
