@@ -7,45 +7,24 @@
     tools:context=".MainActivity"
     android:layout_margin="20dp">
 
+  <Button
+      android:id="@+id/buyButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:onClick="onBuyGasButtonClicked"
+      android:text="@string/buy_gas"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/buyButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onBuyGasButtonClicked"
-        android:text="@string/buy_gas"
-        app:layout_constraintBottom_toTopOf="@id/handshakeButton"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/upgradeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onUpgradeAppButtonClicked"
-        android:text="@string/upgrade_vehicle"
-        app:layout_constraintBottom_toBottomOf="@id/buyButton"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/buyButton" />
-
-    <Button
-        android:id="@+id/handshakeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onHandshakeButtonClick"
-        android:text="@string/handshake"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buyButton" />
-
-    <Button
-        android:id="@+id/sendProofButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onSendProofButtonClick"
-        android:text="@string/send_proof"
-        app:layout_constraintBottom_toBottomOf="@+id/handshakeButton"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/handshakeButton" />
+  <Button
+      android:id="@+id/upgradeButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:onClick="onUpgradeAppButtonClicked"
+      android:text="@string/upgrade_vehicle"
+      app:layout_constraintBottom_toBottomOf="@id/buyButton"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintTop_toTopOf="@id/buyButton" />
 
 </android.support.constraint.ConstraintLayout>
