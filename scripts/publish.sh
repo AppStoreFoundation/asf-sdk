@@ -1,6 +1,6 @@
 #!/bin/bash
 
 cd ..
-./gradlew :appcoins-sdk:clean :appcoins-sdk-iab:clean :appcoins-sdk-ads:clean :appcoins-sdk-core:clean
-./gradlew :appcoins-sdk:assemble :appcoins-sdk-iab:assemble :appcoins-sdk-ads:assemble :appcoins-sdk-core:assemble
+./gradlew :appcoins:clean :appcoins-iab:clean :appcoins-ads:clean :appcoins-core:clean
+./gradlew :appcoins:assemble :appcoins-iab:assemble :appcoins-ads:assemble :appcoins-core:assemble
 ./gradlew publish bintrayUpload
