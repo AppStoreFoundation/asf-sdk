@@ -66,6 +66,23 @@ dependencies {
 }
 ```
 
+As an example, every time there is an update of the SDKs where no further integration needs to be done, the **only thing that should be changed is the version**. For example, after the **release scheduled for the 2nd of May**, the dependencies that should be included in the app's buildscript are:
+
+```
+dependencies {
+    api 'com.asfoundation:appcoins:0.3.0a'
+}
+```
+
+Or
+
+```
+dependencies {
+    api 'com.asfoundation:appcoins-iab:0.3.0a'
+    api 'com.asfoundation:appcoins-ads:0.3.0a'
+}
+```
+
 ## Size
 As of version [0.2.1a](https://bintray.com/asf/asf/appcoins-sdk/0.1.1a), SDK weight is approximately as follows:
 
