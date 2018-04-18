@@ -3,8 +3,7 @@
 
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-  <application
-      android:allowBackup="false">
+  <application>
     <service
         android:name="com.asf.appcoins.sdk.ads.poa.SDKPoAService"
         android:enabled="true"
