@@ -66,7 +66,7 @@ dependencies {
 }
 ```
 
-As an example, every time there is an update of the SDKs where no further integration needs to be done, the **only thing that should be changed is the version**. For example, after the **release scheduled for the 2nd of May**, the dependencies that should be included in the app's buildscript are:
+As an example, every time there is an update of the SDKs where no further integration needs to be done, the **only thing that should be changed is the version**. For example, after the **release scheduled for the 2nd of May**, the dependencies that should be included in the **app's buildscript** are:
 
 ```
 dependencies {
