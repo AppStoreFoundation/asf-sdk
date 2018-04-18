@@ -53,7 +53,7 @@ And in your **app's buildscript**, add the following dependency:
 
 ```
 dependencies {
-    api 'com.asfoundation:appcoins-sdk:0.2.1a'
+    api 'com.asfoundation:appcoins:0.2.1a'
 }
 ```
 
@@ -61,8 +61,8 @@ Or
 
 ```
 dependencies {
-    api 'com.asfoundation:appcoins-sdk-iab:0.1.1a'
-    api 'com.asfoundation:appcoins-sdk-ads:0.1.1a'
+    api 'com.asfoundation:appcoins-iab:0.2.1a'
+    api 'com.asfoundation:appcoins-ads:0.2.1a'
 }
 ```
 
