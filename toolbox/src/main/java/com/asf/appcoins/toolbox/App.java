@@ -8,7 +8,7 @@ import java.util.List;
 
 public class App extends Application {
 
-  private static final String DEVELOPER_ADDRESS = "0x4fbcc5ce88493c3d9903701c143af65f54481119";
+  private static final String DEVELOPER_ADDRESS = "0x2c30194bd2e7b6b8ff1467c5af1650f53cd231be";
 
   @Override public void onCreate() {
     super.onCreate();
