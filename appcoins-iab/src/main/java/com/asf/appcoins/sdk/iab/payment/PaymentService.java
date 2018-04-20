@@ -37,18 +37,20 @@ public final class PaymentService {
   private final String developerAddress;
   private final Map<String, PaymentDetails> payments;
   private final AsfWeb3j asfWeb3j;
-  private final String contractAddress;
+  private final String tokenContractAddress;
+  private final String iabContractAddress;
 
   private PaymentDetails currentPayment;
 
   public PaymentService(int networkId, SkuManager skuManager, String developerAddress,
-      AsfWeb3j asfWeb3j, String contractAddress) {
+      AsfWeb3j asfWeb3j, String tokenContractAddress, String iabContractAddress) {
     this.networkId = networkId;
     this.skuManager = skuManager;
     this.developerAddress = developerAddress;
     this.asfWeb3j = asfWeb3j;
+    this.iabContractAddress = iabContractAddress;
     this.payments = new HashMap<>(1);
-    this.contractAddress = contractAddress;
+    this.tokenContractAddress = tokenContractAddress;
   }
 
   public void buy(String skuId, Activity activity, int defaultRequestCode) {
@@ -56,7 +58,7 @@ public final class PaymentService {
     BigDecimal amount = skuManager.getSkuAmount(skuId);
     BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
-    Intent intent = buildPaymentIntent(sku, total, contractAddress);
+    Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
 
     currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
         new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
@@ -104,11 +106,12 @@ public final class PaymentService {
     });
   }
 
-  @NonNull private Intent buildPaymentIntent(SKU sku, BigDecimal total, String contractAddress) {
+  @NonNull
+  private Intent buildPaymentIntent(SKU sku, BigDecimal amount, String tokenContractAddress,
+      String iabContractAddress) {
     Intent intent = new Intent(Intent.ACTION_VIEW);
-    Uri data =
-        UriBuilder.buildUri(contractAddress, sku.getId(), networkId,
-            total, developerAddress);
+    Uri data = Uri.parse(UriBuilder.buildUriString(tokenContractAddress, iabContractAddress, amount,
+        developerAddress, sku.getId(), networkId));
     intent.setData(data);
 
     intent.putExtra(PRODUCT_NAME, sku.getName());
