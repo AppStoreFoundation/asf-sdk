@@ -35,7 +35,7 @@ final class AppCoinsIabImpl implements AppCoinsIab {
     this.paymentService = paymentService;
   }
 
-  @Override public Observable<PaymentDetails> getPayment(String skuId) {
+  private Observable<PaymentDetails> getPayment(String skuId) {
     return Observable.interval(0, period, TimeUnit.SECONDS, scheduler)
         .timeInterval()
         .switchMap(scan -> paymentService.getPaymentDetails(skuId))

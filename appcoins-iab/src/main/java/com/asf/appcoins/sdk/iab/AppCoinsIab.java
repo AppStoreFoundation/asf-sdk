@@ -12,10 +12,7 @@ import java.util.Collection;
 /**
  * Created by neuro on 26-02-2018.
  */
-
 public interface AppCoinsIab {
-
-  Observable<PaymentDetails> getPayment(String skuId);
 
   Observable<PaymentDetails> getCurrentPayment();
 
