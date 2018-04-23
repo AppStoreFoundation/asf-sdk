@@ -44,14 +44,11 @@ final class AppCoinsIabImpl implements AppCoinsIab {
   }
 
   @Override public Observable<PaymentDetails> getCurrentPayment() {
-    String txHash = paymentService.getCurrentPayment()
+    return Observable.fromCallable(() -> paymentService.getCurrentPayment()
         .getTransaction()
-        .getHash();
-
-    boolean hasTxHash = txHash != null;
-
-    return hasTxHash ? getPayment(paymentService.getCurrentPayment()
-        .getSkuId()) : Observable.just(paymentService.getCurrentPayment());
+        .getHash() != null)
+        .flatMap(hasTxHash -> hasTxHash ? getPayment(paymentService.getCurrentPayment()
+            .getSkuId()) : Observable.just(paymentService.getCurrentPayment()));
   }
 
   @Override public void consume(String skuId) throws ConsumeFailedException {
