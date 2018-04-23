@@ -3,6 +3,7 @@ package com.asf.appcoins.sdk.iab;
 import android.app.Activity;
 import android.content.Intent;
 import com.asf.appcoins.sdk.iab.entity.SKU;
+import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
 import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -18,7 +19,7 @@ public interface AppCoinsIab {
 
   Observable<PaymentDetails> getCurrentPayment();
 
-  void consume(String skuId);
+  void consume(String skuId) throws ConsumeFailedException;
 
   Completable buy(String skuId, Activity activity);
 

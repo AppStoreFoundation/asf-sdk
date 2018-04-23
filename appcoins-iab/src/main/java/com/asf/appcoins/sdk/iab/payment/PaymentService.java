@@ -13,6 +13,7 @@ import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.asf.appcoins.sdk.iab.SkuManager;
 import com.asf.appcoins.sdk.iab.entity.SKU;
+import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
 import com.asf.appcoins.sdk.iab.exception.PaymentFailedException;
 import com.asf.appcoins.sdk.iab.util.UriBuilder;
 import com.asf.appcoins.sdk.iab.wallet.AndroidUtils;
@@ -177,9 +178,9 @@ public final class PaymentService {
     return currentPayment;
   }
 
-  public void consume(String skuId) {
+  public void consume(String skuId) throws ConsumeFailedException {
     if (!payments.containsKey(skuId)) {
-      throw new IllegalArgumentException(
+      throw new ConsumeFailedException(
           "Failed to consume " + skuId + '!' + System.lineSeparator() + "Did you buy it first?");
     }
 

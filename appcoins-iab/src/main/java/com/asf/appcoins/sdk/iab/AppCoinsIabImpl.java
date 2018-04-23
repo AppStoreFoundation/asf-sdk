@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 import com.asf.appcoins.sdk.iab.entity.SKU;
+import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
 import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
 import com.asf.appcoins.sdk.iab.payment.PaymentService;
 import io.reactivex.Completable;
@@ -53,7 +54,7 @@ final class AppCoinsIabImpl implements AppCoinsIab {
         .getSkuId()) : Observable.just(paymentService.getCurrentPayment());
   }
 
-  @Override public void consume(String skuId) {
+  @Override public void consume(String skuId) throws ConsumeFailedException {
     paymentService.consume(skuId);
   }
 
