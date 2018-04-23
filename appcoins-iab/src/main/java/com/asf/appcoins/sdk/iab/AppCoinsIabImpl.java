@@ -27,7 +27,7 @@ final class AppCoinsIabImpl implements AppCoinsIab {
   private final SkuManager skuManager;
 
   AppCoinsIabImpl(int period, Scheduler scheduler, SkuManager skuManager,
-                  PaymentService paymentService, boolean debug) {
+      PaymentService paymentService) {
     this.period = period;
     this.scheduler = scheduler;
     this.skuManager = skuManager;
