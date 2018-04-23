@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import com.asf.appcoins.sdk.iab.entity.SKU;
 import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import java.util.Collection;
 
@@ -19,7 +20,7 @@ public interface AppCoinsIab {
 
   void consume(String skuId);
 
-  void buy(String skuId, Activity activity);
+  Completable buy(String skuId, Activity activity);
 
   Collection<SKU> listSkus();
 

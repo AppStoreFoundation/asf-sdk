@@ -6,6 +6,7 @@ import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 import com.asf.appcoins.sdk.iab.entity.SKU;
 import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
 import com.asf.appcoins.sdk.iab.payment.PaymentService;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import java.util.Collection;
@@ -56,8 +57,8 @@ final class AppCoinsIabImpl implements AppCoinsIab {
     paymentService.consume(skuId);
   }
 
-  @Override public void buy(String skuId, Activity activity) {
-    paymentService.buy(skuId, activity, DEFAULT_REQUEST_CODE);
+  @Override public Completable buy(String skuId, Activity activity) {
+    return paymentService.buy(skuId, activity, DEFAULT_REQUEST_CODE);
   }
 
   @Override public Collection<SKU> listSkus() {
