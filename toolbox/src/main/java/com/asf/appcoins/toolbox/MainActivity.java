@@ -64,10 +64,10 @@ public class MainActivity extends AppCompatActivity {
   public void onBuyGasButtonClicked(View arg0) {
     Disposable disposable = appCoinsIab.buy(Skus.SKU_GAS_ID, this)
         .subscribe(() -> {
-          Toast.makeText(this, "Wallet installed", Toast.LENGTH_LONG)
+          Toast.makeText(this, "Wallet install triggered.", Toast.LENGTH_SHORT)
               .show();
         }, throwable -> {
-          Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG)
+          Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT)
               .show();
           //Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG)
           //    .show();
