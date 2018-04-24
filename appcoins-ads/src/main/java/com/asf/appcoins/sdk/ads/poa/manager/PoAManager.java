@@ -99,7 +99,9 @@ public class PoAManager implements LifeCycleListener.Listener {
     // If starting the PoA process do handshake
     if (!processing) {
       processing = true;
-      poaConnector.startHandshake(appContext);
+      if (proofsSent == 0) {
+        poaConnector.startHandshake(appContext);
+      }
     }
 
     // set the network being used
@@ -133,7 +135,6 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void finishProcess() {
     processing = false;
-    proofsSent = 0;
 
     if (sendProof != null) {
       handler.removeCallbacks(sendProof);
