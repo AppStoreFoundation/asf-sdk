@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import com.asf.appcoins.sdk.core.R;
 import com.asf.appcoins.sdk.core.util.AndroidUtils;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
@@ -21,21 +22,21 @@ public class WalletUtils {
     return AndroidUtils.hasHandlerAvailable(intent, context);
   }
 
-  public static void promptToInstallWallet(Activity activity) {
-    Disposable subscribe = showWalletInstallDialog(activity).filter(aBoolean -> aBoolean)
+  public static void promptToInstallWallet(Activity activity, String message) {
+    Disposable subscribe = showWalletInstallDialog(activity, message).filter(aBoolean -> aBoolean)
         .doOnSuccess(gotoStore(activity))
         .subscribe(aBoolean -> {
         }, Throwable::printStackTrace);
   }
 
-  private static Single<Boolean> showWalletInstallDialog(Context context) {
+  private static Single<Boolean> showWalletInstallDialog(Context context, String message) {
     return Single.create(emitter -> {
       AlertDialog.Builder builder;
       builder = new AlertDialog.Builder(context);
-      builder.setTitle("APPC Wallet Missing")
-          .setMessage("To complete your purchase, you have to install an AppCoins wallet")
-          .setPositiveButton(android.R.string.yes, (dialog, which) -> emitter.onSuccess(true))
-          .setNegativeButton(android.R.string.no, (dialog, which) -> emitter.onSuccess(false))
+      builder.setTitle(R.string.wallet_missing)
+          .setMessage(message)
+          .setPositiveButton(R.string.install, (dialog, which) -> emitter.onSuccess(true))
+          .setNegativeButton(R.string.skip, (dialog, which) -> emitter.onSuccess(false))
           .setIcon(android.R.drawable.ic_dialog_alert)
           .show();
     });

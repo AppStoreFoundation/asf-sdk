@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import com.asf.appcoins.sdk.R;
 import com.asf.appcoins.sdk.core.transaction.Transaction;
 import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
@@ -66,7 +67,8 @@ public final class PaymentService {
         activity.startActivityForResult(intent, defaultRequestCode);
       }
     } else {
-      WalletUtils.promptToInstallWallet(activity);
+      WalletUtils.promptToInstallWallet(activity,
+          activity.getString(R.string.install_wallet_from_iab));
     }
   }
 
