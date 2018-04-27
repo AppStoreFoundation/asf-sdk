@@ -1,6 +1,7 @@
 package com.asf.appcoins.sdk.iab.payment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -11,8 +12,11 @@ import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.asf.appcoins.sdk.iab.SkuManager;
 import com.asf.appcoins.sdk.iab.entity.SKU;
+import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
 import com.asf.appcoins.sdk.iab.util.UriBuilder;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +28,8 @@ public final class PaymentService {
 
   public static final String TRANSACTION_HASH_KEY = "transaction_hash";
   public static final String PRODUCT_NAME = "product_name";
+
+  private static final String WALLET_PACKAGE_NAME = "com.asfoundation.wallet";
 
   private static final int DECIMALS = 18;
   private final int networkId;
@@ -70,6 +76,18 @@ public final class PaymentService {
       WalletUtils.promptToInstallWallet(activity,
           activity.getString(R.string.install_wallet_from_iab));
     }
+  }
+
+  @NonNull private Completable gotoStore(Activity activity) {
+    return Completable.fromRunnable(() -> {
+      try {
+        activity.startActivity(new Intent(Intent.ACTION_VIEW,
+            Uri.parse("market://details?id=" + WALLET_PACKAGE_NAME)));
+      } catch (android.content.ActivityNotFoundException anfe) {
+        activity.startActivity(new Intent(Intent.ACTION_VIEW,
+            Uri.parse("https://play.google.com/store/apps/details?id=" + WALLET_PACKAGE_NAME)));
+      }
+    });
   }
 
   @NonNull
@@ -128,9 +146,9 @@ public final class PaymentService {
     return currentPayment;
   }
 
-  public void consume(String skuId) {
+  public void consume(String skuId) throws ConsumeFailedException {
     if (!payments.containsKey(skuId)) {
-      throw new IllegalArgumentException(
+      throw new ConsumeFailedException(
           "Failed to consume " + skuId + '!' + System.lineSeparator() + "Did you buy it first?");
     }
 

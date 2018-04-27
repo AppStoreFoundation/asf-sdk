@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 import com.asf.appcoins.sdk.iab.entity.SKU;
+import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
 import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
 import com.asf.appcoins.sdk.iab.payment.PaymentService;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import java.util.Collection;
@@ -26,14 +28,14 @@ final class AppCoinsIabImpl implements AppCoinsIab {
   private final SkuManager skuManager;
 
   AppCoinsIabImpl(int period, Scheduler scheduler, SkuManager skuManager,
-                  PaymentService paymentService, boolean debug) {
+      PaymentService paymentService) {
     this.period = period;
     this.scheduler = scheduler;
     this.skuManager = skuManager;
     this.paymentService = paymentService;
   }
 
-  @Override public Observable<PaymentDetails> getPayment(String skuId) {
+  private Observable<PaymentDetails> getPayment(String skuId) {
     return Observable.interval(0, period, TimeUnit.SECONDS, scheduler)
         .timeInterval()
         .switchMap(scan -> paymentService.getPaymentDetails(skuId))
@@ -42,22 +44,19 @@ final class AppCoinsIabImpl implements AppCoinsIab {
   }
 
   @Override public Observable<PaymentDetails> getCurrentPayment() {
-    String txHash = paymentService.getCurrentPayment()
+    return Observable.fromCallable(() -> paymentService.getCurrentPayment()
         .getTransaction()
-        .getHash();
-
-    boolean hasTxHash = txHash != null;
-
-    return hasTxHash ? getPayment(paymentService.getCurrentPayment()
-        .getSkuId()) : Observable.just(paymentService.getCurrentPayment());
+        .getHash() != null)
+        .flatMap(hasTxHash -> hasTxHash ? getPayment(paymentService.getCurrentPayment()
+            .getSkuId()) : Observable.just(paymentService.getCurrentPayment()));
   }
 
-  @Override public void consume(String skuId) {
+  @Override public void consume(String skuId) throws ConsumeFailedException {
     paymentService.consume(skuId);
   }
 
-  @Override public void buy(String skuId, Activity activity) {
-    paymentService.buy(skuId, activity, DEFAULT_REQUEST_CODE);
+  @Override public Completable buy(String skuId, Activity activity) {
+    return paymentService.buy(skuId, activity, DEFAULT_REQUEST_CODE);
   }
 
   @Override public Collection<SKU> listSkus() {
