@@ -36,7 +36,8 @@ class InstallWalletLifecycleCallbacks implements Application.ActivityLifecycleCa
 
   @Override public void onActivityResumed(Activity activity) {
     if (firstRun && !WalletUtils.hasWalletInstalled(activity)) {
-      WalletUtils.promptToInstallWallet(activity);
+      WalletUtils.promptToInstallWallet(activity,
+          activity.getString(R.string.install_wallet_from_ads));
       firstRun = false;
     }
   }
