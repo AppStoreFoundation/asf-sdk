@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.iab.wallet;
+package com.asf.appcoins.sdk.core.util;
 
 import android.content.Context;
 import android.content.Intent;
