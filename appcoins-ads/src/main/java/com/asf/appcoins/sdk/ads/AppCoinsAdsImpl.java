@@ -18,6 +18,8 @@ import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SET_NETWORK;
 
 final class AppCoinsAdsImpl implements AppCoinsAds {
 
+  private static final String ADS_PREFERENCES = "AppCoinsAds";
+
   private final PoAServiceConnector poaConnector;
 
   private Context context;
@@ -70,6 +72,9 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   }
 
   @Override public void init(Application application) {
+    application.registerActivityLifecycleCallbacks(new InstallWalletLifecycleCallbacks(
+        application.getSharedPreferences(ADS_PREFERENCES, Context.MODE_PRIVATE)));
+
     this.context = application;
     LifeCycleListener.get(application)
         .setListener(PoAManager.get(application, poaConnector, networkId, web3j, contractAddress,
