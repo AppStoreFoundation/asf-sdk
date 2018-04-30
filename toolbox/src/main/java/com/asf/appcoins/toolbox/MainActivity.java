@@ -39,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
     if (appCoinsIab.onActivityResult(requestCode, requestCode, data)) {
       compositeDisposable.add(appCoinsIab.getCurrentPayment()
-          .subscribe(paymentDetails -> runOnUiThread(() -> handlePayment(paymentDetails))));
+          .subscribe(paymentDetails -> runOnUiThread(() -> handlePayment(paymentDetails)),
+              Throwable::printStackTrace));
     }
   }
 
