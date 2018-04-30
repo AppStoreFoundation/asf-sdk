@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.os.Handler;
-import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import java.lang.ref.WeakReference;
 
 /**
@@ -31,9 +30,21 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
   /** The listener for the lifecycle background and foreground state */
   private Listener listener;
 
-  public interface Listener {
-    void onBecameForeground();
-    void onBecameBackground();
+  @Override public void onActivityStarted(Activity activity) {
+    currentActivity = new WeakReference<>(activity);
+    // remove any scheduled checks since we're starting another activity
+    // we're definitely not going background
+    if (check != null) {
+      handler.removeCallbacks(check);
+    }
+
+    // check if we're becoming foreground and notify listeners
+    if (!foreground && (activity != null && !activity.isChangingConfigurations())) {
+      foreground = true;
+      if (listener != null) {
+        listener.onBecameForeground(activity);
+      }
+    }
   }
 
   /**
@@ -66,21 +77,7 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
     this.listener = listener;
   }
 
-  @Override public void onActivityStarted(Activity activity) {
-    currentActivity = new WeakReference<>(activity);
-    // remove any scheduled checks since we're starting another activity
-    // we're definitely not going background
-    if (check != null) {
-      handler.removeCallbacks(check);
-    }
-
-    // check if we're becoming foreground and notify listeners
-    if (!foreground && (activity != null && !activity.isChangingConfigurations())){
-      foreground = true;
-      if (listener != null) {
-        listener.onBecameForeground();
-      }
-    }
+  @Override public void onActivityResumed(Activity activity) {
   }
 
 
@@ -103,11 +100,10 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
 
   @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
 
-  @Override public void onActivityResumed(Activity activity) {
-    if (!WalletUtils.hasWalletInstalled(activity)) {
-      WalletUtils.promptToInstallWallet(activity,
-          activity.getString(R.string.install_wallet_from_ads));
-    }
+  public interface Listener {
+    void onBecameForeground(Activity activity);
+
+    void onBecameBackground();
   }
 
   @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
