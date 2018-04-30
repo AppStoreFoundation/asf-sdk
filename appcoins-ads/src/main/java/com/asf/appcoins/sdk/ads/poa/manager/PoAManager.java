@@ -253,9 +253,9 @@ public class PoAManager implements LifeCycleListener.Listener {
       if (!WalletUtils.hasWalletInstalled(activity)) {
         WalletUtils.promptToInstallWallet(activity,
             activity.getString(R.string.install_wallet_from_ads));
+      } else {
+        startProcess();
       }
-
-      startProcess();
     }
   }
 
