@@ -60,7 +60,6 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** integer used to track how many proof were already sent */
   private int proofsSent = 0;
   private BigInteger campaignId;
-  private boolean finished = false;
 
   public PoAManager(SharedPreferences preferences) {
     this.preferences = preferences;
@@ -125,16 +124,6 @@ public class PoAManager implements LifeCycleListener.Listener {
     sendProof();
   }
 
-  private void saveState() {
-    preferences.edit()
-        .putBoolean(FINISHED_KEY, finished)
-        .apply();
-  }
-
-  private void loadState() {
-    finished = preferences.getBoolean(FINISHED_KEY, false);
-  }
-
   /**
    * Method that stops the process. It will send a message to the listening wallet to stop the
    * process and call the finish process method.
@@ -169,34 +158,31 @@ public class PoAManager implements LifeCycleListener.Listener {
    * If all proofs were sent, it stops the process.
    */
   private void sendProof() {
-    if (!finished && !hasSentAllProofs()) {
-      // Connection to service may already been done, but we still need to make sure that it is
-      // connected. In case no connection is not yet done, the message is stored to be sent as soon as
-      // the connection is done.
-      poaConnector.connectToService(appContext);
-      // send proof
-      long timestamp = System.currentTimeMillis();
-      Bundle bundle = new Bundle();
-      bundle.putString("packageName", appContext.getPackageName());
-      bundle.putLong("timeStamp", timestamp);
-      poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
-      proofsSent++;
+    // Connection to service may already been done, but we still need to make sure that it is
+    // connected. In case no connection is not yet done, the message is stored to be sent as soon as
+    // the connection is done.
+    poaConnector.connectToService(appContext);
+    // send proof
+    long timestamp = System.currentTimeMillis();
+    Bundle bundle = new Bundle();
+    bundle.putString("packageName", appContext.getPackageName());
+    bundle.putLong("timeStamp", timestamp);
+    poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
+    proofsSent++;
 
-      // schedule the next proof sending
+    // schedule the next proof sending
+    if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
       handler.postDelayed(sendProof = this::sendProof,
           BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
     } else {
-      // or finish the process
+      // or stop the process
       processing = false;
-      finished = true;
+      preferences.edit()
+          .putBoolean(FINISHED_KEY, true)
+          .apply();
       finishProcess();
     }
   }
-
-  private boolean hasSentAllProofs() {
-    return BuildConfig.ADS_POA_NUMBER_OF_PROOFS <= proofsSent;
-  }
-
   public List<Campaign> getActiveCampaigns(String packageName, BigInteger vercode)
       throws IOException {
     List<BigInteger> campaignsIdsByCountry = campaignContract.getCampaignsByCountry(country);
@@ -260,12 +246,12 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   @Override public void onBecameForeground() {
-    loadState();
-    startProcess();
+    if (!preferences.getBoolean(FINISHED_KEY, false)) {
+      startProcess();
+    }
   }
 
   @Override public void onBecameBackground() {
     stopProcess();
-    saveState();
   }
 }
