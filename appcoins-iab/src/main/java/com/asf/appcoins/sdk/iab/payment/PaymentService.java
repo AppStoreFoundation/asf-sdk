@@ -1,7 +1,6 @@
 package com.asf.appcoins.sdk.iab.payment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -14,9 +13,8 @@ import com.asf.appcoins.sdk.iab.SkuManager;
 import com.asf.appcoins.sdk.iab.entity.SKU;
 import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
 import com.asf.appcoins.sdk.iab.util.UriBuilder;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,13 +102,26 @@ public final class PaymentService {
   }
 
   public Observable<PaymentDetails> getPaymentDetails(String skuId) {
+    return getPaymentDetails(skuId, getTransactionHash(skuId));
+  }
+
+  public Observable<PaymentDetails> getPaymentDetails(String skuId, String transactionHash) {
     if (payments.get(skuId) != null) {
-      return asfWeb3j.getTransactionByHash(getTransactionHash(skuId))
+      return asfWeb3j.getTransactionByHash(transactionHash)
+          .subscribeOn(Schedulers.io())
           .map(transaction -> new PaymentDetails(PaymentStatus.from(transaction.getStatus()), skuId,
               transaction));
     } else {
       throw new IllegalArgumentException("SkuId not present! " + skuId);
     }
+  }
+
+  public Observable<PaymentDetails> getPaymentDetailsUnchecked(String skuId,
+      String transactionHash) {
+    return asfWeb3j.getTransactionByHash(transactionHash)
+        .subscribeOn(Schedulers.io())
+        .map(transaction -> new PaymentDetails(PaymentStatus.from(transaction.getStatus()), skuId,
+            transaction));
   }
 
   private String getTransactionHash(String skuId) {

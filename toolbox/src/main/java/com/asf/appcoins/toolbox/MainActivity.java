@@ -40,12 +40,14 @@ public class MainActivity extends AppCompatActivity {
 
     if (appCoinsIab.onActivityResult(requestCode, requestCode, data)) {
       compositeDisposable.add(appCoinsIab.getCurrentPayment()
-          .subscribe(paymentDetails -> runOnUiThread(() -> handlePayment(paymentDetails))));
+          .distinctUntilChanged(PaymentDetails::getPaymentStatus)
+          .subscribe(paymentDetails -> runOnUiThread(() -> handlePayment(paymentDetails)),
+              Throwable::printStackTrace));
     }
   }
 
   private void handlePayment(PaymentDetails paymentDetails) {
-    if (paymentDetails.getPaymentStatus() == PaymentStatus.SUCCESS) {
+    if (paymentDetails.getPaymentStatus() == PaymentStatus.PENDING) {
       String skuId = paymentDetails.getSkuId();
       appCoinsIab.consume(skuId);
 

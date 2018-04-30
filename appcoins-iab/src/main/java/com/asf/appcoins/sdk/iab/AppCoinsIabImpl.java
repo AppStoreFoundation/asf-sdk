@@ -7,6 +7,7 @@ import com.asf.appcoins.sdk.iab.entity.SKU;
 import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
 import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
 import com.asf.appcoins.sdk.iab.payment.PaymentService;
+import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
@@ -44,11 +45,21 @@ final class AppCoinsIabImpl implements AppCoinsIab {
   }
 
   @Override public Observable<PaymentDetails> getCurrentPayment() {
-    return Observable.fromCallable(() -> paymentService.getCurrentPayment()
+    PaymentDetails currentPayment = paymentService.getCurrentPayment();
+    String txHash = currentPayment
         .getTransaction()
-        .getHash() != null)
-        .flatMap(hasTxHash -> hasTxHash ? getPayment(paymentService.getCurrentPayment()
-            .getSkuId()) : Observable.just(paymentService.getCurrentPayment()));
+        .getHash();
+    String skuId = currentPayment.getSkuId();
+
+    boolean hasTxHash = txHash != null;
+
+    if (hasTxHash) {
+      return Observable.interval(0, period, TimeUnit.SECONDS, scheduler)
+          .flatMap(longTimed -> paymentService.getPaymentDetailsUnchecked(skuId, txHash))
+          .takeUntil(paymentDetails -> paymentDetails.getPaymentStatus() == PaymentStatus.SUCCESS);
+    } else {
+      return Observable.just(currentPayment);
+    }
   }
 
   @Override public void consume(String skuId) throws ConsumeFailedException {
