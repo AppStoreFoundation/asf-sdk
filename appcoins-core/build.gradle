@@ -41,7 +41,6 @@ dependencies {
   testImplementation lib.mockito_core
 
   api lib.rxjava
-  api lib.rxandroid
   api lib.web3j
 }
 
