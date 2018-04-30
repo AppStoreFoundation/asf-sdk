@@ -1,2 +1,7 @@
 <manifest
-    package="com.asf.appcoins.sdk.core"/>
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.asf.appcoins.sdk.core">
+
+  <uses-permission android:name="android.permission.INTERNET"/>
+
+</manifest>
