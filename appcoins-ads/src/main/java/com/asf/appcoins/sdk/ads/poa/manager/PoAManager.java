@@ -209,10 +209,10 @@ public class PoAManager implements LifeCycleListener.Listener {
     for (BigInteger bidId : campaignsIdsByCountry) {
       String campaignPackageName = campaignContract.getPackageNameOfCampaign(bidId);
       List<BigInteger> vercodes = campaignContract.getVercodesOfCampaign(bidId);
-      boolean campaignValidity = campaignContract.getCampaignValidity(bidId);
+      boolean campaignValid = campaignContract.isCampaignValid(bidId);
 
       boolean addCampaign =
-          campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValidity;
+          campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValid;
 
       if (addCampaign) {
         campaign.add(new Campaign(bidId, vercodes, country));
