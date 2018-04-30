@@ -64,6 +64,8 @@ public class PoAManager implements LifeCycleListener.Listener {
   private int proofsSent = 0;
   private BigInteger campaignId;
 
+  private boolean dialogVisible = false;
+
   public PoAManager(SharedPreferences preferences) {
     this.preferences = preferences;
   }
@@ -250,10 +252,12 @@ public class PoAManager implements LifeCycleListener.Listener {
 
   @Override public void onBecameForeground(Activity activity) {
     if (!preferences.getBoolean(FINISHED_KEY, false)) {
-      if (!WalletUtils.hasWalletInstalled(activity)) {
+      if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
         Disposable disposable = WalletUtils.promptToInstallWallet(activity,
             activity.getString(R.string.install_wallet_from_ads))
             .toCompletable()
+            .doOnSubscribe(disposable1 -> dialogVisible = true)
+            .doOnComplete(() -> dialogVisible = false)
             .subscribe(() -> {
             }, Throwable::printStackTrace);
       } else {
