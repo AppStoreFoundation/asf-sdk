@@ -1,5 +1,6 @@
 package com.asf.appcoins.sdk.ads.poa.manager;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -9,10 +10,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
+import com.asf.appcoins.sdk.ads.R;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContract;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContractImpl;
+import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -60,6 +63,8 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** integer used to track how many proof were already sent */
   private int proofsSent = 0;
   private BigInteger campaignId;
+
+  private boolean dialogVisible = false;
 
   public PoAManager(SharedPreferences preferences) {
     this.preferences = preferences;
@@ -245,9 +250,19 @@ public class PoAManager implements LifeCycleListener.Listener {
         .getPackageInfo(packageName, 0).versionCode;
   }
 
-  @Override public void onBecameForeground() {
+  @Override public void onBecameForeground(Activity activity) {
     if (!preferences.getBoolean(FINISHED_KEY, false)) {
-      startProcess();
+      if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
+        Disposable disposable = WalletUtils.promptToInstallWallet(activity,
+            activity.getString(R.string.install_wallet_from_ads))
+            .toCompletable()
+            .doOnSubscribe(disposable1 -> dialogVisible = true)
+            .doOnComplete(() -> dialogVisible = false)
+            .subscribe(() -> {
+            }, Throwable::printStackTrace);
+      } else {
+        startProcess();
+      }
     }
   }
 
