@@ -1,19 +1,29 @@
 package com.asf.appcoins.sdk.iab.payment;
 
+import android.R.drawable;
+import android.R.string;
 import android.app.Activity;
+import android.app.AlertDialog.Builder;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import com.asf.appcoins.sdk.R;
 import com.asf.appcoins.sdk.core.transaction.Transaction;
 import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
-import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.asf.appcoins.sdk.iab.SkuManager;
 import com.asf.appcoins.sdk.iab.entity.SKU;
 import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
+import com.asf.appcoins.sdk.iab.exception.PaymentFailedException;
 import com.asf.appcoins.sdk.iab.util.UriBuilder;
+import com.asf.appcoins.sdk.iab.wallet.AndroidUtils;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -51,29 +61,43 @@ public final class PaymentService {
     this.tokenContractAddress = tokenContractAddress;
   }
 
-  public void buy(String skuId, Activity activity, int defaultRequestCode) {
-    SKU sku = skuManager.getSku(skuId);
-    BigDecimal amount = skuManager.getSkuAmount(skuId);
-    BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
+  public Completable buy(String skuId, Activity activity, int defaultRequestCode) {
+    return Single.fromCallable(() -> {
+      SKU sku = skuManager.getSku(skuId);
+      BigDecimal amount = skuManager.getSkuAmount(skuId);
+      BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
-    Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
+      Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
 
-    currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
-        new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
+      currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
+          new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
 
-    if (WalletUtils.hasWalletInstalled(activity)) {
-      if (payments.containsKey(skuId)) {
-        throw new IllegalArgumentException(
-            "Pending buy action with the same sku found! Did you forget to consume the former?");
-      } else {
-        payments.put(skuId, currentPayment);
+      return intent;
+    })
+        .observeOn(AndroidSchedulers.mainThread())
+        .flatMapCompletable(intent -> {
+          if (AndroidUtils.hasHandlerAvailable(intent, activity)) {
+            if (payments.containsKey(skuId)) {
+              throw new PaymentFailedException(
+                  "Pending buy action with the same sku found! Did you forget to consume the former?");
+            } else {
+              payments.put(skuId, currentPayment);
 
-        activity.startActivityForResult(intent, defaultRequestCode);
-      }
-    } else {
-      WalletUtils.promptToInstallWallet(activity,
-          activity.getString(R.string.install_wallet_from_iab));
-    }
+              activity.startActivityForResult(intent, defaultRequestCode);
+              return Completable.complete();
+            }
+          } else {
+            return showWalletInstallDialog(activity).flatMap(installed -> {
+              if (installed) {
+                return gotoStore(activity).toSingleDefault(0);
+              } else {
+                throw new PaymentFailedException("User didn't install wallet");
+              }
+            })
+                .toCompletable();
+          }
+        })
+        .subscribeOn(Schedulers.io());
   }
 
   @NonNull private Completable gotoStore(Activity activity) {
@@ -85,6 +109,19 @@ public final class PaymentService {
         activity.startActivity(new Intent(Intent.ACTION_VIEW,
             Uri.parse("https://play.google.com/store/apps/details?id=" + WALLET_PACKAGE_NAME)));
       }
+    });
+  }
+
+  private Single<Boolean> showWalletInstallDialog(Context context) {
+    return Single.create(emitter -> {
+      Builder builder;
+      builder = new Builder(context);
+      builder.setTitle("APPC Wallet Missing")
+          .setMessage("To complete your purchase, you have to install an AppCoins wallet")
+          .setPositiveButton(string.yes, (dialog, which) -> emitter.onSuccess(true))
+          .setNegativeButton(string.no, (dialog, which) -> emitter.onSuccess(false))
+          .setIcon(drawable.ic_dialog_alert)
+          .show();
     });
   }
 

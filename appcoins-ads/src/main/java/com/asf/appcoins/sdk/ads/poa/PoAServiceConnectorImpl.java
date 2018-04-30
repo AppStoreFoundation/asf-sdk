@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
@@ -19,7 +20,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
-import com.asf.appcoins.sdk.core.util.AndroidUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.grandcentrix.tray.AppPreferences;
@@ -175,14 +175,11 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     Intent broadcastIntent = new Intent(ACTION_START_HANDSHAKE);
     broadcastIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
     broadcastIntent.putExtra(PARAM_APP_SERVICE_NAME, SDKPoAService.class.getName());
-
-    if (AndroidUtils.hasHandlerAvailable(broadcastIntent, context)) {
-      // We need to start the handshake with the implicit broadcast, instead of a generic one due to a
-      // 'ban' on the implicit broadcast when targeting Android 8.0 sdk (targetSdkVersion). Meaning
-      // that only explicit broadcast will work. For that reason we search for the packages that can
-      // listen to the intent that we intend to send and sent an explicit broadcast for it.
-      sendImplicitBroadcast(context, broadcastIntent);
-    }
+    // We need to start the handshake with the implicit broadcast, instead of a generic one due to a
+    // 'ban' on the implicit broadcast when targeting Android 8.0 sdk (targetSdkVersion). Meaning
+    // that only explicit broadcast will work. For that reason we search for the packages that can
+    // listen to the intent that we intend to send and sent an explicit broadcast for it.
+    sendImplicitBroadcast(context, broadcastIntent);
   }
 
   /**
