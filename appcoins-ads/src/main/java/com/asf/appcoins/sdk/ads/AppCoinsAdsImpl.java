@@ -72,9 +72,6 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   }
 
   @Override public void init(Application application) {
-    application.registerActivityLifecycleCallbacks(new InstallWalletLifecycleCallbacks(
-        application.getSharedPreferences(ADS_PREFERENCES, Context.MODE_PRIVATE)));
-
     this.context = application;
     LifeCycleListener.get(application)
         .setListener(PoAManager.get(application, poaConnector, networkId, web3j, contractAddress,
