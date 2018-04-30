@@ -200,15 +200,19 @@ public class PoAManager implements LifeCycleListener.Listener {
   public List<Campaign> getActiveCampaigns(String packageName, BigInteger vercode)
       throws IOException {
     List<BigInteger> campaignsIdsByCountry = campaignContract.getCampaignsByCountry(country);
+    List<BigInteger> campaignsIdsByCountryWl = campaignContract.getCampaignsByCountry("WL");
+
+    campaignsIdsByCountry.addAll(campaignsIdsByCountryWl);
+
     List<Campaign> campaign = new LinkedList<>();
 
     for (BigInteger bidId : campaignsIdsByCountry) {
       String campaignPackageName = campaignContract.getPackageNameOfCampaign(bidId);
       List<BigInteger> vercodes = campaignContract.getVercodesOfCampaign(bidId);
-      boolean campaignValidity = campaignContract.getCampaignValidity(bidId);
+      boolean campaignValid = campaignContract.isCampaignValid(bidId);
 
       boolean addCampaign =
-          campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValidity;
+          campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValid;
 
       if (addCampaign) {
         campaign.add(new Campaign(bidId, vercodes, country));

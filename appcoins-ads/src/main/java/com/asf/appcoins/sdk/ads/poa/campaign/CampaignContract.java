@@ -15,4 +15,6 @@ public interface CampaignContract {
   List<BigInteger> getVercodesOfCampaign(BigInteger bidId) throws IOException;
 
   boolean getCampaignValidity(BigInteger bidId) throws IOException;
+
+  boolean isCampaignValid(BigInteger bidId);
 }
