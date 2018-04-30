@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 import com.asf.appcoins.sdk.iab.entity.SKU;
+import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
 import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
 import com.asf.appcoins.sdk.iab.payment.PaymentService;
 import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import java.util.Collection;
@@ -34,7 +36,7 @@ final class AppCoinsIabImpl implements AppCoinsIab {
     this.paymentService = paymentService;
   }
 
-  @Override public Observable<PaymentDetails> getPayment(String skuId) {
+  private Observable<PaymentDetails> getPayment(String skuId) {
     return Observable.interval(0, period, TimeUnit.SECONDS, scheduler)
         .timeInterval()
         .switchMap(scan -> paymentService.getPaymentDetails(skuId))
@@ -60,12 +62,12 @@ final class AppCoinsIabImpl implements AppCoinsIab {
     }
   }
 
-  @Override public void consume(String skuId) {
+  @Override public void consume(String skuId) throws ConsumeFailedException {
     paymentService.consume(skuId);
   }
 
-  @Override public void buy(String skuId, Activity activity) {
-    paymentService.buy(skuId, activity, DEFAULT_REQUEST_CODE);
+  @Override public Completable buy(String skuId, Activity activity) {
+    return paymentService.buy(skuId, activity, DEFAULT_REQUEST_CODE);
   }
 
   @Override public Collection<SKU> listSkus() {

@@ -13,12 +13,17 @@ import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.asf.appcoins.sdk.iab.SkuManager;
 import com.asf.appcoins.sdk.iab.entity.SKU;
+import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
+import com.asf.appcoins.sdk.iab.exception.PaymentFailedException;
 import com.asf.appcoins.sdk.iab.util.UriBuilder;
 import com.asf.appcoins.sdk.iab.wallet.AndroidUtils;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -31,6 +36,8 @@ public final class PaymentService {
 
   public static final String TRANSACTION_HASH_KEY = "transaction_hash";
   public static final String PRODUCT_NAME = "product_name";
+
+  private static final String WALLET_PACKAGE_NAME = "com.asfoundation.wallet";
 
   private static final int DECIMALS = 18;
   private final int networkId;
@@ -54,44 +61,55 @@ public final class PaymentService {
     this.tokenContractAddress = tokenContractAddress;
   }
 
-  public void buy(String skuId, Activity activity, int defaultRequestCode) {
-    SKU sku = skuManager.getSku(skuId);
-    BigDecimal amount = skuManager.getSkuAmount(skuId);
-    BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
+  public Completable buy(String skuId, Activity activity, int defaultRequestCode) {
+    return Single.fromCallable(() -> {
+      SKU sku = skuManager.getSku(skuId);
+      BigDecimal amount = skuManager.getSkuAmount(skuId);
+      BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
-    Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
+      Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
 
-    currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
-        new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
+      currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
+          new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
 
-    if (AndroidUtils.hasHandlerAvailable(intent, activity)) {
-      if (payments.containsKey(skuId)) {
-        throw new IllegalArgumentException(
-            "Pending buy action with the same sku found! Did you forget to consume the former?");
-      } else {
-        payments.put(skuId, currentPayment);
+      return intent;
+    })
+        .observeOn(AndroidSchedulers.mainThread())
+        .flatMapCompletable(intent -> {
+          if (AndroidUtils.hasHandlerAvailable(intent, activity)) {
+            if (payments.containsKey(skuId)) {
+              throw new PaymentFailedException(
+                  "Pending buy action with the same sku found! Did you forget to consume the former?");
+            } else {
+              payments.put(skuId, currentPayment);
 
-        activity.startActivityForResult(intent, defaultRequestCode);
-      }
-    } else {
-      Disposable subscribe = showWalletInstallDialog(activity).filter(aBoolean -> aBoolean)
-          .doOnSuccess(gotoStore(activity))
-          .subscribe(aBoolean -> {
-          }, Throwable::printStackTrace);
-    }
+              activity.startActivityForResult(intent, defaultRequestCode);
+              return Completable.complete();
+            }
+          } else {
+            return showWalletInstallDialog(activity).flatMap(installed -> {
+              if (installed) {
+                return gotoStore(activity).toSingleDefault(0);
+              } else {
+                throw new PaymentFailedException("User didn't install wallet");
+              }
+            })
+                .toCompletable();
+          }
+        })
+        .subscribeOn(Schedulers.io());
   }
 
-  @NonNull private Consumer<Boolean> gotoStore(Activity activity) {
-    return aBoolean -> {
-      String appPackageName = "com.asfoundation.wallet";
+  @NonNull private Completable gotoStore(Activity activity) {
+    return Completable.fromRunnable(() -> {
       try {
-        activity.startActivity(
-            new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        activity.startActivity(new Intent(Intent.ACTION_VIEW,
+            Uri.parse("market://details?id=" + WALLET_PACKAGE_NAME)));
       } catch (android.content.ActivityNotFoundException anfe) {
         activity.startActivity(new Intent(Intent.ACTION_VIEW,
-            Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+            Uri.parse("https://play.google.com/store/apps/details?id=" + WALLET_PACKAGE_NAME)));
       }
-    };
+    });
   }
 
   private Single<Boolean> showWalletInstallDialog(Context context) {
@@ -176,9 +194,9 @@ public final class PaymentService {
     return currentPayment;
   }
 
-  public void consume(String skuId) {
+  public void consume(String skuId) throws ConsumeFailedException {
     if (!payments.containsKey(skuId)) {
-      throw new IllegalArgumentException(
+      throw new ConsumeFailedException(
           "Failed to consume " + skuId + '!' + System.lineSeparator() + "Did you buy it first?");
     }
 

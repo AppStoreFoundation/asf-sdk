@@ -108,10 +108,10 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   private void startProcess() {
     // If starting the PoA process do handshake
-    if (!processing && campaignId == null && !hasSentAllProofs()) {
-      if (proofsSent == 0) {
-        poaConnector.startHandshake(appContext);
-      }
+    if (!processing) {
+      processing = true;
+      poaConnector.startHandshake(appContext);
+    }
 
       // set the network being used
       Bundle bundle = new Bundle();
@@ -159,6 +159,7 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void finishProcess() {
     processing = false;
+    proofsSent = 0;
 
     if (sendProof != null) {
       handler.removeCallbacks(sendProof);
