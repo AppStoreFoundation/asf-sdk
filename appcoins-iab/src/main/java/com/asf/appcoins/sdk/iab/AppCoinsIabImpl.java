@@ -9,6 +9,7 @@ import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
 import com.asf.appcoins.sdk.iab.payment.PaymentService;
 import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import io.reactivex.Completable;
+import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import java.util.Collection;

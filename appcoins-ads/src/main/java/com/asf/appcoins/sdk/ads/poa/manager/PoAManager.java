@@ -37,8 +37,7 @@ import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_STOP_PROCESS;
 
 public class PoAManager implements LifeCycleListener.Listener {
 
-  private static final String PROCESSING_KEY = "processing";
-  private static final String PROOFS_SENT_KEY = "proofsSent";
+  private static final String FINISHED_KEY = "finished";
 
   public static final String TAG = PoAManager.class.getName();
   /** The instance of the manager */
@@ -61,6 +60,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** integer used to track how many proof were already sent */
   private int proofsSent = 0;
   private BigInteger campaignId;
+  private boolean finished = false;
 
   public PoAManager(SharedPreferences preferences) {
     this.preferences = preferences;
@@ -113,31 +113,26 @@ public class PoAManager implements LifeCycleListener.Listener {
       poaConnector.startHandshake(appContext);
     }
 
-      // set the network being used
-      Bundle bundle = new Bundle();
-      bundle.putString("packageName", appContext.getPackageName());
-      bundle.putInt("networkId", network);
+    // set the network being used
+    Bundle bundle = new Bundle();
+    bundle.putString("packageName", appContext.getPackageName());
+    bundle.putInt("networkId", network);
 
-      poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
+    poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
 
-      processing = true;
-
-      handleCampaign();
-    }
+    handleCampaign();
 
     sendProof();
   }
 
   private void saveState() {
     preferences.edit()
-        .putBoolean(PROCESSING_KEY, processing)
-        .putInt(PROOFS_SENT_KEY, proofsSent)
+        .putBoolean(FINISHED_KEY, finished)
         .apply();
   }
 
   private void loadState() {
-    processing = preferences.getBoolean(PROCESSING_KEY, false);
-    proofsSent = preferences.getInt(PROOFS_SENT_KEY, 0);
+    finished = preferences.getBoolean(FINISHED_KEY, false);
   }
 
   /**
@@ -174,7 +169,7 @@ public class PoAManager implements LifeCycleListener.Listener {
    * If all proofs were sent, it stops the process.
    */
   private void sendProof() {
-    if (!hasSentAllProofs()) {
+    if (!finished && !hasSentAllProofs()) {
       // Connection to service may already been done, but we still need to make sure that it is
       // connected. In case no connection is not yet done, the message is stored to be sent as soon as
       // the connection is done.
@@ -186,14 +181,14 @@ public class PoAManager implements LifeCycleListener.Listener {
       bundle.putLong("timeStamp", timestamp);
       poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
       proofsSent++;
-      //saveState();
 
       // schedule the next proof sending
       handler.postDelayed(sendProof = this::sendProof,
           BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
     } else {
-      // or stop the process
+      // or finish the process
       processing = false;
+      finished = true;
       finishProcess();
     }
   }
