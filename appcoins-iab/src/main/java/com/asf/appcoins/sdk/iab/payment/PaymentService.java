@@ -19,6 +19,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -120,13 +121,26 @@ public final class PaymentService {
   }
 
   public Observable<PaymentDetails> getPaymentDetails(String skuId) {
+    return getPaymentDetails(skuId, getTransactionHash(skuId));
+  }
+
+  public Observable<PaymentDetails> getPaymentDetails(String skuId, String transactionHash) {
     if (payments.get(skuId) != null) {
-      return asfWeb3j.getTransactionByHash(getTransactionHash(skuId))
+      return asfWeb3j.getTransactionByHash(transactionHash)
+          .subscribeOn(Schedulers.io())
           .map(transaction -> new PaymentDetails(PaymentStatus.from(transaction.getStatus()), skuId,
               transaction));
     } else {
       throw new IllegalArgumentException("SkuId not present! " + skuId);
     }
+  }
+
+  public Observable<PaymentDetails> getPaymentDetailsUnchecked(String skuId,
+      String transactionHash) {
+    return asfWeb3j.getTransactionByHash(transactionHash)
+        .subscribeOn(Schedulers.io())
+        .map(transaction -> new PaymentDetails(PaymentStatus.from(transaction.getStatus()), skuId,
+            transaction));
   }
 
   private String getTransactionHash(String skuId) {
