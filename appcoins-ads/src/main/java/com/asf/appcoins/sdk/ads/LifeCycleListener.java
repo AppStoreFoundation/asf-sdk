@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.os.Handler;
+import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import java.lang.ref.WeakReference;
 
 /**
@@ -102,7 +103,12 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
 
   @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
 
-  @Override public void onActivityResumed(Activity activity) {}
+  @Override public void onActivityResumed(Activity activity) {
+    if (!WalletUtils.hasWalletInstalled(activity)) {
+      WalletUtils.promptToInstallWallet(activity,
+          activity.getString(R.string.install_wallet_from_ads));
+    }
+  }
 
   @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
 
