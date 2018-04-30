@@ -11,8 +11,17 @@ import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.asf.appcoins.sdk.iab.SkuManager;
 import com.asf.appcoins.sdk.iab.entity.SKU;
+import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
+import com.asf.appcoins.sdk.iab.exception.PaymentFailedException;
 import com.asf.appcoins.sdk.iab.util.UriBuilder;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +33,8 @@ public final class PaymentService {
 
   public static final String TRANSACTION_HASH_KEY = "transaction_hash";
   public static final String PRODUCT_NAME = "product_name";
+
+  private static final String WALLET_PACKAGE_NAME = "com.asfoundation.wallet";
 
   private static final int DECIMALS = 18;
   private final int networkId;
@@ -48,14 +59,14 @@ public final class PaymentService {
   }
 
   public void buy(String skuId, Activity activity, int defaultRequestCode) {
-    SKU sku = skuManager.getSku(skuId);
-    BigDecimal amount = skuManager.getSkuAmount(skuId);
-    BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
+      SKU sku = skuManager.getSku(skuId);
+      BigDecimal amount = skuManager.getSkuAmount(skuId);
+      BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
-    Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
+      Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
 
-    currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
-        new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
+      currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
+          new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
 
     if (WalletUtils.hasWalletInstalled(activity)) {
       if (payments.containsKey(skuId)) {
@@ -86,13 +97,26 @@ public final class PaymentService {
   }
 
   public Observable<PaymentDetails> getPaymentDetails(String skuId) {
+    return getPaymentDetails(skuId, getTransactionHash(skuId));
+  }
+
+  public Observable<PaymentDetails> getPaymentDetails(String skuId, String transactionHash) {
     if (payments.get(skuId) != null) {
-      return asfWeb3j.getTransactionByHash(getTransactionHash(skuId))
+      return asfWeb3j.getTransactionByHash(transactionHash)
+          .subscribeOn(Schedulers.io())
           .map(transaction -> new PaymentDetails(PaymentStatus.from(transaction.getStatus()), skuId,
               transaction));
     } else {
       throw new IllegalArgumentException("SkuId not present! " + skuId);
     }
+  }
+
+  public Observable<PaymentDetails> getPaymentDetailsUnchecked(String skuId,
+      String transactionHash) {
+    return asfWeb3j.getTransactionByHash(transactionHash)
+        .subscribeOn(Schedulers.io())
+        .map(transaction -> new PaymentDetails(PaymentStatus.from(transaction.getStatus()), skuId,
+            transaction));
   }
 
   private String getTransactionHash(String skuId) {
@@ -128,9 +152,9 @@ public final class PaymentService {
     return currentPayment;
   }
 
-  public void consume(String skuId) {
+  public void consume(String skuId) throws ConsumeFailedException {
     if (!payments.containsKey(skuId)) {
-      throw new IllegalArgumentException(
+      throw new ConsumeFailedException(
           "Failed to consume " + skuId + '!' + System.lineSeparator() + "Did you buy it first?");
     }
 

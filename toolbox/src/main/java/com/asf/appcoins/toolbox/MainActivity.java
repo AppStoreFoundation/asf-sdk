@@ -9,6 +9,7 @@ import com.asf.appcoins.sdk.iab.AppCoinsIab;
 import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
 import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,12 +40,14 @@ public class MainActivity extends AppCompatActivity {
 
     if (appCoinsIab.onActivityResult(requestCode, requestCode, data)) {
       compositeDisposable.add(appCoinsIab.getCurrentPayment()
-          .subscribe(paymentDetails -> runOnUiThread(() -> handlePayment(paymentDetails))));
+          .distinctUntilChanged(PaymentDetails::getPaymentStatus)
+          .subscribe(paymentDetails -> runOnUiThread(() -> handlePayment(paymentDetails)),
+              Throwable::printStackTrace));
     }
   }
 
   private void handlePayment(PaymentDetails paymentDetails) {
-    if (paymentDetails.getPaymentStatus() == PaymentStatus.SUCCESS) {
+    if (paymentDetails.getPaymentStatus() == PaymentStatus.PENDING) {
       String skuId = paymentDetails.getSkuId();
       appCoinsIab.consume(skuId);
 
@@ -61,7 +64,16 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void onBuyGasButtonClicked(View arg0) {
-    appCoinsIab.buy(Skus.SKU_GAS_ID, this);
+    Disposable disposable = appCoinsIab.buy(Skus.SKU_GAS_ID, this)
+        .subscribe(() -> {
+          Toast.makeText(this, "Wallet install triggered.", Toast.LENGTH_SHORT)
+              .show();
+        }, throwable -> {
+          Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT)
+              .show();
+          //Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG)
+          //    .show();
+        });
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {

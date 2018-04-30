@@ -1,6 +1,7 @@
 package com.asf.appcoins.sdk.ads.poa.manager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -36,8 +37,10 @@ import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_STOP_PROCESS;
 
 public class PoAManager implements LifeCycleListener.Listener {
 
-  public static final String TAG = PoAManager.class.getName();
+  private static final String PROCESSING_KEY = "processing";
+  private static final String PROOFS_SENT_KEY = "proofsSent";
 
+  public static final String TAG = PoAManager.class.getName();
   /** The instance of the manager */
   private static PoAManager instance;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
@@ -48,6 +51,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   private static int network = 0;
   private static CampaignContract campaignContract;
   private static String country;
+  private final SharedPreferences preferences;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
   /** The handle to keep the runnable tasks that we be running within a certain period */
@@ -56,6 +60,11 @@ public class PoAManager implements LifeCycleListener.Listener {
   private Runnable sendProof;
   /** integer used to track how many proof were already sent */
   private int proofsSent = 0;
+  private BigInteger campaignId;
+
+  public PoAManager(SharedPreferences preferences) {
+    this.preferences = preferences;
+  }
 
   /**
    * Initialisation method for the manager
@@ -66,7 +75,9 @@ public class PoAManager implements LifeCycleListener.Listener {
   public static PoAManager init(Context context, PoAServiceConnector connector, int networkId,
       AsfWeb3j asfWeb3j, Address contractAddress, String countryId) {
     if (instance == null) {
-      instance = new PoAManager();
+      SharedPreferences preferences =
+          context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
+      instance = new PoAManager(preferences);
       poaConnector = connector;
       appContext = context;
       network = networkId;
@@ -109,9 +120,23 @@ public class PoAManager implements LifeCycleListener.Listener {
 
     poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
 
+    processing = true;
+
     handleCampaign();
 
     sendProof();
+  }
+
+  private void saveState() {
+    preferences.edit()
+        .putBoolean(PROCESSING_KEY, processing)
+        .putInt(PROOFS_SENT_KEY, proofsSent)
+        .apply();
+  }
+
+  private void loadState() {
+    processing = preferences.getBoolean(PROCESSING_KEY, false);
+    proofsSent = preferences.getInt(PROOFS_SENT_KEY, 0);
   }
 
   /**
@@ -148,20 +173,21 @@ public class PoAManager implements LifeCycleListener.Listener {
    * If all proofs were sent, it stops the process.
    */
   private void sendProof() {
-    // Connection to service may already been done, but we still need to make sure that it is
-    // connected. In case no connection is not yet done, the message is stored to be sent as soon as
-    // the connection is done.
-    poaConnector.connectToService(appContext);
-    // send proof
-    long timestamp = System.currentTimeMillis();
-    Bundle bundle = new Bundle();
-    bundle.putString("packageName", appContext.getPackageName());
-    bundle.putLong("timeStamp", timestamp);
-    poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
-    proofsSent++;
+    if (!hasSentAllProofs()) {
+      // Connection to service may already been done, but we still need to make sure that it is
+      // connected. In case no connection is not yet done, the message is stored to be sent as soon as
+      // the connection is done.
+      poaConnector.connectToService(appContext);
+      // send proof
+      long timestamp = System.currentTimeMillis();
+      Bundle bundle = new Bundle();
+      bundle.putString("packageName", appContext.getPackageName());
+      bundle.putLong("timeStamp", timestamp);
+      poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
+      proofsSent++;
+      //saveState();
 
-    // schedule the next proof sending
-    if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+      // schedule the next proof sending
       handler.postDelayed(sendProof = this::sendProof,
           BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
     } else {
@@ -171,18 +197,26 @@ public class PoAManager implements LifeCycleListener.Listener {
     }
   }
 
+  private boolean hasSentAllProofs() {
+    return BuildConfig.ADS_POA_NUMBER_OF_PROOFS <= proofsSent;
+  }
+
   public List<Campaign> getActiveCampaigns(String packageName, BigInteger vercode)
       throws IOException {
     List<BigInteger> campaignsIdsByCountry = campaignContract.getCampaignsByCountry(country);
+    List<BigInteger> campaignsIdsByCountryWl = campaignContract.getCampaignsByCountry("WL");
+
+    campaignsIdsByCountry.addAll(campaignsIdsByCountryWl);
+
     List<Campaign> campaign = new LinkedList<>();
 
     for (BigInteger bidId : campaignsIdsByCountry) {
       String campaignPackageName = campaignContract.getPackageNameOfCampaign(bidId);
       List<BigInteger> vercodes = campaignContract.getVercodesOfCampaign(bidId);
-      boolean campaignValidity = campaignContract.getCampaignValidity(bidId);
+      boolean campaignValid = campaignContract.isCampaignValid(bidId);
 
       boolean addCampaign =
-          campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValidity;
+          campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValid;
 
       if (addCampaign) {
         campaign.add(new Campaign(bidId, vercodes, country));
@@ -202,12 +236,16 @@ public class PoAManager implements LifeCycleListener.Listener {
             if (campaigns.isEmpty()) {
               stopProcess();
             } else {
+              BigInteger campaignId = campaigns.get(0)
+                  .getId();
+
               Bundle bundle = new Bundle();
               bundle.putString("packageName", appContext.getPackageName());
-              bundle.putString("campaignId", campaigns.get(0)
-                  .getId()
-                  .toString());
+              bundle.putString("campaignId", campaignId.toString());
+
               poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
+
+              this.campaignId = campaignId;
             }
           });
     }
@@ -226,10 +264,12 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   @Override public void onBecameForeground() {
+    loadState();
     startProcess();
   }
 
   @Override public void onBecameBackground() {
     stopProcess();
+    saveState();
   }
 }
