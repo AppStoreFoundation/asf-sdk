@@ -246,7 +246,6 @@ public class PoAManager implements LifeCycleListener.Listener {
               poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
 
               this.campaignId = campaignId;
-              //saveState();
             }
           });
     }

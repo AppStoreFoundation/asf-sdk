@@ -165,9 +165,7 @@ public class CampaignContractImpl implements CampaignContract {
     List<Type> response = FunctionReturnDecoder.decode(result, function.getOutputParameters());
 
     if (!response.isEmpty()) {
-      for (Type type : response) {
-        return ((Bool) type).getValue();
-      }
+      return ((Bool) response.get(0)).getValue();
     }
     throw new IllegalArgumentException("Failed to isCampaignValid!");
   }

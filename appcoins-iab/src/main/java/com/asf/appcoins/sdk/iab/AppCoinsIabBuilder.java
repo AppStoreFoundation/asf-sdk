@@ -95,6 +95,6 @@ public final class AppCoinsIabBuilder {
           tokenContractAddress, iabContractAddress);
     }
 
-    return new AppCoinsIabImpl(period, scheduler, skuManager, paymentService, debug);
+    return new AppCoinsIabImpl(period, scheduler, skuManager, paymentService);
   }
 }
