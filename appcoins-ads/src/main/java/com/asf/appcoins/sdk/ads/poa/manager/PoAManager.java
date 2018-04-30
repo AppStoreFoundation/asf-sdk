@@ -204,6 +204,10 @@ public class PoAManager implements LifeCycleListener.Listener {
   public List<Campaign> getActiveCampaigns(String packageName, BigInteger vercode)
       throws IOException {
     List<BigInteger> campaignsIdsByCountry = campaignContract.getCampaignsByCountry(country);
+    List<BigInteger> campaignsIdsByCountryWl = campaignContract.getCampaignsByCountry("WL");
+
+    campaignsIdsByCountry.addAll(campaignsIdsByCountryWl);
+
     List<Campaign> campaign = new LinkedList<>();
 
     for (BigInteger bidId : campaignsIdsByCountry) {
