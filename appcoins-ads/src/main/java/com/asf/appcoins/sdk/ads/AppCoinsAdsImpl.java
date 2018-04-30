@@ -2,11 +2,19 @@ package com.asf.appcoins.sdk.ads;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.manager.PoAManager;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
+import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import java.math.BigInteger;
 import org.web3j.abi.datatypes.Address;
+import org.web3j.protocol.Web3j;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -75,4 +83,8 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
         .setListener(PoAManager.get(application, poaConnector, networkId, web3j, contractAddress,
             countryId));
   }
+
+
+
+
 }

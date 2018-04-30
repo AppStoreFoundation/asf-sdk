@@ -20,6 +20,7 @@ ver.mockito_core = "2.16.0"
 ver.rxjava = "2.1.10"
 // https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxandroid
 ver.rxandroid = "2.0.2"
+
 // https://mvnrepository.com/artifact/org.web3j/core
 ver.web3j = "3.3.1-android"
 

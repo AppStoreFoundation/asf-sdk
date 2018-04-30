@@ -11,10 +11,9 @@ lib.constraint_layout = "com.android.support.constraint:constraint-layout:${ver.
 lib.junit = "junit:junit:${ver.junit}"
 lib.mockito_core = "org.mockito:mockito-core:${ver.mockito_core}"
 
-lib.rxjava = [
-    "io.reactivex.rxjava2:rxjava:${ver.rxjava}",
-    "io.reactivex.rxjava2:rxandroid:${ver.rxandroid}"
-]
+lib.rxjava = "io.reactivex.rxjava2:rxjava:${ver.rxjava}"
+lib.rxandroid = "io.reactivex.rxjava2:rxandroid:${ver.rxandroid}"
+
 lib.web3j = "org.web3j:core:${ver.web3j}"
 
 lib.commons_lang3 = "org.apache.commons:commons-lang3:${ver.commons_lang3}"
