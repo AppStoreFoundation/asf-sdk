@@ -12,15 +12,9 @@ import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.asf.appcoins.sdk.iab.SkuManager;
 import com.asf.appcoins.sdk.iab.entity.SKU;
 import com.asf.appcoins.sdk.iab.exception.ConsumeFailedException;
-import com.asf.appcoins.sdk.iab.exception.PaymentFailedException;
 import com.asf.appcoins.sdk.iab.util.UriBuilder;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -58,10 +52,10 @@ public final class PaymentService {
     this.tokenContractAddress = tokenContractAddress;
   }
 
-  public void buy(String skuId, Activity activity, int defaultRequestCode) {
-      SKU sku = skuManager.getSku(skuId);
-      BigDecimal amount = skuManager.getSkuAmount(skuId);
-      BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
+  public Single<Boolean> buy(String skuId, Activity activity, int defaultRequestCode) {
+    SKU sku = skuManager.getSku(skuId);
+    BigDecimal amount = skuManager.getSkuAmount(skuId);
+    BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
       Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
 
@@ -77,8 +71,9 @@ public final class PaymentService {
 
         activity.startActivityForResult(intent, defaultRequestCode);
       }
+      return Single.just(true);
     } else {
-      WalletUtils.promptToInstallWallet(activity,
+      return WalletUtils.promptToInstallWallet(activity,
           activity.getString(R.string.install_wallet_from_iab));
     }
   }

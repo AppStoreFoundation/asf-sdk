@@ -9,9 +9,9 @@ import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
 import com.asf.appcoins.sdk.iab.payment.PaymentService;
 import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import io.reactivex.Completable;
-import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
@@ -68,8 +68,15 @@ final class AppCoinsIabImpl implements AppCoinsIab {
   }
 
   @Override public Completable buy(String skuId, Activity activity) {
-    return Completable.fromRunnable(
-        () -> paymentService.buy(skuId, activity, DEFAULT_REQUEST_CODE));
+    return paymentService.buy(skuId, activity, DEFAULT_REQUEST_CODE)
+        .flatMap(aBoolean -> {
+          if (aBoolean) {
+            return Single.just(true);
+          } else {
+            return Single.error(new IllegalStateException("User didn't install wallet!"));
+          }
+        })
+        .toCompletable();
   }
 
   @Override public Collection<SKU> listSkus() {

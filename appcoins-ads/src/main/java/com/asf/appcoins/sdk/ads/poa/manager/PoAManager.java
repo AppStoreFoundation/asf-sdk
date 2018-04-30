@@ -251,8 +251,11 @@ public class PoAManager implements LifeCycleListener.Listener {
   @Override public void onBecameForeground(Activity activity) {
     if (!preferences.getBoolean(FINISHED_KEY, false)) {
       if (!WalletUtils.hasWalletInstalled(activity)) {
-        WalletUtils.promptToInstallWallet(activity,
-            activity.getString(R.string.install_wallet_from_ads));
+        Disposable disposable = WalletUtils.promptToInstallWallet(activity,
+            activity.getString(R.string.install_wallet_from_ads))
+            .toCompletable()
+            .subscribe(() -> {
+            }, Throwable::printStackTrace);
       } else {
         startProcess();
       }

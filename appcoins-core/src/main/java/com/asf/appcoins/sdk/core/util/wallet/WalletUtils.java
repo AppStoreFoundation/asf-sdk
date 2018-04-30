@@ -9,8 +9,6 @@ import com.asf.appcoins.sdk.core.R;
 import com.asf.appcoins.sdk.core.util.AndroidUtils;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 
 public class WalletUtils {
 
@@ -22,11 +20,12 @@ public class WalletUtils {
     return AndroidUtils.hasHandlerAvailable(intent, context);
   }
 
-  public static void promptToInstallWallet(Activity activity, String message) {
-    Disposable subscribe = showWalletInstallDialog(activity, message).filter(aBoolean -> aBoolean)
-        .doOnSuccess(gotoStore(activity))
-        .subscribe(aBoolean -> {
-        }, Throwable::printStackTrace);
+  public static Single<Boolean> promptToInstallWallet(Activity activity, String message) {
+    return showWalletInstallDialog(activity, message).doOnSuccess(aBoolean -> {
+      if (aBoolean) {
+        gotoStore(activity);
+      }
+    });
   }
 
   private static Single<Boolean> showWalletInstallDialog(Context context, String message) {
@@ -42,8 +41,7 @@ public class WalletUtils {
     });
   }
 
-  @NonNull private static Consumer<Boolean> gotoStore(Context activity) {
-    return aBoolean -> {
+  @NonNull private static void gotoStore(Context activity) {
       String appPackageName = "com.asfoundation.wallet";
       try {
         activity.startActivity(
@@ -52,6 +50,5 @@ public class WalletUtils {
         activity.startActivity(new Intent(Intent.ACTION_VIEW,
             Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
       }
-    };
   }
 }
