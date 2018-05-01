@@ -55,7 +55,7 @@ public final class AppCoinsAdsBuilder {
     } else {
       networkId = NETWORK_MAIN;
       web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      contractAddress = new Address("0xfB4df13c45f04780B04310852eBEADa7D168D46D");
+      contractAddress = new Address("0x2b3b93E6a7c56A90c6679da2e8E522Fb292f4B89");
     }
 
     if (this.asfWeb3j == null) {
