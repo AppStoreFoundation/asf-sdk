@@ -5,6 +5,7 @@ import com.asf.appcoins.sdk.core.transaction.Transaction;
 import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 import io.reactivex.Observable;
 import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -62,7 +63,8 @@ public final class AsfWeb3jImpl implements AsfWeb3j {
             return Observable.just(
                 TransactionFactory.fromEthGetTransactionReceipt(ethGetTransactionReceipt));
           }
-        });
+        })
+        .retryWhen(attempts -> attempts.flatMap(i -> Observable.timer(5, TimeUnit.SECONDS)));
   }
 
   @Override
