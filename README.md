@@ -53,23 +53,6 @@ And in your **app's buildscript**, add the following dependency:
 
 ```
 dependencies {
-    api 'com.asfoundation:appcoins:0.2.2a'
-}
-```
-
-Or
-
-```
-dependencies {
-    api 'com.asfoundation:appcoins-iab:0.2.2a'
-    api 'com.asfoundation:appcoins-ads:0.2.2a'
-}
-```
-
-As an example, every time there is an update of the SDKs where no further integration needs to be done, the **only thing that should be changed is the version**. For example, after the **release scheduled for the 2nd of May**, the dependencies that should be included in the **app's buildscript** are:
-
-```
-dependencies {
     api 'com.asfoundation:appcoins:0.3.0a'
 }
 ```
@@ -83,8 +66,25 @@ dependencies {
 }
 ```
 
+As an example, every time there is an update of the SDKs where no further integration needs to be done, the **only thing that should be changed is the version**. For example, after the **release scheduled for the 2nd of May**, the dependencies that should be included in the **app's buildscript** are:
+
+```
+dependencies {
+    api 'com.asfoundation:appcoins:0.3.1a'
+}
+```
+
+Or
+
+```
+dependencies {
+    api 'com.asfoundation:appcoins-iab:0.3.1a'
+    api 'com.asfoundation:appcoins-ads:0.3.1a'
+}
+```
+
 ## Size
-As of version [0.2.2a](https://bintray.com/asf/asf/appcoins-sdk/0.1.1a), SDK weight is approximately as follows:
+As of version [0.3.0a](https://bintray.com/asf/asf/appcoins-ads/0.3.0a), SDK weight is approximately as follows:
 
 - SDK aar only (without dependencies) - 24KB.
 
