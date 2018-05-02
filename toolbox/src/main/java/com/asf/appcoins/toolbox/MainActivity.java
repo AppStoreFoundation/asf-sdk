@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private void handlePayment(PaymentDetails paymentDetails) {
-    if (paymentDetails.getPaymentStatus() == PaymentStatus.PENDING) {
+    if (paymentDetails.getPaymentStatus() == PaymentStatus.SUCCESS) {
       String skuId = paymentDetails.getSkuId();
       appCoinsIab.consume(skuId);
 
@@ -66,13 +66,11 @@ public class MainActivity extends AppCompatActivity {
   public void onBuyGasButtonClicked(View arg0) {
     Disposable disposable = appCoinsIab.buy(Skus.SKU_GAS_ID, this)
         .subscribe(() -> {
-          Toast.makeText(this, "Wallet install triggered.", Toast.LENGTH_SHORT)
+          Toast.makeText(this, "Buy successfully triggered.", Toast.LENGTH_SHORT)
               .show();
         }, throwable -> {
           Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT)
               .show();
-          //Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG)
-          //    .show();
         });
   }
 
