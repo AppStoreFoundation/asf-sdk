@@ -21,8 +21,8 @@ public class App extends Application {
   private List<SKU> buildSkus() {
     List<SKU> skus = new LinkedList<>();
 
-    skus.add(new SKU(Skus.SKU_GAS_LABEL, Skus.SKU_GAS_ID, BigDecimal.valueOf(1)));
-    skus.add(new SKU(Skus.SKU_PREMIUM_LABEL, Skus.SKU_PREMIUM_ID, BigDecimal.valueOf(2)));
+    skus.add(new SKU(Skus.SKU_GAS_LABEL, Skus.SKU_GAS_ID, BigDecimal.valueOf(0.01)));
+    skus.add(new SKU(Skus.SKU_PREMIUM_LABEL, Skus.SKU_PREMIUM_ID, BigDecimal.valueOf(0.02)));
 
     return skus;
   }
