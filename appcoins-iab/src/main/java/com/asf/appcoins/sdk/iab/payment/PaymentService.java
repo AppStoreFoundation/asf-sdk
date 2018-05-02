@@ -110,8 +110,23 @@ public final class PaymentService {
       String transactionHash) {
     return asfWeb3j.getTransactionByHash(transactionHash)
         .subscribeOn(Schedulers.io())
+        .map(this::mapPendingToSuccess)
         .map(transaction -> new PaymentDetails(PaymentStatus.from(transaction.getStatus()), skuId,
             transaction));
+  }
+
+  private Transaction mapPendingToSuccess(Transaction transaction) {
+    if (transaction.getStatus() == Status.PENDING) {
+      String hash = transaction.getHash();
+      String from = transaction.getFrom();
+      String to = transaction.getTo();
+      String value = transaction.getValue();
+      Status status = Status.ACCEPTED;
+
+      return new Transaction(hash, from, to, value, status);
+    } else {
+      return transaction;
+    }
   }
 
   private String getTransactionHash(String skuId) {
