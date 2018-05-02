@@ -3,7 +3,7 @@ ext {
 }
 
 // Gradle
-ver.gradle = '4.6'
+ver.gradle = '4.7'
 
 // https://mvnrepository.com/artifact/com.android.support/support-annotations
 ver.support_annotations = "27.1.0"
