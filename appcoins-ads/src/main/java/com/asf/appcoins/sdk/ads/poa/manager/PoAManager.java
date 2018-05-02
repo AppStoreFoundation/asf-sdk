@@ -1,6 +1,8 @@
 package com.asf.appcoins.sdk.ads.poa.manager;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -8,10 +10,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
+import com.asf.appcoins.sdk.ads.R;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContract;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContractImpl;
+import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -36,8 +40,9 @@ import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_STOP_PROCESS;
 
 public class PoAManager implements LifeCycleListener.Listener {
 
-  public static final String TAG = PoAManager.class.getName();
+  private static final String FINISHED_KEY = "finished";
 
+  public static final String TAG = PoAManager.class.getName();
   /** The instance of the manager */
   private static PoAManager instance;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
@@ -48,6 +53,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   private static int network = 0;
   private static CampaignContract campaignContract;
   private static String country;
+  private final SharedPreferences preferences;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
   /** The handle to keep the runnable tasks that we be running within a certain period */
@@ -56,6 +62,13 @@ public class PoAManager implements LifeCycleListener.Listener {
   private Runnable sendProof;
   /** integer used to track how many proof were already sent */
   private int proofsSent = 0;
+  private BigInteger campaignId;
+
+  private boolean dialogVisible = false;
+
+  public PoAManager(SharedPreferences preferences) {
+    this.preferences = preferences;
+  }
 
   /**
    * Initialisation method for the manager
@@ -66,7 +79,9 @@ public class PoAManager implements LifeCycleListener.Listener {
   public static PoAManager init(Context context, PoAServiceConnector connector, int networkId,
       AsfWeb3j asfWeb3j, Address contractAddress, String countryId) {
     if (instance == null) {
-      instance = new PoAManager();
+      SharedPreferences preferences =
+          context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
+      instance = new PoAManager(preferences);
       poaConnector = connector;
       appContext = context;
       network = networkId;
@@ -167,22 +182,28 @@ public class PoAManager implements LifeCycleListener.Listener {
     } else {
       // or stop the process
       processing = false;
+      preferences.edit()
+          .putBoolean(FINISHED_KEY, true)
+          .apply();
       finishProcess();
     }
   }
-
   public List<Campaign> getActiveCampaigns(String packageName, BigInteger vercode)
       throws IOException {
     List<BigInteger> campaignsIdsByCountry = campaignContract.getCampaignsByCountry(country);
+    List<BigInteger> campaignsIdsByCountryWl = campaignContract.getCampaignsByCountry("WL");
+
+    campaignsIdsByCountry.addAll(campaignsIdsByCountryWl);
+
     List<Campaign> campaign = new LinkedList<>();
 
     for (BigInteger bidId : campaignsIdsByCountry) {
       String campaignPackageName = campaignContract.getPackageNameOfCampaign(bidId);
       List<BigInteger> vercodes = campaignContract.getVercodesOfCampaign(bidId);
-      boolean campaignValidity = campaignContract.getCampaignValidity(bidId);
+      boolean campaignValid = campaignContract.isCampaignValid(bidId);
 
       boolean addCampaign =
-          campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValidity;
+          campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValid;
 
       if (addCampaign) {
         campaign.add(new Campaign(bidId, vercodes, country));
@@ -202,12 +223,16 @@ public class PoAManager implements LifeCycleListener.Listener {
             if (campaigns.isEmpty()) {
               stopProcess();
             } else {
+              BigInteger campaignId = campaigns.get(0)
+                  .getId();
+
               Bundle bundle = new Bundle();
               bundle.putString("packageName", appContext.getPackageName());
-              bundle.putString("campaignId", campaigns.get(0)
-                  .getId()
-                  .toString());
+              bundle.putString("campaignId", campaignId.toString());
+
               poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
+
+              this.campaignId = campaignId;
             }
           });
     }
@@ -225,8 +250,20 @@ public class PoAManager implements LifeCycleListener.Listener {
         .getPackageInfo(packageName, 0).versionCode;
   }
 
-  @Override public void onBecameForeground() {
-    startProcess();
+  @Override public void onBecameForeground(Activity activity) {
+    if (!preferences.getBoolean(FINISHED_KEY, false)) {
+      if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
+        Disposable disposable = WalletUtils.promptToInstallWallet(activity,
+            activity.getString(R.string.install_wallet_from_ads))
+            .toCompletable()
+            .doOnSubscribe(disposable1 -> dialogVisible = true)
+            .doOnComplete(() -> dialogVisible = false)
+            .subscribe(() -> {
+            }, Throwable::printStackTrace);
+      } else {
+        startProcess();
+      }
+    }
   }
 
   @Override public void onBecameBackground() {

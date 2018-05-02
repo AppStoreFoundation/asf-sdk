@@ -150,6 +150,26 @@ public class CampaignContractImpl implements CampaignContract {
     throw new IllegalArgumentException("Failed to getCampaignValidity!");
   }
 
+  @Override public boolean isCampaignValid(BigInteger bidId) {
+    byte[] value = new byte[32];
+    System.arraycopy(bidId.toByteArray(), 0, value, value.length - bidId.toByteArray().length,
+        bidId.toByteArray().length);
+
+    Function function =
+        new Function("isCampaignValid", Collections.singletonList(new Bytes32(value)),
+            Collections.singletonList(new TypeReference<Bool>() {
+            }));
+
+    String result =
+        callSmartContractFunction(function, address.getValue(), Address.DEFAULT.getValue());
+    List<Type> response = FunctionReturnDecoder.decode(result, function.getOutputParameters());
+
+    if (!response.isEmpty()) {
+      return ((Bool) response.get(0)).getValue();
+    }
+    throw new IllegalArgumentException("Failed to isCampaignValid!");
+  }
+
   private String callSmartContractFunction(Function function, String contractAddress,
       String walletAddress) {
     String encodedFunction = FunctionEncoder.encode(function);
