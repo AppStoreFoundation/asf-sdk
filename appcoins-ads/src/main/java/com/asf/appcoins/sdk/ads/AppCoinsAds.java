@@ -25,20 +25,22 @@ public interface AppCoinsAds {
 
   /**
    * Method to register the campaign for the proof of attention.
+   *
    * @param campaignId The campaign id to be added to the message bundle.
    */
   void registerCampaign(String campaignId);
 
   /**
    * Method to register the campaign for the proof of attention.
+   *
    * @param networkId The network where the advertisement process is done.
    */
   void setNetwork(int networkId);
 
   /**
    * Method to initialize the Advertisement SDK.
+   *
    * @param application The application instance of the app.
    */
   void init(Application application);
-
 }

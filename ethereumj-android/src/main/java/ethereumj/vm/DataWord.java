@@ -37,13 +37,13 @@ import org.spongycastle.util.encoders.Hex;
 public class DataWord implements Comparable<DataWord> {
 
   /* Maximum value of the DataWord */
-	public static final BigInteger _2_256 = BigInteger.valueOf(2)
+  public static final BigInteger _2_256 = BigInteger.valueOf(2)
       .pow(256);
   public static final BigInteger MAX_VALUE = _2_256.subtract(BigInteger.ONE);
   public static final DataWord ZERO = new DataWord(new byte[32]);
-      // don't push it in to the stack
+  // don't push it in to the stack
   public static final DataWord ZERO_EMPTY_ARRAY = new DataWord(new byte[0]);
-      // don't push it in to the stack
+  // don't push it in to the stack
 
   private byte[] data = new byte[32];
 
@@ -76,15 +76,15 @@ public class DataWord implements Comparable<DataWord> {
   }
 
   public DataWord(byte[] data) {
-		if (data == null) {
-			this.data = ByteUtil.EMPTY_BYTE_ARRAY;
-		} else if (data.length == 32) {
-			this.data = data;
-		} else if (data.length <= 32) {
-			System.arraycopy(data, 0, this.data, 32 - data.length, data.length);
-		} else {
-			throw new RuntimeException("Data word can't exceed 32 bytes: " + data);
-		}
+    if (data == null) {
+      this.data = ByteUtil.EMPTY_BYTE_ARRAY;
+    } else if (data.length == 32) {
+      this.data = data;
+    } else if (data.length <= 32) {
+      System.arraycopy(data, 0, this.data, 32 - data.length, data.length);
+    } else {
+      throw new RuntimeException("Data word can't exceed 32 bytes: " + data);
+    }
   }
 
   public byte[] getData() {

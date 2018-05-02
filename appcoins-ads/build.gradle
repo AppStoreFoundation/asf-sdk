@@ -12,7 +12,8 @@ android {
     versionCode VERSION_CODE
     versionName VERSION_NAME
     buildConfigField 'int', 'ADS_POA_NUMBER_OF_PROOFS', project.ADS_POA_NUMBER_OF_PROOFS
-    buildConfigField 'int', 'ADS_POA_PROOFS_INTERVAL_IN_MILIS', project.ADS_POA_PROOFS_INTERVAL_IN_MILIS
+    buildConfigField 'int', 'ADS_POA_PROOFS_INTERVAL_IN_MILIS',
+        project.ADS_POA_PROOFS_INTERVAL_IN_MILIS
 
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 

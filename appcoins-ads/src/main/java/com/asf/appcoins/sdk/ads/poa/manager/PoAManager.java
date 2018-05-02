@@ -40,9 +40,8 @@ import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_STOP_PROCESS;
 
 public class PoAManager implements LifeCycleListener.Listener {
 
-  private static final String FINISHED_KEY = "finished";
-
   public static final String TAG = PoAManager.class.getName();
+  private static final String FINISHED_KEY = "finished";
   /** The instance of the manager */
   private static PoAManager instance;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
@@ -188,6 +187,7 @@ public class PoAManager implements LifeCycleListener.Listener {
       finishProcess();
     }
   }
+
   public List<Campaign> getActiveCampaigns(String packageName, BigInteger vercode)
       throws IOException {
     List<BigInteger> campaignsIdsByCountry = campaignContract.getCampaignsByCountry(country);

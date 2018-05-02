@@ -12,7 +12,7 @@ import java.lang.ref.WeakReference;
  * Created by Joao Raimundo on 09/04/2018.
  */
 
-public class LifeCycleListener implements Application.ActivityLifecycleCallbacks  {
+public class LifeCycleListener implements Application.ActivityLifecycleCallbacks {
 
   /** Delay value used to handle time between screen changes. */
   private static final long CHECK_DELAY = 2000;
@@ -24,11 +24,48 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
   private WeakReference<Activity> currentActivity;
   /** Handler for delayed task to check if we are in the foreground or in the background */
   private Handler handler = new Handler();
-  /** The runnable task reference, used to remove it from the handler when the is still on the
-   * foreground but the life cycle triggered a possible background state before.*/
+  /**
+   * The runnable task reference, used to remove it from the handler when the is still on the
+   * foreground but the life cycle triggered a possible background state before.
+   */
   private Runnable check;
   /** The listener for the lifecycle background and foreground state */
   private Listener listener;
+
+  /**
+   * Method to initialize the lifecycle listener.
+   *
+   * @param application The application context.
+   */
+  public static LifeCycleListener init(Application application) {
+    if (instance == null) {
+      instance = new LifeCycleListener();
+      application.registerActivityLifecycleCallbacks(instance);
+    }
+    return instance;
+  }
+
+  /**
+   * Getter for the lifecycle listener.
+   *
+   * @param application The application context.
+   */
+  public static LifeCycleListener get(Application application) {
+    if (instance == null) {
+      init(application);
+    }
+    return instance;
+  }
+
+  /**
+   * Method to set the listener to the lifecycle events that detect a background/foreground state.
+   */
+  public void setListener(Listener listener) {
+    this.listener = listener;
+  }
+
+  @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+  }
 
   @Override public void onActivityStarted(Activity activity) {
     currentActivity = new WeakReference<>(activity);
@@ -47,39 +84,8 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
     }
   }
 
-  /**
-   * Method to initialize the lifecycle listener.
-   * @param application The application context.
-   */
-  public static LifeCycleListener init(Application application){
-    if (instance == null) {
-      instance = new LifeCycleListener();
-      application.registerActivityLifecycleCallbacks(instance);
-    }
-    return instance;
-  }
-
-  /**
-   * Getter for the lifecycle listener.
-   * @param application The application context.
-   */
-  public static LifeCycleListener get(Application application){
-    if (instance == null) {
-      init(application);
-    }
-    return instance;
-  }
-
-  /**
-   * Method to set the listener to the lifecycle events that detect a background/foreground state.
-   */
-  public void setListener(Listener listener) {
-    this.listener = listener;
-  }
-
   @Override public void onActivityResumed(Activity activity) {
   }
-
 
   @Override public void onActivityPaused(Activity activity) {
     // if we're changing configurations we aren't going background so
@@ -98,31 +104,33 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
     onActivityClosed(activity);
   }
 
-  @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
-
-  public interface Listener {
-    void onBecameForeground(Activity activity);
-
-    void onBecameBackground();
+  @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
   }
 
-  @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
+  @Override public void onActivityDestroyed(Activity activity) {
+  }
 
-  @Override public void onActivityDestroyed(Activity activity) {}
-
-  /** Method called when the activity was considered close. This method validates if we are till on
+  /**
+   * Method called when the activity was considered close. This method validates if we are till on
    * foreground in case an activity was closed but a new one was opened.
+   *
    * @param activity The  activity that was in foreground when this method was triggered.
    */
-  private void onActivityClosed(Activity activity){
+  private void onActivityClosed(Activity activity) {
     if (foreground) {
-      if ((activity == currentActivity.get())
-          && (activity != null && !activity.isChangingConfigurations())){
+      if ((activity == currentActivity.get()) && (activity != null
+          && !activity.isChangingConfigurations())) {
         foreground = false;
         if (listener != null) {
           listener.onBecameBackground();
         }
       }
     }
+  }
+
+  public interface Listener {
+    void onBecameForeground(Activity activity);
+
+    void onBecameBackground();
   }
 }
