@@ -42,13 +42,13 @@ public class WalletUtils {
   }
 
   @NonNull private static void gotoStore(Context activity) {
-      String appPackageName = "com.asfoundation.wallet";
-      try {
-        activity.startActivity(
-            new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-      } catch (android.content.ActivityNotFoundException anfe) {
-        activity.startActivity(new Intent(Intent.ACTION_VIEW,
-            Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-      }
+    String appPackageName = "com.asfoundation.wallet";
+    try {
+      activity.startActivity(
+          new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+    } catch (android.content.ActivityNotFoundException anfe) {
+      activity.startActivity(new Intent(Intent.ACTION_VIEW,
+          Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+    }
   }
 }

@@ -250,8 +250,7 @@ public class ECKey implements Serializable {
    *
    * @param privKey -
    *
-   *
-   * @return  -
+   * @return -
    */
   public static ECKey fromPrivate(BigInteger privKey) {
     return new ECKey(privKey, CURVE.getG()
@@ -277,7 +276,7 @@ public class ECKey implements Serializable {
    * @param priv -
    * @param pub -
    *
-   * @return  -
+   * @return -
    */
   public static ECKey fromPrivateAndPrecalculatedPublic(BigInteger priv, ECPoint pub) {
     return new ECKey(priv, pub);
@@ -290,6 +289,7 @@ public class ECKey implements Serializable {
    *
    * @param priv -
    * @param pub -
+   *
    * @return -
    */
   public static ECKey fromPrivateAndPrecalculatedPublic(byte[] priv, byte[] pub) {
@@ -304,6 +304,7 @@ public class ECKey implements Serializable {
    * compression state of pub will be preserved.
    *
    * @param pub -
+   *
    * @return -
    */
   public static ECKey fromPublicOnly(ECPoint pub) {
@@ -315,6 +316,7 @@ public class ECKey implements Serializable {
    * The compression state of pub will be preserved.
    *
    * @param pub -
+   *
    * @return -
    */
   public static ECKey fromPublicOnly(byte[] pub) {
@@ -328,6 +330,7 @@ public class ECKey implements Serializable {
    *
    * @param privKey -
    * @param compressed -
+   *
    * @return -
    */
   public static byte[] publicKeyFromPrivate(BigInteger privKey, boolean compressed) {
@@ -340,6 +343,7 @@ public class ECKey implements Serializable {
    * Compute an address from an encoded public key.
    *
    * @param pubBytes an encoded (uncompressed) public key
+   *
    * @return 20-byte address
    */
   public static byte[] computeAddress(byte[] pubBytes) {
@@ -350,6 +354,7 @@ public class ECKey implements Serializable {
    * Compute an address from a public point.
    *
    * @param pubPoint a public point
+   *
    * @return 20-byte address
    */
   public static byte[] computeAddress(ECPoint pubPoint) {
@@ -362,6 +367,7 @@ public class ECKey implements Serializable {
    * This is the encoded public key without the leading byte.
    *
    * @param pubPoint a public point
+   *
    * @return 64-byte X,Y point pair
    */
   public static byte[] pubBytesWithoutFormat(ECPoint pubPoint) {
@@ -391,6 +397,7 @@ public class ECKey implements Serializable {
    * @param signatureBase64 The Ethereum-format message signature in base64
    *
    * @return -
+   *
    * @throws SignatureException If the public key could not be recovered or if there was a signature format error.
    */
   public static byte[] signatureToKeyBytes(byte[] messageHash, String signatureBase64)
@@ -436,6 +443,7 @@ public class ECKey implements Serializable {
    *
    * @param messageHash 32-byte hash of message
    * @param signatureBase64 Base-64 encoded signature
+   *
    * @return 20-byte address
    */
   public static byte[] signatureToAddress(byte[] messageHash, String signatureBase64)
@@ -448,6 +456,7 @@ public class ECKey implements Serializable {
    *
    * @param messageHash 32-byte hash of message
    * @param sig -
+   *
    * @return 20-byte address
    */
   public static byte[] signatureToAddress(byte[] messageHash, ECDSASignature sig)
@@ -460,6 +469,7 @@ public class ECKey implements Serializable {
    *
    * @param messageHash 32-byte hash of message
    * @param signatureBase64 Base-64 encoded signature
+   *
    * @return ECKey
    */
   public static ECKey signatureToKey(byte[] messageHash, String signatureBase64)
@@ -473,6 +483,7 @@ public class ECKey implements Serializable {
    *
    * @param messageHash 32-byte hash of message
    * @param sig -
+   *
    * @return ECKey
    */
   public static ECKey signatureToKey(byte[] messageHash, ECDSASignature sig)
@@ -515,7 +526,7 @@ public class ECKey implements Serializable {
    * @param signature signature.
    * @param pub The public key bytes to use.
    *
-   * @return  -
+   * @return -
    */
   public static boolean verify(byte[] data, byte[] signature, byte[] pub) {
     return verify(data, ECDSASignature.decodeFromDER(signature), pub);
@@ -523,7 +534,9 @@ public class ECKey implements Serializable {
 
   /**
    * Returns true if the given pubkey is canonical, i.e. the correct length taking into account compression.
+   *
    * @param pubkey -
+   *
    * @return -
    */
   public static boolean isPubKeyCanonical(byte[] pubkey) {
@@ -555,6 +568,7 @@ public class ECKey implements Serializable {
    * @param recId Which possible key to recover.
    * @param sig the R and S components of the signature, wrapped.
    * @param messageHash Hash of the data that was signed.
+   *
    * @return 65-byte encoded public key
    */
   @Nullable public static byte[] recoverPubBytesFromSignature(int recId, ECDSASignature sig,
@@ -615,10 +629,10 @@ public class ECKey implements Serializable {
   }
 
   /**
-   *
    * @param recId Which possible key to recover.
    * @param sig the R and S components of the signature, wrapped.
    * @param messageHash Hash of the data that was signed.
+   *
    * @return 20-byte address
    */
   @Nullable public static byte[] recoverAddressFromSignature(int recId, ECDSASignature sig,
@@ -631,18 +645,11 @@ public class ECKey implements Serializable {
     }
   }
 
-  public String toString() {
-    StringBuilder b = new StringBuilder();
-    b.append("pub:")
-        .append(Hex.toHexString(pub.getEncoded(false)));
-    return b.toString();
-  }
-
   /**
-   *
    * @param recId Which possible key to recover.
    * @param sig the R and S components of the signature, wrapped.
    * @param messageHash Hash of the data that was signed.
+   *
    * @return ECKey
    */
   @Nullable public static ECKey recoverFromSignature(int recId, ECDSASignature sig,
@@ -654,12 +661,12 @@ public class ECKey implements Serializable {
       return fromPublicOnly(pubBytes);
     }
   }
-
   /**
    * Decompress a compressed public key (x co-ord and low-bit of y-coord).
    *
    * @param xBN -
    * @param yBit -
+   *
    * @return -
    */
   private static ECPoint decompressKey(BigInteger xBN, boolean yBit) {
@@ -668,6 +675,13 @@ public class ECKey implements Serializable {
     compEnc[0] = (byte) (yBit ? 0x03 : 0x02);
     return CURVE.getCurve()
         .decodePoint(compEnc);
+  }
+
+  public String toString() {
+    StringBuilder b = new StringBuilder();
+    b.append("pub:")
+        .append(Hex.toHexString(pub.getEncoded(false)));
+    return b.toString();
   }
 
   private static void check(boolean test, String message) {
@@ -688,7 +702,7 @@ public class ECKey implements Serializable {
    * Returns true if this key has access to private key bytes. Does the opposite of
    * {@link #isPubKeyOnly()}.
    *
-   * @return  -
+   * @return -
    */
   public boolean hasPrivKey() {
     return privKey != null;
@@ -728,7 +742,7 @@ public class ECKey implements Serializable {
   /**
    * Gets the public key in the form of an elliptic curve point object from Bouncy Castle.
    *
-   * @return  -
+   * @return -
    */
   public ECPoint getPubKeyPoint() {
     return pub;
@@ -738,8 +752,7 @@ public class ECKey implements Serializable {
    * Gets the private key in the form of an integer field element. The public key is derived by performing EC
    * point addition this number of times (i.e. point multiplying).
    *
-   *
-   * @return  -
+   * @return -
    *
    * @throws IllegalStateException if the private key bytes are not available.
    */
@@ -757,8 +770,7 @@ public class ECKey implements Serializable {
    * Produce a string rendering of the ECKey INCLUDING the private key.
    * Unless you absolutely need the private key it is better for security reasons to just use toString().
    *
-   *
-   * @return  -
+   * @return -
    */
   public String toStringWithPrivate() {
     StringBuilder b = new StringBuilder();
@@ -776,6 +788,7 @@ public class ECKey implements Serializable {
    * and put them in ECDSASignature
    *
    * @param input to sign
+   *
    * @return ECDSASignature signature that contains the R and S components
    */
   public ECDSASignature doSign(byte[] input) {
@@ -810,7 +823,9 @@ public class ECKey implements Serializable {
    * Takes the keccak hash (32 bytes) of data and returns the ECDSA signature
    *
    * @param messageHash -
+   *
    * @return -
+   *
    * @throws IllegalStateException if this ECKey does not have the private part.
    */
   public ECDSASignature sign(byte[] messageHash) {
@@ -850,6 +865,7 @@ public class ECKey implements Serializable {
    *
    * @param sigHash -
    * @param signature -
+   *
    * @return -
    */
   public boolean verify(byte[] sigHash, ECDSASignature signature) {
@@ -868,7 +884,7 @@ public class ECKey implements Serializable {
   /**
    * Returns a 32 byte array containing the private key, or null if the key is encrypted or public only
    *
-   *  @return  -
+   * @return -
    */
   @Nullable public byte[] getPrivKeyBytes() {
     if (privKey == null) {
@@ -904,9 +920,11 @@ public class ECKey implements Serializable {
     }
 
     /**
-     *t
+     * t
+     *
      * @param r
      * @param s
+     *
      * @return -
      */
     private static ECDSASignature fromComponents(byte[] r, byte[] s) {
@@ -914,10 +932,10 @@ public class ECKey implements Serializable {
     }
 
     /**
-     *
      * @param r -
      * @param s -
      * @param v -
+     *
      * @return -
      */
     public static ECDSASignature fromComponents(byte[] r, byte[] s, byte v) {
@@ -976,7 +994,7 @@ public class ECKey implements Serializable {
      * been signed, as that violates various assumed invariants. Thus in future only one of those forms will be
      * considered legal and the other will be banned.
      *
-     * @return  -
+     * @return -
      */
     public ECDSASignature toCanonicalised() {
       if (s.compareTo(HALF_CURVE_ORDER) > 0) {
@@ -993,7 +1011,6 @@ public class ECKey implements Serializable {
     }
 
     /**
-     *
      * @return -
      */
     public String toBase64() {

@@ -69,9 +69,9 @@ public class Value {
     return this;
   }
 
-    /* *****************
-     *      Convert
-     * *****************/
+  /* *****************
+   *      Convert
+   * *****************/
 
   public Object asObj() {
     decode();
@@ -156,9 +156,9 @@ public class Value {
     return new Value(null);
   }
 
-    /* *****************
-     *      Utility
-     * *****************/
+  /* *****************
+   *      Utility
+   * *****************/
 
   public void decode() {
     if (!this.decoded) {
@@ -182,9 +182,9 @@ public class Value {
     return DeepEquals.deepEquals(this, o);
   }
 
-    /* *****************
-     *      Checks
-     * *****************/
+  /* *****************
+   *      Checks
+   * *****************/
 
   public boolean isList() {
     decode();

@@ -24,7 +24,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -63,9 +63,9 @@ import ethereumj.util.FastByteComparisons.LexicographicalComparerHolder.PureJava
     return LexicographicalComparerHolder.BEST_COMPARER.compareTo(b1, s1, l1, b2, s2, l2);
   }
 
-    private static Comparer<byte[]> lexicographicalComparerJavaImpl() {
-      return PureJavaComparer.INSTANCE;
-    }
+  private static Comparer<byte[]> lexicographicalComparerJavaImpl() {
+    return PureJavaComparer.INSTANCE;
+  }
 
   private interface Comparer<T> {
     int compareTo(T buffer1, int offset1, int length1, T buffer2, int offset2, int length2);

@@ -48,7 +48,8 @@ import static org.apache.commons.lang3.StringUtils.stripEnd;
  */
 public class CallTransaction {
 
-  private static final ObjectMapper DEFAULT_MAPPER = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+  private static final ObjectMapper DEFAULT_MAPPER =
+      new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
           .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
 
   public static Transaction createRawTransaction(long nonce, long gasPrice, long gasLimit,
@@ -133,9 +134,9 @@ public class CallTransaction {
     }
 
     public byte[] encodeArguments(Object... args) {
-			if (args.length > inputs.length) {
-				throw new RuntimeException("Too many arguments: " + args.length + " > " + inputs.length);
-			}
+      if (args.length > inputs.length) {
+        throw new RuntimeException("Too many arguments: " + args.length + " > " + inputs.length);
+      }
 
       int staticSize = 0;
       int dynamicCnt = 0;
@@ -270,9 +271,9 @@ public class CallTransaction {
     public Invocation parseInvocation(byte[] data) {
       if (data.length < 4) throw new RuntimeException("Invalid data length: " + data.length);
       Function function = getBySignatureHash(Arrays.copyOfRange(data, 0, 4));
-			if (function == null) {
-				throw new RuntimeException("Can't find function/event by it " + "signature");
-			}
+      if (function == null) {
+        throw new RuntimeException("Can't find function/event by it " + "signature");
+      }
       Object[] args = function.decode(data);
       return new Invocation(this, function, args);
     }

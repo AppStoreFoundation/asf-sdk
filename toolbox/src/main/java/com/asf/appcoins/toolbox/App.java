@@ -15,7 +15,8 @@ public class App extends Application {
 
     AppCoinsIabSingleton.create(DEVELOPER_ADDRESS, buildSkus(), true);
     AdvertisementSdkSingleton.create(this, true);
-    AdvertisementSdkSingleton.getAdsSdk().init(this);
+    AdvertisementSdkSingleton.getAdsSdk()
+        .init(this);
   }
 
   private List<SKU> buildSkus() {

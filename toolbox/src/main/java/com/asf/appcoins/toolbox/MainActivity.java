@@ -17,7 +17,6 @@ public class MainActivity extends AppCompatActivity {
 
   private AppCoinsIab appCoinsIab;
 
-
   public MainActivity() {
     this.compositeDisposable = new CompositeDisposable();
   }

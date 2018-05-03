@@ -51,7 +51,6 @@ public final class AppCoinsAdsBuilder {
       networkId = NETWORK_ROPSTEN;
       web3 = Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
       contractAddress = new Address("0x6dbF56Dde265e8E20C81Ac91F3a46cDf4B367104");
-
     } else {
       networkId = NETWORK_MAIN;
       web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));

@@ -57,10 +57,10 @@ public final class PaymentService {
     BigDecimal amount = skuManager.getSkuAmount(skuId);
     BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
 
-      Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
+    Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
 
-      currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
-          new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
+    currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
+        new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
 
     if (WalletUtils.hasWalletInstalled(activity)) {
       if (payments.containsKey(skuId)) {

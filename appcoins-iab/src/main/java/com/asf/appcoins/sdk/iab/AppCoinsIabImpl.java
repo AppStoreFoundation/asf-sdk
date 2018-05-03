@@ -47,8 +47,7 @@ final class AppCoinsIabImpl implements AppCoinsIab {
 
   @Override public Observable<PaymentDetails> getCurrentPayment() {
     PaymentDetails currentPayment = paymentService.getCurrentPayment();
-    String txHash = currentPayment
-        .getTransaction()
+    String txHash = currentPayment.getTransaction()
         .getHash();
     String skuId = currentPayment.getSkuId();
 
