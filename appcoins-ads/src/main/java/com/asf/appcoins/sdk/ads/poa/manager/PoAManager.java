@@ -70,38 +70,30 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   /**
+   * Getter for the instance of the manager.
+   */
+  public static PoAManager get() {
+    return instance;
+  }
+
+  /**
    * Initialisation method for the manager
    *
    * @param context The context of the application.
    * @param connector The PoA service connector used on the communication of the proof of attention.
    */
-  public static PoAManager init(Context context, PoAServiceConnector connector, int networkId,
+  public static void init(Context context, PoAServiceConnector connector, int networkId,
       AsfWeb3j asfWeb3j, Address contractAddress, String countryId) {
     if (instance == null) {
       SharedPreferences preferences =
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
       instance = new PoAManager(preferences);
-      poaConnector = connector;
-      appContext = context;
-      network = networkId;
-      campaignContract = new CampaignContractImpl(asfWeb3j, contractAddress);
+      PoAManager.poaConnector = connector;
+      PoAManager.appContext = context;
+      PoAManager.network = networkId;
+      PoAManager.campaignContract = new CampaignContractImpl(asfWeb3j, contractAddress);
       country = countryId;
     }
-    return instance;
-  }
-
-  /**
-   * Getter for the instance of the manager.
-   *
-   * @param context The application context
-   * @param connector The onnector to the wallet service.
-   */
-  public static PoAManager get(Context context, PoAServiceConnector connector, int networkId,
-      AsfWeb3j asfWeb3j, Address contractAddress, String countryId) {
-    if (instance == null) {
-      init(context, connector, networkId, asfWeb3j, contractAddress, countryId);
-    }
-    return instance;
   }
 
   /**
@@ -109,12 +101,8 @@ public class PoAManager implements LifeCycleListener.Listener {
    * with the wallet service, if not already done.
    * Then it will trigger the first proof sent.
    */
-  private void startProcess() {
-    // If starting the PoA process do handshake
-    if (!processing) {
-      processing = true;
-      poaConnector.startHandshake(appContext);
-    }
+  public void startProcess() {
+    processing = true;
 
     // set the network being used
     Bundle bundle = new Bundle();
@@ -261,7 +249,7 @@ public class PoAManager implements LifeCycleListener.Listener {
             .subscribe(() -> {
             }, Throwable::printStackTrace);
       } else {
-        startProcess();
+        poaConnector.startHandshake(appContext);
       }
     }
   }

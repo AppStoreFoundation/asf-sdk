@@ -3,6 +3,7 @@ package com.asf.appcoins.sdk.ads.poa;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import com.asf.appcoins.sdk.ads.poa.manager.PoAManager;
 import net.grandcentrix.tray.AppPreferences;
 
 import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PARAM_WALLET_PACKAGE_NAME;
@@ -26,8 +27,12 @@ public class SDKPoAService extends Service {
         // create a preference accessor. This is for global app preferences.
         final AppPreferences appPreferences = new AppPreferences(
             getApplicationContext()); // this Preference comes for free from the library
-        appPreferences.put(PREFERENCE_WALLET_PCKG_NAME,
-            intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME));
+        String packageName = intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME);
+        appPreferences.put(PREFERENCE_WALLET_PCKG_NAME, packageName);
+
+        PoAManager.get()
+            .startProcess();
+
         stopSelf(startId);
       }
     }
