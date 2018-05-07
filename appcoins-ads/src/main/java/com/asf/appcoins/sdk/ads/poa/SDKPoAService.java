@@ -25,9 +25,10 @@ public class SDKPoAService extends Service {
         // TODO Add logic to handle possible multiple intents received.
         // create a preference accessor. This is for global app preferences.
         final AppPreferences appPreferences = new AppPreferences(
-            getApplicationContext()); // this Preference comes for free from the library
-        appPreferences.put(PREFERENCE_WALLET_PCKG_NAME,
-            intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME));
+            getApplicationContext());
+        String packageName = intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME);
+        appPreferences.put(PREFERENCE_WALLET_PCKG_NAME, packageName);
+
         stopSelf(startId);
       }
     }

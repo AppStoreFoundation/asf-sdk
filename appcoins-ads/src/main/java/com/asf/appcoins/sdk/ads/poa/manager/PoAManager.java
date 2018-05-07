@@ -22,14 +22,19 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import net.grandcentrix.tray.AppPreferences;
+import net.grandcentrix.tray.core.OnTrayPreferenceChangeListener;
+import net.grandcentrix.tray.core.TrayItem;
 import org.web3j.abi.datatypes.Address;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SET_NETWORK;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_STOP_PROCESS;
+import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PREFERENCE_WALLET_PCKG_NAME;
 
 /**
  * Class that will manage the PoA process, by sending the proofs on the correct time. By handling
@@ -61,6 +66,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   private Runnable sendProof;
   /** integer used to track how many proof were already sent */
   private int proofsSent = 0;
+  /** The campaign ID value */
   private BigInteger campaignId;
 
   private boolean dialogVisible = false;
@@ -70,38 +76,30 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   /**
+   * Getter for the instance of the manager.
+   */
+  public static PoAManager get() {
+    return instance;
+  }
+
+  /**
    * Initialisation method for the manager
    *
    * @param context The context of the application.
    * @param connector The PoA service connector used on the communication of the proof of attention.
    */
-  public static PoAManager init(Context context, PoAServiceConnector connector, int networkId,
+  public static void init(Context context, PoAServiceConnector connector, int networkId,
       AsfWeb3j asfWeb3j, Address contractAddress, String countryId) {
     if (instance == null) {
       SharedPreferences preferences =
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
       instance = new PoAManager(preferences);
-      poaConnector = connector;
-      appContext = context;
-      network = networkId;
-      campaignContract = new CampaignContractImpl(asfWeb3j, contractAddress);
+      PoAManager.poaConnector = connector;
+      PoAManager.appContext = context;
+      PoAManager.network = networkId;
+      PoAManager.campaignContract = new CampaignContractImpl(asfWeb3j, contractAddress);
       country = countryId;
     }
-    return instance;
-  }
-
-  /**
-   * Getter for the instance of the manager.
-   *
-   * @param context The application context
-   * @param connector The onnector to the wallet service.
-   */
-  public static PoAManager get(Context context, PoAServiceConnector connector, int networkId,
-      AsfWeb3j asfWeb3j, Address contractAddress, String countryId) {
-    if (instance == null) {
-      init(context, connector, networkId, asfWeb3j, contractAddress, countryId);
-    }
-    return instance;
   }
 
   /**
@@ -109,12 +107,8 @@ public class PoAManager implements LifeCycleListener.Listener {
    * with the wallet service, if not already done.
    * Then it will trigger the first proof sent.
    */
-  private void startProcess() {
-    // If starting the PoA process do handshake
-    if (!processing) {
-      processing = true;
-      poaConnector.startHandshake(appContext);
-    }
+  public void startProcess() {
+    processing = true;
 
     // set the network being used
     Bundle bundle = new Bundle();
@@ -261,7 +255,15 @@ public class PoAManager implements LifeCycleListener.Listener {
             .subscribe(() -> {
             }, Throwable::printStackTrace);
       } else {
-        startProcess();
+        final AppPreferences appPreferences =
+            new AppPreferences(appContext); // this Preference comes for free from the library
+        appPreferences.registerOnTrayPreferenceChangeListener(new OnTrayPreferenceChangeListener() {
+          @Override public void onTrayPreferenceChanged(Collection<TrayItem> items) {
+             appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME);
+             startProcess();
+          }
+        });
+        poaConnector.startHandshake(appContext);
       }
     }
   }

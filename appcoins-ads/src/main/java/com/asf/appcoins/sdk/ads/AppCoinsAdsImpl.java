@@ -68,8 +68,8 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
 
   @Override public void init(Application application) {
     this.context = application;
+    PoAManager.init(application, poaConnector, networkId, web3j, contractAddress, countryId);
     LifeCycleListener.get(application)
-        .setListener(PoAManager.get(application, poaConnector, networkId, web3j, contractAddress,
-            countryId));
+        .setListener(PoAManager.get());
   }
 }
