@@ -22,14 +22,19 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import net.grandcentrix.tray.AppPreferences;
+import net.grandcentrix.tray.core.OnTrayPreferenceChangeListener;
+import net.grandcentrix.tray.core.TrayItem;
 import org.web3j.abi.datatypes.Address;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SET_NETWORK;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_STOP_PROCESS;
+import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PREFERENCE_WALLET_PCKG_NAME;
 
 /**
  * Class that will manage the PoA process, by sending the proofs on the correct time. By handling
@@ -61,6 +66,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   private Runnable sendProof;
   /** integer used to track how many proof were already sent */
   private int proofsSent = 0;
+  /** The campaign ID value */
   private BigInteger campaignId;
 
   private boolean dialogVisible = false;
@@ -249,6 +255,14 @@ public class PoAManager implements LifeCycleListener.Listener {
             .subscribe(() -> {
             }, Throwable::printStackTrace);
       } else {
+        final AppPreferences appPreferences =
+            new AppPreferences(appContext); // this Preference comes for free from the library
+        appPreferences.registerOnTrayPreferenceChangeListener(new OnTrayPreferenceChangeListener() {
+          @Override public void onTrayPreferenceChanged(Collection<TrayItem> items) {
+             appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME);
+             startProcess();
+          }
+        });
         poaConnector.startHandshake(appContext);
       }
     }
