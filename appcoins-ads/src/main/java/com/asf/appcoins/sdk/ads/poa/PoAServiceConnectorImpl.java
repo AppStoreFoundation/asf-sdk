@@ -95,11 +95,12 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     }
   }
 
-  @Override public void startHandshake(Context context) {
+  @Override public void startHandshake(Context context, int networkId) {
     // send broadcast intent to start the handshake
     Intent broadcastIntent = new Intent(ACTION_START_HANDSHAKE);
     broadcastIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
     broadcastIntent.putExtra(PARAM_APP_SERVICE_NAME, SDKPoAService.class.getName());
+    broadcastIntent.putExtra(PARAM_NETWORK_ID, networkId);
     // We need to start the handshake with the implicit broadcast, instead of a generic one due to a
     // 'ban' on the implicit broadcast when targeting Android 8.0 sdk (targetSdkVersion). Meaning
     // that only explicit broadcast will work. For that reason we search for the packages that can

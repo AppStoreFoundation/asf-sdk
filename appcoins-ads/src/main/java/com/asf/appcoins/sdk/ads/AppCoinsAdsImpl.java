@@ -37,7 +37,7 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   }
 
   @Override public void handshake() {
-    poaConnector.startHandshake(context);
+    poaConnector.startHandshake(context, networkId);
   }
 
   @Override public void sendProof() {
