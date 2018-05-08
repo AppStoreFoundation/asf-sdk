@@ -39,14 +39,19 @@ public interface PoAServiceConnector {
    * handshake.
    */
   String PARAM_APP_SERVICE_NAME = "PARAM_APP_SERVICE_NAME";
+  /**
+   * Intent parameter for the application service name, to identify the network we are using.
+   */
+  String PARAM_NETWORK_ID = "PARAM_NETWORK_ID";
 
   /**
    * Method that starts the handshake process, that obtains the wallet that is listening to our
    * broadcast and that manages the PoA process.
    *
    * @param context The context where this connector is being used.
+   * @param networkId The id of the network in use.
    */
-  void startHandshake(Context context);
+  void startHandshake(Context context, int networkId);
 
   /**
    * Method to bind to the service on the received package name and listening to the for the given

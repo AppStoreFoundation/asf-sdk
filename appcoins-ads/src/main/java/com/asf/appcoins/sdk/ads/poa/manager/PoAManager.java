@@ -263,7 +263,7 @@ public class PoAManager implements LifeCycleListener.Listener {
              startProcess();
           }
         });
-        poaConnector.startHandshake(appContext);
+        poaConnector.startHandshake(appContext, network);
       }
     }
   }
