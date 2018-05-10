@@ -32,12 +32,13 @@ public class CampaignContractImpl implements CampaignContract {
 
   @Override public String getPackageNameOfCampaign(BigInteger bidId) {
     byte[] value = new byte[32];
-    System.arraycopy(bidId.toByteArray(), 0, value, value.length-bidId.toByteArray().length, bidId.toByteArray().length);
+    System.arraycopy(bidId.toByteArray(), 0, value, value.length - bidId.toByteArray().length,
+        bidId.toByteArray().length);
 
-    Function function = new Function("getPackageNameOfCampaign",
-        Collections.singletonList(new Bytes32(value)),
-        Collections.singletonList(new TypeReference<Utf8String>() {
-        }));
+    Function function =
+        new Function("getPackageNameOfCampaign", Collections.singletonList(new Bytes32(value)),
+            Collections.singletonList(new TypeReference<Utf8String>() {
+            }));
 
     String result =
         callSmartContractFunction(function, address.getValue(), Address.DEFAULT.getValue());
@@ -102,12 +103,13 @@ public class CampaignContractImpl implements CampaignContract {
 
   @Override public List<BigInteger> getVercodesOfCampaign(BigInteger bidId) {
     byte[] value = new byte[32];
-    System.arraycopy(bidId.toByteArray(), 0, value, value.length-bidId.toByteArray().length, bidId.toByteArray().length);
+    System.arraycopy(bidId.toByteArray(), 0, value, value.length - bidId.toByteArray().length,
+        bidId.toByteArray().length);
 
-    Function function = new Function("getVercodesOfCampaign",
-        Collections.singletonList(new Bytes32(value)),
-        Collections.singletonList(new TypeReference<DynamicArray<Uint>>() {
-        }));
+    Function function =
+        new Function("getVercodesOfCampaign", Collections.singletonList(new Bytes32(value)),
+            Collections.singletonList(new TypeReference<DynamicArray<Uint>>() {
+            }));
 
     String result =
         callSmartContractFunction(function, address.getValue(), Address.DEFAULT.getValue());

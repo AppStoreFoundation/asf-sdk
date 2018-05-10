@@ -371,9 +371,9 @@ public class Transaction {
     return data;
   }
 
-    /*
-     * Crypto
-     */
+  /*
+   * Crypto
+   */
 
   protected void setData(byte[] data) {
     this.data = data;

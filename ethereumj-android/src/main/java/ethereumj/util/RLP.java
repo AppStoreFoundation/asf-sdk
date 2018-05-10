@@ -93,10 +93,10 @@ public class RLP {
 
   /** RLP encoding rules are defined as follows: */
 
-    /*
-     * For a single byte whose value is in the [0x00, 0x7f] range, that byte is
-     * its own RLP encoding.
-     */
+  /*
+   * For a single byte whose value is in the [0x00, 0x7f] range, that byte is
+   * its own RLP encoding.
+   */
   /**
    * [0xb7]
    * If a string is more than 55 bytes long, the RLP encoding consists of a
@@ -129,9 +129,9 @@ public class RLP {
   private static final int OFFSET_LONG_LIST = 0xf7;
 
 
-    /* ******************************************************
-     *                      DECODING                        *
-     * ******************************************************/
+  /* ******************************************************
+   *                      DECODING                        *
+   * ******************************************************/
 
   private static byte decodeOneByteItem(byte[] data, int index) {
     // null item
@@ -274,11 +274,11 @@ public class RLP {
     byte[] result = new byte[4];
     for (int i = 0; i < 4; i++) {
       result[i] = decodeOneByteItem(data, index + offset);
-        if ((data[index + offset] & 0xFF) > OFFSET_SHORT_ITEM) {
-            offset += 2;
-        } else {
-            offset += 1;
-        }
+      if ((data[index + offset] & 0xFF) > OFFSET_SHORT_ITEM) {
+        offset += 2;
+      } else {
+        offset += 1;
+      }
     }
 
     // return IP address
@@ -518,10 +518,9 @@ public class RLP {
           RLPList newLevelList = new RLPList();
           newLevelList.setRLPData(rlpData);
 
-            if (length > 0) {
-                fullTraverse(msgData, level + 1, pos + 1, pos + length + 1, levelToIndex,
-                    newLevelList);
-            }
+          if (length > 0) {
+            fullTraverse(msgData, level + 1, pos + 1, pos + length + 1, levelToIndex, newLevelList);
+          }
           rlpList.add(newLevelList);
 
           pos += 1 + length;
@@ -733,9 +732,9 @@ public class RLP {
     }
   }
 
-    /* ******************************************************
-     *                      ENCODING                        *
-     * ******************************************************/
+  /* ******************************************************
+   *                      ENCODING                        *
+   * ******************************************************/
 
   /**
    * Integer limitation goes up to 2^31-1 so length can never be bigger than MAX_ITEM_LENGTH
@@ -746,11 +745,11 @@ public class RLP {
       return new byte[] { firstByte };
     } else if (length < MAX_ITEM_LENGTH) {
       byte[] binaryLength;
-        if (length > 0xFF) {
-            binaryLength = intToBytesNoLeadZeroes(length);
-        } else {
-            binaryLength = new byte[] { (byte) length };
-        }
+      if (length > 0xFF) {
+        binaryLength = intToBytesNoLeadZeroes(length);
+      } else {
+        binaryLength = new byte[] { (byte) length };
+      }
       byte firstByte = (byte) (binaryLength.length + offset + SIZE_THRESHOLD - 1);
       return concatenate(new byte[] { firstByte }, binaryLength);
     } else {
@@ -769,32 +768,32 @@ public class RLP {
   }
 
   public static byte[] encodeShort(short singleShort) {
-      if ((singleShort & 0xFF) == singleShort) {
-          return encodeByte((byte) singleShort);
-      } else {
-          return new byte[] {
-              (byte) (OFFSET_SHORT_ITEM + 2), (byte) (singleShort >> 8 & 0xFF),
-              (byte) (singleShort >> 0 & 0xFF)
-          };
-      }
+    if ((singleShort & 0xFF) == singleShort) {
+      return encodeByte((byte) singleShort);
+    } else {
+      return new byte[] {
+          (byte) (OFFSET_SHORT_ITEM + 2), (byte) (singleShort >> 8 & 0xFF),
+          (byte) (singleShort >> 0 & 0xFF)
+      };
+    }
   }
 
   public static byte[] encodeInt(int singleInt) {
-      if ((singleInt & 0xFF) == singleInt) {
-          return encodeByte((byte) singleInt);
-      } else if ((singleInt & 0xFFFF) == singleInt) {
-          return encodeShort((short) singleInt);
-      } else if ((singleInt & 0xFFFFFF) == singleInt) {
-          return new byte[] {
-              (byte) (OFFSET_SHORT_ITEM + 3), (byte) (singleInt >>> 16), (byte) (singleInt >>> 8),
-              (byte) singleInt
-          };
-      } else {
-          return new byte[] {
-              (byte) (OFFSET_SHORT_ITEM + 4), (byte) (singleInt >>> 24), (byte) (singleInt >>> 16),
-              (byte) (singleInt >>> 8), (byte) singleInt
-          };
-      }
+    if ((singleInt & 0xFF) == singleInt) {
+      return encodeByte((byte) singleInt);
+    } else if ((singleInt & 0xFFFF) == singleInt) {
+      return encodeShort((short) singleInt);
+    } else if ((singleInt & 0xFFFFFF) == singleInt) {
+      return new byte[] {
+          (byte) (OFFSET_SHORT_ITEM + 3), (byte) (singleInt >>> 16), (byte) (singleInt >>> 8),
+          (byte) singleInt
+      };
+    } else {
+      return new byte[] {
+          (byte) (OFFSET_SHORT_ITEM + 4), (byte) (singleInt >>> 24), (byte) (singleInt >>> 16),
+          (byte) (singleInt >>> 8), (byte) singleInt
+      };
+    }
   }
 
   public static byte[] encodeString(String srcString) {
@@ -802,74 +801,74 @@ public class RLP {
   }
 
   public static byte[] encodeBigInteger(BigInteger srcBigInteger) {
-      if (srcBigInteger.equals(BigInteger.ZERO)) {
-          return encodeByte((byte) 0);
-      } else {
-          return encodeElement(asUnsignedByteArray(srcBigInteger));
-      }
+    if (srcBigInteger.equals(BigInteger.ZERO)) {
+      return encodeByte((byte) 0);
+    } else {
+      return encodeElement(asUnsignedByteArray(srcBigInteger));
+    }
   }
 
   public static byte[] encodeElement(byte[] srcData) {
 
-      if (isNullOrZeroArray(srcData)) {
-          return new byte[] { (byte) OFFSET_SHORT_ITEM };
-      } else if (isSingleZero(srcData)) {
-          return srcData;
-      } else if (srcData.length == 1 && (srcData[0] & 0xFF) < 0x80) {
-          return srcData;
-      } else if (srcData.length < SIZE_THRESHOLD) {
-          // length = 8X
-          byte length = (byte) (OFFSET_SHORT_ITEM + srcData.length);
-          byte[] data = Arrays.copyOf(srcData, srcData.length + 1);
-          System.arraycopy(data, 0, data, 1, srcData.length);
-          data[0] = length;
+    if (isNullOrZeroArray(srcData)) {
+      return new byte[] { (byte) OFFSET_SHORT_ITEM };
+    } else if (isSingleZero(srcData)) {
+      return srcData;
+    } else if (srcData.length == 1 && (srcData[0] & 0xFF) < 0x80) {
+      return srcData;
+    } else if (srcData.length < SIZE_THRESHOLD) {
+      // length = 8X
+      byte length = (byte) (OFFSET_SHORT_ITEM + srcData.length);
+      byte[] data = Arrays.copyOf(srcData, srcData.length + 1);
+      System.arraycopy(data, 0, data, 1, srcData.length);
+      data[0] = length;
 
-          return data;
-      } else {
-          // length of length = BX
-          // prefix = [BX, [length]]
-          int tmpLength = srcData.length;
-          byte byteNum = 0;
-          while (tmpLength != 0) {
-              ++byteNum;
-              tmpLength = tmpLength >> 8;
-          }
-          byte[] lenBytes = new byte[byteNum];
-          for (int i = 0; i < byteNum; ++i) {
-              lenBytes[byteNum - 1 - i] = (byte) ((srcData.length >> (8 * i)) & 0xFF);
-          }
-          // first byte = F7 + bytes.length
-          byte[] data = Arrays.copyOf(srcData, srcData.length + 1 + byteNum);
-          System.arraycopy(data, 0, data, 1 + byteNum, srcData.length);
-          data[0] = (byte) (OFFSET_LONG_ITEM + byteNum);
-          System.arraycopy(lenBytes, 0, data, 1, lenBytes.length);
-
-          return data;
+      return data;
+    } else {
+      // length of length = BX
+      // prefix = [BX, [length]]
+      int tmpLength = srcData.length;
+      byte byteNum = 0;
+      while (tmpLength != 0) {
+        ++byteNum;
+        tmpLength = tmpLength >> 8;
       }
+      byte[] lenBytes = new byte[byteNum];
+      for (int i = 0; i < byteNum; ++i) {
+        lenBytes[byteNum - 1 - i] = (byte) ((srcData.length >> (8 * i)) & 0xFF);
+      }
+      // first byte = F7 + bytes.length
+      byte[] data = Arrays.copyOf(srcData, srcData.length + 1 + byteNum);
+      System.arraycopy(data, 0, data, 1 + byteNum, srcData.length);
+      data[0] = (byte) (OFFSET_LONG_ITEM + byteNum);
+      System.arraycopy(lenBytes, 0, data, 1, lenBytes.length);
+
+      return data;
+    }
   }
 
   public static int calcElementPrefixSize(byte[] srcData) {
 
-      if (isNullOrZeroArray(srcData)) {
-          return 0;
-      } else if (isSingleZero(srcData)) {
-          return 0;
-      } else if (srcData.length == 1 && (srcData[0] & 0xFF) < 0x80) {
-          return 0;
-      } else if (srcData.length < SIZE_THRESHOLD) {
-          return 1;
-      } else {
-          // length of length = BX
-          // prefix = [BX, [length]]
-          int tmpLength = srcData.length;
-          byte byteNum = 0;
-          while (tmpLength != 0) {
-              ++byteNum;
-              tmpLength = tmpLength >> 8;
-          }
-
-          return 1 + byteNum;
+    if (isNullOrZeroArray(srcData)) {
+      return 0;
+    } else if (isSingleZero(srcData)) {
+      return 0;
+    } else if (srcData.length == 1 && (srcData[0] & 0xFF) < 0x80) {
+      return 0;
+    } else if (srcData.length < SIZE_THRESHOLD) {
+      return 1;
+    } else {
+      // length of length = BX
+      // prefix = [BX, [length]]
+      int tmpLength = srcData.length;
+      byte byteNum = 0;
+      while (tmpLength != 0) {
+        ++byteNum;
+        tmpLength = tmpLength >> 8;
       }
+
+      return 1 + byteNum;
+    }
   }
 
   public static byte[] encodeListHeader(int size) {
@@ -913,11 +912,11 @@ public class RLP {
 
     if (length < SIZE_THRESHOLD) {
 
-        if (length == 0) {
-            return new byte[] { (byte) 0x80 };
-        } else {
-            return new byte[] { (byte) (0x80 + length) };
-        }
+      if (length == 0) {
+        return new byte[] { (byte) 0x80 };
+      } else {
+        return new byte[] { (byte) (0x80 + length) };
+      }
     } else {
 
       // length of length = BX

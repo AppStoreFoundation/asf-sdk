@@ -109,12 +109,12 @@ abstract class KeccakCore extends DigestEngine {
     long t, kt;
     long c0, c1, c2, c3, c4, bnn;
 
-		/*
-		 * Unrolling four rounds kills performance big time
-		 * on Intel x86 Core2, in both 32-bit and 64-bit modes
-		 * (less than 1 MB/s instead of 55 MB/s on x86-64).
-		 * Unrolling two rounds appears to be fine.
-		 */
+    /*
+     * Unrolling four rounds kills performance big time
+     * on Intel x86 Core2, in both 32-bit and 64-bit modes
+     * (less than 1 MB/s instead of 55 MB/s on x86-64).
+     * Unrolling two rounds appears to be fine.
+     */
     for (int j = 0; j < 24; j += 2) {
 
       tt0 = A[1] ^ A[6];

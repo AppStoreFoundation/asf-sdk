@@ -29,6 +29,5 @@ public interface MessageListener {
    */
   int MSG_STOP_PROCESS = 4;
 
-
   void handle(Message message);
 }
