@@ -69,6 +69,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** The campaign ID value */
   private BigInteger campaignId;
 
+  private boolean foreground = false;
   private boolean dialogVisible = false;
 
   public PoAManager(SharedPreferences preferences) {
@@ -242,6 +243,8 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   @Override public void onBecameForeground(Activity activity) {
+    foreground = true;
+
     if (!preferences.getBoolean(FINISHED_KEY, false)) {
       if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
         Disposable disposable = WalletUtils.promptToInstallWallet(activity,
@@ -256,8 +259,9 @@ public class PoAManager implements LifeCycleListener.Listener {
             new AppPreferences(appContext); // this Preference comes for free from the library
         appPreferences.registerOnTrayPreferenceChangeListener(new OnTrayPreferenceChangeListener() {
           @Override public void onTrayPreferenceChanged(Collection<TrayItem> items) {
-             appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME);
-             startProcess();
+            if (foreground && appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
+              startProcess();
+            }
           }
         });
         poaConnector.startHandshake(appContext, network);
@@ -266,6 +270,8 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   @Override public void onBecameBackground() {
+    foreground = false;
+
     stopProcess();
     compositeDisposable.dispose();
   }
