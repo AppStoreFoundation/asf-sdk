@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import com.asf.appcoins.sdk.ads.BuildConfig;
@@ -17,7 +15,8 @@ import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContract;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContractImpl;
 import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
-import io.reactivex.Single;
+import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import java.io.IOException;
@@ -57,6 +56,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   private static int network = 0;
   private static CampaignContract campaignContract;
   private static String country;
+  private final CompositeDisposable compositeDisposable;
   private final SharedPreferences preferences;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
@@ -73,6 +73,7 @@ public class PoAManager implements LifeCycleListener.Listener {
 
   public PoAManager(SharedPreferences preferences) {
     this.preferences = preferences;
+    this.compositeDisposable = new CompositeDisposable();
   }
 
   /**
@@ -208,34 +209,30 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   private void handleCampaign() {
-    if (hasNetwork()) {
-      String packageName = appContext.getPackageName();
-      Disposable subscribe = Single.fromCallable(() -> getVerCode(appContext, packageName))
-          .subscribeOn(Schedulers.io())
-          .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
-          .subscribe(campaigns -> {
-            if (campaigns.isEmpty()) {
-              stopProcess();
-            } else {
-              BigInteger campaignId = campaigns.get(0)
-                  .getId();
+    String packageName = appContext.getPackageName();
 
-              Bundle bundle = new Bundle();
-              bundle.putString("packageName", appContext.getPackageName());
-              bundle.putString("campaignId", campaignId.toString());
+    compositeDisposable.add(ReactiveNetwork.observeInternetConnectivity()
+        .subscribeOn(Schedulers.io())
+        .filter(aBoolean -> aBoolean)
+        .filter(aBoolean -> this.campaignId == null)
+        .map(__ -> getVerCode(appContext, packageName))
+        .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
+        .subscribe(campaigns -> {
+          if (campaigns.isEmpty()) {
+            stopProcess();
+          } else {
+            BigInteger campaignId = campaigns.get(0)
+                .getId();
 
-              poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
+            Bundle bundle = new Bundle();
+            bundle.putString("packageName", appContext.getPackageName());
+            bundle.putString("campaignId", campaignId.toString());
 
-              this.campaignId = campaignId;
-            }
-          });
-    }
-  }
+            poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
 
-  private boolean hasNetwork() {
-    NetworkInfo activeNetworkInfo = ((ConnectivityManager) appContext.getSystemService(
-        Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+            this.campaignId = campaignId;
+          }
+        }));
   }
 
   private int getVerCode(Context context, String packageName)
@@ -270,5 +267,6 @@ public class PoAManager implements LifeCycleListener.Listener {
 
   @Override public void onBecameBackground() {
     stopProcess();
+    compositeDisposable.dispose();
   }
 }
