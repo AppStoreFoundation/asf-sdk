@@ -1,14 +1,10 @@
 package com.asf.appcoins.sdk.ads;
 
 import android.content.Context;
-import android.util.Log;
-import com.asf.appcoins.sdk.ads.ip.IpApi;
-import com.asf.appcoins.sdk.ads.ip.IpResponse;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnectorImpl;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
-import io.reactivex.schedulers.Schedulers;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jFactory;
@@ -61,15 +57,6 @@ public final class AppCoinsAdsBuilder {
       this.asfWeb3j = new AsfWeb3jImpl(web3);
     }
 
-    String countryId = IpApi.create()
-        .myIp()
-        .map(IpResponse::getCountryCode)
-        .subscribeOn(Schedulers.io())
-        .doOnError(throwable -> Log.w(TAG, "createAdvertisementSdk: Failed to get country code!",
-            throwable))
-        .onErrorReturn(throwable -> "")
-        .blockingFirst();
-
-    return new AppCoinsAdsImpl(poaConnector, networkId, asfWeb3j, contractAddress, countryId);
+    return new AppCoinsAdsImpl(poaConnector, networkId, asfWeb3j, contractAddress);
   }
 }

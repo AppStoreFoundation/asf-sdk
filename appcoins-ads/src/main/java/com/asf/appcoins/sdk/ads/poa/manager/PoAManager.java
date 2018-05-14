@@ -6,9 +6,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
 import com.asf.appcoins.sdk.ads.R;
+import com.asf.appcoins.sdk.ads.ip.IpApi;
+import com.asf.appcoins.sdk.ads.ip.IpResponse;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContract;
@@ -55,7 +58,6 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** integer used to identify the network to wich we are connected */
   private static int network = 0;
   private static CampaignContract campaignContract;
-  private static String country;
   private final CompositeDisposable compositeDisposable;
   private final SharedPreferences preferences;
   /** boolean indicating if we are already processing a PoA */
@@ -91,7 +93,7 @@ public class PoAManager implements LifeCycleListener.Listener {
    * @param connector The PoA service connector used on the communication of the proof of attention.
    */
   public static void init(Context context, PoAServiceConnector connector, int networkId,
-      AsfWeb3j asfWeb3j, Address contractAddress, String countryId) {
+      AsfWeb3j asfWeb3j, Address contractAddress) {
     if (instance == null) {
       SharedPreferences preferences =
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
@@ -100,7 +102,6 @@ public class PoAManager implements LifeCycleListener.Listener {
       PoAManager.appContext = context;
       PoAManager.network = networkId;
       PoAManager.campaignContract = new CampaignContractImpl(asfWeb3j, contractAddress);
-      country = countryId;
     }
   }
 
@@ -186,7 +187,15 @@ public class PoAManager implements LifeCycleListener.Listener {
 
   public List<Campaign> getActiveCampaigns(String packageName, BigInteger vercode)
       throws IOException {
-    List<BigInteger> campaignsIdsByCountry = campaignContract.getCampaignsByCountry(country);
+    String countryId = IpApi.create()
+        .myIp()
+        .map(IpResponse::getCountryCode)
+        .subscribeOn(Schedulers.io())
+        .doOnError(throwable -> Log.w(TAG, "createAdvertisementSdk: Failed to get country code!",
+            throwable))
+        .blockingFirst();
+
+    List<BigInteger> campaignsIdsByCountry = campaignContract.getCampaignsByCountry(countryId);
     List<BigInteger> campaignsIdsByCountryWl = campaignContract.getCampaignsByCountry("WL");
 
     campaignsIdsByCountry.addAll(campaignsIdsByCountryWl);
@@ -202,7 +211,7 @@ public class PoAManager implements LifeCycleListener.Listener {
           campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValid;
 
       if (addCampaign) {
-        campaign.add(new Campaign(bidId, vercodes, country));
+        campaign.add(new Campaign(bidId, vercodes, countryId));
       }
     }
 
