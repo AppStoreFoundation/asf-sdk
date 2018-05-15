@@ -24,12 +24,9 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import net.grandcentrix.tray.AppPreferences;
-import net.grandcentrix.tray.core.OnTrayPreferenceChangeListener;
-import net.grandcentrix.tray.core.TrayItem;
 import org.web3j.abi.datatypes.Address;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
@@ -58,7 +55,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** integer used to identify the network to wich we are connected */
   private static int network = 0;
   private static CampaignContract campaignContract;
-  private final CompositeDisposable compositeDisposable;
+  private CompositeDisposable compositeDisposable;
   private final SharedPreferences preferences;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
@@ -76,7 +73,6 @@ public class PoAManager implements LifeCycleListener.Listener {
 
   public PoAManager(SharedPreferences preferences) {
     this.preferences = preferences;
-    this.compositeDisposable = new CompositeDisposable();
   }
 
   /**
@@ -122,7 +118,9 @@ public class PoAManager implements LifeCycleListener.Listener {
 
     handleCampaign();
 
-    sendProof();
+    if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+      sendProof();
+    }
   }
 
   /**
@@ -144,7 +142,6 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void finishProcess() {
     processing = false;
-    proofsSent = 0;
 
     if (sendProof != null) {
       handler.removeCallbacks(sendProof);
@@ -178,9 +175,11 @@ public class PoAManager implements LifeCycleListener.Listener {
     } else {
       // or stop the process
       processing = false;
-      preferences.edit()
-          .putBoolean(FINISHED_KEY, true)
-          .apply();
+      if (campaignId != null && !preferences.contains(FINISHED_KEY)) {
+        preferences.edit()
+            .putBoolean(FINISHED_KEY, true)
+            .apply();
+      }
       finishProcess();
     }
   }
@@ -252,6 +251,8 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   @Override public void onBecameForeground(Activity activity) {
+    this.compositeDisposable = new CompositeDisposable();
+
     foreground = true;
 
     if (!preferences.getBoolean(FINISHED_KEY, false)) {
@@ -266,13 +267,16 @@ public class PoAManager implements LifeCycleListener.Listener {
       } else {
         final AppPreferences appPreferences =
             new AppPreferences(appContext); // this Preference comes for free from the library
-        appPreferences.registerOnTrayPreferenceChangeListener(new OnTrayPreferenceChangeListener() {
-          @Override public void onTrayPreferenceChanged(Collection<TrayItem> items) {
+
+        if (appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
+          startProcess();
+        } else {
+          appPreferences.registerOnTrayPreferenceChangeListener(items -> {
             if (foreground && appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
               startProcess();
             }
-          }
-        });
+          });
+        }
         poaConnector.startHandshake(appContext, network);
       }
     }

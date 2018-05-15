@@ -144,6 +144,8 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   }
 
   @Override public void sendMessage(Context context, int type, Bundle bundle) {
+    Log.d(TAG, "sendMessage() called with type = " + type);
+
     // Create and send a message to the service, using a supported 'what' value
     Message msg = Message.obtain(null, type, 0, 0);
     msg.setData(bundle);
