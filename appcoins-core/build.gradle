@@ -40,6 +40,8 @@ dependencies {
   testImplementation lib.junit
   testImplementation lib.mockito_core
 
+  androidTestImplementation lib.android_test_runner
+
   api lib.rxjava
   api lib.web3j
 }
