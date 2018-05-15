@@ -224,7 +224,7 @@ public class PoAManager implements LifeCycleListener.Listener {
     compositeDisposable.add(ReactiveNetwork.observeInternetConnectivity()
         .subscribeOn(Schedulers.io())
         .filter(hasInternet -> hasInternet)
-        .filter(aBoolean -> this.campaignId == null)
+        .filter(hasInternet -> this.campaignId == null)
         .map(__ -> getVerCode(appContext, packageName))
         .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
         .subscribe(campaigns -> {
