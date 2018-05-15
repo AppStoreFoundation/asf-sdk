@@ -1,0 +1,34 @@
+apply plugin: 'com.android.library'
+
+android {
+  compileSdkVersion COMPILE_SDK_VERSION
+
+  defaultConfig {
+    minSdkVersion MIN_SDK_VERSION
+    targetSdkVersion TARGET_SDK_VERSION
+
+    versionCode 1
+    versionName "1.0"
+
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    consumerProguardFiles 'proguard-rules.pro'
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+    }
+  }
+
+  compileOptions {
+    targetCompatibility TARGET_COMPATIBILITY
+    sourceCompatibility SOURCE_COMPATIBILITY
+  }
+}
+
+dependencies {
+  testImplementation lib.junit
+  testImplementation lib.mockito_core
+  androidTestImplementation lib.android_test_runner
+}
