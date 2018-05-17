@@ -27,9 +27,6 @@ ver.rxRelay = "2.0.0"
 // https://mvnrepository.com/artifact/org.web3j/core
 ver.web3j = "3.3.1-android"
 
-// https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15
-ver.spongycastle = "1.46"
-
 // https://mvnrepository.com/artifact/com.madgag.spongycastle/core
 ver.spongycastle = "1.58.0.0"
 
