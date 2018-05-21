@@ -19,6 +19,7 @@ package ethereumj.vm;
 
 import ethereumj.core.Bloom;
 import ethereumj.crypto.HashUtil;
+import ethereumj.datasource.MemSizeEstimator;
 import ethereumj.util.RLP;
 import ethereumj.util.RLPElement;
 import ethereumj.util.RLPItem;
@@ -27,18 +28,20 @@ import java.util.ArrayList;
 import java.util.List;
 import org.spongycastle.util.encoders.Hex;
 
+import static ethereumj.datasource.MemSizeEstimator.ByteArrayEstimator;
+
 /**
  * @author Roman Mandeleil
  * @since 19.11.2014
  */
 public class LogInfo {
 
-  byte[] address = {};
+  public static final MemSizeEstimator<LogInfo> MemEstimator =
+      log -> ByteArrayEstimator.estimateSize(log.address) + ByteArrayEstimator.estimateSize(
+          log.data) + log.topics.size() * DataWord.MEM_SIZE + 16;
   List<DataWord> topics = new ArrayList<>();
-  byte[] data = {};
-
-  /* Log info in encoded form */
-  private byte[] rlpEncoded;
+  byte[] address = new byte[] {};
+  byte[] data = new byte[] {};
 
   public LogInfo(byte[] rlp) {
 
@@ -56,14 +59,6 @@ public class LogInfo {
       byte[] topic = topic1.getRLPData();
       this.topics.add(new DataWord(topic));
     }
-
-    rlpEncoded = rlp;
-  }
-
-  public LogInfo(byte[] address, List<DataWord> topics, byte[] data) {
-    this.address = (address != null) ? address : new byte[] {};
-    this.topics = (topics != null) ? topics : new ArrayList<DataWord>();
-    this.data = (data != null) ? data : new byte[] {};
   }
 
   public byte[] getAddress() {
@@ -105,6 +100,12 @@ public class LogInfo {
       ret.or(Bloom.create(HashUtil.sha3(topicData)));
     }
     return ret;
+  }
+
+  public LogInfo(byte[] address, List<DataWord> topics, byte[] data) {
+    this.address = (address != null) ? address : new byte[] {};
+    this.topics = (topics != null) ? topics : new ArrayList<DataWord>();
+    this.data = (data != null) ? data : new byte[] {};
   }
 
   @Override public String toString() {
