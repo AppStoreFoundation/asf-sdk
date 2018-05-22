@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Objects;
 import org.spongycastle.util.encoders.Hex;
 
-public final class HexStr {
+public class HexStr {
 
   private final String value;
 
