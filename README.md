@@ -53,7 +53,7 @@ And in your **app's buildscript**, add the following dependency:
 
 ```
 dependencies {
-    api 'com.asfoundation:appcoins:0.3.0a'
+    api 'com.asfoundation:appcoins:0.3.1a'
 }
 ```
 
