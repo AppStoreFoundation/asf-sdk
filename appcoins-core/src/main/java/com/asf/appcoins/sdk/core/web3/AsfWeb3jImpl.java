@@ -26,9 +26,9 @@ public final class AsfWeb3jImpl implements AsfWeb3j {
   }
 
   @Override public Observable<Long> getNonce(Address address) {
-    return Observable.fromCallable(() -> web3j.ethGetTransactionCount(address.getTypeAsString(),
-        DefaultBlockParameterName.PENDING)
-        .send())
+    return Observable.fromCallable(
+        () -> web3j.ethGetTransactionCount(address.getValue(), DefaultBlockParameterName.PENDING)
+            .send())
         .map(ethGetTransactionCount -> ethGetTransactionCount.getTransactionCount()
             .longValue());
   }
