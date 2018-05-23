@@ -23,17 +23,15 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   private final PoAServiceConnector poaConnector;
   Address contractAddress;
   AsfWeb3j web3j;
-  String countryId;
   private Context context;
   private int networkId;
 
   AppCoinsAdsImpl(PoAServiceConnector poaConnector, int networkId, AsfWeb3j asfWeb3j,
-      Address contractAddress, String countryId) {
+      Address contractAddress) {
     this.poaConnector = poaConnector;
     this.networkId = networkId;
     this.contractAddress = contractAddress;
     this.web3j = asfWeb3j;
-    this.countryId = countryId;
   }
 
   @Override public void handshake() {
@@ -68,7 +66,7 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
 
   @Override public void init(Application application) {
     this.context = application;
-    PoAManager.init(application, poaConnector, networkId, web3j, contractAddress, countryId);
+    PoAManager.init(application, poaConnector, networkId, web3j, contractAddress);
     LifeCycleListener.get(application)
         .setListener(PoAManager.get());
   }
