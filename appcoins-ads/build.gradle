@@ -41,9 +41,10 @@ dependencies {
   testImplementation lib.mockito_core
 
   api lib.retrofit2
+  api lib.tray
+  api lib.reactivenetwork_rx2
 
   api project(':appcoins-core')
-  api 'net.grandcentrix.tray:tray:0.12.0'
 }
 
 //region Publishing

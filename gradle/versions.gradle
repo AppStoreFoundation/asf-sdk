@@ -20,6 +20,8 @@ ver.mockito_core = "2.16.0"
 ver.rxjava = "2.1.10"
 // https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxandroid
 ver.rxandroid = "2.0.2"
+// https://mvnrepository.com/artifact/com.jakewharton.rxrelay2/rxrelay
+ver.rxRelay = "2.0.0"
 // https://mvnrepository.com/artifact/org.web3j/core
 ver.web3j = "3.3.1-android"
 
@@ -41,3 +43,6 @@ ver.jackson = "2.9.5"
 
 // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
 ver.retrofit2 = "2.4.0"
+
+ver.tray = "0.12.0"
+ver.reactivenetwork_rx2 = "0.12.3"
