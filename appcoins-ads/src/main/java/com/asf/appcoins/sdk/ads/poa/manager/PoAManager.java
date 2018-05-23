@@ -46,6 +46,7 @@ public class PoAManager implements LifeCycleListener.Listener {
 
   public static final String TAG = PoAManager.class.getName();
   private static final String FINISHED_KEY = "finished";
+  private static final int PREFERENCES_LISTENER_DELAY = 1000;
   /** The instance of the manager */
   private static PoAManager instance;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
@@ -63,6 +64,10 @@ public class PoAManager implements LifeCycleListener.Listener {
   private Handler handler = new Handler();
   /** The runnnable taks that will be trigger periodically */
   private Runnable sendProof;
+  /** The handle to keep the runnable tasks that we be running within a certain period */
+  private Handler spHandler = new Handler();
+  /** The runnnable taks that will be trigger periodically */
+  private Runnable spListener;
   /** integer used to track how many proof were already sent */
   private int proofsSent = 0;
   /** The campaign ID value */
@@ -129,6 +134,7 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void stopProcess() {
     if (processing) {
+      Log.d(TAG, "Stopping process.");
       Bundle bundle = new Bundle();
       bundle.putString("packageName", appContext.getPackageName());
       poaConnector.sendMessage(appContext, MSG_STOP_PROCESS, bundle);
@@ -141,10 +147,15 @@ public class PoAManager implements LifeCycleListener.Listener {
    * service.
    */
   public void finishProcess() {
+    Log.d(TAG, "Finishing process.");
     processing = false;
 
     if (sendProof != null) {
       handler.removeCallbacks(sendProof);
+    }
+
+    if (spListener != null) {
+      spHandler.removeCallbacks(spListener);
     }
 
     poaConnector.disconnectFromService(appContext);
@@ -228,6 +239,7 @@ public class PoAManager implements LifeCycleListener.Listener {
         .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
         .subscribe(campaigns -> {
           if (campaigns.isEmpty()) {
+            Log.d(TAG, "No campaign is available.");
             stopProcess();
           } else {
             BigInteger campaignId = campaigns.get(0)
@@ -250,6 +262,23 @@ public class PoAManager implements LifeCycleListener.Listener {
         .getPackageInfo(packageName, 0).versionCode;
   }
 
+  /**
+   * Method to check if we have the wallet package name available to start the PoA process.
+   * If not available start a runnable in 1 second to check again.
+   * If the available start process.
+   */
+  private void checkPreferencesForPackage() {
+    final AppPreferences appPreferences =
+        new AppPreferences(appContext);
+
+    if (foreground && appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
+      Log.d(TAG, "Starting PoA process");
+      startProcess();
+    } else {
+      spHandler.postDelayed(spListener = this::checkPreferencesForPackage,
+          PREFERENCES_LISTENER_DELAY);
+    }
+  }
   @Override public void onBecameForeground(Activity activity) {
     this.compositeDisposable = new CompositeDisposable();
 
@@ -265,19 +294,10 @@ public class PoAManager implements LifeCycleListener.Listener {
             .subscribe(() -> {
             }, Throwable::printStackTrace);
       } else {
-        final AppPreferences appPreferences =
-            new AppPreferences(appContext); // this Preference comes for free from the library
-
-        if (appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
-          startProcess();
-        } else {
-          appPreferences.registerOnTrayPreferenceChangeListener(items -> {
-            if (foreground && appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
-              startProcess();
-            }
-          });
-        }
+        // start handshake
         poaConnector.startHandshake(appContext, network);
+
+        checkPreferencesForPackage();
       }
     }
   }

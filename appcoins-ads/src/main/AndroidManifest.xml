@@ -9,8 +9,7 @@
     <service
         android:name="com.asf.appcoins.sdk.ads.poa.SDKPoAService"
         android:enabled="true"
-        android:exported="true"
-        android:process="com.asf.appcoins.sdk.advertisement">
+        android:exported="true">
       <intent-filter>
         <action android:name="com.asf.appcoins.service.ACTION_BIND"/>
         <action android:name="com.asf.appcoins.service.ACTION_ACK_BROADCAST"/>
