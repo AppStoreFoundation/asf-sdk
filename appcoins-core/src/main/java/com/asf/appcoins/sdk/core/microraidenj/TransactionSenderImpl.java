@@ -11,12 +11,12 @@ import org.web3j.abi.datatypes.Address;
 public class TransactionSenderImpl implements TransactionSender {
 
   private final AsfWeb3j asfWeb3j;
-  private final int gasPrice;
+  private final long gasPrice;
   private final int gasLimit;
 
   private Long nonce;
 
-  public TransactionSenderImpl(AsfWeb3j asfWeb3j, int gasPrice, int gasLimit) {
+  public TransactionSenderImpl(AsfWeb3j asfWeb3j, long gasPrice, int gasLimit) {
     this.asfWeb3j = asfWeb3j;
     this.gasPrice = gasPrice;
     this.gasLimit = gasLimit;
