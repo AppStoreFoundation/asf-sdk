@@ -19,6 +19,8 @@ import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContractImpl;
 import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -120,8 +122,6 @@ public class PoAManager implements LifeCycleListener.Listener {
     bundle.putInt("networkId", network);
 
     poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
-
-    handleCampaign();
 
     if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
       sendProof();
@@ -235,8 +235,13 @@ public class PoAManager implements LifeCycleListener.Listener {
         .subscribeOn(Schedulers.io())
         .filter(hasInternet -> hasInternet)
         .filter(hasInternet -> this.campaignId == null)
+        .doOnNext(aBoolean -> startHandshake())
+        .map(aBoolean -> appContext.getPackageName())
         .map(__ -> getVerCode(appContext, packageName))
         .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
+        .retryWhen(throwableObservable -> throwableObservable.flatMap(
+            throwable -> ReactiveNetwork.observeInternetConnectivity())
+            .flatMap(this::retryIfNetworkAvailable))
         .subscribe(campaigns -> {
           if (campaigns.isEmpty()) {
             Log.d(TAG, "No campaign is available.");
@@ -254,6 +259,16 @@ public class PoAManager implements LifeCycleListener.Listener {
             this.campaignId = campaignId;
           }
         }));
+  }
+
+  private ObservableSource<? extends Integer> retryIfNetworkAvailable(Boolean hasInternet) {
+    if (hasInternet) {
+      return Observable.just(0);
+    } else {
+      stopProcess();
+      proofsSent = 0;
+      return Observable.empty();
+    }
   }
 
   private int getVerCode(Context context, String packageName)
@@ -294,11 +309,17 @@ public class PoAManager implements LifeCycleListener.Listener {
             .subscribe(() -> {
             }, Throwable::printStackTrace);
       } else {
-        // start handshake
-        poaConnector.startHandshake(appContext, network);
-
-        checkPreferencesForPackage();
+        handleCampaign();
       }
+    }
+  }
+
+  private void startHandshake() {
+    if (!processing) {
+      // start handshake
+      poaConnector.startHandshake(appContext, network);
+
+      checkPreferencesForPackage();
     }
   }
 
