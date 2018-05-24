@@ -34,7 +34,8 @@ public final class MicroRaidenImpl implements MicroRaiden {
     this.getTransactionReceipt = getTransactionReceipt;
   }
 
-  @Override public void createChannel(ECKey ecKey, Address receiverAddress, BigInteger deposit)
+  @Override
+  public BigInteger createChannel(ECKey ecKey, Address receiverAddress, BigInteger deposit)
       throws TransactionFailedException, DepositTooHighException {
     try {
       byte[] senderAddress = ecKey.getAddress();
@@ -53,11 +54,36 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
       log.logChannelCreation(receiverAddress, deposit, senderAddress,
           transactionReceipt.getTransactionHash());
+
+      return transactionReceipt.getBlockNumber();
     } catch (DepositTooHighException e) {
       throw e;
     } catch (Exception e) {
-      throw new TransactionFailedException("Failed to create channel");
+      throw new TransactionFailedException("Failed to create channel", e);
     }
+  }
+
+  @Override public void topUpChannel(ECKey ecKey, Address receiverAddress, BigInteger depositToAdd,
+      BigInteger openBlockNumber) {
+    byte[] senderAddress = ecKey.getAddress();
+
+    String approveTxHash = callApprove(ecKey, depositToAdd);
+    String topUpChannelTxHash =
+        callChannelTopUp(ecKey, receiverAddress, depositToAdd, openBlockNumber);
+
+    TransactionReceipt transactionReceipt = getTransactionReceipt.get(topUpChannelTxHash)
+        .blockingGet();
+  }
+
+  private String callChannelTopUp(ECKey ecKey, Address receiverAddress, BigInteger depositToAdd,
+      BigInteger openBlockNumber) {
+
+    CallTransaction.Function approveFunction =
+        CallTransaction.Function.fromSignature("topUp", "address", "uint32", "uint192");
+
+    byte[] encoded = approveFunction.encode(receiverAddress.get(), openBlockNumber, depositToAdd);
+
+    return transactionSender.send(ecKey, channelManagerAddr, BigInteger.ZERO.longValue(), encoded);
   }
 
   private String callApprove(ECKey ecKey, BigInteger deposit) {
