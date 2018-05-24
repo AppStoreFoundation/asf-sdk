@@ -26,7 +26,7 @@ public class TransactionSenderImpl implements TransactionSender {
       long value, byte[] data) {
 
     if (nonce == null) {
-      computeNonce();
+      computeNonce(Hex.toHexString(senderECKey.getAddress()));
     }
 
     Transaction transaction =
@@ -39,8 +39,8 @@ public class TransactionSenderImpl implements TransactionSender {
         .blockingFirst();
   }
 
-  private void computeNonce() {
-    nonce = asfWeb3j.getNonce(new Address("0x82c8af156413d7c51af09590749EfcBC508ecc5e"))
+  private void computeNonce(String hexValue) {
+    nonce = asfWeb3j.getNonce(new Address(hexValue))
         .blockingFirst();
   }
 }
