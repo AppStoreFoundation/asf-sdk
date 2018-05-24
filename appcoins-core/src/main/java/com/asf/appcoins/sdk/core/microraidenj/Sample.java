@@ -26,7 +26,8 @@ public class Sample {
     Address tokenAddr = new Address("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3");
     Logger log = Logger.getLogger(MicroRaidenImpl.class.getSimpleName());
     BigInteger maxDeposit = BigInteger.valueOf(10);
-    TransactionSender transactionSender = new TransactionSenderImpl(asfWeb3j, 5000000000L, 4000000);
+    TransactionSender transactionSender =
+        new TransactionSenderImpl(asfWeb3j, 50000000000L, 4000000);
 
     GetTransactionReceipt getTransactionReceipt = new GetTransactionReceiptImpl(web3j, 3, 1500);
 
