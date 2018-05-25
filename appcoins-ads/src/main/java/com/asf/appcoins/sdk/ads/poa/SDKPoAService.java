@@ -32,9 +32,9 @@ public class SDKPoAService extends Service {
         String packageName = intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME);
         appPreferences.put(PREFERENCE_WALLET_PCKG_NAME, packageName);
 
-        stopSelf(startId);
       }
     }
+    stopSelf(startId);
     return super.onStartCommand(intent, flags, startId);
   }
 
