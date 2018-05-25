@@ -19,6 +19,8 @@ import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContractImpl;
 import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -238,6 +240,9 @@ public class PoAManager implements LifeCycleListener.Listener {
         .filter(hasInternet -> this.campaignId == null)
         .map(__ -> getVerCode(appContext, packageName))
         .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
+        .retryWhen(throwableObservable -> throwableObservable.flatMap(
+            throwable -> ReactiveNetwork.observeInternetConnectivity())
+            .flatMap(this::retryIfNetworkAvailable))
         .subscribe(campaigns -> {
           if (campaigns.isEmpty()) {
             Log.d(TAG, "No campaign is available.");
@@ -280,6 +285,15 @@ public class PoAManager implements LifeCycleListener.Listener {
       }
     }
   }
+
+  /**
+   * Return an observable that emits 0 if there is network. Emits empty otherwise.
+   * This is supposed to avoid breaking the chain.
+   */
+  private ObservableSource<? extends Integer> retryIfNetworkAvailable(Boolean hasInternet) {
+    return hasInternet ? Observable.just(0) : Observable.empty();
+  }
+
   @Override public void onBecameForeground(Activity activity) {
     this.compositeDisposable = new CompositeDisposable();
 
