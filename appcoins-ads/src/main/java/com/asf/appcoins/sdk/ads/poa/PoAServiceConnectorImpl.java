@@ -174,18 +174,16 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   /**
    * Method to send all messages that are pending.
    */
-  private void sendPendingMessages() {
+  private synchronized void sendPendingMessages() {
     Log.d(TAG, "Sending pending messages: " + pendingMsgsList.size());
-    synchronized (pendingMsgsList) {
-      if (!pendingMsgsList.isEmpty()) {
-        while (pendingMsgsList.size() > 0) {
-          Message msg = pendingMsgsList.remove(0);
-          try {
-            Log.e(TAG, "Send message: " + msg);
-            serviceMessenger.send(msg);
-          } catch (RemoteException e) {
-            Log.e(TAG, "Failed to send message: " + e.getMessage(), e);
-          }
+    if (!pendingMsgsList.isEmpty()) {
+      while (pendingMsgsList.size() > 0) {
+        Message msg = pendingMsgsList.remove(0);
+        try {
+          Log.e(TAG, "Send message: " + msg.getData());
+          serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+          Log.e(TAG, "Failed to send message: " + e.getMessage(), e);
         }
       }
     }

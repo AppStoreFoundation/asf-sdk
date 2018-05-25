@@ -134,6 +134,7 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void stopProcess() {
     if (processing) {
+      proofsSent = 0;
       Log.d(TAG, "Stopping process.");
       Bundle bundle = new Bundle();
       bundle.putString("packageName", appContext.getPackageName());
@@ -149,6 +150,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   public void finishProcess() {
     Log.d(TAG, "Finishing process.");
     processing = false;
+    campaignId = null;
 
     if (sendProof != null) {
       handler.removeCallbacks(sendProof);
@@ -178,20 +180,19 @@ public class PoAManager implements LifeCycleListener.Listener {
     bundle.putLong("timeStamp", timestamp);
     poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
     proofsSent++;
-
+    Log.e(TAG, "Proof " + proofsSent + " sent!");
     // schedule the next proof sending
     if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
       handler.postDelayed(sendProof = this::sendProof,
           BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
     } else {
       // or stop the process
-      processing = false;
       if (campaignId != null && !preferences.contains(FINISHED_KEY)) {
         preferences.edit()
             .putBoolean(FINISHED_KEY, true)
             .apply();
+        finishProcess();
       }
-      finishProcess();
     }
   }
 
@@ -268,15 +269,15 @@ public class PoAManager implements LifeCycleListener.Listener {
    * If the available start process.
    */
   private void checkPreferencesForPackage() {
-    final AppPreferences appPreferences =
-        new AppPreferences(appContext);
-
-    if (foreground && appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
-      Log.d(TAG, "Starting PoA process");
-      startProcess();
-    } else {
-      spHandler.postDelayed(spListener = this::checkPreferencesForPackage,
-          PREFERENCES_LISTENER_DELAY);
+    if (!processing) {
+      final AppPreferences appPreferences = new AppPreferences(appContext);
+      if (foreground && appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
+        Log.d(TAG, "Starting PoA process");
+        startProcess();
+      } else {
+        spHandler.postDelayed(spListener = this::checkPreferencesForPackage,
+            PREFERENCES_LISTENER_DELAY);
+      }
     }
   }
   @Override public void onBecameForeground(Activity activity) {
