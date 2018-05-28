@@ -16,4 +16,27 @@ public class ByteArray {
 
     return bytes;
   }
+
+  /**
+   * Helper function to join many byte arrays together.
+   *
+   * @param arrays arrays to merge.
+   *
+   * @return the merged array
+   */
+  public static byte[] concat(byte[]... arrays) {
+    int count = 0;
+    for (byte[] array : arrays) {
+      count += array.length;
+    }
+
+    // Create new array and copy all array contents
+    byte[] mergedArray = new byte[count];
+    int start = 0;
+    for (byte[] array : arrays) {
+      System.arraycopy(array, 0, mergedArray, start, array.length);
+      start += array.length;
+    }
+    return mergedArray;
+  }
 }

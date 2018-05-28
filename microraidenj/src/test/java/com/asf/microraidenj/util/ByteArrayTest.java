@@ -15,6 +15,15 @@ public final class ByteArrayTest {
     expected[6] = 'a';
     expected[7] = 'b';
 
-    assertArrayEquals(ByteArray.prependZeros(bytes, 8), expected);
+    assertArrayEquals(expected, ByteArray.prependZeros(bytes, 8));
+  }
+
+  @Test public void concat() {
+    byte[] b1 = "a".getBytes();
+    byte[] b2 = "b".getBytes();
+
+    byte[] expected = "ab".getBytes();
+
+    assertArrayEquals(expected, ByteArray.concat(b1, b2));
   }
 }
