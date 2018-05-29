@@ -37,24 +37,35 @@ public class Sample {
 
     ECKey ecKey = ECKey.fromPrivate(
         new BigInteger("dd615cb6205e116410272c5c885ec1fcc1728bac667704523cc79a694fd61227", 16));
+    ECKey receiverEcKey = ECKey.fromPrivate(
+        new BigInteger("dd615cb6205e116410272c5c885ec1fcc1728bac667704523cc79a694fd61227", 16));
 
+    Address receiverAddress = new Address("0x82c8af156413d7c51af09590749EfcBC508ecc5e");
+
+    BigInteger openBlockNumber;
     try {
-      Address receiverAddress = new Address("0x1BA4cd48B9F4D159192f23c8B1cF27c4b5188d26");
-      BigInteger openBlockNumber =
-          microRaiden.createChannel(ecKey, receiverAddress, BigInteger.valueOf(1));
+      openBlockNumber = microRaiden.createChannel(ecKey, receiverAddress, BigInteger.valueOf(1));
 
       microRaiden.topUpChannel(ecKey, receiverAddress, maxDeposit, openBlockNumber);
     } catch (TransactionFailedException | DepositTooHighException e) {
-      e.printStackTrace();
+      throw new RuntimeException("Failed!", e);
     }
 
     byte[] closingMsgHash =
-        microRaiden.getClosingMsgHash(Address.from(ecKey.getAddress()), BigInteger.valueOf(3298424),
+        microRaiden.getClosingMsgHash(Address.from(ecKey.getAddress()), openBlockNumber,
             BigInteger.valueOf(0));
 
     System.out.println("Closing Msg Hash");
     System.out.println(Hex.toHexString(closingMsgHash) + ", " + Hex.toHexString(
-        microRaiden.getClosingMsgHashSigned(Address.from(ecKey.getAddress()),
-            BigInteger.valueOf(3298424), BigInteger.valueOf(0), ecKey)));
+        microRaiden.getClosingMsgHashSigned(Address.from(ecKey.getAddress()), openBlockNumber,
+            BigInteger.valueOf(0), receiverEcKey)));
+
+    byte[] balanceMsgHash =
+        microRaiden.getBalanceMsgHash(receiverAddress, openBlockNumber, BigInteger.valueOf(0));
+
+    System.out.println("Balance Msg Hash");
+    System.out.println(Hex.toHexString(closingMsgHash) + ", " + Hex.toHexString(
+        microRaiden.getBalanceMsgHashSigned(Address.from(receiverEcKey.getAddress()),
+            openBlockNumber, BigInteger.valueOf(0), receiverEcKey)));
   }
 }

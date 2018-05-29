@@ -79,14 +79,6 @@ public final class MicroRaidenImpl implements MicroRaiden {
         .blockingGet();
   }
 
-  public byte[] getClosingMsgHashSigned(Address senderAddress, BigInteger openBlockNumber,
-      BigInteger owedBalance, ECKey receiverECKey) {
-    byte[] closingMsgHash = getClosingMsgHash(senderAddress, openBlockNumber, owedBalance);
-
-    return receiverECKey.sign(closingMsgHash)
-        .toByteArray();
-  }
-
   public byte[] getClosingMsgHash(Address senderAddress, BigInteger openBlockNumber,
       BigInteger owedBalance) {
     byte[] receiverAddressBytes = senderAddress.getDecoded();
@@ -106,6 +98,43 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
     return result;
   }
+
+  public byte[] getClosingMsgHashSigned(Address senderAddress, BigInteger openBlockNumber,
+      BigInteger owedBalance, ECKey receiverECKey) {
+    byte[] closingMsgHash = getClosingMsgHash(senderAddress, openBlockNumber, owedBalance);
+
+    return receiverECKey.sign(closingMsgHash)
+        .toByteArray();
+  }
+
+  public byte[] getBalanceMsgHash(Address receiverAddress, BigInteger openBlockNumber,
+      BigInteger owedBalance) {
+    byte[] receiverAddressBytes = receiverAddress.getDecoded();
+    byte[] channelAddressBytes = channelManagerAddr.getDecoded();
+
+    byte[] openBlockNumberBytes = ByteArray.prependZeros(openBlockNumber.toByteArray(), 4);
+    byte[] balanceBytes = ByteArray.prependZeros(Hex.decode(prependZerosIfNeeded(owedBalance)), 24);
+
+    byte[] dataTypeName =
+        "string message_idaddress receiveruint32 block_createduint192 balanceaddress contract".getBytes(
+            Charset.forName("UTF-8"));
+    byte[] dataValue =
+        ByteArray.concat("Sender balance proof signature".getBytes(), receiverAddressBytes,
+            openBlockNumberBytes, balanceBytes, channelAddressBytes);
+    byte[] result =
+        HashUtil.sha3(ByteArray.concat(HashUtil.sha3(dataTypeName), HashUtil.sha3(dataValue)));
+
+    return result;
+  }
+
+  public byte[] getBalanceMsgHashSigned(Address receiverAddress, BigInteger openBlockNumber,
+      BigInteger owedBalance, ECKey receiverECKey) {
+    byte[] closingMsgHash = getBalanceMsgHash(receiverAddress, openBlockNumber, owedBalance);
+
+    return receiverECKey.sign(closingMsgHash)
+        .toByteArray();
+  }
+
 
   private String prependZerosIfNeeded(BigInteger balance) {
     String s = balance.toString(16);
