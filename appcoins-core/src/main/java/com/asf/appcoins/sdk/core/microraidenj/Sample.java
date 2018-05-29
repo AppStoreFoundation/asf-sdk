@@ -1,7 +1,6 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
-import com.asf.microraidenj.MicroRaiden;
 import com.asf.microraidenj.MicroRaidenImpl;
 import com.asf.microraidenj.eth.interfaces.GetTransactionReceipt;
 import com.asf.microraidenj.eth.interfaces.TransactionSender;
@@ -11,6 +10,7 @@ import com.asf.microraidenj.type.Address;
 import ethereumj.crypto.ECKey;
 import java.math.BigInteger;
 import java.util.logging.Logger;
+import org.spongycastle.util.encoders.Hex;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jFactory;
 import org.web3j.protocol.http.HttpService;
@@ -31,7 +31,7 @@ public class Sample {
 
     GetTransactionReceipt getTransactionReceipt = new GetTransactionReceiptImpl(web3j, 3, 1500);
 
-    MicroRaiden microRaiden =
+    MicroRaidenImpl microRaiden =
         new MicroRaidenImpl(channelManagerAddr, tokenAddr, log, maxDeposit, transactionSender,
             getTransactionReceipt);
 
@@ -47,5 +47,14 @@ public class Sample {
     } catch (TransactionFailedException | DepositTooHighException e) {
       e.printStackTrace();
     }
+
+    byte[] closingMsgHash =
+        microRaiden.getClosingMsgHash(Address.from(ecKey.getAddress()), BigInteger.valueOf(3298424),
+            BigInteger.valueOf(0));
+
+    System.out.println("Closing Msg Hash");
+    System.out.println(Hex.toHexString(closingMsgHash) + ", " + Hex.toHexString(
+        microRaiden.getClosingMsgHashSigned(Address.from(ecKey.getAddress()),
+            BigInteger.valueOf(3298424), BigInteger.valueOf(0), ecKey)));
   }
 }

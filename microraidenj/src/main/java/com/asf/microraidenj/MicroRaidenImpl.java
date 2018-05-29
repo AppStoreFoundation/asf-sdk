@@ -6,10 +6,14 @@ import com.asf.microraidenj.eth.interfaces.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
+import com.asf.microraidenj.util.ByteArray;
 import ethereumj.core.CallTransaction;
 import ethereumj.crypto.ECKey;
+import ethereumj.crypto.HashUtil;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.util.logging.Logger;
+import org.spongycastle.util.encoders.Hex;
 
 public final class MicroRaidenImpl implements MicroRaiden {
 
@@ -73,6 +77,39 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
     TransactionReceipt transactionReceipt = getTransactionReceipt.get(topUpChannelTxHash)
         .blockingGet();
+  }
+
+  public byte[] getClosingMsgHashSigned(Address senderAddress, BigInteger openBlockNumber,
+      BigInteger owedBalance, ECKey receiverECKey) {
+    byte[] closingMsgHash = getClosingMsgHash(senderAddress, openBlockNumber, owedBalance);
+
+    return receiverECKey.sign(closingMsgHash)
+        .toByteArray();
+  }
+
+  public byte[] getClosingMsgHash(Address senderAddress, BigInteger openBlockNumber,
+      BigInteger owedBalance) {
+    byte[] receiverAddressBytes = senderAddress.getDecoded();
+    byte[] channelAddressBytes = channelManagerAddr.getDecoded();
+
+    byte[] openBlockNumberBytes = ByteArray.prependZeros(openBlockNumber.toByteArray(), 4);
+    byte[] balanceBytes = ByteArray.prependZeros(Hex.decode(prependZerosIfNeeded(owedBalance)), 24);
+
+    byte[] dataTypeName =
+        "string message_idaddress senderuint32 block_createduint192 balanceaddress contract".getBytes(
+            Charset.forName("UTF-8"));
+    byte[] dataValue =
+        ByteArray.concat("Receiver closing signature".getBytes(), receiverAddressBytes,
+            openBlockNumberBytes, balanceBytes, channelAddressBytes);
+    byte[] result =
+        HashUtil.sha3(ByteArray.concat(HashUtil.sha3(dataTypeName), HashUtil.sha3(dataValue)));
+
+    return result;
+  }
+
+  private String prependZerosIfNeeded(BigInteger balance) {
+    String s = balance.toString(16);
+    return s.length() % 2 == 0 ? s : '0' + s;
   }
 
   private String callChannelTopUp(ECKey ecKey, Address receiverAddress, BigInteger depositToAdd,
