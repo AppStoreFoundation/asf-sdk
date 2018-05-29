@@ -48,7 +48,6 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
    */
   private ServiceConnection mConnection = new ServiceConnection() {
     @Override public void onServiceConnected(ComponentName className, IBinder service) {
-
       serviceMessenger = new Messenger(service);
       isBound = true;
 
@@ -96,6 +95,8 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   }
 
   @Override public void startHandshake(Context context, int networkId) {
+    Log.d(TAG, "Start handshake...");
+
     // send broadcast intent to start the handshake
     Intent broadcastIntent = new Intent(ACTION_START_HANDSHAKE);
     broadcastIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
@@ -144,6 +145,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   }
 
   @Override public void sendMessage(Context context, int type, Bundle bundle) {
+    Log.d(TAG, "Send message to service of type: " + type + " with bundle: " + bundle);
     // Create and send a message to the service, using a supported 'what' value
     Message msg = Message.obtain(null, type, 0, 0);
     msg.setData(bundle);
@@ -172,16 +174,16 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   /**
    * Method to send all messages that are pending.
    */
-  private void sendPendingMessages() {
-    synchronized (pendingMsgsList) {
-      if (!pendingMsgsList.isEmpty()) {
-        while (pendingMsgsList.size() > 0) {
-          Message msg = pendingMsgsList.remove(0);
-          try {
-            serviceMessenger.send(msg);
-          } catch (RemoteException e) {
-            Log.e(TAG, "Failed to send message: " + e.getMessage(), e);
-          }
+  private synchronized void sendPendingMessages() {
+    Log.d(TAG, "Sending pending messages: " + pendingMsgsList.size());
+    if (!pendingMsgsList.isEmpty()) {
+      while (pendingMsgsList.size() > 0) {
+        Message msg = pendingMsgsList.remove(0);
+        try {
+          Log.e(TAG, "Send message: " + msg.getData());
+          serviceMessenger.send(msg);
+        } catch (RemoteException e) {
+          Log.e(TAG, "Failed to send message: " + e.getMessage(), e);
         }
       }
     }

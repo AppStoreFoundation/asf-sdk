@@ -35,3 +35,9 @@
    public static **[] values();
    public static ** valueOf(java.lang.String);
 }
+
+# https://github.com/pwittchen/ReactiveNetwork
+-dontwarn com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
+-dontwarn io.reactivex.functions.Function
+-dontwarn rx.internal.util.**
+-dontwarn sun.misc.Unsafe
