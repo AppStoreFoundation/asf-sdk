@@ -131,8 +131,9 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   /**
-   * Method that stops the process. It will send a message to the listening wallet to stop the
-   * process and call the finish process method.
+   * Method that stops the process. First removes pending tasks for proofs to be sent and shared
+   * preferences change listener. Then sends message to the listening wallet to stop the process
+   * and call the finish process method.
    */
   public void stopProcess() {
     if (processing) {
@@ -157,8 +158,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   /**
-   * Method that finish the process. It will remove any running tasks and disconnect from the wallet
-   * service.
+   * Method that finish the process. The method simply disconnects from the bound service.
    */
   public void finishProcess() {
     Log.d(TAG, "Finishing process.");
