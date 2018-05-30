@@ -136,7 +136,18 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void stopProcess() {
     if (processing) {
+      processing = false;
       proofsSent = 0;
+      campaignId = null;
+
+      if (sendProof != null) {
+        handler.removeCallbacks(sendProof);
+      }
+
+      if (spListener != null) {
+        spHandler.removeCallbacks(spListener);
+      }
+
       Log.d(TAG, "Stopping process.");
       Bundle bundle = new Bundle();
       bundle.putString("packageName", appContext.getPackageName());
@@ -151,17 +162,6 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void finishProcess() {
     Log.d(TAG, "Finishing process.");
-    processing = false;
-    campaignId = null;
-
-    if (sendProof != null) {
-      handler.removeCallbacks(sendProof);
-    }
-
-    if (spListener != null) {
-      spHandler.removeCallbacks(spListener);
-    }
-
     poaConnector.disconnectFromService(appContext);
   }
 
