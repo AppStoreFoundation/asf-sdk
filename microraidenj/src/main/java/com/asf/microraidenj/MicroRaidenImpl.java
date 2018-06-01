@@ -1,7 +1,6 @@
 package com.asf.microraidenj;
 
-import com.asf.microraidenj.entities.TransactionReceipt;
-import com.asf.microraidenj.eth.interfaces.GetTransactionReceipt;
+import com.asf.microraidenj.eth.interfaces.GetChannelBlock;
 import com.asf.microraidenj.eth.interfaces.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
@@ -17,25 +16,20 @@ import org.spongycastle.util.encoders.Hex;
 
 public final class MicroRaidenImpl implements MicroRaiden {
 
-  private final MicroRaidenLogger log;
-
   private final BigInteger maxDeposit;
   private final Address channelManagerAddr;
   private final Address tokenAddr;
 
   private final TransactionSender transactionSender;
-  private final GetTransactionReceipt getTransactionReceipt;
+  private final GetChannelBlock getChannelBlock;
 
   public MicroRaidenImpl(Address channelManagerAddr, Address tokenAddr, Logger log,
-      BigInteger maxDeposit, TransactionSender transactionSender,
-      GetTransactionReceipt getTransactionReceipt) {
-    this.log = new MicroRaidenLogger(log);
-
+      BigInteger maxDeposit, TransactionSender transactionSender, GetChannelBlock getChannelBlock) {
     this.channelManagerAddr = channelManagerAddr;
     this.tokenAddr = tokenAddr;
     this.maxDeposit = maxDeposit;
     this.transactionSender = transactionSender;
-    this.getTransactionReceipt = getTransactionReceipt;
+    this.getChannelBlock = getChannelBlock;
   }
 
   @Override
@@ -48,18 +42,10 @@ public final class MicroRaidenImpl implements MicroRaiden {
         throw new DepositTooHighException(maxDeposit);
       }
 
-      log.logChannelCreationAttempt(receiverAddress, deposit, senderAddress);
-
       String approveTxHash = callApprove(senderECKey, deposit);
       String createChannelTxHash = callCreateChannel(senderECKey, receiverAddress, deposit);
 
-      TransactionReceipt transactionReceipt = getTransactionReceipt.get(createChannelTxHash)
-          .blockingGet();
-
-      log.logChannelCreation(receiverAddress, deposit, senderAddress,
-          transactionReceipt.getTransactionHash());
-
-      return transactionReceipt.getBlockNumber();
+      return getChannelBlock.get(createChannelTxHash);
     } catch (DepositTooHighException e) {
       throw e;
     } catch (Exception e) {
@@ -75,8 +61,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
     String topUpChannelTxHash =
         callChannelTopUp(senderECKey, receiverAddress, depositToAdd, openBlockNumber);
 
-    TransactionReceipt transactionReceipt = getTransactionReceipt.get(topUpChannelTxHash)
-        .blockingGet();
+    BigInteger bigInteger = getChannelBlock.get(topUpChannelTxHash);
   }
 
   public byte[] getClosingMsgHash(Address senderAddress, BigInteger openBlockNumber,

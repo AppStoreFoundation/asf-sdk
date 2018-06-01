@@ -1,13 +1,11 @@
 package com.asf.microraidenj;
 
-import com.asf.microraidenj.entities.TransactionReceipt;
-import com.asf.microraidenj.eth.interfaces.GetTransactionReceipt;
+import com.asf.microraidenj.eth.interfaces.GetChannelBlock;
 import com.asf.microraidenj.eth.interfaces.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
 import ethereumj.crypto.ECKey;
-import io.reactivex.Single;
 import java.math.BigInteger;
 import java.util.logging.Logger;
 import org.junit.Test;
@@ -32,18 +30,18 @@ public class MicroRaidenImplTest {
   @Test public void createChannel() throws TransactionFailedException, DepositTooHighException {
     Logger logger = Logger.getLogger(MicroRaidenImplTest.class.getSimpleName());
     TransactionSender transactionSender = Mockito.mock(TransactionSender.class);
-    GetTransactionReceipt getTransactionReceipt = Mockito.mock(GetTransactionReceipt.class);
+    GetChannelBlock getChannelBlock = Mockito.mock(GetChannelBlock.class);
 
     Mockito.when(transactionSender.send(any(), any(), anyLong(), any()))
         .thenReturn("0xa04391a989f95c09cb3d553b42341fab3f38d4b7d9eed8585a646c44d8f2f54d");
 
-    Mockito.when(getTransactionReceipt.get(
-        "0xa04391a989f95c09cb3d553b42341fab3f38d4b7d9eed8585a646c44d8f2f54d"))
-        .thenReturn(Single.just(new TransactionReceipt(null, null, null, null, null, null, null)));
+    Mockito.when(
+        getChannelBlock.get("0xa04391a989f95c09cb3d553b42341fab3f38d4b7d9eed8585a646c44d8f2f54d"))
+        .thenReturn(BigInteger.ONE);
 
     MicroRaidenImpl microRaiden =
         new MicroRaidenImpl(CHANNEL_MANAGER_ADRESS, TOKEN_ADRESS, logger, MAX_DEPOSIT,
-            transactionSender, getTransactionReceipt);
+            transactionSender, getChannelBlock);
 
     microRaiden.createChannel(ECKey.fromPrivate(
         new BigInteger("c7b2735a7aed53b3668f0dc7f1d67833c0adf526cfcdb50f63d8bfe7bfc8c9b6", 16)),

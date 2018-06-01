@@ -2,7 +2,7 @@ package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
 import com.asf.microraidenj.MicroRaidenImpl;
-import com.asf.microraidenj.eth.interfaces.GetTransactionReceipt;
+import com.asf.microraidenj.eth.interfaces.GetChannelBlock;
 import com.asf.microraidenj.eth.interfaces.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
@@ -29,11 +29,12 @@ public class Sample {
     TransactionSender transactionSender =
         new TransactionSenderImpl(asfWeb3j, 50000000000L, 4000000);
 
-    GetTransactionReceipt getTransactionReceipt = new GetTransactionReceiptImpl(web3j, 3, 1500);
+    GetChannelBlock getChannelBlock =
+        createChannelTxHash -> new GetChannelBlockImpl(web3j, 3, 1500).get(createChannelTxHash);
 
     MicroRaidenImpl microRaiden =
         new MicroRaidenImpl(channelManagerAddr, tokenAddr, log, maxDeposit, transactionSender,
-            getTransactionReceipt);
+            getChannelBlock);
 
     // Put a private key
     ECKey senderECKey = ECKey.fromPrivate(new BigInteger("", 16));
