@@ -39,10 +39,10 @@ public final class MicroRaidenImpl implements MicroRaiden {
   }
 
   @Override
-  public BigInteger createChannel(ECKey ecKey, Address receiverAddress, BigInteger deposit)
+  public BigInteger createChannel(ECKey senderECKey, Address receiverAddress, BigInteger deposit)
       throws TransactionFailedException, DepositTooHighException {
     try {
-      byte[] senderAddress = ecKey.getAddress();
+      byte[] senderAddress = senderECKey.getAddress();
 
       if (maxDeposit.compareTo(deposit) < 0) {
         throw new DepositTooHighException(maxDeposit);
@@ -50,8 +50,8 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
       log.logChannelCreationAttempt(receiverAddress, deposit, senderAddress);
 
-      String approveTxHash = callApprove(ecKey, deposit);
-      String createChannelTxHash = callCreateChannel(ecKey, receiverAddress, deposit);
+      String approveTxHash = callApprove(senderECKey, deposit);
+      String createChannelTxHash = callCreateChannel(senderECKey, receiverAddress, deposit);
 
       TransactionReceipt transactionReceipt = getTransactionReceipt.get(createChannelTxHash)
           .blockingGet();
@@ -67,13 +67,13 @@ public final class MicroRaidenImpl implements MicroRaiden {
     }
   }
 
-  @Override public void topUpChannel(ECKey ecKey, Address receiverAddress, BigInteger depositToAdd,
+  @Override
+  public void topUpChannel(ECKey senderECKey, Address receiverAddress, BigInteger depositToAdd,
       BigInteger openBlockNumber) {
-    byte[] senderAddress = ecKey.getAddress();
 
-    String approveTxHash = callApprove(ecKey, depositToAdd);
+    String approveTxHash = callApprove(senderECKey, depositToAdd);
     String topUpChannelTxHash =
-        callChannelTopUp(ecKey, receiverAddress, depositToAdd, openBlockNumber);
+        callChannelTopUp(senderECKey, receiverAddress, depositToAdd, openBlockNumber);
 
     TransactionReceipt transactionReceipt = getTransactionReceipt.get(topUpChannelTxHash)
         .blockingGet();
@@ -128,20 +128,20 @@ public final class MicroRaidenImpl implements MicroRaiden {
   }
 
   public byte[] getBalanceMsgHashSigned(Address receiverAddress, BigInteger openBlockNumber,
-      BigInteger owedBalance, ECKey receiverECKey) {
-    byte[] closingMsgHash = getBalanceMsgHash(receiverAddress, openBlockNumber, owedBalance);
+      BigInteger owedBalance, ECKey senderECKey) {
+    byte[] balanceMsgHash = getBalanceMsgHash(receiverAddress, openBlockNumber, owedBalance);
 
-    return receiverECKey.sign(closingMsgHash)
+    return senderECKey.sign(balanceMsgHash)
         .toByteArray();
   }
-
 
   private String prependZerosIfNeeded(BigInteger balance) {
     String s = balance.toString(16);
     return s.length() % 2 == 0 ? s : '0' + s;
   }
 
-  private String callChannelTopUp(ECKey ecKey, Address receiverAddress, BigInteger depositToAdd,
+  private String callChannelTopUp(ECKey senderECKey, Address receiverAddress,
+      BigInteger depositToAdd,
       BigInteger openBlockNumber) {
 
     CallTransaction.Function approveFunction =
@@ -149,26 +149,55 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
     byte[] encoded = approveFunction.encode(receiverAddress.get(), openBlockNumber, depositToAdd);
 
-    return transactionSender.send(ecKey, channelManagerAddr, BigInteger.ZERO.longValue(), encoded);
+    return transactionSender.send(senderECKey, channelManagerAddr, BigInteger.ZERO.longValue(),
+        encoded);
   }
 
-  private String callApprove(ECKey ecKey, BigInteger deposit) {
+  private String callApprove(ECKey senderECKey, BigInteger deposit) {
+
     CallTransaction.Function approveFunction =
         CallTransaction.Function.fromSignature("approve", "address", "uint256");
 
     byte[] encoded = approveFunction.encode(channelManagerAddr.get(), deposit);
 
-    return transactionSender.send(ecKey, tokenAddr, BigInteger.ZERO.longValue(), encoded);
+    return transactionSender.send(senderECKey, tokenAddr, BigInteger.ZERO.longValue(), encoded);
   }
 
-  private String callCreateChannel(ECKey ecKey, Address receiverAddress, BigInteger deposit) {
+  private String callCreateChannel(ECKey senderECKey, Address receiverAddress, BigInteger deposit) {
 
     CallTransaction.Function createChannelFunction =
         CallTransaction.Function.fromSignature("createChannel", "address", "uint192");
 
     byte[] encoded = createChannelFunction.encode(receiverAddress.get(), deposit);
 
-    return transactionSender.send(ecKey, channelManagerAddr, new BigInteger("0", 10).longValue(),
-        encoded);
+    return transactionSender.send(senderECKey, channelManagerAddr,
+        new BigInteger("0", 10).longValue(), encoded);
+  }
+
+  private String callCooperativeClose(ECKey ecKey, Address receiverAddress,
+      BigInteger openBlockNumber, BigInteger owedBalance, byte[] balanceMsgSigned,
+      byte[] closingMsgSigned) {
+
+    CallTransaction.Function createChannelFunction =
+        CallTransaction.Function.fromSignature("cooperativeClose", "address", "uint32", "uint192",
+            "bytes", "bytes");
+
+    byte[] encoded =
+        createChannelFunction.encode(receiverAddress.get(true), openBlockNumber, owedBalance,
+            balanceMsgSigned, closingMsgSigned);
+
+    return transactionSender.send(ecKey, channelManagerAddr, 0, encoded);
+  }
+
+  public String closeChannelCooperatively(ECKey ecKey, Address receiverAddress,
+      BigInteger openBlockNum, BigInteger owedBalance, byte[] balanceMsgHashSig,
+      byte[] closingMsgHashSig) {
+
+    if (BigInteger.ZERO.equals(owedBalance)) {
+      throw new IllegalArgumentException("Owed balance cannot be zero!");
+    }
+
+    return callCooperativeClose(ecKey, receiverAddress, openBlockNum, owedBalance,
+        balanceMsgHashSig, closingMsgHashSig);
   }
 }

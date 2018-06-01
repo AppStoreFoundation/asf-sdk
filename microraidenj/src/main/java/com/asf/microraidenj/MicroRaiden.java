@@ -8,9 +8,9 @@ import java.math.BigInteger;
 
 public interface MicroRaiden {
 
-  BigInteger createChannel(ECKey ecKey, Address receiverAddress, BigInteger deposit)
+  BigInteger createChannel(ECKey senderECKey, Address receiverAddress, BigInteger deposit)
       throws TransactionFailedException, DepositTooHighException;
 
-  void topUpChannel(ECKey ecKey, Address receiverAddress, BigInteger deposit,
+  void topUpChannel(ECKey senderECKey, Address receiverAddress, BigInteger deposit,
       BigInteger openBlockNumber) throws TransactionFailedException, DepositTooHighException;
 }

@@ -10,7 +10,6 @@ import com.asf.microraidenj.type.Address;
 import ethereumj.crypto.ECKey;
 import java.math.BigInteger;
 import java.util.logging.Logger;
-import org.spongycastle.util.encoders.Hex;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jFactory;
 import org.web3j.protocol.http.HttpService;
@@ -18,6 +17,7 @@ import org.web3j.protocol.http.HttpService;
 public class Sample {
 
   public static void main(String[] args) {
+
     Web3j web3j =
         Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
     AsfWeb3jImpl asfWeb3j = new AsfWeb3jImpl(web3j);
@@ -35,37 +35,35 @@ public class Sample {
         new MicroRaidenImpl(channelManagerAddr, tokenAddr, log, maxDeposit, transactionSender,
             getTransactionReceipt);
 
-    ECKey ecKey = ECKey.fromPrivate(
-        new BigInteger("dd615cb6205e116410272c5c885ec1fcc1728bac667704523cc79a694fd61227", 16));
+    // Put a private key
+    ECKey senderECKey = ECKey.fromPrivate(new BigInteger("", 16));
     ECKey receiverEcKey = ECKey.fromPrivate(
         new BigInteger("dd615cb6205e116410272c5c885ec1fcc1728bac667704523cc79a694fd61227", 16));
 
-    Address receiverAddress = new Address("0x82c8af156413d7c51af09590749EfcBC508ecc5e");
+    Address receiverAddress = Address.from(receiverEcKey.getAddress());
 
-    BigInteger openBlockNumber;
+    BigInteger openBlockNumber = null;
     try {
-      openBlockNumber = microRaiden.createChannel(ecKey, receiverAddress, BigInteger.valueOf(1));
+      openBlockNumber =
+          microRaiden.createChannel(senderECKey, receiverAddress, BigInteger.valueOf(1));
 
-      microRaiden.topUpChannel(ecKey, receiverAddress, maxDeposit, openBlockNumber);
+      microRaiden.topUpChannel(senderECKey, receiverAddress, maxDeposit, openBlockNumber);
     } catch (TransactionFailedException | DepositTooHighException e) {
-      throw new RuntimeException("Failed!", e);
+      e.printStackTrace();
     }
 
-    byte[] closingMsgHash =
-        microRaiden.getClosingMsgHash(Address.from(ecKey.getAddress()), openBlockNumber,
-            BigInteger.valueOf(0));
+    BigInteger owedBalance = BigInteger.valueOf(1);
 
-    System.out.println("Closing Msg Hash");
-    System.out.println(Hex.toHexString(closingMsgHash) + ", " + Hex.toHexString(
-        microRaiden.getClosingMsgHashSigned(Address.from(ecKey.getAddress()), openBlockNumber,
-            BigInteger.valueOf(0), receiverEcKey)));
-
-    byte[] balanceMsgHash =
-        microRaiden.getBalanceMsgHash(receiverAddress, openBlockNumber, BigInteger.valueOf(0));
-
-    System.out.println("Balance Msg Hash");
-    System.out.println(Hex.toHexString(closingMsgHash) + ", " + Hex.toHexString(
+    byte[] balanceMsgHashSigned =
         microRaiden.getBalanceMsgHashSigned(Address.from(receiverEcKey.getAddress()),
-            openBlockNumber, BigInteger.valueOf(0), receiverEcKey)));
+            openBlockNumber, owedBalance, senderECKey);
+
+    byte[] closingMsgHashSigned =
+        microRaiden.getClosingMsgHashSigned(Address.from(senderECKey.getAddress()), openBlockNumber,
+            owedBalance, receiverEcKey);
+
+    String txHash =
+        microRaiden.closeChannelCooperatively(senderECKey, Address.from(receiverEcKey.getAddress()),
+            openBlockNumber, owedBalance, balanceMsgHashSigned, closingMsgHashSigned);
   }
 }
