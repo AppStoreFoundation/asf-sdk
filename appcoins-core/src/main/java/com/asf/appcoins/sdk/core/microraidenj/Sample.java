@@ -49,7 +49,11 @@ public class Sample {
       openBlockNumber =
           microRaiden.createChannel(senderECKey, receiverAddress, BigInteger.valueOf(1));
 
+      log.info("Channel created on block " + openBlockNumber);
+
       microRaiden.topUpChannel(senderECKey, receiverAddress, maxDeposit, openBlockNumber);
+
+      log.info("Channel topup");
     } catch (TransactionFailedException | DepositTooHighException e) {
       throw new RuntimeException(e);
     }
@@ -67,5 +71,7 @@ public class Sample {
     String txHash =
         microRaiden.closeChannelCooperatively(senderECKey, Address.from(receiverEcKey.getAddress()),
             openBlockNumber, owedBalance, balanceMsgHashSigned, closingMsgHashSigned);
+
+    log.info("Channel closed with tx " + txHash);
   }
 }
