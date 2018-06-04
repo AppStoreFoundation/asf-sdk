@@ -55,7 +55,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
   @Override
   public void topUpChannel(ECKey senderECKey, Address receiverAddress, BigInteger depositToAdd,
-      BigInteger openBlockNumber) {
+      BigInteger openBlockNumber) throws TransactionFailedException {
 
     String approveTxHash = callApprove(senderECKey, depositToAdd);
     String topUpChannelTxHash =
@@ -126,8 +126,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
   }
 
   private String callChannelTopUp(ECKey senderECKey, Address receiverAddress,
-      BigInteger depositToAdd,
-      BigInteger openBlockNumber) {
+      BigInteger depositToAdd, BigInteger openBlockNumber) throws TransactionFailedException {
 
     CallTransaction.Function approveFunction =
         CallTransaction.Function.fromSignature("topUp", "address", "uint32", "uint192");
@@ -138,7 +137,8 @@ public final class MicroRaidenImpl implements MicroRaiden {
         encoded);
   }
 
-  private String callApprove(ECKey senderECKey, BigInteger deposit) {
+  private String callApprove(ECKey senderECKey, BigInteger deposit)
+      throws TransactionFailedException {
 
     CallTransaction.Function approveFunction =
         CallTransaction.Function.fromSignature("approve", "address", "uint256");
@@ -148,7 +148,8 @@ public final class MicroRaidenImpl implements MicroRaiden {
     return transactionSender.send(senderECKey, tokenAddr, BigInteger.ZERO.longValue(), encoded);
   }
 
-  private String callCreateChannel(ECKey senderECKey, Address receiverAddress, BigInteger deposit) {
+  private String callCreateChannel(ECKey senderECKey, Address receiverAddress, BigInteger deposit)
+      throws TransactionFailedException {
 
     CallTransaction.Function createChannelFunction =
         CallTransaction.Function.fromSignature("createChannel", "address", "uint192");
@@ -161,7 +162,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
   private String callCooperativeClose(ECKey ecKey, Address receiverAddress,
       BigInteger openBlockNumber, BigInteger owedBalance, byte[] balanceMsgSigned,
-      byte[] closingMsgSigned) {
+      byte[] closingMsgSigned) throws TransactionFailedException {
 
     CallTransaction.Function createChannelFunction =
         CallTransaction.Function.fromSignature("cooperativeClose", "address", "uint32", "uint192",
@@ -176,7 +177,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
   public String closeChannelCooperatively(ECKey ecKey, Address receiverAddress,
       BigInteger openBlockNum, BigInteger owedBalance, byte[] balanceMsgHashSig,
-      byte[] closingMsgHashSig) {
+      byte[] closingMsgHashSig) throws TransactionFailedException {
 
     if (BigInteger.ZERO.equals(owedBalance)) {
       throw new IllegalArgumentException("Owed balance cannot be zero!");

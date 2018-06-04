@@ -16,7 +16,7 @@ import org.web3j.protocol.http.HttpService;
 
 public class Sample {
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws TransactionFailedException {
 
     Web3j web3j =
         Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
@@ -27,8 +27,8 @@ public class Sample {
     Logger log = Logger.getLogger(MicroRaidenImpl.class.getSimpleName());
     BigInteger maxDeposit = BigInteger.valueOf(10);
     TransactionSender transactionSender =
-        new TransactionSenderImpl(asfWeb3j, () -> 50000000000L, 4000000,
-            new GetNonceImpl(asfWeb3j));
+        new TransactionSenderImpl(asfWeb3j, () -> 50000000000L, new GetNonceImpl(asfWeb3j),
+            new GasLimitImpl(web3j));
 
     GetChannelBlock getChannelBlock =
         createChannelTxHash -> new GetChannelBlockImpl(web3j, 3, 1500).get(createChannelTxHash);
@@ -51,7 +51,7 @@ public class Sample {
 
       microRaiden.topUpChannel(senderECKey, receiverAddress, maxDeposit, openBlockNumber);
     } catch (TransactionFailedException | DepositTooHighException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     BigInteger owedBalance = BigInteger.valueOf(1);
