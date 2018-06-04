@@ -35,7 +35,7 @@ public class Sample {
         createChannelTxHash -> new GetChannelBlockImpl(web3j, 3, 1500).get(createChannelTxHash);
 
     MicroRaidenImpl microRaiden =
-        new MicroRaidenImpl(channelManagerAddr, tokenAddr, log, maxDeposit, transactionSender,
+        new MicroRaidenImpl(channelManagerAddr, tokenAddr, maxDeposit, transactionSender,
             getChannelBlock);
 
     // Put a private key
@@ -61,17 +61,9 @@ public class Sample {
 
     BigInteger owedBalance = BigInteger.valueOf(1);
 
-    byte[] balanceMsgHashSigned =
-        microRaiden.getBalanceMsgHashSigned(Address.from(receiverEcKey.getAddress()),
-            openBlockNumber, owedBalance, senderECKey);
-
-    byte[] closingMsgHashSigned =
-        microRaiden.getClosingMsgHashSigned(Address.from(senderECKey.getAddress()), openBlockNumber,
-            owedBalance, receiverEcKey);
-
     String txHash =
-        microRaiden.closeChannelCooperatively(senderECKey, Address.from(receiverEcKey.getAddress()),
-            openBlockNumber, owedBalance, balanceMsgHashSigned, closingMsgHashSigned);
+        microRaiden.closeChannelCooperatively(senderECKey, receiverEcKey, openBlockNumber,
+            owedBalance);
 
     log.info("Channel closed with tx " + txHash);
   }

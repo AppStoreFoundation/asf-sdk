@@ -12,7 +12,6 @@ import ethereumj.crypto.ECKey;
 import ethereumj.crypto.HashUtil;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
-import java.util.logging.Logger;
 import org.spongycastle.util.encoders.Hex;
 
 public final class MicroRaidenImpl implements MicroRaiden {
@@ -24,8 +23,8 @@ public final class MicroRaidenImpl implements MicroRaiden {
   private final TransactionSender transactionSender;
   private final GetChannelBlock getChannelBlock;
 
-  public MicroRaidenImpl(Address channelManagerAddr, Address tokenAddr, Logger log,
-      BigInteger maxDeposit, TransactionSender transactionSender, GetChannelBlock getChannelBlock) {
+  public MicroRaidenImpl(Address channelManagerAddr, Address tokenAddr, BigInteger maxDeposit,
+      TransactionSender transactionSender, GetChannelBlock getChannelBlock) {
     this.channelManagerAddr = channelManagerAddr;
     this.tokenAddr = tokenAddr;
     this.maxDeposit = maxDeposit;
@@ -37,8 +36,6 @@ public final class MicroRaidenImpl implements MicroRaiden {
   public BigInteger createChannel(ECKey senderECKey, Address receiverAddress, BigInteger deposit)
       throws TransactionFailedException, DepositTooHighException {
     try {
-      byte[] senderAddress = senderECKey.getAddress();
-
       if (maxDeposit.compareTo(deposit) < 0) {
         throw new DepositTooHighException(maxDeposit);
       }
@@ -63,7 +60,21 @@ public final class MicroRaidenImpl implements MicroRaiden {
         callChannelTopUp(senderECKey, receiverAddress, depositToAdd, openBlockNumber);
   }
 
-  public byte[] getClosingMsgHash(Address senderAddress, BigInteger openBlockNumber,
+  public String closeChannelCooperatively(ECKey senderECKey, ECKey receiverECKey,
+      BigInteger openBlockNum, BigInteger owedBalance) throws TransactionFailedException {
+    if (BigInteger.ZERO.equals(owedBalance)) {
+      throw new IllegalArgumentException("Owed balance cannot be zero!");
+    }
+
+    Address senderAddress = Address.from(senderECKey.getAddress());
+    Address receiverAddress = Address.from(receiverECKey.getAddress());
+
+    return callCooperativeClose(senderECKey, receiverAddress, openBlockNum, owedBalance,
+        getBalanceMsgHashSigned(receiverAddress, openBlockNum, owedBalance, senderECKey),
+        getClosingMsgHashSigned(senderAddress, openBlockNum, owedBalance, receiverECKey));
+  }
+
+  private byte[] getClosingMsgHash(Address senderAddress, BigInteger openBlockNumber,
       BigInteger owedBalance) {
     byte[] receiverAddressBytes = senderAddress.getDecoded();
     byte[] channelAddressBytes = channelManagerAddr.getDecoded();
@@ -77,13 +88,11 @@ public final class MicroRaidenImpl implements MicroRaiden {
     byte[] dataValue =
         ByteArray.concat("Receiver closing signature".getBytes(), receiverAddressBytes,
             openBlockNumberBytes, balanceBytes, channelAddressBytes);
-    byte[] result =
-        HashUtil.sha3(ByteArray.concat(HashUtil.sha3(dataTypeName), HashUtil.sha3(dataValue)));
 
-    return result;
+    return HashUtil.sha3(ByteArray.concat(HashUtil.sha3(dataTypeName), HashUtil.sha3(dataValue)));
   }
 
-  public byte[] getClosingMsgHashSigned(Address senderAddress, BigInteger openBlockNumber,
+  private byte[] getClosingMsgHashSigned(Address senderAddress, BigInteger openBlockNumber,
       BigInteger owedBalance, ECKey receiverECKey) {
     byte[] closingMsgHash = getClosingMsgHash(senderAddress, openBlockNumber, owedBalance);
 
@@ -91,7 +100,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
         .toByteArray();
   }
 
-  public byte[] getBalanceMsgHash(Address receiverAddress, BigInteger openBlockNumber,
+  private byte[] getBalanceMsgHash(Address receiverAddress, BigInteger openBlockNumber,
       BigInteger owedBalance) {
     byte[] receiverAddressBytes = receiverAddress.getDecoded();
     byte[] channelAddressBytes = channelManagerAddr.getDecoded();
@@ -105,13 +114,11 @@ public final class MicroRaidenImpl implements MicroRaiden {
     byte[] dataValue =
         ByteArray.concat("Sender balance proof signature".getBytes(), receiverAddressBytes,
             openBlockNumberBytes, balanceBytes, channelAddressBytes);
-    byte[] result =
-        HashUtil.sha3(ByteArray.concat(HashUtil.sha3(dataTypeName), HashUtil.sha3(dataValue)));
 
-    return result;
+    return HashUtil.sha3(ByteArray.concat(HashUtil.sha3(dataTypeName), HashUtil.sha3(dataValue)));
   }
 
-  public byte[] getBalanceMsgHashSigned(Address receiverAddress, BigInteger openBlockNumber,
+  private byte[] getBalanceMsgHashSigned(Address receiverAddress, BigInteger openBlockNumber,
       BigInteger owedBalance, ECKey senderECKey) {
     byte[] balanceMsgHash = getBalanceMsgHash(receiverAddress, openBlockNumber, owedBalance);
 
@@ -132,8 +139,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
     byte[] encoded = approveFunction.encode(receiverAddress.get(), openBlockNumber, depositToAdd);
 
-    return transactionSender.send(senderECKey, channelManagerAddr, BigInteger.ZERO,
-        encoded);
+    return transactionSender.send(senderECKey, channelManagerAddr, BigInteger.ZERO, encoded);
   }
 
   private String callApprove(ECKey senderECKey, BigInteger deposit)
@@ -171,17 +177,5 @@ public final class MicroRaidenImpl implements MicroRaiden {
             balanceMsgSigned, closingMsgSigned);
 
     return transactionSender.send(ecKey, channelManagerAddr, BigInteger.ZERO, encoded);
-  }
-
-  public String closeChannelCooperatively(ECKey ecKey, Address receiverAddress,
-      BigInteger openBlockNum, BigInteger owedBalance, byte[] balanceMsgHashSig,
-      byte[] closingMsgHashSig) throws TransactionFailedException {
-
-    if (BigInteger.ZERO.equals(owedBalance)) {
-      throw new IllegalArgumentException("Owed balance cannot be zero!");
-    }
-
-    return callCooperativeClose(ecKey, receiverAddress, openBlockNum, owedBalance,
-        balanceMsgHashSig, closingMsgHashSig);
   }
 }

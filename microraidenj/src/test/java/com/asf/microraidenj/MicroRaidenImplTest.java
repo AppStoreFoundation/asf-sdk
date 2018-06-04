@@ -40,7 +40,7 @@ public class MicroRaidenImplTest {
         .thenReturn(BigInteger.ONE);
 
     MicroRaidenImpl microRaiden =
-        new MicroRaidenImpl(CHANNEL_MANAGER_ADRESS, TOKEN_ADRESS, logger, MAX_DEPOSIT,
+        new MicroRaidenImpl(CHANNEL_MANAGER_ADRESS, TOKEN_ADRESS, MAX_DEPOSIT,
             transactionSender, getChannelBlock);
 
     microRaiden.createChannel(ECKey.fromPrivate(
