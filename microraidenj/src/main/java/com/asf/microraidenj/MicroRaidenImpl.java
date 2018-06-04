@@ -77,6 +77,13 @@ public final class MicroRaidenImpl implements MicroRaiden {
             receiverECKey, channelManagerAddr));
   }
 
+  @Override public byte[] createBalanceProof(ECKey senderECKey, Address receiverAddress,
+      BigInteger openBlockNum, BigInteger owedBalance) {
+
+    return MicroRaidenUtils.createBalanceMsgHash(receiverAddress, openBlockNum, owedBalance,
+        senderECKey, channelManagerAddr);
+  }
+
   private String callChannelTopUp(ECKey senderECKey, Address receiverAddress,
       BigInteger depositToAdd, BigInteger openBlockNumber) throws TransactionFailedException {
 

@@ -21,4 +21,7 @@ public interface MicroRaiden {
   String closeChannelCooperativelyReceiver(ECKey receiverECKey, Address senderAddress,
       BigInteger openBlockNum, BigInteger owedBalance, byte[] balanceMsgSigned, ECKey ecKey)
       throws TransactionFailedException;
+
+  byte[] createBalanceProof(ECKey senderECKey, Address receiverAddress, BigInteger openBlockNum,
+      BigInteger owedBalance);
 }
