@@ -21,7 +21,8 @@ public class GasLimitImpl implements GasLimit {
       throws EstimateGasException {
 
     Transaction transaction =
-        Transaction.createEthCallTransaction(from.get(true), to.get(true), Hex.toHexString(data));
+        Transaction.createEthCallTransaction(from.toHexString(true), to.toHexString(true),
+            Hex.toHexString(data));
 
     try {
       return web3j.ethEstimateGas(transaction)

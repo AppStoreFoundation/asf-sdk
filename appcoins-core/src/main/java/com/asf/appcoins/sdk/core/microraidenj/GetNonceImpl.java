@@ -17,7 +17,7 @@ public class GetNonceImpl implements GetNonce {
 
   @Override public BigInteger get(Address address) {
     if (nonce == null) {
-      computeNonce(address.get());
+      computeNonce(address.toHexString());
     }
 
     BigInteger tmp = nonce;

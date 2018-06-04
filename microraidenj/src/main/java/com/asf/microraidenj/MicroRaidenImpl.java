@@ -76,8 +76,8 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
   private byte[] getClosingMsgHash(Address senderAddress, BigInteger openBlockNumber,
       BigInteger owedBalance) {
-    byte[] receiverAddressBytes = senderAddress.getDecoded();
-    byte[] channelAddressBytes = channelManagerAddr.getDecoded();
+    byte[] receiverAddressBytes = senderAddress.getBytes();
+    byte[] channelAddressBytes = channelManagerAddr.getBytes();
 
     byte[] openBlockNumberBytes = ByteArray.prependZeros(openBlockNumber.toByteArray(), 4);
     byte[] balanceBytes = ByteArray.prependZeros(Hex.decode(prependZerosIfNeeded(owedBalance)), 24);
@@ -102,8 +102,8 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
   private byte[] getBalanceMsgHash(Address receiverAddress, BigInteger openBlockNumber,
       BigInteger owedBalance) {
-    byte[] receiverAddressBytes = receiverAddress.getDecoded();
-    byte[] channelAddressBytes = channelManagerAddr.getDecoded();
+    byte[] receiverAddressBytes = receiverAddress.getBytes();
+    byte[] channelAddressBytes = channelManagerAddr.getBytes();
 
     byte[] openBlockNumberBytes = ByteArray.prependZeros(openBlockNumber.toByteArray(), 4);
     byte[] balanceBytes = ByteArray.prependZeros(Hex.decode(prependZerosIfNeeded(owedBalance)), 24);
@@ -137,7 +137,8 @@ public final class MicroRaidenImpl implements MicroRaiden {
     CallTransaction.Function approveFunction =
         CallTransaction.Function.fromSignature("topUp", "address", "uint32", "uint192");
 
-    byte[] encoded = approveFunction.encode(receiverAddress.get(), openBlockNumber, depositToAdd);
+    byte[] encoded =
+        approveFunction.encode(receiverAddress.toHexString(), openBlockNumber, depositToAdd);
 
     return transactionSender.send(senderECKey, channelManagerAddr, BigInteger.ZERO, encoded);
   }
@@ -148,7 +149,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
     CallTransaction.Function approveFunction =
         CallTransaction.Function.fromSignature("approve", "address", "uint256");
 
-    byte[] encoded = approveFunction.encode(channelManagerAddr.get(), deposit);
+    byte[] encoded = approveFunction.encode(channelManagerAddr.toHexString(), deposit);
 
     return transactionSender.send(senderECKey, tokenAddr, BigInteger.ZERO, encoded);
   }
@@ -159,7 +160,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
     CallTransaction.Function createChannelFunction =
         CallTransaction.Function.fromSignature("createChannel", "address", "uint192");
 
-    byte[] encoded = createChannelFunction.encode(receiverAddress.get(), deposit);
+    byte[] encoded = createChannelFunction.encode(receiverAddress.toHexString(), deposit);
 
     return transactionSender.send(senderECKey, channelManagerAddr, BigInteger.ZERO, encoded);
   }
@@ -173,7 +174,8 @@ public final class MicroRaidenImpl implements MicroRaiden {
             "bytes", "bytes");
 
     byte[] encoded =
-        createChannelFunction.encode(receiverAddress.get(true), openBlockNumber, owedBalance,
+        createChannelFunction.encode(receiverAddress.toHexString(true), openBlockNumber,
+            owedBalance,
             balanceMsgSigned, closingMsgSigned);
 
     return transactionSender.send(ecKey, channelManagerAddr, BigInteger.ZERO, encoded);

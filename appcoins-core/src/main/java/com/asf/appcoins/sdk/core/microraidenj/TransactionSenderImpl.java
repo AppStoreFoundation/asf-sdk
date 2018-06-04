@@ -40,7 +40,7 @@ public class TransactionSenderImpl implements TransactionSender {
       transaction = CallTransaction.createRawTransaction(nonce.longValue(), gasPrice.get()
               .longValue(),
           gasLimit.estimate(Address.from(senderECKey.getAddress()), receiveAddress, data)
-              .longValue(), receiveAddress.get(), value.longValue(), data);
+              .longValue(), receiveAddress.toHexString(), value.longValue(), data);
     } catch (EstimateGasException e) {
       throw new TransactionFailedException(e);
     }

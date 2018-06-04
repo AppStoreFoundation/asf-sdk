@@ -26,13 +26,13 @@ public class AddressTest {
     Address address;
 
     address = Address.from(hexStr);
-    assertThat(address.get(), is(hexStr));
+    assertThat(address.toHexString(), is(hexStr));
 
     address = Address.from(addressBytes);
-    assertThat(address.get(), is(hexStr));
+    assertThat(address.toHexString(), is(hexStr));
   }
 
   @Test public void get() {
-    assertThat(address.get(), is(addrHexStr.substring(2)));
+    assertThat(address.toHexString(), is(addrHexStr.substring(2)));
   }
 }
