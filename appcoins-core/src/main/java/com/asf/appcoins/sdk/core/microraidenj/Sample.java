@@ -2,6 +2,7 @@ package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
 import com.asf.microraidenj.MicroRaidenImpl;
+import com.asf.microraidenj.MicroRaidenUtils;
 import com.asf.microraidenj.eth.GetChannelBlock;
 import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
@@ -61,10 +62,25 @@ public class Sample {
 
     BigInteger owedBalance = BigInteger.valueOf(1);
 
-    String txHash =
-        microRaiden.closeChannelCooperatively(senderECKey, receiverEcKey, openBlockNumber,
-            owedBalance);
+    //byte[] closingSig =
+    //    MicroRaidenUtils.buildClosingMsgHash(Address.from(senderECKey.getAddress()), openBlockNumber,
+    //        owedBalance, receiverEcKey, channelManagerAddr);
+    //
+    //String txHash = microRaiden.closeChannelCooperativelySender(senderECKey, receiverAddress, openBlockNumber,
+    //    owedBalance, closingSig, senderECKey);
 
-    log.info("Channel closed with tx " + txHash);
+    byte[] balanceSig =
+        MicroRaidenUtils.createBalanceMsgHash(receiverAddress, openBlockNumber, owedBalance,
+            senderECKey, channelManagerAddr);
+
+    String txHash = microRaiden.closeChannelCooperativelyReceiver(receiverEcKey,
+        Address.from(senderECKey.getAddress()), openBlockNumber, owedBalance, balanceSig,
+        senderECKey);
+
+    //String txHash =
+    //    microRaiden.closeChannelCooperativelySender(senderECKey, receiverEcKey, openBlockNumber,
+    //        owedBalance);
+
+    log.info("Channel will be closed with tx " + txHash);
   }
 }

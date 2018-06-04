@@ -55,18 +55,24 @@ public final class MicroRaidenImpl implements MicroRaiden {
         callChannelTopUp(senderECKey, receiverAddress, depositToAdd, openBlockNumber);
   }
 
-  public String closeChannelCooperatively(ECKey senderECKey, ECKey receiverECKey,
-      BigInteger openBlockNum, BigInteger owedBalance) throws TransactionFailedException {
-    if (BigInteger.ZERO.equals(owedBalance)) {
-      throw new IllegalArgumentException("Owed balance cannot be zero!");
-    }
+  @Override
+  public String closeChannelCooperativelySender(ECKey senderECKey, Address receiverAddress,
+      BigInteger openBlockNum, BigInteger owedBalance, byte[] closingMsgSigned, ECKey ecKey)
+      throws TransactionFailedException {
 
-    Address senderAddress = Address.from(senderECKey.getAddress());
+    return callCooperativeClose(ecKey, receiverAddress, openBlockNum, owedBalance,
+        MicroRaidenUtils.createBalanceMsgHash(receiverAddress, openBlockNum, owedBalance,
+            senderECKey, channelManagerAddr), closingMsgSigned);
+  }
+
+  @Override
+  public String closeChannelCooperativelyReceiver(ECKey receiverECKey, Address senderAddress,
+      BigInteger openBlockNum, BigInteger owedBalance, byte[] balanceMsgSigned, ECKey ecKey)
+      throws TransactionFailedException {
+
     Address receiverAddress = Address.from(receiverECKey.getAddress());
 
-    return callCooperativeClose(senderECKey, receiverAddress, openBlockNum, owedBalance,
-        MicroRaidenUtils.createBalanceMsgHash(receiverAddress, openBlockNum, owedBalance,
-            senderECKey, channelManagerAddr),
+    return callCooperativeClose(ecKey, receiverAddress, openBlockNum, owedBalance, balanceMsgSigned,
         MicroRaidenUtils.createClosingMsgHash(senderAddress, openBlockNum, owedBalance,
             receiverECKey, channelManagerAddr));
   }
@@ -115,8 +121,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
     byte[] encoded =
         createChannelFunction.encode(receiverAddress.toHexString(true), openBlockNumber,
-            owedBalance,
-            balanceMsgSigned, closingMsgSigned);
+            owedBalance, balanceMsgSigned, closingMsgSigned);
 
     return transactionSender.send(ecKey, channelManagerAddr, BigInteger.ZERO, encoded);
   }

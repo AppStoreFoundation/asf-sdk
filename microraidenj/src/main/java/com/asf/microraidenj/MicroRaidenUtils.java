@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import org.spongycastle.util.encoders.Hex;
 
-class MicroRaidenUtils {
+public final class MicroRaidenUtils {
 
   private static byte[] getClosingMsgHashRaw(Address senderAddress, BigInteger openBlockNumber,
       BigInteger owedBalance, Address channelManagerAddr) {
@@ -28,7 +28,7 @@ class MicroRaidenUtils {
     return HashUtil.sha3(ByteUtils.concat(HashUtil.sha3(dataTypeName), HashUtil.sha3(dataValue)));
   }
 
-  static byte[] createClosingMsgHash(Address senderAddress, BigInteger openBlockNumber,
+  public static byte[] createClosingMsgHash(Address senderAddress, BigInteger openBlockNumber,
       BigInteger owedBalance, ECKey receiverECKey, Address channelManagerAddr) {
     byte[] closingMsgHash =
         getClosingMsgHashRaw(senderAddress, openBlockNumber, owedBalance, channelManagerAddr);
@@ -55,7 +55,7 @@ class MicroRaidenUtils {
     return HashUtil.sha3(ByteUtils.concat(HashUtil.sha3(dataTypeName), HashUtil.sha3(dataValue)));
   }
 
-  static byte[] createBalanceMsgHash(Address receiverAddress, BigInteger openBlockNumber,
+  public static byte[] createBalanceMsgHash(Address receiverAddress, BigInteger openBlockNumber,
       BigInteger owedBalance, ECKey senderECKey, Address channelManagerAddr) {
     byte[] balanceMsgHash =
         getBalanceMsgHashRaw(receiverAddress, openBlockNumber, owedBalance, channelManagerAddr);
