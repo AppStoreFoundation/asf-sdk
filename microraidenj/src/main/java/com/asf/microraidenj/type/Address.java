@@ -2,7 +2,7 @@ package com.asf.microraidenj.type;
 
 public class Address extends HexStr {
 
-  public Address(String value) {
+  private Address(String value) {
     super(value);
   }
 
@@ -12,6 +12,7 @@ public class Address extends HexStr {
   }
 
   public static Address from(String address) {
-    return new Address(address);
+    return new Address(HexStr.from(address)
+        .get());
   }
 }

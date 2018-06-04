@@ -9,6 +9,10 @@ public class HexStr {
   private final String value;
 
   public HexStr(String value) {
+    this.value = value;
+  }
+
+  public static HexStr from(String value) {
     if (value.isEmpty()) {
       throw new RuntimeException("Value cannot be empty!");
     }
@@ -16,9 +20,9 @@ public class HexStr {
     value = value.toLowerCase();
 
     if (value.startsWith("0x")) {
-      this.value = value.substring(2);
+      return new HexStr(value.substring(2));
     } else {
-      this.value = value;
+      return new HexStr(value);
     }
   }
 

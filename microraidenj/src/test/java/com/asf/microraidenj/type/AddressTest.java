@@ -14,7 +14,7 @@ public class AddressTest {
 
   @BeforeClass public static void beforeClass() {
     addrHexStr = "0xd95c64c6eee9164539d679354f349779a04f57cb";
-    address = new Address(addrHexStr);
+    address = Address.from(addrHexStr);
   }
 
   @Test public void from() {

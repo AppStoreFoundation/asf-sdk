@@ -18,8 +18,8 @@ public class HexStrTest {
   private final String addressString2 = "895c64c6eee9164539d679354f349779a04f57cb";
 
   @BeforeClass public static void beforeClass() {
-    zeroHex = new HexStr("0x00");
-    ffHex = new HexStr("FF");
+    zeroHex = HexStr.from("0x00");
+    ffHex = HexStr.from("FF");
   }
 
   @Test public void constructor() {
@@ -27,7 +27,7 @@ public class HexStrTest {
     RuntimeException exception = null;
 
     try {
-      new HexStr("");
+      HexStr.from("");
     } catch (RuntimeException e) {
       exception = e;
     }
@@ -71,12 +71,14 @@ public class HexStrTest {
   }
 
   @Test public void equalsAndhashCode() {
-    HexStr hexStr = new HexStr(addressString1);
+    HexStr hexStr = HexStr.from(addressString1);
 
-    assertThat(hexStr, is(new HexStr(addressString1)));
-    assertThat(hexStr.hashCode(), is(new HexStr(addressString1).hashCode()));
+    assertThat(hexStr, is(HexStr.from(addressString1)));
+    assertThat(hexStr.hashCode(), is(HexStr.from(addressString1)
+        .hashCode()));
 
-    assertThat(hexStr, not(new HexStr(addressString2)));
-    assertThat(hexStr.hashCode(), not(new HexStr(addressString2).hashCode()));
+    assertThat(hexStr, not(HexStr.from(addressString2)));
+    assertThat(hexStr.hashCode(), not(HexStr.from(addressString2)
+        .hashCode()));
   }
 }

@@ -22,8 +22,8 @@ public class Sample {
         Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
     AsfWeb3jImpl asfWeb3j = new AsfWeb3jImpl(web3j);
 
-    Address channelManagerAddr = new Address("0x97a3e71e4d9cb19542574457939a247491152e81");
-    Address tokenAddr = new Address("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3");
+    Address channelManagerAddr = Address.from("0x97a3e71e4d9cb19542574457939a247491152e81");
+    Address tokenAddr = Address.from("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3");
     Logger log = Logger.getLogger(MicroRaidenImpl.class.getSimpleName());
     BigInteger maxDeposit = BigInteger.valueOf(10);
     TransactionSender transactionSender =
