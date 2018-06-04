@@ -20,9 +20,11 @@ public class GetNonceImpl implements GetNonce {
       computeNonce(address.get());
     }
 
+    BigInteger tmp = nonce;
+
     nonce = nonce.add(BigInteger.valueOf(1));
 
-    return nonce;
+    return tmp;
   }
 
   private void computeNonce(String hexValue) {
