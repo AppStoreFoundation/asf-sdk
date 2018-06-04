@@ -1,9 +1,9 @@
 package com.asf.microraidenj.eth.interfaces;
 
-import com.asf.microraidenj.type.HexStr;
+import com.asf.microraidenj.type.ByteArray;
 import java.math.BigInteger;
 
 public interface GetChannelBlock {
 
-  BigInteger get(HexStr createChannelTxHash);
+  BigInteger get(ByteArray createChannelTxHash);
 }

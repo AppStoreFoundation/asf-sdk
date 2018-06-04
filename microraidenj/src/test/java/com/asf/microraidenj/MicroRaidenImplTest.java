@@ -5,7 +5,7 @@ import com.asf.microraidenj.eth.interfaces.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
-import com.asf.microraidenj.type.HexStr;
+import com.asf.microraidenj.type.ByteArray;
 import ethereumj.crypto.ECKey;
 import java.math.BigInteger;
 import java.util.logging.Logger;
@@ -36,7 +36,7 @@ public class MicroRaidenImplTest {
         .thenReturn("0xa04391a989f95c09cb3d553b42341fab3f38d4b7d9eed8585a646c44d8f2f54d");
 
     Mockito.when(getChannelBlock.get(
-        HexStr.from("0xa04391a989f95c09cb3d553b42341fab3f38d4b7d9eed8585a646c44d8f2f54d")))
+        ByteArray.from("0xa04391a989f95c09cb3d553b42341fab3f38d4b7d9eed8585a646c44d8f2f54d")))
         .thenReturn(BigInteger.ONE);
 
     MicroRaidenImpl microRaiden =

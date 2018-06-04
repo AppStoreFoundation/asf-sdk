@@ -2,7 +2,7 @@ package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.microraidenj.eth.interfaces.GetChannelBlock;
 import com.asf.microraidenj.exception.TransactionNotFoundException;
-import com.asf.microraidenj.type.HexStr;
+import com.asf.microraidenj.type.ByteArray;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.math.BigInteger;
@@ -21,16 +21,16 @@ public class GetChannelBlockImpl implements GetChannelBlock {
     this.timeout = timeout;
   }
 
-  @Override public BigInteger get(HexStr createChannelTxHash) {
+  @Override public BigInteger get(ByteArray createChannelTxHash) {
     return Observable.fromCallable(
-        () -> web3j.ethGetTransactionReceipt(createChannelTxHash.get(true))
+        () -> web3j.ethGetTransactionReceipt(createChannelTxHash.toHexString(true))
         .send()
         .getTransactionReceipt())
         .retryWhen(flowable -> flowable.zipWith(Observable.interval(period, TimeUnit.SECONDS),
             (throwable, integer) -> integer))
         .singleOrError()
         .timeout(timeout, TimeUnit.SECONDS,
-            Single.error(new TransactionNotFoundException(createChannelTxHash.get())))
+            Single.error(new TransactionNotFoundException(createChannelTxHash.toHexString())))
         .map(org.web3j.protocol.core.methods.response.TransactionReceipt::getBlockNumber)
         .blockingGet();
   }

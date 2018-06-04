@@ -5,7 +5,6 @@ import com.asf.microraidenj.eth.interfaces.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
-import com.asf.microraidenj.type.HexStr;
 import com.asf.microraidenj.util.ByteArray;
 import ethereumj.core.CallTransaction;
 import ethereumj.crypto.ECKey;
@@ -43,7 +42,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
       String approveTxHash = callApprove(senderECKey, deposit);
       String createChannelTxHash = callCreateChannel(senderECKey, receiverAddress, deposit);
 
-      return getChannelBlock.get(HexStr.from(createChannelTxHash));
+      return getChannelBlock.get(com.asf.microraidenj.type.ByteArray.from(createChannelTxHash));
     } catch (DepositTooHighException e) {
       throw e;
     } catch (Exception e) {
