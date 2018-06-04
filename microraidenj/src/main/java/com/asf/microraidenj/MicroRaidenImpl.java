@@ -60,8 +60,6 @@ public final class MicroRaidenImpl implements MicroRaiden {
     String approveTxHash = callApprove(senderECKey, depositToAdd);
     String topUpChannelTxHash =
         callChannelTopUp(senderECKey, receiverAddress, depositToAdd, openBlockNumber);
-
-    BigInteger bigInteger = getChannelBlock.get(topUpChannelTxHash);
   }
 
   public byte[] getClosingMsgHash(Address senderAddress, BigInteger openBlockNumber,
