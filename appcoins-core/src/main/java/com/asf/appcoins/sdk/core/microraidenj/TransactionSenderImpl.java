@@ -11,6 +11,7 @@ import com.asf.microraidenj.type.Address;
 import ethereumj.Transaction;
 import ethereumj.core.CallTransaction;
 import ethereumj.crypto.ECKey;
+import java.math.BigInteger;
 import org.spongycastle.util.encoders.Hex;
 
 public class TransactionSenderImpl implements TransactionSender {
@@ -28,16 +29,18 @@ public class TransactionSenderImpl implements TransactionSender {
     this.gasLimit = gasLimit;
   }
 
-  @Override public String send(ECKey senderECKey, Address receiveAddress, long value, byte[] data)
+  @Override
+  public String send(ECKey senderECKey, Address receiveAddress, BigInteger value, byte[] data)
       throws TransactionFailedException {
 
-    long nonce = getNonce.get(Address.from(senderECKey.getAddress()));
+    BigInteger nonce = getNonce.get(Address.from(senderECKey.getAddress()));
 
     Transaction transaction;
     try {
-      transaction = CallTransaction.createRawTransaction(nonce, gasPrice.get(),
+      transaction = CallTransaction.createRawTransaction(nonce.longValue(), gasPrice.get()
+              .longValue(),
           gasLimit.estimate(Address.from(senderECKey.getAddress()), receiveAddress, data)
-              .longValue(), receiveAddress.get(), value, data);
+              .longValue(), receiveAddress.get(), value.longValue(), data);
     } catch (EstimateGasException e) {
       throw new TransactionFailedException(e);
     }

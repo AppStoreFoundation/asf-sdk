@@ -1,6 +1,8 @@
 package com.asf.microraidenj.eth.interfaces;
 
+import java.math.BigInteger;
+
 public interface GasPrice {
 
-  long get();
+  BigInteger get();
 }

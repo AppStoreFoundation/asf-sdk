@@ -27,7 +27,8 @@ public class Sample {
     Logger log = Logger.getLogger(MicroRaidenImpl.class.getSimpleName());
     BigInteger maxDeposit = BigInteger.valueOf(10);
     TransactionSender transactionSender =
-        new TransactionSenderImpl(asfWeb3j, () -> 50000000000L, new GetNonceImpl(asfWeb3j),
+        new TransactionSenderImpl(asfWeb3j, () -> BigInteger.valueOf(50000000000L),
+            new GetNonceImpl(asfWeb3j),
             new GasLimitImpl(web3j));
 
     GetChannelBlock getChannelBlock =
@@ -44,7 +45,7 @@ public class Sample {
 
     Address receiverAddress = Address.from(receiverEcKey.getAddress());
 
-    BigInteger openBlockNumber = null;
+    BigInteger openBlockNumber;
     try {
       openBlockNumber =
           microRaiden.createChannel(senderECKey, receiverAddress, BigInteger.valueOf(1));

@@ -5,6 +5,7 @@ import com.asf.microraidenj.eth.interfaces.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
+import com.asf.microraidenj.type.HexStr;
 import com.asf.microraidenj.util.ByteArray;
 import ethereumj.core.CallTransaction;
 import ethereumj.crypto.ECKey;
@@ -45,7 +46,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
       String approveTxHash = callApprove(senderECKey, deposit);
       String createChannelTxHash = callCreateChannel(senderECKey, receiverAddress, deposit);
 
-      return getChannelBlock.get(createChannelTxHash);
+      return getChannelBlock.get(HexStr.from(createChannelTxHash));
     } catch (DepositTooHighException e) {
       throw e;
     } catch (Exception e) {
@@ -131,7 +132,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
     byte[] encoded = approveFunction.encode(receiverAddress.get(), openBlockNumber, depositToAdd);
 
-    return transactionSender.send(senderECKey, channelManagerAddr, BigInteger.ZERO.longValue(),
+    return transactionSender.send(senderECKey, channelManagerAddr, BigInteger.ZERO,
         encoded);
   }
 
@@ -143,7 +144,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
     byte[] encoded = approveFunction.encode(channelManagerAddr.get(), deposit);
 
-    return transactionSender.send(senderECKey, tokenAddr, BigInteger.ZERO.longValue(), encoded);
+    return transactionSender.send(senderECKey, tokenAddr, BigInteger.ZERO, encoded);
   }
 
   private String callCreateChannel(ECKey senderECKey, Address receiverAddress, BigInteger deposit)
@@ -154,8 +155,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
 
     byte[] encoded = createChannelFunction.encode(receiverAddress.get(), deposit);
 
-    return transactionSender.send(senderECKey, channelManagerAddr,
-        new BigInteger("0", 10).longValue(), encoded);
+    return transactionSender.send(senderECKey, channelManagerAddr, BigInteger.ZERO, encoded);
   }
 
   private String callCooperativeClose(ECKey ecKey, Address receiverAddress,
@@ -170,7 +170,7 @@ public final class MicroRaidenImpl implements MicroRaiden {
         createChannelFunction.encode(receiverAddress.get(true), openBlockNumber, owedBalance,
             balanceMsgSigned, closingMsgSigned);
 
-    return transactionSender.send(ecKey, channelManagerAddr, 0, encoded);
+    return transactionSender.send(ecKey, channelManagerAddr, BigInteger.ZERO, encoded);
   }
 
   public String closeChannelCooperatively(ECKey ecKey, Address receiverAddress,
