@@ -1,7 +1,11 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
-import com.asf.microraidenj.MicroRaidenImpl;
+import com.asf.microraidenj.DefaultMicroRaidenClient;
+import com.asf.microraidenj.DefaultMicroRaidenServer;
+import com.asf.microraidenj.MicroRaidenClient;
+import com.asf.microraidenj.MicroRaidenServer;
+import com.asf.microraidenj.contract.MicroRaidenContract;
 import com.asf.microraidenj.eth.GetChannelBlock;
 import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
@@ -24,7 +28,7 @@ public class Sample {
 
     Address channelManagerAddr = Address.from("0x97a3e71e4d9cb19542574457939a247491152e81");
     Address tokenAddr = Address.from("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3");
-    Logger log = Logger.getLogger(MicroRaidenImpl.class.getSimpleName());
+    Logger log = Logger.getLogger(MicroRaidenClient.class.getSimpleName());
     BigInteger maxDeposit = BigInteger.valueOf(10);
     TransactionSender transactionSender =
         new TransactionSenderImpl(asfWeb3j, () -> BigInteger.valueOf(50000000000L),
@@ -34,9 +38,13 @@ public class Sample {
     GetChannelBlock getChannelBlock =
         createChannelTxHash -> new GetChannelBlockImpl(web3j, 3, 1500).get(createChannelTxHash);
 
-    MicroRaidenImpl microRaiden =
-        new MicroRaidenImpl(channelManagerAddr, tokenAddr, maxDeposit, transactionSender,
-            getChannelBlock);
+    MicroRaidenContract microRaidenContract =
+        new MicroRaidenContract(channelManagerAddr, tokenAddr, transactionSender);
+    MicroRaidenClient microRaidenClient =
+        new DefaultMicroRaidenClient(channelManagerAddr, maxDeposit, getChannelBlock,
+            microRaidenContract);
+    MicroRaidenServer microRaidenServer =
+        new DefaultMicroRaidenServer(channelManagerAddr, microRaidenContract);
 
     // Put a private key
     ECKey senderECKey = ECKey.fromPrivate(new BigInteger("", 16));
@@ -48,11 +56,11 @@ public class Sample {
     BigInteger openBlockNumber;
     try {
       openBlockNumber =
-          microRaiden.createChannel(senderECKey, receiverAddress, BigInteger.valueOf(1));
+          microRaidenClient.createChannel(senderECKey, receiverAddress, BigInteger.valueOf(1));
 
       log.info("Channel created on block " + openBlockNumber);
 
-      microRaiden.topUpChannel(senderECKey, receiverAddress, maxDeposit, openBlockNumber);
+      microRaidenClient.topUpChannel(senderECKey, receiverAddress, openBlockNumber, maxDeposit);
 
       log.info("Channel topup");
     } catch (TransactionFailedException | DepositTooHighException e) {
@@ -61,19 +69,24 @@ public class Sample {
 
     BigInteger owedBalance = BigInteger.valueOf(1);
 
-    //byte[] closingSig =
-    //    MicroRaidenUtils.buildClosingMsgHash(Address.from(senderECKey.getAddress()), openBlockNumber,
-    //        owedBalance, receiverEcKey, channelManagerAddr);
-    //
-    //String txHash = microRaiden.closeChannelCooperativelySender(senderECKey, receiverAddress, openBlockNumber,
-    //    owedBalance, closingSig, senderECKey);
+    String txHash;
+    boolean client = true;
 
-    byte[] balanceProof =
-        microRaiden.createBalanceProof(senderECKey, receiverAddress, openBlockNumber, owedBalance);
+    if (client) {
+      byte[] closingSig = microRaidenServer.createClosingMessage(receiverEcKey,
+          Address.from(senderECKey.getAddress()), openBlockNumber, owedBalance);
 
-    String txHash = microRaiden.closeChannelCooperativelyReceiver(receiverEcKey,
-        Address.from(senderECKey.getAddress()), openBlockNumber, owedBalance, balanceProof,
-        senderECKey);
+      txHash =
+          microRaidenClient.closeChannelCooperatively(senderECKey, receiverAddress, openBlockNumber,
+              owedBalance, closingSig, senderECKey);
+    } else {
+      byte[] balanceProof =
+          microRaidenClient.createBalanceProof(senderECKey, receiverAddress, openBlockNumber,
+              owedBalance);
+
+      txHash = microRaidenServer.closeChannelCooperatively(Address.from(senderECKey.getAddress()),
+          receiverEcKey, openBlockNumber, owedBalance, balanceProof, senderECKey);
+    }
 
     log.info("Channel will be closed with tx " + txHash);
   }

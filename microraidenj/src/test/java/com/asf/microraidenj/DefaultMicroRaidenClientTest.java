@@ -1,5 +1,6 @@
 package com.asf.microraidenj;
 
+import com.asf.microraidenj.contract.MicroRaidenContract;
 import com.asf.microraidenj.eth.GetChannelBlock;
 import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
@@ -8,7 +9,6 @@ import com.asf.microraidenj.type.Address;
 import com.asf.microraidenj.type.ByteArray;
 import ethereumj.crypto.ECKey;
 import java.math.BigInteger;
-import java.util.logging.Logger;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -16,7 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class MicroRaidenImplTest {
+public class DefaultMicroRaidenClientTest {
 
   // Ropsten network 21/05/2018
   private static final Address CHANNEL_MANAGER_ADRESS =
@@ -28,7 +28,6 @@ public class MicroRaidenImplTest {
   private static final BigInteger MAX_DEPOSIT = BigInteger.valueOf(1000);
 
   @Test public void createChannel() throws TransactionFailedException, DepositTooHighException {
-    Logger logger = Logger.getLogger(MicroRaidenImplTest.class.getSimpleName());
     TransactionSender transactionSender = Mockito.mock(TransactionSender.class);
     GetChannelBlock getChannelBlock = Mockito.mock(GetChannelBlock.class);
 
@@ -39,9 +38,9 @@ public class MicroRaidenImplTest {
         ByteArray.from("0xa04391a989f95c09cb3d553b42341fab3f38d4b7d9eed8585a646c44d8f2f54d")))
         .thenReturn(BigInteger.ONE);
 
-    MicroRaidenImpl microRaiden =
-        new MicroRaidenImpl(CHANNEL_MANAGER_ADRESS, TOKEN_ADRESS, MAX_DEPOSIT,
-            transactionSender, getChannelBlock);
+    MicroRaidenClient microRaiden =
+        new DefaultMicroRaidenClient(CHANNEL_MANAGER_ADRESS, MAX_DEPOSIT, getChannelBlock,
+            new MicroRaidenContract(CHANNEL_MANAGER_ADRESS, TOKEN_ADRESS, transactionSender));
 
     microRaiden.createChannel(ECKey.fromPrivate(
         new BigInteger("c7b2735a7aed53b3668f0dc7f1d67833c0adf526cfcdb50f63d8bfe7bfc8c9b6", 16)),
