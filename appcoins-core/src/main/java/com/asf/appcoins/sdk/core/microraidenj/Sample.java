@@ -27,7 +27,7 @@ public class Sample {
     Logger log = Logger.getLogger(MicroRaidenImpl.class.getSimpleName());
     BigInteger maxDeposit = BigInteger.valueOf(10);
     TransactionSender transactionSender =
-        new TransactionSenderImpl(asfWeb3j, 50000000000L, 4000000);
+        new TransactionSenderImpl(asfWeb3j, () -> 50000000000L, 4000000);
 
     GetChannelBlock getChannelBlock =
         createChannelTxHash -> new GetChannelBlockImpl(web3j, 3, 1500).get(createChannelTxHash);

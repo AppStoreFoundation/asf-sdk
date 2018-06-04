@@ -1,6 +1,7 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
+import com.asf.microraidenj.eth.interfaces.GasPrice;
 import com.asf.microraidenj.eth.interfaces.TransactionSender;
 import ethereumj.Transaction;
 import ethereumj.core.CallTransaction;
@@ -10,13 +11,12 @@ import org.web3j.abi.datatypes.Address;
 
 public class TransactionSenderImpl implements TransactionSender {
 
+  final int gasLimit;
   private final AsfWeb3j asfWeb3j;
-  private final long gasPrice;
-  private final int gasLimit;
-
+  private final GasPrice gasPrice;
   private Long nonce;
 
-  public TransactionSenderImpl(AsfWeb3j asfWeb3j, long gasPrice, int gasLimit) {
+  public TransactionSenderImpl(AsfWeb3j asfWeb3j, GasPrice gasPrice, int gasLimit) {
     this.asfWeb3j = asfWeb3j;
     this.gasPrice = gasPrice;
     this.gasLimit = gasLimit;
@@ -30,8 +30,8 @@ public class TransactionSenderImpl implements TransactionSender {
     }
 
     Transaction transaction =
-        CallTransaction.createRawTransaction(nonce++, gasPrice, gasLimit, receiveAddress.get(),
-            value, data);
+        CallTransaction.createRawTransaction(nonce++, gasPrice.get(), gasLimit,
+            receiveAddress.get(), value, data);
 
     transaction.sign(senderECKey);
 
