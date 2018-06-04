@@ -1,10 +1,10 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
-import com.asf.microraidenj.eth.interfaces.GasLimit;
-import com.asf.microraidenj.eth.interfaces.GasPrice;
-import com.asf.microraidenj.eth.interfaces.GetNonce;
-import com.asf.microraidenj.eth.interfaces.TransactionSender;
+import com.asf.microraidenj.eth.GasLimit;
+import com.asf.microraidenj.eth.GasPrice;
+import com.asf.microraidenj.eth.GetNonce;
+import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.EstimateGasException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;

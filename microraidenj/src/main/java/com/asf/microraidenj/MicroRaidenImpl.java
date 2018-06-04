@@ -1,17 +1,13 @@
 package com.asf.microraidenj;
 
-import com.asf.microraidenj.eth.interfaces.GetChannelBlock;
-import com.asf.microraidenj.eth.interfaces.TransactionSender;
+import com.asf.microraidenj.eth.GetChannelBlock;
+import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
-import com.asf.microraidenj.util.ByteArray;
 import ethereumj.core.CallTransaction;
 import ethereumj.crypto.ECKey;
-import ethereumj.crypto.HashUtil;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
-import org.spongycastle.util.encoders.Hex;
 
 public final class MicroRaidenImpl implements MicroRaiden {
 
@@ -69,65 +65,10 @@ public final class MicroRaidenImpl implements MicroRaiden {
     Address receiverAddress = Address.from(receiverECKey.getAddress());
 
     return callCooperativeClose(senderECKey, receiverAddress, openBlockNum, owedBalance,
-        getBalanceMsgHashSigned(receiverAddress, openBlockNum, owedBalance, senderECKey),
-        getClosingMsgHashSigned(senderAddress, openBlockNum, owedBalance, receiverECKey));
-  }
-
-  private byte[] getClosingMsgHash(Address senderAddress, BigInteger openBlockNumber,
-      BigInteger owedBalance) {
-    byte[] receiverAddressBytes = senderAddress.getBytes();
-    byte[] channelAddressBytes = channelManagerAddr.getBytes();
-
-    byte[] openBlockNumberBytes = ByteArray.prependZeros(openBlockNumber.toByteArray(), 4);
-    byte[] balanceBytes = ByteArray.prependZeros(Hex.decode(prependZerosIfNeeded(owedBalance)), 24);
-
-    byte[] dataTypeName =
-        "string message_idaddress senderuint32 block_createduint192 balanceaddress contract".getBytes(
-            Charset.forName("UTF-8"));
-    byte[] dataValue =
-        ByteArray.concat("Receiver closing signature".getBytes(), receiverAddressBytes,
-            openBlockNumberBytes, balanceBytes, channelAddressBytes);
-
-    return HashUtil.sha3(ByteArray.concat(HashUtil.sha3(dataTypeName), HashUtil.sha3(dataValue)));
-  }
-
-  private byte[] getClosingMsgHashSigned(Address senderAddress, BigInteger openBlockNumber,
-      BigInteger owedBalance, ECKey receiverECKey) {
-    byte[] closingMsgHash = getClosingMsgHash(senderAddress, openBlockNumber, owedBalance);
-
-    return receiverECKey.sign(closingMsgHash)
-        .toByteArray();
-  }
-
-  private byte[] getBalanceMsgHash(Address receiverAddress, BigInteger openBlockNumber,
-      BigInteger owedBalance) {
-    byte[] receiverAddressBytes = receiverAddress.getBytes();
-    byte[] channelAddressBytes = channelManagerAddr.getBytes();
-
-    byte[] openBlockNumberBytes = ByteArray.prependZeros(openBlockNumber.toByteArray(), 4);
-    byte[] balanceBytes = ByteArray.prependZeros(Hex.decode(prependZerosIfNeeded(owedBalance)), 24);
-
-    byte[] dataTypeName =
-        "string message_idaddress receiveruint32 block_createduint192 balanceaddress contract".getBytes(
-            Charset.forName("UTF-8"));
-    byte[] dataValue =
-        ByteArray.concat("Sender balance proof signature".getBytes(), receiverAddressBytes,
-            openBlockNumberBytes, balanceBytes, channelAddressBytes);
-
-    return HashUtil.sha3(ByteArray.concat(HashUtil.sha3(dataTypeName), HashUtil.sha3(dataValue)));
-  }
-
-  private byte[] getBalanceMsgHashSigned(Address receiverAddress, BigInteger openBlockNumber,
-      BigInteger owedBalance, ECKey senderECKey) {
-    byte[] balanceMsgHash = getBalanceMsgHash(receiverAddress, openBlockNumber, owedBalance);
-
-    return senderECKey.sign(balanceMsgHash)
-        .toByteArray();
-  }
-
-  private String prependZerosIfNeeded(BigInteger balance) {
-    String s = balance.toString(16);
-    return s.length() % 2 == 0 ? s : '0' + s;
+        MicroRaidenUtils.createBalanceMsgHash(receiverAddress, openBlockNum, owedBalance,
+            senderECKey, channelManagerAddr),
+        MicroRaidenUtils.createClosingMsgHash(senderAddress, openBlockNum, owedBalance,
+            receiverECKey, channelManagerAddr));
   }
 
   private String callChannelTopUp(ECKey senderECKey, Address receiverAddress,

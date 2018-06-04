@@ -1,7 +1,7 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
-import com.asf.microraidenj.eth.interfaces.GetNonce;
+import com.asf.microraidenj.eth.GetNonce;
 import com.asf.microraidenj.type.Address;
 import java.math.BigInteger;
 

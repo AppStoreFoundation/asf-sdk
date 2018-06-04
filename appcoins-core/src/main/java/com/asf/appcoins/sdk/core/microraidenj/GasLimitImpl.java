@@ -1,6 +1,6 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
-import com.asf.microraidenj.eth.interfaces.GasLimit;
+import com.asf.microraidenj.eth.GasLimit;
 import com.asf.microraidenj.exception.EstimateGasException;
 import com.asf.microraidenj.type.Address;
 import java.io.IOException;

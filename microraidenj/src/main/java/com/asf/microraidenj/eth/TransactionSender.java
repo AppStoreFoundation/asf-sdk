@@ -1,4 +1,4 @@
-package com.asf.microraidenj.eth.interfaces;
+package com.asf.microraidenj.eth;
 
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;

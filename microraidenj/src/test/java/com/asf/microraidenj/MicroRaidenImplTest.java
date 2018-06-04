@@ -1,7 +1,7 @@
 package com.asf.microraidenj;
 
-import com.asf.microraidenj.eth.interfaces.GetChannelBlock;
-import com.asf.microraidenj.eth.interfaces.TransactionSender;
+import com.asf.microraidenj.eth.GetChannelBlock;
+import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;

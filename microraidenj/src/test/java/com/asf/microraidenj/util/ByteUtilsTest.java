@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 
-public final class ByteArrayTest {
+public final class ByteUtilsTest {
 
   @Test public void prependZeros() {
     byte[] bytes = new byte[2];
@@ -15,7 +15,7 @@ public final class ByteArrayTest {
     expected[6] = 'a';
     expected[7] = 'b';
 
-    assertArrayEquals(expected, ByteArray.prependZeros(bytes, 8));
+    assertArrayEquals(expected, ByteUtils.prependZeros(bytes, 8));
   }
 
   @Test public void concat() {
@@ -24,6 +24,6 @@ public final class ByteArrayTest {
 
     byte[] expected = "ab".getBytes();
 
-    assertArrayEquals(expected, ByteArray.concat(b1, b2));
+    assertArrayEquals(expected, ByteUtils.concat(b1, b2));
   }
 }

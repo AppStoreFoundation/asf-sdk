@@ -1,8 +1,8 @@
 package com.asf.microraidenj.util;
 
-public class ByteArray {
+public class ByteUtils {
 
-  private ByteArray() {
+  private ByteUtils() {
   }
 
   public static byte[] prependZeros(byte[] arr, int size) {

@@ -1,6 +1,6 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
-import com.asf.microraidenj.eth.interfaces.GetChannelBlock;
+import com.asf.microraidenj.eth.GetChannelBlock;
 import com.asf.microraidenj.exception.TransactionNotFoundException;
 import com.asf.microraidenj.type.ByteArray;
 import io.reactivex.Observable;

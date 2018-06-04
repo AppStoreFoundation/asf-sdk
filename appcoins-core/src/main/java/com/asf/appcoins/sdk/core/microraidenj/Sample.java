@@ -2,8 +2,8 @@ package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
 import com.asf.microraidenj.MicroRaidenImpl;
-import com.asf.microraidenj.eth.interfaces.GetChannelBlock;
-import com.asf.microraidenj.eth.interfaces.TransactionSender;
+import com.asf.microraidenj.eth.GetChannelBlock;
+import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
