@@ -22,7 +22,8 @@ public class GetChannelBlockImpl implements GetChannelBlock {
   }
 
   @Override public BigInteger get(HexStr createChannelTxHash) {
-    return Observable.fromCallable(() -> web3j.ethGetTransactionReceipt(createChannelTxHash.get())
+    return Observable.fromCallable(
+        () -> web3j.ethGetTransactionReceipt(createChannelTxHash.get(true))
         .send()
         .getTransactionReceipt())
         .retryWhen(flowable -> flowable.zipWith(Observable.interval(period, TimeUnit.SECONDS),
