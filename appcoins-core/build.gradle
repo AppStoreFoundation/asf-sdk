@@ -42,7 +42,7 @@ dependencies {
 
   androidTestImplementation lib.android_test_runner
 
-  api project(":microraidenj")
+  api project(":microraidenj-bds")
 
   api lib.rxjava
   api lib.web3j

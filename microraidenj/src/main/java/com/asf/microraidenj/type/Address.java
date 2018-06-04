@@ -13,4 +13,8 @@ public class Address extends ByteArray {
   public static Address from(String address) {
     return new Address(ByteArray.from(address));
   }
+
+  @Override public String toString() {
+    return toHexString(true);
+  }
 }

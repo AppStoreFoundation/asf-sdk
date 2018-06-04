@@ -37,5 +37,7 @@ dependencies {
   testImplementation lib.mockito_core
   androidTestImplementation lib.android_test_runner
 
+  api lib.retrofit2
+
   api project(":microraidenj")
 }
