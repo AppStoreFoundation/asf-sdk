@@ -2,6 +2,7 @@ package com.asf.appcoins.sdk.ads.poa.campaign;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,9 +46,9 @@ public class CampaignContractImpl implements CampaignContract {
     List<Type> response = FunctionReturnDecoder.decode(result, function.getOutputParameters());
     if (!response.isEmpty()) {
       return String.valueOf(response.get(0));
-    } else {
-      throw new IllegalArgumentException("Failed to getPackageNameOfCampaign!");
     }
+
+    return handleError(response, "Failed to getPackageNameOfCampaign!", "");
   }
 
   @Override public List<BigInteger> getCampaignsByCountry(String countryId) {
@@ -71,10 +72,10 @@ public class CampaignContractImpl implements CampaignContract {
         ids.add(campaignId);
       }
       return ids;
-    } else {
-      throw new IllegalArgumentException("Failed to getCampaignsByCountry!");
     }
-  }
+
+    return handleError(response, "Failed to getCampaignsByCountry!", new ArrayList<BigInteger>());
+    }
 
   @Override public List<String> getCountryList() {
     Function function = new Function("getCountryList", Collections.emptyList(),
@@ -96,9 +97,9 @@ public class CampaignContractImpl implements CampaignContract {
         countries.add(country);
       }
       return countries;
-    } else {
-      throw new IllegalArgumentException("Failed to getCountryList!");
     }
+
+    return handleError(response, "Failed to getCountryList!", new ArrayList<String>());
   }
 
   @Override public List<BigInteger> getVercodesOfCampaign(BigInteger bidId) {
@@ -125,9 +126,9 @@ public class CampaignContractImpl implements CampaignContract {
         vercodes.add(uint.getValue());
       }
       return vercodes;
-    } else {
-      throw new IllegalArgumentException("Failed to getVercodesOfCampaign!");
     }
+
+    return handleError(response, "Failed to getVercodesOfCampaign!", new ArrayList<BigInteger>());
   }
 
   @Override public boolean getCampaignValidity(BigInteger bidId) {
@@ -149,7 +150,8 @@ public class CampaignContractImpl implements CampaignContract {
         return ((Bool) type).getValue();
       }
     }
-    throw new IllegalArgumentException("Failed to getCampaignValidity!");
+
+    return handleError(response, "Failed to getCampaignValidity!", false);
   }
 
   @Override public boolean isCampaignValid(BigInteger bidId) {
@@ -169,7 +171,9 @@ public class CampaignContractImpl implements CampaignContract {
     if (!response.isEmpty()) {
       return ((Bool) response.get(0)).getValue();
     }
-    throw new IllegalArgumentException("Failed to isCampaignValid!");
+
+    return handleError(response, "Failed to isCampaignValid!", false);
+
   }
 
   private String callSmartContractFunction(Function function, String contractAddress,
@@ -180,5 +184,12 @@ public class CampaignContractImpl implements CampaignContract {
 
     return asfWeb3j.call(transaction)
         .blockingFirst();
+  }
+
+  private <T> T handleError(List<Type> response, String errorMsg, T defaultValue) {
+    if (response.isEmpty()) {
+      return defaultValue;
+    }
+    throw new IllegalArgumentException(errorMsg);
   }
 }

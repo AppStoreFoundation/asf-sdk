@@ -137,10 +137,6 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void stopProcess() {
     if (processing) {
-      processing = false;
-      proofsSent = 0;
-      campaignId = null;
-
       if (sendProof != null) {
         handler.removeCallbacks(sendProof);
       }
@@ -162,6 +158,11 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void finishProcess() {
     Log.d(TAG, "Finishing process.");
+    processing = false;
+    proofsSent = 0;
+    campaignId = null;
+    final AppPreferences appPreferences = new AppPreferences(appContext);
+    appPreferences.remove(PREFERENCE_WALLET_PCKG_NAME);
     poaConnector.disconnectFromService(appContext);
   }
 
