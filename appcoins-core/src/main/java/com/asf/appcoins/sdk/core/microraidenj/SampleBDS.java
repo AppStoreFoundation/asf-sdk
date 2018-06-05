@@ -8,9 +8,9 @@ import com.asf.microraidenj.eth.GetChannelBlock;
 import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.type.Address;
 import com.bds.microraidenj.MicroRaidenBDS;
+import com.bds.microraidenj.channel.ChannelClient;
 import com.bds.microraidenj.ws.BDSMicroRaidenApi;
 import ethereumj.crypto.ECKey;
-import io.reactivex.disposables.Disposable;
 import java.math.BigInteger;
 import java.util.logging.Logger;
 import org.web3j.protocol.Web3j;
@@ -46,26 +46,28 @@ public class SampleBDS {
 
     // Put a private key
     ECKey senderECKey = ECKey.fromPrivate(new BigInteger("", 16));
-    ECKey receiverEcKey = ECKey.fromPrivate(
-        new BigInteger("dd615cb6205e116410272c5c885ec1fcc1728bac667704523cc79a694fd61227", 16));
 
-    Address receiverAddress = Address.from(receiverEcKey.getAddress());
+    Address receiverAddress = Address.from("0x31a16aDF2D5FC73F149fBB779D20c036678b1bBD");
 
-    BigInteger openBlockNumber =
-        microRaidenBDS.createChannel(senderECKey, receiverAddress, BigInteger.valueOf(1))
+    ChannelClient channelClient =
+        microRaidenBDS.createChannel(senderECKey, receiverAddress, maxDeposit)
             .blockingGet();
+
+    BigInteger openBlockNumber = channelClient.getOpenBlockNumber();
 
     log.info("Channel created on block " + openBlockNumber);
 
-    microRaidenBDS.topUpChannel(senderECKey, receiverAddress, openBlockNumber, maxDeposit)
-        .blockingAwait();
+    //channelClient.topUp(maxDeposit.divide(BigInteger.valueOf(2)));
 
-    log.info("Channel topup");
+    //log.info("Channel topup");
 
     BigInteger owedBalance = BigInteger.valueOf(1);
 
-    Disposable disposable =
-        microRaidenBDS.closeChannel(senderECKey, receiverAddress, openBlockNumber, owedBalance)
-            .subscribe(txHash -> log.info("Channel closed with tx " + txHash));
+    try {
+      channelClient.closeCooperatively(owedBalance, senderECKey);
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println(e.getMessage());
+    }
   }
 }
