@@ -21,7 +21,7 @@ for testing purposes.
 + Minimum gradle plugin version is 3.0.1.
 + Minimum build tools version is 26.0.1.
 + The Android minimum API Level to use ASF SDK is 21 (Android 5.0).
-+ Basic understanding of RxJava is advised but now required.
++ Basic understanding of RxJava not required but is recommended.
 
 ## Build Script
 
