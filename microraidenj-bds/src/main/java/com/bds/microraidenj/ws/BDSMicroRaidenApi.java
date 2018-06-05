@@ -1,6 +1,7 @@
 package com.bds.microraidenj.ws;
 
 import com.asf.microraidenj.type.Address;
+import com.asf.microraidenj.type.ByteArray;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 import retrofit2.Retrofit;
@@ -23,6 +24,12 @@ public interface BDSMicroRaidenApi {
   }
 
   @GET("close_sig") Observable<CloseChannelResponse> closeChannel(
-      @Query("sender") Address senderAddress, @Query("openBlock") BigInteger openBlockNum,
-      @Query("balance") BigInteger owedBalance);
+      @Query("sender") Address senderAddress, @Query("openBlock") BigInteger openBlock,
+      @Query("balance") BigInteger owedBalance, @Query("balance_proof") ByteArray balanceProof);
+
+  @GET("channelpayment") Observable<MakePaymentResponse> makePayment(
+      @Query("balance_proof") ByteArray balanceProof, @Query("sender") Address senderAddress,
+      @Query("openBlock") BigInteger openBlock, @Query("item_cost") BigInteger itemCost,
+      @Query("balance") BigInteger balance, @Query("dev") Address devAddress,
+      @Query("store") Address storeAddress, @Query("oem") Address oemAddress);
 }

@@ -31,6 +31,10 @@ public class ByteArray {
     return bytes;
   }
 
+  @Override public String toString() {
+    return toHexString(true);
+  }
+
   @Override public final int hashCode() {
     return Arrays.hashCode(bytes);
   }

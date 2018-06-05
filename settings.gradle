@@ -1,9 +1,10 @@
 rootProject.name = 'asf-sdk'
 
-include ':appcoins', ':microraidenj-bds'
+include ':appcoins'
 include ':appcoins-core'
 include ':appcoins-iab'
 include ':appcoins-ads'
 include ':microraidenj'
+include ':microraidenj-bds'
 include ':ethereumj-android'
 include ':toolbox'

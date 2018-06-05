@@ -6,9 +6,11 @@ import com.asf.microraidenj.MicroRaidenClient;
 import com.asf.microraidenj.contract.MicroRaidenContract;
 import com.asf.microraidenj.eth.GetChannelBlock;
 import com.asf.microraidenj.eth.TransactionSender;
+import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
 import com.bds.microraidenj.MicroRaidenBDS;
-import com.bds.microraidenj.channel.ChannelClient;
+import com.bds.microraidenj.channel.BDSChannelClient;
+import com.bds.microraidenj.channel.InsufficientFundsException;
 import com.bds.microraidenj.ws.BDSMicroRaidenApi;
 import ethereumj.crypto.ECKey;
 import java.math.BigInteger;
@@ -19,7 +21,8 @@ import org.web3j.protocol.http.HttpService;
 
 public class SampleBDS {
 
-  public static void main(String[] args) {
+  public static void main(String[] args)
+      throws InsufficientFundsException, TransactionFailedException {
 
     Web3j web3j =
         Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
@@ -49,22 +52,28 @@ public class SampleBDS {
 
     Address receiverAddress = Address.from("0x31a16aDF2D5FC73F149fBB779D20c036678b1bBD");
 
-    ChannelClient channelClient =
+    BDSChannelClient bdsChannelClient =
         microRaidenBDS.createChannel(senderECKey, receiverAddress, maxDeposit)
             .blockingGet();
 
-    BigInteger openBlockNumber = channelClient.getOpenBlockNumber();
+    BigInteger openBlockNumber = bdsChannelClient.getOpenBlockNumber();
 
     log.info("Channel created on block " + openBlockNumber);
 
-    //channelClient.topUp(maxDeposit.divide(BigInteger.valueOf(2)));
+    //bdsChannelClient.topUp(maxDeposit.divide(BigInteger.valueOf(2)));
 
     //log.info("Channel topup");
+
+    Address devAddress = receiverAddress;
+    Address storeAddress = receiverAddress;
+    Address oemAddress = receiverAddress;
+
+    bdsChannelClient.makePayment(BigInteger.valueOf(1), devAddress, storeAddress, oemAddress);
 
     BigInteger owedBalance = BigInteger.valueOf(1);
 
     try {
-      channelClient.closeCooperatively(owedBalance, senderECKey);
+      bdsChannelClient.closeCooperatively(senderECKey);
     } catch (Exception e) {
       e.printStackTrace();
       System.out.println(e.getMessage());

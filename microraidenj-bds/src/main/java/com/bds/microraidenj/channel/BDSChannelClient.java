@@ -4,16 +4,15 @@ import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
 import ethereumj.crypto.ECKey;
-import io.reactivex.Single;
 import java.math.BigInteger;
 
-public interface ChannelClient {
+public interface BDSChannelClient {
 
   void topUp(BigInteger depositToAdd) throws TransactionFailedException, DepositTooHighException;
 
-  String closeCooperatively(BigInteger owedBalance, ECKey ecKey) throws TransactionFailedException;
+  String closeCooperatively(ECKey ecKey) throws TransactionFailedException;
 
-  Single<byte[]> transfer(BigInteger amount)
+  void makePayment(BigInteger amount, Address devAddress, Address storeAddress, Address oemAddress)
       throws InsufficientFundsException, TransactionFailedException;
 
   BigInteger getOpenBlockNumber();
