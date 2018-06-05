@@ -11,7 +11,7 @@ import retrofit2.http.Query;
 
 public interface BDSMicroRaidenApi {
 
-  String ENDPOINT = "http:///";
+  String ENDPOINT = "http://34.240.68.255/appc/";
 
   static BDSMicroRaidenApi create() {
     Retrofit retrofit = new Retrofit.Builder().addConverterFactory(JacksonConverterFactory.create())
@@ -22,7 +22,7 @@ public interface BDSMicroRaidenApi {
     return retrofit.create(BDSMicroRaidenApi.class);
   }
 
-  @GET("") Observable<CloseChannelResponse> closeChannel(
-      @Query("senderAddress") Address senderAddress, @Query("openBlockNum") BigInteger openBlockNum,
-      @Query("owedBalance") BigInteger owedBalance, @Query("balanceProof") String balanceProof);
+  @GET("close_sig") Observable<CloseChannelResponse> closeChannel(
+      @Query("sender") Address senderAddress, @Query("openBlock") BigInteger openBlockNum,
+      @Query("balance") BigInteger owedBalance);
 }

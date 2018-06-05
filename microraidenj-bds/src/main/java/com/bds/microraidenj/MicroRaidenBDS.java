@@ -41,7 +41,7 @@ public final class MicroRaidenBDS {
             owedBalance)))
         .flatMapObservable(
             balanceProof -> bdsMicroRaidenApi.closeChannel(Address.from(senderECKey.getAddress()),
-                openBlockNumber, owedBalance, balanceProof))
+                openBlockNumber, owedBalance))
         .map(this::extractSig)
         .map(closingMsg -> microRaidenClient.closeChannelCooperatively(senderECKey, receiverAddress,
             openBlockNumber, owedBalance, closingMsg, senderECKey))

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class CloseChannelResponse {
 
-  @JsonProperty("closingSig") private String closingSig;
+  @JsonProperty("close_sig") private String closingSig;
 
   public CloseChannelResponse(String closingSig) {
     this.closingSig = closingSig;
