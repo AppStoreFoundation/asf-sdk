@@ -5,4 +5,7 @@
   <string name="handshake">Handshake</string>
   <string name="register">Register Campaign</string>
   <string name="send_proof">Send Proof</string>
+  <string name="createChannelButton">Create Channel</string>
+  <string name="makePaymentButton">Make Payment</string>
+  <string name="closeChannelButton">Close Channel</string>
 </resources>
