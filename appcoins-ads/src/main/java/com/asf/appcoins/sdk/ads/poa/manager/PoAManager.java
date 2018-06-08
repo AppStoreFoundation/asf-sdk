@@ -137,10 +137,6 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void stopProcess() {
     if (processing) {
-      processing = false;
-      proofsSent = 0;
-      campaignId = null;
-
       if (sendProof != null) {
         handler.removeCallbacks(sendProof);
       }
@@ -162,6 +158,11 @@ public class PoAManager implements LifeCycleListener.Listener {
    */
   public void finishProcess() {
     Log.d(TAG, "Finishing process.");
+    processing = false;
+    proofsSent = 0;
+    campaignId = null;
+    final AppPreferences appPreferences = new AppPreferences(appContext);
+    appPreferences.remove(PREFERENCE_WALLET_PCKG_NAME);
     poaConnector.disconnectFromService(appContext);
   }
 
@@ -243,23 +244,9 @@ public class PoAManager implements LifeCycleListener.Listener {
         .retryWhen(throwableObservable -> throwableObservable.flatMap(
             throwable -> ReactiveNetwork.observeInternetConnectivity())
             .flatMap(this::retryIfNetworkAvailable))
-        .subscribe(campaigns -> {
-          if (campaigns.isEmpty()) {
-            Log.d(TAG, "No campaign is available.");
-            stopProcess();
-          } else {
-            BigInteger campaignId = campaigns.get(0)
-                .getId();
-
-            Bundle bundle = new Bundle();
-            bundle.putString("packageName", appContext.getPackageName());
-            bundle.putString("campaignId", campaignId.toString());
-
-            poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
-
-            this.campaignId = campaignId;
-          }
-        }));
+        .firstOrError()
+        .doOnSuccess(this::processCampaign)
+        .subscribe());
   }
 
   private int getVerCode(Context context, String packageName)
@@ -322,5 +309,27 @@ public class PoAManager implements LifeCycleListener.Listener {
 
     stopProcess();
     compositeDisposable.dispose();
+  }
+
+  /**
+   * Process the given campaigns list. In case the list is empty the PoA process is stopped.
+   * Otherwise the register campaign message is send with the first campaign on the list.
+   */
+  private void processCampaign(List<Campaign> campaigns) {
+    if (campaigns.isEmpty()) {
+      Log.d(TAG, "No campaign is available.");
+      stopProcess();
+    } else {
+      BigInteger campaignId = campaigns.get(0)
+          .getId();
+
+      Bundle bundle = new Bundle();
+      bundle.putString("packageName", appContext.getPackageName());
+      bundle.putString("campaignId", campaignId.toString());
+
+      poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
+
+      this.campaignId = campaignId;
+    }
   }
 }
