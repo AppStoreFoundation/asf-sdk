@@ -8,6 +8,7 @@ import com.asf.microraidenj.DefaultMicroRaidenClient;
 import com.asf.microraidenj.contract.MicroRaidenContract;
 import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.type.Address;
+import com.bds.microraidenj.DefaultMicroRaidenBDS;
 import com.bds.microraidenj.MicroRaidenBDS;
 import com.bds.microraidenj.util.TransactionSenderImpl;
 import com.bds.microraidenj.ws.BDSMicroRaidenApi;
@@ -37,7 +38,7 @@ public class BDSMicroRaidenjSingleton {
         new TransactionSenderImpl(web3j, () -> BigInteger.valueOf(50000000000L),
             new GetNonceImpl(asfWeb3j), new GasLimitImpl(web3j));
 
-    return new MicroRaidenBDS(
+    return new DefaultMicroRaidenBDS(
         new DefaultMicroRaidenClient(channelManagerAddr, BigInteger.valueOf(13),
             new GetChannelBlockImpl(web3j, 3, 1500),
             new MicroRaidenContract(channelManagerAddr, tokenAddr, transactionSender)),

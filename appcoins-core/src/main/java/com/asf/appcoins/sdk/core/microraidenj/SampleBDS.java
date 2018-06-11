@@ -8,6 +8,7 @@ import com.asf.microraidenj.eth.GetChannelBlock;
 import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
+import com.bds.microraidenj.DefaultMicroRaidenBDS;
 import com.bds.microraidenj.MicroRaidenBDS;
 import com.bds.microraidenj.channel.BDSChannelClient;
 import com.bds.microraidenj.channel.InsufficientFundsException;
@@ -46,7 +47,7 @@ public class SampleBDS {
         new DefaultMicroRaidenClient(channelManagerAddr, maxDeposit, getChannelBlock,
             microRaidenContract);
     BDSMicroRaidenApi bdsMicroRaidenApi = BDSMicroRaidenApi.create(true);
-    MicroRaidenBDS microRaidenBDS = new MicroRaidenBDS(microRaidenClient, bdsMicroRaidenApi);
+    MicroRaidenBDS microRaidenBDS = new DefaultMicroRaidenBDS(microRaidenClient, bdsMicroRaidenApi);
 
     // Put a private key
     ECKey senderECKey = ECKey.fromPrivate(new BigInteger("", 16));
