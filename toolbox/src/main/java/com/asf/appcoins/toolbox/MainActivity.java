@@ -98,6 +98,9 @@ public class MainActivity extends AppCompatActivity {
   public void onCreateChannelButtonClicked(View view) {
     compositeDisposable.add(
         microRaidenBDS.createChannel(senderECKey, receiverAddress, BigInteger.valueOf(10))
+            .doOnSubscribe(disposable -> runOnUiThread(
+                () -> Toast.makeText(this, "Creating channel", Toast.LENGTH_SHORT)
+                    .show()))
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess(
                 bdsChannelClient1 -> Toast.makeText(this, "Channel Created.", Toast.LENGTH_SHORT)
@@ -114,6 +117,9 @@ public class MainActivity extends AppCompatActivity {
     Completable.fromAction(
         () -> bdsChannelClient.makePayment(BigInteger.ONE, receiverAddress, receiverAddress,
             receiverAddress))
+        .doOnSubscribe(disposable -> runOnUiThread(
+            () -> Toast.makeText(this, "Making payment", Toast.LENGTH_SHORT)
+                .show()))
         .observeOn(AndroidSchedulers.mainThread())
         .doOnError(throwable -> Toast.makeText(this, "Payment Failed!", Toast.LENGTH_SHORT)
             .show())
@@ -126,16 +132,22 @@ public class MainActivity extends AppCompatActivity {
   public void onCloseChannelButtonClicked(View view) {
     if (!checkChannelAvailable()) {
       return;
-    }
+    } else {
+      BDSChannelClient tmp = bdsChannelClient;
+      bdsChannelClient = null;
 
-    Single.fromCallable(() -> bdsChannelClient.closeCooperatively(senderECKey))
-        .observeOn(AndroidSchedulers.mainThread())
-        .doOnError(throwable -> Toast.makeText(this, "Transaction Failed!", Toast.LENGTH_SHORT)
-            .show())
-        .subscribeOn(Schedulers.io())
-        .doOnSuccess(s -> Toast.makeText(this, "Channel Closed.", Toast.LENGTH_SHORT)
-            .show())
-        .subscribe();
+      Single.fromCallable(() -> tmp.closeCooperatively(senderECKey))
+          .observeOn(AndroidSchedulers.mainThread())
+          .doOnSubscribe(disposable -> runOnUiThread(
+              () -> Toast.makeText(this, "Closing channel", Toast.LENGTH_SHORT)
+                  .show()))
+          .doOnError(throwable -> Toast.makeText(this, "Transaction Failed!", Toast.LENGTH_SHORT)
+              .show())
+          .subscribeOn(Schedulers.io())
+          .doOnSuccess(s -> Toast.makeText(this, "Channel Closed.", Toast.LENGTH_SHORT)
+              .show())
+          .subscribe();
+    }
   }
 
   private boolean checkChannelAvailable() {
