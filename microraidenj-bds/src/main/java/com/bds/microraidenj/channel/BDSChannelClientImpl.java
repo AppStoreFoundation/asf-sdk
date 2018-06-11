@@ -9,11 +9,13 @@ import com.bds.microraidenj.ws.BDSMicroRaidenApi;
 import com.bds.microraidenj.ws.CloseChannelResponse;
 import ethereumj.crypto.ECKey;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.spongycastle.util.encoders.Hex;
+import retrofit2.HttpException;
 
 public final class BDSChannelClientImpl implements BDSChannelClient {
 
@@ -81,15 +83,25 @@ public final class BDSChannelClientImpl implements BDSChannelClient {
             balanceProof -> bdsMicroRaidenApi.makePayment(balanceProof, getSenderAddress(),
                 // TODO: 06-06-2018 neuro actualizar balanço
                 openBlockNumber, value, owedBalance, devAddress, storeAddress, oemAddress)
-                .retryWhen(throwableObservable -> {
-                  AtomicInteger counter = new AtomicInteger();
-                  return throwableObservable.takeWhile(__ -> counter.getAndIncrement() != 5)
-                      .flatMap(__ -> Observable.timer(5, TimeUnit.SECONDS));
-                })
+                .retryWhen(this::handleZeError)
                 .map(makePaymentResponse -> balanceProof.getBytes())
                 .ignoreElements())
         .doOnError(throwable -> owedBalance = owedBalance.subtract(value))
         .blockingAwait();
+  }
+
+  private ObservableSource<?> handleZeError(Observable<Throwable> throwableObservable) {
+    AtomicInteger counter = new AtomicInteger();
+
+    return throwableObservable.flatMap(throwable -> {
+      if (throwable instanceof HttpException) {
+        return Observable.just(throwable)
+            .takeWhile(__ -> counter.getAndIncrement() != 5)
+            .flatMap(__ -> Observable.timer(5, TimeUnit.SECONDS));
+      } else {
+        return Observable.just(throwable);
+      }
+    });
   }
 
   @Override public BigInteger getOpenBlockNumber() {
