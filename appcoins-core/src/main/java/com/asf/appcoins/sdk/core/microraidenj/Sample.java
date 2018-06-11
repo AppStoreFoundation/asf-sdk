@@ -11,6 +11,7 @@ import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
+import com.bds.microraidenj.util.TransactionSenderImpl;
 import ethereumj.crypto.ECKey;
 import java.math.BigInteger;
 import java.util.logging.Logger;
@@ -31,7 +32,7 @@ public class Sample {
     Logger log = Logger.getLogger(MicroRaidenClient.class.getSimpleName());
     BigInteger maxDeposit = BigInteger.valueOf(10);
     TransactionSender transactionSender =
-        new TransactionSenderImpl(asfWeb3j, () -> BigInteger.valueOf(50000000000L),
+        new TransactionSenderImpl(web3j, () -> BigInteger.valueOf(50000000000L),
             new GetNonceImpl(asfWeb3j),
             new GasLimitImpl(web3j));
 

@@ -11,6 +11,7 @@ import com.asf.microraidenj.type.Address;
 import com.bds.microraidenj.MicroRaidenBDS;
 import com.bds.microraidenj.channel.BDSChannelClient;
 import com.bds.microraidenj.channel.InsufficientFundsException;
+import com.bds.microraidenj.util.TransactionSenderImpl;
 import com.bds.microraidenj.ws.BDSMicroRaidenApi;
 import ethereumj.crypto.ECKey;
 import java.math.BigInteger;
@@ -33,7 +34,7 @@ public class SampleBDS {
     Logger log = Logger.getLogger(MicroRaidenClient.class.getSimpleName());
     BigInteger maxDeposit = BigInteger.valueOf(10);
     TransactionSender transactionSender =
-        new TransactionSenderImpl(asfWeb3j, () -> BigInteger.valueOf(50000000000L),
+        new TransactionSenderImpl(web3j, () -> BigInteger.valueOf(50000000000L),
             new GetNonceImpl(asfWeb3j), new GasLimitImpl(web3j));
 
     GetChannelBlock getChannelBlock =

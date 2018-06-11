@@ -1,6 +1,5 @@
-package com.asf.appcoins.sdk.core.microraidenj;
+package com.bds.microraidenj.util;
 
-import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.asf.microraidenj.eth.GasLimit;
 import com.asf.microraidenj.eth.GasPrice;
 import com.asf.microraidenj.eth.GetNonce;
@@ -11,19 +10,21 @@ import com.asf.microraidenj.type.Address;
 import ethereumj.Transaction;
 import ethereumj.core.CallTransaction;
 import ethereumj.crypto.ECKey;
+import java.io.IOException;
 import java.math.BigInteger;
 import org.spongycastle.util.encoders.Hex;
+import org.web3j.protocol.Web3j;
 
 public class TransactionSenderImpl implements TransactionSender {
 
-  private final AsfWeb3j asfWeb3j;
+  private final Web3j web3j;
   private final GasPrice gasPrice;
   private final GetNonce getNonce;
   private final GasLimit gasLimit;
 
-  public TransactionSenderImpl(AsfWeb3j asfWeb3j, GasPrice gasPrice, GetNonce getNonce,
+  public TransactionSenderImpl(Web3j web3j, GasPrice gasPrice, GetNonce getNonce,
       GasLimit gasLimit) {
-    this.asfWeb3j = asfWeb3j;
+    this.web3j = web3j;
     this.gasPrice = gasPrice;
     this.getNonce = getNonce;
     this.gasLimit = gasLimit;
@@ -47,7 +48,12 @@ public class TransactionSenderImpl implements TransactionSender {
 
     transaction.sign(senderECKey);
 
-    return asfWeb3j.sendRawTransaction("0x" + Hex.toHexString(transaction.getEncoded()))
-        .blockingFirst();
+    try {
+      return web3j.ethSendRawTransaction("0x" + Hex.toHexString(transaction.getEncoded()))
+          .send()
+          .getTransactionHash();
+    } catch (IOException e) {
+      throw new TransactionFailedException(e);
+    }
   }
 }
