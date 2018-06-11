@@ -23,12 +23,12 @@ public class BDSMicroRaidenjSingleton {
   private static final Address tokenAddr =
       Address.from("0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3");
 
-  private static MicroRaidenBDS instance = create();
+  private static MicroRaidenBDS instance = create(false);
 
   private BDSMicroRaidenjSingleton() {
   }
 
-  public static MicroRaidenBDS create() {
+  public static MicroRaidenBDS create(boolean debug) {
     Web3j web3j =
         Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
     AsfWeb3jImpl asfWeb3j = new AsfWeb3jImpl(web3j);
@@ -41,7 +41,7 @@ public class BDSMicroRaidenjSingleton {
         new DefaultMicroRaidenClient(channelManagerAddr, BigInteger.valueOf(13),
             new GetChannelBlockImpl(web3j, 3, 1500),
             new MicroRaidenContract(channelManagerAddr, tokenAddr, transactionSender)),
-        BDSMicroRaidenApi.create());
+        BDSMicroRaidenApi.create(debug));
   }
 
   public static MicroRaidenBDS getInstance() {

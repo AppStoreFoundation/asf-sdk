@@ -3,7 +3,11 @@ package com.bds.microraidenj.ws;
 import com.asf.microraidenj.type.Address;
 import com.asf.microraidenj.type.ByteArray;
 import io.reactivex.Observable;
+import java.io.IOException;
 import java.math.BigInteger;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -14,13 +18,29 @@ public interface BDSMicroRaidenApi {
 
   String ENDPOINT = "http://34.240.68.255/appc/";
 
-  static BDSMicroRaidenApi create() {
+  static BDSMicroRaidenApi create(boolean debug) {
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+
+    if (debug) {
+      builder.addInterceptor(BDSMicroRaidenApi::debugCall);
+    }
+
+    OkHttpClient client = builder.build();
+
     Retrofit retrofit = new Retrofit.Builder().addConverterFactory(JacksonConverterFactory.create())
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .client(client)
         .baseUrl(ENDPOINT)
         .build();
 
     return retrofit.create(BDSMicroRaidenApi.class);
+  }
+
+  static Response debugCall(Interceptor.Chain chain) throws IOException {
+    System.out.println("Request: " + chain.request());
+    Response response = chain.proceed(chain.request());
+    System.out.println("Response: " + response);
+    return response;
   }
 
   @GET("close_sig") Observable<CloseChannelResponse> closeChannel(

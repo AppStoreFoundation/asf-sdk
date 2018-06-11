@@ -44,7 +44,7 @@ public class SampleBDS {
     MicroRaidenClient microRaidenClient =
         new DefaultMicroRaidenClient(channelManagerAddr, maxDeposit, getChannelBlock,
             microRaidenContract);
-    BDSMicroRaidenApi bdsMicroRaidenApi = BDSMicroRaidenApi.create();
+    BDSMicroRaidenApi bdsMicroRaidenApi = BDSMicroRaidenApi.create(true);
     MicroRaidenBDS microRaidenBDS = new MicroRaidenBDS(microRaidenClient, bdsMicroRaidenApi);
 
     // Put a private key
