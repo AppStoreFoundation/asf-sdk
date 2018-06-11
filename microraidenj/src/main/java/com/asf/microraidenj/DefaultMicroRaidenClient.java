@@ -1,7 +1,7 @@
 package com.asf.microraidenj;
 
 import com.asf.microraidenj.contract.MicroRaidenContract;
-import com.asf.microraidenj.eth.GetChannelBlock;
+import com.asf.microraidenj.eth.ChannelBlockObtainer;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
@@ -17,15 +17,15 @@ public final class DefaultMicroRaidenClient implements MicroRaidenClient {
   private final BigInteger maxDeposit;
   private final Address channelManagerAddr;
 
-  private final GetChannelBlock getChannelBlock;
+  private final ChannelBlockObtainer channelBlockObtainer;
 
   private final MicroRaidenContract microRaidenContract;
 
   public DefaultMicroRaidenClient(Address channelManagerAddr, BigInteger maxDeposit,
-      GetChannelBlock getChannelBlock, MicroRaidenContract microRaidenContract) {
+      ChannelBlockObtainer channelBlockObtainer, MicroRaidenContract microRaidenContract) {
     this.channelManagerAddr = channelManagerAddr;
     this.maxDeposit = maxDeposit;
-    this.getChannelBlock = getChannelBlock;
+    this.channelBlockObtainer = channelBlockObtainer;
     this.microRaidenContract = microRaidenContract;
   }
 
@@ -41,7 +41,8 @@ public final class DefaultMicroRaidenClient implements MicroRaidenClient {
       String createChannelTxHash =
           microRaidenContract.callCreateChannel(senderECKey, receiverAddress, deposit);
 
-      return getChannelBlock.get(com.asf.microraidenj.type.ByteArray.from(createChannelTxHash));
+      return channelBlockObtainer.get(
+          com.asf.microraidenj.type.ByteArray.from(createChannelTxHash));
     } catch (DepositTooHighException e) {
       throw e;
     } catch (Exception e) {

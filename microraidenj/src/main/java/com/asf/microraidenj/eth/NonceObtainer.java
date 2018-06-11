@@ -3,7 +3,7 @@ package com.asf.microraidenj.eth;
 import com.asf.microraidenj.type.Address;
 import java.math.BigInteger;
 
-public interface GetNonce {
+public interface NonceObtainer {
 
-  BigInteger get(Address address);
+  BigInteger getNonce(Address address);
 }

@@ -1,7 +1,7 @@
 package com.asf.microraidenj;
 
 import com.asf.microraidenj.contract.MicroRaidenContract;
-import com.asf.microraidenj.eth.GetChannelBlock;
+import com.asf.microraidenj.eth.ChannelBlockObtainer;
 import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
@@ -29,17 +29,17 @@ public class DefaultMicroRaidenClientTest {
 
   @Test public void createChannel() throws TransactionFailedException, DepositTooHighException {
     TransactionSender transactionSender = Mockito.mock(TransactionSender.class);
-    GetChannelBlock getChannelBlock = Mockito.mock(GetChannelBlock.class);
+    ChannelBlockObtainer channelBlockObtainer = Mockito.mock(ChannelBlockObtainer.class);
 
     Mockito.when(transactionSender.send(any(), any(), any(), any()))
         .thenReturn("0xa04391a989f95c09cb3d553b42341fab3f38d4b7d9eed8585a646c44d8f2f54d");
 
-    Mockito.when(getChannelBlock.get(
+    Mockito.when(channelBlockObtainer.get(
         ByteArray.from("0xa04391a989f95c09cb3d553b42341fab3f38d4b7d9eed8585a646c44d8f2f54d")))
         .thenReturn(BigInteger.ONE);
 
     MicroRaidenClient microRaiden =
-        new DefaultMicroRaidenClient(CHANNEL_MANAGER_ADRESS, MAX_DEPOSIT, getChannelBlock,
+        new DefaultMicroRaidenClient(CHANNEL_MANAGER_ADRESS, MAX_DEPOSIT, channelBlockObtainer,
             new MicroRaidenContract(CHANNEL_MANAGER_ADRESS, TOKEN_ADRESS, transactionSender));
 
     microRaiden.createChannel(ECKey.fromPrivate(

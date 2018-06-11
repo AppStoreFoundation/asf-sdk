@@ -1,8 +1,8 @@
 package com.asf.appcoins.toolbox;
 
-import com.asf.appcoins.sdk.core.microraidenj.GasLimitImpl;
-import com.asf.appcoins.sdk.core.microraidenj.GetChannelBlockImpl;
-import com.asf.appcoins.sdk.core.microraidenj.GetNonceImpl;
+import com.asf.appcoins.sdk.core.microraidenj.DefaultChannelBlockObtainer;
+import com.asf.appcoins.sdk.core.microraidenj.DefaultGasLimitEstimator;
+import com.asf.appcoins.sdk.core.microraidenj.DefaultNonceObtainer;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
 import com.asf.microraidenj.DefaultMicroRaidenClient;
 import com.asf.microraidenj.contract.MicroRaidenContract;
@@ -10,7 +10,7 @@ import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.type.Address;
 import com.bds.microraidenj.DefaultMicroRaidenBDS;
 import com.bds.microraidenj.MicroRaidenBDS;
-import com.bds.microraidenj.util.TransactionSenderImpl;
+import com.bds.microraidenj.util.DefaultTransactionSender;
 import com.bds.microraidenj.ws.BDSMicroRaidenApi;
 import java.math.BigInteger;
 import org.web3j.protocol.Web3j;
@@ -35,12 +35,12 @@ public class BDSMicroRaidenjSingleton {
     AsfWeb3jImpl asfWeb3j = new AsfWeb3jImpl(web3j);
 
     TransactionSender transactionSender =
-        new TransactionSenderImpl(web3j, () -> BigInteger.valueOf(50000000000L),
-            new GetNonceImpl(asfWeb3j), new GasLimitImpl(web3j));
+        new DefaultTransactionSender(web3j, () -> BigInteger.valueOf(50000000000L),
+            new DefaultNonceObtainer(asfWeb3j), new DefaultGasLimitEstimator(web3j));
 
     return new DefaultMicroRaidenBDS(
         new DefaultMicroRaidenClient(channelManagerAddr, BigInteger.valueOf(13),
-            new GetChannelBlockImpl(web3j, 3, 1500),
+            new DefaultChannelBlockObtainer(web3j, 3, 1500),
             new MicroRaidenContract(channelManagerAddr, tokenAddr, transactionSender)),
         BDSMicroRaidenApi.create(debug));
   }
