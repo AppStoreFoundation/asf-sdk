@@ -1,5 +1,6 @@
-package com.asf.microraidenj;
+package com.bds.microraidenj;
 
+import com.asf.microraidenj.MicroRaidenClient;
 import com.asf.microraidenj.contract.MicroRaidenContract;
 import com.asf.microraidenj.eth.ChannelBlockObtainer;
 import com.asf.microraidenj.exception.DepositTooHighException;

@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.core.microraidenj;
+package com.bds.microraidenj;
 
 import com.asf.microraidenj.eth.ChannelBlockObtainer;
 import com.asf.microraidenj.exception.TransactionNotFoundException;
