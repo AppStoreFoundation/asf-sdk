@@ -39,10 +39,10 @@ dependencies {
 
   androidTestImplementation lib.android_test_runner
 
-  implementation lib.support_annotations
-  implementation lib.commons_lang3
-  implementation lib.spongycastle_prov
-  implementation lib.jackson
+  api lib.support_annotations
+  api lib.commons_lang3
+  api lib.spongycastle_prov
+  api lib.jackson
 }
 
 //region Publishing
