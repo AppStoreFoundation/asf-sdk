@@ -113,9 +113,9 @@ public class MainActivity extends AppCompatActivity {
       return;
     }
 
-    Completable.fromAction(
-        () -> bdsChannel.makePayment(BigInteger.ONE, receiverAddress, receiverAddress,
-            receiverAddress))
+    Completable.defer(() -> bdsChannel.makePayment(BigInteger.ONE, receiverAddress, receiverAddress,
+        receiverAddress)
+        .toCompletable())
         .doOnSubscribe(disposable -> runOnUiThread(
             () -> Toast.makeText(this, "Making payment", Toast.LENGTH_SHORT)
                 .show()))

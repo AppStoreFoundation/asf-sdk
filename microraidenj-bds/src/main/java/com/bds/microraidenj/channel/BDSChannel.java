@@ -15,7 +15,8 @@ public interface BDSChannel {
 
   String closeCooperatively(ECKey ecKey) throws TransactionFailedException;
 
-  void makePayment(BigInteger amount, Address devAddress, Address storeAddress, Address oemAddress)
+  Single<String> makePayment(BigInteger amount, Address devAddress, Address storeAddress,
+      Address oemAddress)
       throws InsufficientFundsException, TransactionFailedException;
 
   Single<List<ChannelHistoryResponse.MicroTransaction>> listTransactions();

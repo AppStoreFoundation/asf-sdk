@@ -8,6 +8,7 @@ import com.asf.microraidenj.type.ByteArray;
 import com.bds.microraidenj.ws.BDSMicroRaidenApi;
 import com.bds.microraidenj.ws.ChannelHistoryResponse;
 import com.bds.microraidenj.ws.CloseChannelResponse;
+import com.bds.microraidenj.ws.MakePaymentResponse;
 import com.bds.microraidenj.ws.Type;
 import ethereumj.crypto.ECKey;
 import io.reactivex.Observable;
@@ -70,9 +71,10 @@ public final class BDSChannelImpl implements BDSChannel {
         .blockingFirst();
   }
 
-  @Override public void makePayment(BigInteger value, Address devAddress, Address storeAddress,
+  @Override
+  public Single<String> makePayment(BigInteger value, Address devAddress, Address storeAddress,
       Address oemAddress) {
-    Single.fromCallable(() -> {
+    return Single.fromCallable(() -> {
       if (hasFunds(value)) {
         return createBalanceProof();
       } else {
@@ -82,15 +84,14 @@ public final class BDSChannelImpl implements BDSChannel {
     })
         .doOnSubscribe(disposable -> owedBalance = owedBalance.add(value))
         .map(ByteArray::new)
-        .flatMapCompletable(
+        .flatMap(
             balanceProof -> bdsMicroRaidenApi.makePayment(balanceProof, getSenderAddress(),
                 // TODO: 06-06-2018 neuro actualizar balanço
                 openBlockNumber, value, owedBalance, devAddress, storeAddress, oemAddress)
                 .retryWhen(this::handleWsError)
-                .map(makePaymentResponse -> balanceProof.getBytes())
-                .ignoreElements())
-        .doOnError(throwable -> owedBalance = owedBalance.subtract(value))
-        .blockingAwait();
+                .map(MakePaymentResponse::getResult)
+                .singleOrError())
+        .doOnError(throwable -> owedBalance = owedBalance.subtract(value));
   }
 
   @Override public Single<List<ChannelHistoryResponse.MicroTransaction>> listTransactions() {
