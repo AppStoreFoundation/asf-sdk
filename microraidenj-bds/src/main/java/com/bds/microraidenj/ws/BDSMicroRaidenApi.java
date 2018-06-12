@@ -70,7 +70,7 @@ public interface BDSMicroRaidenApi {
 
   @GET("channelhistory") Observable<ChannelHistoryResponse> channelHistory(
       @Query("sender") Address senderAddress, @Query("receiver") Address receiverAddress,
-      @Query("type") Type type);
+      @Query("block") BigInteger block, @Query("type") Type type);
 
   @GET("listallchannels") Observable<ListAllChannelsResponse> listAllChannels(
       @Query("sender") Address senderAddress, @Query("closed") boolean closed);
