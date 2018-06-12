@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.spongycastle.util.encoders.Hex;
 import retrofit2.HttpException;
 
-public final class BDSChannelClientImpl implements BDSChannelClient {
+public final class BDSChannelImpl implements BDSChannel {
 
   private final ECKey senderECKey;
   private final Address receiverAddress;
@@ -28,7 +28,7 @@ public final class BDSChannelClientImpl implements BDSChannelClient {
   private BigInteger owedBalance;
   private BigInteger totalBalance;
 
-  public BDSChannelClientImpl(ECKey senderECKey, Address receiverAddress,
+  public BDSChannelImpl(ECKey senderECKey, Address receiverAddress,
       BigInteger openBlockNumber, MicroRaidenClient microRaidenClient,
       BDSMicroRaidenApi bdsMicroRaidenApi, BigInteger owedBalance, BigInteger totalBalance) {
     this.senderECKey = senderECKey;
@@ -41,7 +41,7 @@ public final class BDSChannelClientImpl implements BDSChannelClient {
     this.totalBalance = totalBalance;
   }
 
-  public BDSChannelClientImpl(ECKey senderECKey, Address receiverAddress,
+  public BDSChannelImpl(ECKey senderECKey, Address receiverAddress,
       BigInteger openBlockNumber,
       BigInteger balance, MicroRaidenClient microRaidenClient,
       BDSMicroRaidenApi bdsMicroRaidenApi) {

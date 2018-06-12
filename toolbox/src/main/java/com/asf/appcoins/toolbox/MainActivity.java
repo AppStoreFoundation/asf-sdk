@@ -10,7 +10,7 @@ import com.asf.appcoins.sdk.iab.payment.PaymentDetails;
 import com.asf.appcoins.sdk.iab.payment.PaymentStatus;
 import com.asf.microraidenj.type.Address;
 import com.bds.microraidenj.MicroRaidenBDS;
-import com.bds.microraidenj.channel.BDSChannelClient;
+import com.bds.microraidenj.channel.BDSChannel;
 import ethereumj.crypto.ECKey;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
   private AppCoinsIab appCoinsIab;
   private MicroRaidenBDS microRaidenBDS;
   private ECKey senderECKey;
-  private BDSChannelClient bdsChannelClient;
+  private BDSChannel bdsChannel;
 
   public MainActivity() {
     this.compositeDisposable = new CompositeDisposable();
@@ -102,11 +102,10 @@ public class MainActivity extends AppCompatActivity {
                 () -> Toast.makeText(this, "Creating channel", Toast.LENGTH_SHORT)
                     .show()))
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess(
-                bdsChannelClient1 -> Toast.makeText(this, "Channel Created.", Toast.LENGTH_SHORT)
+            .doOnSuccess(bdsChannel -> Toast.makeText(this, "Channel Created.", Toast.LENGTH_SHORT)
                     .show())
             .subscribeOn(Schedulers.io())
-            .subscribe(bdsChannelClient -> this.bdsChannelClient = bdsChannelClient));
+            .subscribe(bdsChannel -> this.bdsChannel = bdsChannel));
   }
 
   public void makePaymentButtonClicked(View view) {
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     Completable.fromAction(
-        () -> bdsChannelClient.makePayment(BigInteger.ONE, receiverAddress, receiverAddress,
+        () -> bdsChannel.makePayment(BigInteger.ONE, receiverAddress, receiverAddress,
             receiverAddress))
         .doOnSubscribe(disposable -> runOnUiThread(
             () -> Toast.makeText(this, "Making payment", Toast.LENGTH_SHORT)
@@ -133,8 +132,8 @@ public class MainActivity extends AppCompatActivity {
     if (!checkChannelAvailable()) {
       return;
     } else {
-      BDSChannelClient tmp = bdsChannelClient;
-      bdsChannelClient = null;
+      BDSChannel tmp = bdsChannel;
+      bdsChannel = null;
 
       Single.fromCallable(() -> tmp.closeCooperatively(senderECKey))
           .observeOn(AndroidSchedulers.mainThread())
@@ -151,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private boolean checkChannelAvailable() {
-    if (bdsChannelClient == null) {
+    if (bdsChannel == null) {
       Toast.makeText(this, "No channel available.", Toast.LENGTH_SHORT)
           .show();
 

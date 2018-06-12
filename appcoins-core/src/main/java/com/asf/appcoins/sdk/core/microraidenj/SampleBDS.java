@@ -12,7 +12,7 @@ import com.bds.microraidenj.DefaultGasLimitEstimator;
 import com.bds.microraidenj.DefaultMicroRaidenBDS;
 import com.bds.microraidenj.DefaultMicroRaidenClient;
 import com.bds.microraidenj.MicroRaidenBDS;
-import com.bds.microraidenj.channel.BDSChannelClient;
+import com.bds.microraidenj.channel.BDSChannel;
 import com.bds.microraidenj.channel.InsufficientFundsException;
 import com.bds.microraidenj.util.DefaultTransactionSender;
 import com.bds.microraidenj.ws.BDSMicroRaidenApi;
@@ -57,15 +57,15 @@ public class SampleBDS {
 
     Address receiverAddress = Address.from("0x31a16aDF2D5FC73F149fBB779D20c036678b1bBD");
 
-    BDSChannelClient bdsChannelClient =
+    BDSChannel bdsChannel =
         microRaidenBDS.createChannel(senderECKey, receiverAddress, maxDeposit)
             .blockingGet();
 
-    BigInteger openBlockNumber = bdsChannelClient.getOpenBlockNumber();
+    BigInteger openBlockNumber = bdsChannel.getOpenBlockNumber();
 
     log.info("Channel created on block " + openBlockNumber);
 
-    //bdsChannelClient.topUp(maxDeposit.divide(BigInteger.valueOf(2)));
+    //bdsChannel.topUp(maxDeposit.divide(BigInteger.valueOf(2)));
 
     //log.info("Channel topup");
 
@@ -73,12 +73,12 @@ public class SampleBDS {
     Address storeAddress = receiverAddress;
     Address oemAddress = receiverAddress;
 
-    bdsChannelClient.makePayment(BigInteger.valueOf(1), devAddress, storeAddress, oemAddress);
+    bdsChannel.makePayment(BigInteger.valueOf(1), devAddress, storeAddress, oemAddress);
 
     BigInteger owedBalance = BigInteger.valueOf(1);
 
     try {
-      bdsChannelClient.closeCooperatively(senderECKey);
+      bdsChannel.closeCooperatively(senderECKey);
     } catch (Exception e) {
       e.printStackTrace();
       System.out.println(e.getMessage());

@@ -6,7 +6,7 @@ import com.asf.microraidenj.type.Address;
 import ethereumj.crypto.ECKey;
 import java.math.BigInteger;
 
-public interface BDSChannelClient {
+public interface BDSChannel {
 
   void topUp(BigInteger depositToAdd) throws TransactionFailedException, DepositTooHighException;
 
