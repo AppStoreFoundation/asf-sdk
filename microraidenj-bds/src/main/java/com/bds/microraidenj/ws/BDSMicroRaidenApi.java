@@ -52,4 +52,8 @@ public interface BDSMicroRaidenApi {
       @Query("openBlock") BigInteger openBlock, @Query("item_cost") BigInteger itemCost,
       @Query("balance") BigInteger balance, @Query("dev") Address devAddress,
       @Query("store") Address storeAddress, @Query("oem") Address oemAddress);
+
+  @GET("channelhistory") Observable<ChannelHistoryResponse> channelHistory(
+      @Query("sender") Address senderAddress, @Query("receiver") Address receiverAddress,
+      @Query("type") Type type);
 }
