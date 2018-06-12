@@ -50,12 +50,20 @@ public class DefaultTransactionSender implements TransactionSender {
 
     transaction.sign(senderECKey);
 
+    String transactionHash;
     try {
-      return web3j.ethSendRawTransaction("0x" + Hex.toHexString(transaction.getEncoded()))
+      transactionHash =
+          web3j.ethSendRawTransaction("0x" + Hex.toHexString(transaction.getEncoded()))
           .send()
           .getTransactionHash();
     } catch (IOException e) {
       throw new TransactionFailedException(e);
+    }
+
+    if (transactionHash != null) {
+      return transactionHash;
+    } else {
+      throw new TransactionFailedException("ethSendRawTransaction returned null!");
     }
   }
 }
