@@ -6,12 +6,15 @@ import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
 import com.asf.microraidenj.type.ByteArray;
 import com.bds.microraidenj.ws.BDSMicroRaidenApi;
+import com.bds.microraidenj.ws.ChannelHistoryResponse;
 import com.bds.microraidenj.ws.CloseChannelResponse;
+import com.bds.microraidenj.ws.Type;
 import ethereumj.crypto.ECKey;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.spongycastle.util.encoders.Hex;
@@ -88,6 +91,13 @@ public final class BDSChannelImpl implements BDSChannel {
                 .ignoreElements())
         .doOnError(throwable -> owedBalance = owedBalance.subtract(value))
         .blockingAwait();
+  }
+
+  @Override public Single<List<ChannelHistoryResponse.MicroTransaction>> listTransactions() {
+    return bdsMicroRaidenApi.channelHistory(getSenderAddress(), receiverAddress, openBlockNumber,
+        Type.Payment)
+        .singleOrError()
+        .map(ChannelHistoryResponse::getResult);
   }
 
   private ObservableSource<?> handleWsError(Observable<Throwable> throwableObservable) {
