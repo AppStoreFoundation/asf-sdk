@@ -136,6 +136,6 @@ public final class BDSChannelImpl implements BDSChannel {
   }
 
   private boolean hasFunds(BigInteger amount) {
-    return (getBalance().compareTo(BigInteger.ZERO)) > 0;
+    return (getBalance().compareTo(BigInteger.ZERO)) >= 0;
   }
 }
