@@ -12,5 +12,5 @@ public interface MicroRaidenBDS {
   Single<BDSChannel> createChannel(ECKey senderECKey, Address receiverAddress,
       BigInteger balance);
 
-  Single<List<BDSChannel>> listChannels(Address senderAddress, Address receiverAddress);
+  Single<List<BDSChannel>> listChannels(ECKey senderECKey, boolean closed);
 }

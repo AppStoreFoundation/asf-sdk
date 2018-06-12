@@ -5,10 +5,10 @@ import com.asf.microraidenj.type.Address;
 import com.bds.microraidenj.channel.BDSChannel;
 import com.bds.microraidenj.channel.BDSChannelImpl;
 import com.bds.microraidenj.ws.BDSMicroRaidenApi;
+import com.bds.microraidenj.ws.ListAllChannelsResponse;
 import ethereumj.crypto.ECKey;
 import io.reactivex.Single;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 
 public final class DefaultMicroRaidenBDS implements MicroRaidenBDS {
@@ -30,8 +30,22 @@ public final class DefaultMicroRaidenBDS implements MicroRaidenBDS {
             openBlockNumber, microRaidenClient, bdsMicroRaidenApi, BigInteger.ZERO, balance));
   }
 
-  @Override public Single<List<BDSChannel>> listChannels(Address senderAddress,
-      Address receiverAddress) {
-    return Single.just(Collections.emptyList());
+  @Override public Single<List<BDSChannel>> listChannels(ECKey senderECKey, boolean closed) {
+    return bdsMicroRaidenApi.listAllChannels(Address.from(senderECKey.getAddress()), closed)
+        .flatMapIterable(ListAllChannelsResponse::getResult)
+        .map(result -> map(senderECKey, result))
+        .toList();
+  }
+
+  private BDSChannel map(ECKey senderECKey, ListAllChannelsResponse.Result result) {
+    Address receiverAddress = Address.from(result.getReceiver());
+    BigInteger block = BigInteger.valueOf(result.getBlock());
+    BigInteger owedBalance = result.getReceiverBalance();
+    BigInteger balance = result.getSenderBalance();
+
+    BigInteger totalBalance = owedBalance.add(balance);
+
+    return new BDSChannelImpl(senderECKey, receiverAddress, block, microRaidenClient,
+        bdsMicroRaidenApi, owedBalance, totalBalance);
   }
 }
