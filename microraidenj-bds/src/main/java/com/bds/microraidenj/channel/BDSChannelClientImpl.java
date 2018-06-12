@@ -83,14 +83,14 @@ public final class BDSChannelClientImpl implements BDSChannelClient {
             balanceProof -> bdsMicroRaidenApi.makePayment(balanceProof, getSenderAddress(),
                 // TODO: 06-06-2018 neuro actualizar balanço
                 openBlockNumber, value, owedBalance, devAddress, storeAddress, oemAddress)
-                .retryWhen(this::handleZeError)
+                .retryWhen(this::handleWsError)
                 .map(makePaymentResponse -> balanceProof.getBytes())
                 .ignoreElements())
         .doOnError(throwable -> owedBalance = owedBalance.subtract(value))
         .blockingAwait();
   }
 
-  private ObservableSource<?> handleZeError(Observable<Throwable> throwableObservable) {
+  private ObservableSource<?> handleWsError(Observable<Throwable> throwableObservable) {
     AtomicInteger counter = new AtomicInteger();
 
     return throwableObservable.flatMap(throwable -> {
