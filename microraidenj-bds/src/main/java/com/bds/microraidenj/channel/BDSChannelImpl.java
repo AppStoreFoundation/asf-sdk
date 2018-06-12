@@ -77,7 +77,7 @@ public final class BDSChannelImpl implements BDSChannel {
         return createBalanceProof();
       } else {
         throw new InsufficientFundsException(
-            "Insuficient funds! Available: " + getBalance() + ", Requested: " + value);
+            "Insuficient funds! Available: " + getBalance().add(value) + ", Requested: " + value);
       }
     })
         .doOnSubscribe(disposable -> owedBalance = owedBalance.add(value))
@@ -136,7 +136,6 @@ public final class BDSChannelImpl implements BDSChannel {
   }
 
   private boolean hasFunds(BigInteger amount) {
-    return (getBalance().subtract(amount)
-        .compareTo(BigInteger.ZERO)) > 0;
+    return (getBalance().compareTo(BigInteger.ZERO)) > 0;
   }
 }
