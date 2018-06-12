@@ -26,8 +26,22 @@ public final class DefaultMicroRaidenBDS implements MicroRaidenBDS {
       BigInteger balance) {
     return Single.fromCallable(
         () -> microRaidenClient.createChannel(senderECKey, receiverAddress, balance))
-        .map(openBlockNumber -> new BDSChannelImpl(senderECKey, receiverAddress,
-            openBlockNumber, microRaidenClient, bdsMicroRaidenApi, BigInteger.ZERO, balance));
+        .map(openBlockNumber -> new BDSChannelImpl(senderECKey, receiverAddress, openBlockNumber,
+            microRaidenClient, bdsMicroRaidenApi, BigInteger.ZERO, balance))
+        .flatMap(
+            bdsChannel -> bdsMicroRaidenApi.listAllChannels(Address.from(senderECKey.getAddress()),
+                false)
+                .flatMapIterable(ListAllChannelsResponse::getResult)
+                .map(ListAllChannelsResponse.Result::getBlock)
+                .contains(bdsChannel.getOpenBlockNumber()
+                    .intValue())
+                .doOnSuccess(aBoolean -> {
+                  if (!aBoolean) {
+                    throw new RuntimeException();
+                  }
+                })
+                .retry()
+                .map(aBoolean -> bdsChannel));
   }
 
   @Override public Single<List<BDSChannel>> listChannels(ECKey senderECKey, boolean closed) {
