@@ -1,21 +1,21 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
-import com.asf.microraidenj.eth.GetNonce;
+import com.asf.microraidenj.eth.NonceObtainer;
 import com.asf.microraidenj.type.Address;
 import java.math.BigInteger;
 
-public class GetNonceImpl implements GetNonce {
+public class DefaultNonceObtainer implements NonceObtainer {
 
   private final AsfWeb3j asfWeb3j;
 
   private BigInteger nonce;
 
-  public GetNonceImpl(AsfWeb3j asfWeb3j) {
+  public DefaultNonceObtainer(AsfWeb3j asfWeb3j) {
     this.asfWeb3j = asfWeb3j;
   }
 
-  @Override public BigInteger get(Address address) {
+  @Override public BigInteger getNonce(Address address) {
     if (nonce == null) {
       computeNonce(address.toHexString());
     }

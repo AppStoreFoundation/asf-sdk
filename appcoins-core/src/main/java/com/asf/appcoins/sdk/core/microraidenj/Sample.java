@@ -1,16 +1,19 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
-import com.asf.microraidenj.DefaultMicroRaidenClient;
 import com.asf.microraidenj.DefaultMicroRaidenServer;
 import com.asf.microraidenj.MicroRaidenClient;
 import com.asf.microraidenj.MicroRaidenServer;
 import com.asf.microraidenj.contract.MicroRaidenContract;
-import com.asf.microraidenj.eth.GetChannelBlock;
+import com.asf.microraidenj.eth.ChannelBlockObtainer;
 import com.asf.microraidenj.eth.TransactionSender;
 import com.asf.microraidenj.exception.DepositTooHighException;
 import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
+import com.bds.microraidenj.DefaultChannelBlockObtainer;
+import com.bds.microraidenj.DefaultGasLimitEstimator;
+import com.bds.microraidenj.DefaultMicroRaidenClient;
+import com.bds.microraidenj.util.DefaultTransactionSender;
 import ethereumj.crypto.ECKey;
 import java.math.BigInteger;
 import java.util.logging.Logger;
@@ -31,17 +34,17 @@ public class Sample {
     Logger log = Logger.getLogger(MicroRaidenClient.class.getSimpleName());
     BigInteger maxDeposit = BigInteger.valueOf(10);
     TransactionSender transactionSender =
-        new TransactionSenderImpl(asfWeb3j, () -> BigInteger.valueOf(50000000000L),
-            new GetNonceImpl(asfWeb3j),
-            new GasLimitImpl(web3j));
+        new DefaultTransactionSender(web3j, () -> BigInteger.valueOf(50000000000L),
+            new DefaultNonceObtainer(asfWeb3j), new DefaultGasLimitEstimator(web3j));
 
-    GetChannelBlock getChannelBlock =
-        createChannelTxHash -> new GetChannelBlockImpl(web3j, 3, 1500).get(createChannelTxHash);
+    ChannelBlockObtainer channelBlockObtainer =
+        createChannelTxHash -> new DefaultChannelBlockObtainer(web3j, 3, 1500).get(
+            createChannelTxHash);
 
     MicroRaidenContract microRaidenContract =
         new MicroRaidenContract(channelManagerAddr, tokenAddr, transactionSender);
     MicroRaidenClient microRaidenClient =
-        new DefaultMicroRaidenClient(channelManagerAddr, maxDeposit, getChannelBlock,
+        new DefaultMicroRaidenClient(channelManagerAddr, maxDeposit, channelBlockObtainer,
             microRaidenContract);
     MicroRaidenServer microRaidenServer =
         new DefaultMicroRaidenServer(channelManagerAddr, microRaidenContract);

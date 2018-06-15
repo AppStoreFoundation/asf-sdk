@@ -3,7 +3,7 @@ package com.asf.microraidenj.eth;
 import com.asf.microraidenj.type.ByteArray;
 import java.math.BigInteger;
 
-public interface GetChannelBlock {
+public interface ChannelBlockObtainer {
 
   BigInteger get(ByteArray createChannelTxHash);
 }

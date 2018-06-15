@@ -6,8 +6,7 @@ public final class CloseChannelResponse {
 
   @JsonProperty("close_sig") private String closingSig;
 
-  public CloseChannelResponse(String closingSig) {
-    this.closingSig = closingSig;
+  public CloseChannelResponse() {
   }
 
   public String getClosingSig() {

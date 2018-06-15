@@ -1,6 +1,6 @@
-package com.asf.appcoins.sdk.core.microraidenj;
+package com.bds.microraidenj;
 
-import com.asf.microraidenj.eth.GasLimit;
+import com.asf.microraidenj.eth.GasLimitEstimator;
 import com.asf.microraidenj.exception.EstimateGasException;
 import com.asf.microraidenj.type.Address;
 import java.io.IOException;
@@ -9,11 +9,11 @@ import org.spongycastle.util.encoders.Hex;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.request.Transaction;
 
-public class GasLimitImpl implements GasLimit {
+public class DefaultGasLimitEstimator implements GasLimitEstimator {
 
   private final Web3j web3j;
 
-  public GasLimitImpl(Web3j web3j) {
+  public DefaultGasLimitEstimator(Web3j web3j) {
     this.web3j = web3j;
   }
 

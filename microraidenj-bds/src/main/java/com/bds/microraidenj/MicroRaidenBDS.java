@@ -1,29 +1,18 @@
 package com.bds.microraidenj;
 
-import com.asf.microraidenj.MicroRaidenClient;
 import com.asf.microraidenj.type.Address;
-import com.bds.microraidenj.channel.ChannelClient;
-import com.bds.microraidenj.channel.ChannelClientImpl;
-import com.bds.microraidenj.ws.BDSMicroRaidenApi;
+import com.bds.microraidenj.channel.BDSChannel;
+import com.bds.microraidenj.ws.ChannelHistoryResponse;
 import ethereumj.crypto.ECKey;
 import io.reactivex.Single;
 import java.math.BigInteger;
+import java.util.List;
 
-public final class MicroRaidenBDS {
+public interface MicroRaidenBDS {
 
-  private final MicroRaidenClient microRaidenClient;
-  private final BDSMicroRaidenApi bdsMicroRaidenApi;
+  Single<BDSChannel> createChannel(ECKey senderECKey, Address receiverAddress, BigInteger balance);
 
-  public MicroRaidenBDS(MicroRaidenClient microRaidenClient, BDSMicroRaidenApi bdsMicroRaidenApi) {
-    this.microRaidenClient = microRaidenClient;
-    this.bdsMicroRaidenApi = bdsMicroRaidenApi;
-  }
+  Single<List<BDSChannel>> listChannels(ECKey senderECKey, boolean closed);
 
-  public Single<ChannelClient> createChannel(ECKey senderECKey, Address receiverAddress,
-      BigInteger balance) {
-    return Single.fromCallable(
-        () -> microRaidenClient.createChannel(senderECKey, receiverAddress, balance))
-        .map(openBlockNumber -> new ChannelClientImpl(senderECKey, receiverAddress, openBlockNumber,
-            BigInteger.ZERO, balance, microRaidenClient, bdsMicroRaidenApi));
-  }
+  Single<List<ChannelHistoryResponse.MicroTransaction>> listTransactions(Address senderAddress);
 }

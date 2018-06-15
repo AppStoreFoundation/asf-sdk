@@ -2,7 +2,7 @@ package com.asf.microraidenj.eth;
 
 import java.math.BigInteger;
 
-public interface GasPrice {
+public interface GasPriceObtainer {
 
-  BigInteger get();
+  BigInteger getGasPrice();
 }

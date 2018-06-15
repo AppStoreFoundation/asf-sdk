@@ -29,5 +29,33 @@
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toTopOf="@id/buyButton"
       />
+  <Button
+      android:id="@+id/createChannelButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:onClick="onCreateChannelButtonClicked"
+      android:text="@string/createChannelButton"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/upgradeButton"
+      />
+
+  <Button
+      android:id="@+id/makePaymentButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:onClick="makePaymentButtonClicked"
+      android:text="@string/makePaymentButton"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/createChannelButton"
+      />
+  <Button
+      android:id="@+id/closeChannelButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:onClick="onCloseChannelButtonClicked"
+      android:text="@string/closeChannelButton"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/makePaymentButton"
+      />
 
 </android.support.constraint.ConstraintLayout>

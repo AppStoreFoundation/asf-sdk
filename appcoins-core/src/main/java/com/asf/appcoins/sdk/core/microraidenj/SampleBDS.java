@@ -1,14 +1,20 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
-import com.asf.microraidenj.DefaultMicroRaidenClient;
 import com.asf.microraidenj.MicroRaidenClient;
 import com.asf.microraidenj.contract.MicroRaidenContract;
-import com.asf.microraidenj.eth.GetChannelBlock;
+import com.asf.microraidenj.eth.ChannelBlockObtainer;
 import com.asf.microraidenj.eth.TransactionSender;
+import com.asf.microraidenj.exception.TransactionFailedException;
 import com.asf.microraidenj.type.Address;
+import com.bds.microraidenj.DefaultChannelBlockObtainer;
+import com.bds.microraidenj.DefaultGasLimitEstimator;
+import com.bds.microraidenj.DefaultMicroRaidenBDS;
+import com.bds.microraidenj.DefaultMicroRaidenClient;
 import com.bds.microraidenj.MicroRaidenBDS;
-import com.bds.microraidenj.channel.ChannelClient;
+import com.bds.microraidenj.channel.BDSChannel;
+import com.bds.microraidenj.channel.InsufficientFundsException;
+import com.bds.microraidenj.util.DefaultTransactionSender;
 import com.bds.microraidenj.ws.BDSMicroRaidenApi;
 import ethereumj.crypto.ECKey;
 import java.math.BigInteger;
@@ -19,7 +25,8 @@ import org.web3j.protocol.http.HttpService;
 
 public class SampleBDS {
 
-  public static void main(String[] args) {
+  public static void main(String[] args)
+      throws InsufficientFundsException, TransactionFailedException {
 
     Web3j web3j =
         Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
@@ -30,41 +37,48 @@ public class SampleBDS {
     Logger log = Logger.getLogger(MicroRaidenClient.class.getSimpleName());
     BigInteger maxDeposit = BigInteger.valueOf(10);
     TransactionSender transactionSender =
-        new TransactionSenderImpl(asfWeb3j, () -> BigInteger.valueOf(50000000000L),
-            new GetNonceImpl(asfWeb3j), new GasLimitImpl(web3j));
+        new DefaultTransactionSender(web3j, () -> BigInteger.valueOf(50000000000L),
+            new DefaultNonceObtainer(asfWeb3j), new DefaultGasLimitEstimator(web3j));
 
-    GetChannelBlock getChannelBlock =
-        createChannelTxHash -> new GetChannelBlockImpl(web3j, 3, 1500).get(createChannelTxHash);
+    ChannelBlockObtainer channelBlockObtainer =
+        createChannelTxHash -> new DefaultChannelBlockObtainer(web3j, 3, 1500).get(
+            createChannelTxHash);
 
     MicroRaidenContract microRaidenContract =
         new MicroRaidenContract(channelManagerAddr, tokenAddr, transactionSender);
     MicroRaidenClient microRaidenClient =
-        new DefaultMicroRaidenClient(channelManagerAddr, maxDeposit, getChannelBlock,
+        new DefaultMicroRaidenClient(channelManagerAddr, maxDeposit, channelBlockObtainer,
             microRaidenContract);
-    BDSMicroRaidenApi bdsMicroRaidenApi = BDSMicroRaidenApi.create();
-    MicroRaidenBDS microRaidenBDS = new MicroRaidenBDS(microRaidenClient, bdsMicroRaidenApi);
+    BDSMicroRaidenApi bdsMicroRaidenApi = BDSMicroRaidenApi.create(true);
+    MicroRaidenBDS microRaidenBDS = new DefaultMicroRaidenBDS(microRaidenClient, bdsMicroRaidenApi);
 
     // Put a private key
     ECKey senderECKey = ECKey.fromPrivate(new BigInteger("", 16));
 
     Address receiverAddress = Address.from("0x31a16aDF2D5FC73F149fBB779D20c036678b1bBD");
 
-    ChannelClient channelClient =
+    BDSChannel bdsChannel =
         microRaidenBDS.createChannel(senderECKey, receiverAddress, maxDeposit)
             .blockingGet();
 
-    BigInteger openBlockNumber = channelClient.getOpenBlockNumber();
+    BigInteger openBlockNumber = bdsChannel.getOpenBlockNumber();
 
     log.info("Channel created on block " + openBlockNumber);
 
-    //channelClient.topUp(maxDeposit.divide(BigInteger.valueOf(2)));
+    //bdsChannel.topUp(maxDeposit.divide(BigInteger.valueOf(2)));
 
     //log.info("Channel topup");
+
+    Address devAddress = receiverAddress;
+    Address storeAddress = receiverAddress;
+    Address oemAddress = receiverAddress;
+
+    bdsChannel.makePayment(BigInteger.valueOf(1), devAddress, storeAddress, oemAddress);
 
     BigInteger owedBalance = BigInteger.valueOf(1);
 
     try {
-      channelClient.closeCooperatively(owedBalance, senderECKey);
+      bdsChannel.closeCooperatively(senderECKey);
     } catch (Exception e) {
       e.printStackTrace();
       System.out.println(e.getMessage());

@@ -143,19 +143,27 @@ public final class PaymentService {
     } else {
       String txHash = data.getStringExtra(TRANSACTION_HASH_KEY);
 
-      if (txHash == null) {
-        throw new IllegalStateException("Failed to get tx hash!");
+      if (isMicroRaidenTransaction(txHash)) {
+        currentPayment.setPaymentStatus(PaymentStatus.PENDING);
       } else {
-        currentPayment.getTransaction()
-            .setHash(txHash);
-      }
+        if (txHash == null) {
+          throw new IllegalStateException("Failed to get tx hash!");
+        } else {
+          currentPayment.getTransaction()
+              .setHash(txHash);
+        }
 
-      if (currentPayment == null) {
-        throw new IllegalStateException("Catastrofic Failure! No ongoing payment in course!");
-      }
+        if (currentPayment == null) {
+          throw new IllegalStateException("Catastrofic Failure! No ongoing payment in course!");
+        }
 
-      currentPayment.setPaymentStatus(PaymentStatus.PENDING);
+        currentPayment.setPaymentStatus(PaymentStatus.PENDING);
+      }
     }
+  }
+
+  private boolean isMicroRaidenTransaction(String txHash) {
+    return txHash.length() > 66;
   }
 
   public PaymentDetails getCurrentPayment() {
