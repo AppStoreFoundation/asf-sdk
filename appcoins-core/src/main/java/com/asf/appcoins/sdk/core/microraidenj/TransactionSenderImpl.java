@@ -1,46 +1,53 @@
 package com.asf.appcoins.sdk.core.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
-import com.asf.microraidenj.eth.interfaces.TransactionSender;
+import com.asf.microraidenj.eth.GasLimit;
+import com.asf.microraidenj.eth.GasPrice;
+import com.asf.microraidenj.eth.GetNonce;
+import com.asf.microraidenj.eth.TransactionSender;
+import com.asf.microraidenj.exception.EstimateGasException;
+import com.asf.microraidenj.exception.TransactionFailedException;
+import com.asf.microraidenj.type.Address;
 import ethereumj.Transaction;
 import ethereumj.core.CallTransaction;
 import ethereumj.crypto.ECKey;
+import java.math.BigInteger;
 import org.spongycastle.util.encoders.Hex;
-import org.web3j.abi.datatypes.Address;
 
 public class TransactionSenderImpl implements TransactionSender {
 
   private final AsfWeb3j asfWeb3j;
-  private final long gasPrice;
-  private final int gasLimit;
+  private final GasPrice gasPrice;
+  private final GetNonce getNonce;
+  private final GasLimit gasLimit;
 
-  private Long nonce;
-
-  public TransactionSenderImpl(AsfWeb3j asfWeb3j, long gasPrice, int gasLimit) {
+  public TransactionSenderImpl(AsfWeb3j asfWeb3j, GasPrice gasPrice, GetNonce getNonce,
+      GasLimit gasLimit) {
     this.asfWeb3j = asfWeb3j;
     this.gasPrice = gasPrice;
+    this.getNonce = getNonce;
     this.gasLimit = gasLimit;
   }
 
-  @Override public String send(ECKey senderECKey, com.asf.microraidenj.type.Address receiveAddress,
-      long value, byte[] data) {
+  @Override
+  public String send(ECKey senderECKey, Address receiveAddress, BigInteger value, byte[] data)
+      throws TransactionFailedException {
 
-    if (nonce == null) {
-      computeNonce(Hex.toHexString(senderECKey.getAddress()));
+    BigInteger nonce = getNonce.get(Address.from(senderECKey.getAddress()));
+
+    Transaction transaction;
+    try {
+      transaction = CallTransaction.createRawTransaction(nonce.longValue(), gasPrice.get()
+              .longValue(),
+          gasLimit.estimate(Address.from(senderECKey.getAddress()), receiveAddress, data)
+              .longValue(), receiveAddress.toHexString(), value.longValue(), data);
+    } catch (EstimateGasException e) {
+      throw new TransactionFailedException(e);
     }
-
-    Transaction transaction =
-        CallTransaction.createRawTransaction(nonce++, gasPrice, gasLimit, receiveAddress.get(),
-            value, data);
 
     transaction.sign(senderECKey);
 
     return asfWeb3j.sendRawTransaction("0x" + Hex.toHexString(transaction.getEncoded()))
-        .blockingFirst();
-  }
-
-  private void computeNonce(String hexValue) {
-    nonce = asfWeb3j.getNonce(new Address(hexValue))
         .blockingFirst();
   }
 }

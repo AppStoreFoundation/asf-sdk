@@ -1,17 +1,20 @@
 package com.asf.microraidenj.type;
 
-public class Address extends HexStr {
+public class Address extends ByteArray {
 
-  public Address(String value) {
-    super(value);
+  public Address(ByteArray byteArray) {
+    super(byteArray.getBytes());
   }
 
   public static Address from(byte[] address) {
-    return new Address(HexStr.from(address)
-        .get());
+    return new Address(new ByteArray(address));
   }
 
   public static Address from(String address) {
-    return new Address(address);
+    return new Address(ByteArray.from(address));
+  }
+
+  @Override public String toString() {
+    return toHexString(true);
   }
 }

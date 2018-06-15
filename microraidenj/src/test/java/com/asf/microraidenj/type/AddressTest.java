@@ -14,7 +14,7 @@ public class AddressTest {
 
   @BeforeClass public static void beforeClass() {
     addrHexStr = "0xd95c64c6eee9164539d679354f349779a04f57cb";
-    address = new Address(addrHexStr);
+    address = Address.from(addrHexStr);
   }
 
   @Test public void from() {
@@ -26,13 +26,13 @@ public class AddressTest {
     Address address;
 
     address = Address.from(hexStr);
-    assertThat(address.get(), is(hexStr));
+    assertThat(address.toHexString(), is(hexStr));
 
     address = Address.from(addressBytes);
-    assertThat(address.get(), is(hexStr));
+    assertThat(address.toHexString(), is(hexStr));
   }
 
   @Test public void get() {
-    assertThat(address.get(), is(addrHexStr.substring(2)));
+    assertThat(address.toHexString(), is(addrHexStr.substring(2)));
   }
 }
