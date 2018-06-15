@@ -21,6 +21,7 @@ import ethereumj.crypto.ECKey;
 import ethereumj.crypto.ECKey.ECDSASignature;
 import ethereumj.crypto.ECKey.MissingPrivateKeyException;
 import ethereumj.crypto.HashUtil;
+import ethereumj.datasource.MemSizeEstimator;
 import ethereumj.util.ByteUtil;
 import ethereumj.util.RLP;
 import ethereumj.util.RLPElement;
@@ -33,6 +34,7 @@ import java.util.logging.Logger;
 import org.spongycastle.util.BigIntegers;
 import org.spongycastle.util.encoders.Hex;
 
+import static ethereumj.datasource.MemSizeEstimator.ByteArrayEstimator;
 import static ethereumj.util.ByteUtil.EMPTY_BYTE_ARRAY;
 import static ethereumj.util.ByteUtil.ZERO_BYTE_ARRAY;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
@@ -60,6 +62,21 @@ public class Transaction {
   protected byte[] sendAddress;
   /* Tx in encoded form */
   protected byte[] rlpEncoded;
+  public static final MemSizeEstimator<Transaction> MemEstimator =
+      tx -> ByteArrayEstimator.estimateSize(tx.hash)
+          + ByteArrayEstimator.estimateSize(tx.nonce)
+          + ByteArrayEstimator.estimateSize(tx.value)
+          + ByteArrayEstimator.estimateSize(tx.gasPrice)
+          + ByteArrayEstimator.estimateSize(tx.gasLimit)
+          + ByteArrayEstimator.estimateSize(tx.data)
+          + ByteArrayEstimator.estimateSize(tx.sendAddress)
+          + ByteArrayEstimator.estimateSize(tx.rlpEncoded)
+          + ByteArrayEstimator.estimateSize(tx.rawHash)
+          + (tx.chainId != null ? 24 : 0)
+          + (tx.signature != null ? 208 : 0)
+          +
+          // approximate size of signature
+          16; // Object header + ref
   /* Indicates if this transaction has been parsed
    * from the RLP-encoded data */
   protected boolean parsed;
@@ -133,15 +150,7 @@ public class Transaction {
     this.signature = ECDSASignature.fromComponents(r, s, v);
   }
 
-  /**
-   * Warning: this transaction would not be protected by replay-attack protection mechanism
-   * Use {@link Transaction#Transaction(byte[], byte[], byte[], byte[], byte[], byte[], byte[], * byte[], byte, Integer)}
-   * constructor instead and specify the desired chainID
-   */
-  public Transaction(byte[] nonce, byte[] gasPrice, byte[] gasLimit, byte[] receiveAddress,
-      byte[] value, byte[] data, byte[] r, byte[] s, byte v) {
-    this(nonce, gasPrice, gasLimit, receiveAddress, value, data, r, s, v, null);
-  }
+  private byte[] rawHash;
 
   /**
    * @deprecated Use {@link Transaction#createDefault(String, BigInteger, BigInteger, Integer)}
@@ -286,10 +295,14 @@ public class Transaction {
     return HashUtil.sha3(plainMsg);
   }
 
-  public byte[] getRawHash() {
-    rlpParse();
-    byte[] plainMsg = this.getEncodedRaw();
-    return HashUtil.sha3(plainMsg);
+  /**
+   * Warning: this transaction would not be protected by replay-attack protection mechanism
+   * Use {@link Transaction#Transaction(byte[], byte[], byte[], byte[], byte[], byte[], byte[], byte[], byte, Integer)}
+   * constructor instead and specify the desired chainID
+   */
+  public Transaction(byte[] nonce, byte[] gasPrice, byte[] gasLimit, byte[] receiveAddress,
+      byte[] value, byte[] data, byte[] r, byte[] s, byte v) {
+    this(nonce, gasPrice, gasLimit, receiveAddress, value, data, r, s, v, null);
   }
 
   public byte[] getNonce() {
@@ -572,5 +585,12 @@ public class Transaction {
 
   @Override public String toString() {
     return toString(Integer.MAX_VALUE);
+  }
+
+  public byte[] getRawHash() {
+    rlpParse();
+    if (rawHash != null) return rawHash;
+    byte[] plainMsg = this.getEncodedRaw();
+    return rawHash = HashUtil.sha3(plainMsg);
   }
 }

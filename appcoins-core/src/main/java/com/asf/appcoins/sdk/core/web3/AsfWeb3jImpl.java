@@ -3,6 +3,7 @@ package com.asf.appcoins.sdk.core.web3;
 import com.asf.appcoins.sdk.core.factory.TransactionFactory;
 import com.asf.appcoins.sdk.core.transaction.Transaction;
 import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
+import com.asf.microraidenj.exception.TransactionFailedException;
 import io.reactivex.Observable;
 import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
@@ -26,9 +27,9 @@ public final class AsfWeb3jImpl implements AsfWeb3j {
   }
 
   @Override public Observable<Long> getNonce(Address address) {
-    return Observable.fromCallable(() -> web3j.ethGetTransactionCount(address.getTypeAsString(),
-        DefaultBlockParameterName.PENDING)
-        .send())
+    return Observable.fromCallable(
+        () -> web3j.ethGetTransactionCount(address.getValue(), DefaultBlockParameterName.PENDING)
+            .send())
         .map(ethGetTransactionCount -> ethGetTransactionCount.getTransactionCount()
             .longValue());
   }
@@ -47,7 +48,17 @@ public final class AsfWeb3jImpl implements AsfWeb3j {
   @Override public Observable<String> sendRawTransaction(String rawData) {
     return Observable.fromCallable(() -> web3j.ethSendRawTransaction(rawData)
         .send())
-        .map(EthSendTransaction::getTransactionHash);
+        .map(this::successOrThrow);
+  }
+
+  private String successOrThrow(EthSendTransaction ethSendTransaction)
+      throws TransactionFailedException {
+    if (ethSendTransaction.getError() != null) {
+      throw new TransactionFailedException(ethSendTransaction.getError()
+          .getMessage());
+    } else {
+      return ethSendTransaction.getTransactionHash();
+    }
   }
 
   @Override public Observable<Transaction> getTransactionByHash(String txHash) {

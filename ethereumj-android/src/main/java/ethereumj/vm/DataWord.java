@@ -28,8 +28,8 @@ import org.spongycastle.util.Arrays;
 import org.spongycastle.util.encoders.Hex;
 
 /**
- * DataWord is the 32-byte array representation of a 256-bit number Calculations can be done on this
- * word with other DataWords
+ * DataWord is the 32-byte array representation of a 256-bit number
+ * Calculations can be done on this word with other DataWords
  *
  * @author Roman Mandeleil
  * @since 01.06.2014
@@ -41,9 +41,11 @@ public class DataWord implements Comparable<DataWord> {
       .pow(256);
   public static final BigInteger MAX_VALUE = _2_256.subtract(BigInteger.ONE);
   public static final DataWord ZERO = new DataWord(new byte[32]);
-  // don't push it in to the stack
+      // don't push it in to the stack
   public static final DataWord ZERO_EMPTY_ARRAY = new DataWord(new byte[0]);
-  // don't push it in to the stack
+      // don't push it in to the stack
+
+  public static final long MEM_SIZE = 32 + 16 + 16;
 
   private byte[] data = new byte[32];
 
@@ -61,8 +63,8 @@ public class DataWord implements Comparable<DataWord> {
   }
 
   private DataWord(ByteBuffer buffer) {
-    ByteBuffer data = ByteBuffer.allocate(32);
-    byte[] array = buffer.array();
+    final ByteBuffer data = ByteBuffer.allocate(32);
+    final byte[] array = buffer.array();
     System.arraycopy(array, 0, data.array(), 32 - array.length, array.length);
     this.data = data.array();
   }
@@ -76,15 +78,14 @@ public class DataWord implements Comparable<DataWord> {
   }
 
   public DataWord(byte[] data) {
-    if (data == null) {
+    if (data == null)
       this.data = ByteUtil.EMPTY_BYTE_ARRAY;
-    } else if (data.length == 32) {
+    else if (data.length == 32)
       this.data = data;
-    } else if (data.length <= 32) {
+    else if (data.length <= 32)
       System.arraycopy(data, 0, this.data, 32 - data.length, data.length);
-    } else {
+    else
       throw new RuntimeException("Data word can't exceed 32 bytes: " + data);
-    }
   }
 
   public byte[] getData() {
@@ -104,26 +105,26 @@ public class DataWord implements Comparable<DataWord> {
   }
 
   /**
-   * Converts this DataWord to an int, checking for lost information. If this DataWord is out
-   * of the
-   * possible range for an int result then an ArithmeticException is thrown.
+   * Converts this DataWord to an int, checking for lost information.
+   * If this DataWord is out of the possible range for an int result
+   * then an ArithmeticException is thrown.
    *
    * @return this DataWord converted to an int.
-   *
    * @throws ArithmeticException - if this will not fit in an int.
    */
   public int intValue() {
     int intVal = 0;
 
-    for (int i = 0; i < data.length; i++) {
-      intVal = (intVal << 8) + (data[i] & 0xff);
+    for (byte aData : data) {
+      intVal = (intVal << 8) + (aData & 0xff);
     }
 
     return intVal;
   }
 
   /**
-   * In case of int overflow returns Integer.MAX_VALUE otherwise works as #intValue()
+   * In case of int overflow returns Integer.MAX_VALUE
+   * otherwise works as #intValue()
    */
   public int intValueSafe() {
     int bytesOccupied = bytesOccupied();
@@ -133,26 +134,26 @@ public class DataWord implements Comparable<DataWord> {
   }
 
   /**
-   * Converts this DataWord to a long, checking for lost information. If this DataWord is out
-   * of the
-   * possible range for a long result then an ArithmeticException is thrown.
+   * Converts this DataWord to a long, checking for lost information.
+   * If this DataWord is out of the possible range for a long result
+   * then an ArithmeticException is thrown.
    *
    * @return this DataWord converted to a long.
-   *
    * @throws ArithmeticException - if this will not fit in a long.
    */
   public long longValue() {
 
     long longVal = 0;
-    for (int i = 0; i < data.length; i++) {
-      longVal = (longVal << 8) + (data[i] & 0xff);
+    for (byte aData : data) {
+      longVal = (longVal << 8) + (aData & 0xff);
     }
 
     return longVal;
   }
 
   /**
-   * In case of long overflow returns Long.MAX_VALUE otherwise works as #longValue()
+   * In case of long overflow returns Long.MAX_VALUE
+   * otherwise works as #longValue()
    */
   public long longValueSafe() {
     int bytesOccupied = bytesOccupied();
@@ -370,6 +371,7 @@ public class DataWord implements Comparable<DataWord> {
     DataWord dataWord = (DataWord) o;
 
     return java.util.Arrays.equals(data, dataWord.data);
+
   }
 
   public DataWord clone() {

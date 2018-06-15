@@ -10,6 +10,7 @@ lib.constraint_layout = "com.android.support.constraint:constraint-layout:${ver.
 
 lib.junit = "junit:junit:${ver.junit}"
 lib.mockito_core = "org.mockito:mockito-core:${ver.mockito_core}"
+lib.android_test_runner = "com.android.support.test:runner:${ver.android_test_runner}"
 
 lib.rxjava = ["io.reactivex.rxjava2:rxjava:${ver.rxjava}",
               "io.reactivex.rxjava2:rxandroid:${ver.rxandroid}",
