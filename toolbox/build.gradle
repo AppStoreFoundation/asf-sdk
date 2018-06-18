@@ -39,4 +39,6 @@ dependencies {
   testImplementation lib.junit
 
   api project(':appcoins')
+
+  api project(":microraidenj-bds")
 }
