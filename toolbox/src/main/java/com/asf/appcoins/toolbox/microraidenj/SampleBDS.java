@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.core.microraidenj;
+package com.asf.appcoins.toolbox.microraidenj;
 
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
 import com.asf.microraidenj.MicroRaidenClient;

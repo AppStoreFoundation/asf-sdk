@@ -1,9 +1,9 @@
 package com.asf.appcoins.sdk.core.web3;
 
+import com.asf.appcoins.sdk.core.exception.TransactionFailedException;
 import com.asf.appcoins.sdk.core.factory.TransactionFactory;
 import com.asf.appcoins.sdk.core.transaction.Transaction;
 import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
-import com.asf.microraidenj.exception.TransactionFailedException;
 import io.reactivex.Observable;
 import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
