@@ -22,7 +22,8 @@ import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import io.reactivex.Completable;
-import io.reactivex.Single;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -32,7 +33,6 @@ import java.util.LinkedList;
 import java.util.List;
 import net.grandcentrix.tray.AppPreferences;
 import org.web3j.abi.datatypes.Address;
-import org.web3j.protocol.Web3j;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -141,11 +141,20 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   /**
-   * Method that stops the process. It will send a message to the listening wallet to stop the
-   * process and call the finish process method.
+   * Method that stops the process. First removes pending tasks for proofs to be sent and shared
+   * preferences change listener. Then sends message to the listening wallet to stop the process
+   * and call the finish process method.
    */
   public void stopProcess() {
     if (processing) {
+      if (sendProof != null) {
+        handler.removeCallbacks(sendProof);
+      }
+
+      if (spListener != null) {
+        spHandler.removeCallbacks(spListener);
+      }
+
       Log.d(TAG, "Stopping process.");
       Bundle bundle = new Bundle();
       bundle.putString("packageName", appContext.getPackageName());
@@ -155,21 +164,15 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   /**
-   * Method that finish the process. It will remove any running tasks and disconnect from the wallet
-   * service.
+   * Method that finish the process. The method simply disconnects from the bound service.
    */
   public void finishProcess() {
     Log.d(TAG, "Finishing process.");
     processing = false;
-
-    if (sendProof != null) {
-      handler.removeCallbacks(sendProof);
-    }
-
-    if (spListener != null) {
-      spHandler.removeCallbacks(spListener);
-    }
-
+    proofsSent = 0;
+    campaignId = null;
+    final AppPreferences appPreferences = new AppPreferences(appContext);
+    appPreferences.remove(PREFERENCE_WALLET_PCKG_NAME);
     poaConnector.disconnectFromService(appContext);
   }
 
@@ -190,20 +193,19 @@ public class PoAManager implements LifeCycleListener.Listener {
     bundle.putLong("timeStamp", timestamp);
     poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
     proofsSent++;
-
+    Log.e(TAG, "Proof " + proofsSent + " sent!");
     // schedule the next proof sending
     if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
       handler.postDelayed(sendProof = this::sendProof,
           BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
     } else {
       // or stop the process
-      processing = false;
       if (campaignId != null && !preferences.contains(FINISHED_KEY)) {
         preferences.edit()
             .putBoolean(FINISHED_KEY, true)
             .apply();
+        finishProcess();
       }
-      finishProcess();
     }
   }
 
@@ -248,25 +250,14 @@ public class PoAManager implements LifeCycleListener.Listener {
         .filter(hasInternet -> hasInternet)
         .filter(hasInternet -> this.campaignId == null)
         .flatMapCompletable(__ -> getCampaignContract())
-        .andThen(Single.fromCallable(() -> getVerCode(appContext, packageName)))
+        .andThen(Observable.fromCallable(() -> getVerCode(appContext, packageName)))
         .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
-        .subscribe(campaigns -> {
-          if (campaigns.isEmpty()) {
-            Log.d(TAG, "No campaign is available.");
-            stopProcess();
-          } else {
-            BigInteger campaignId = campaigns.get(0)
-                .getId();
-
-            Bundle bundle = new Bundle();
-            bundle.putString("packageName", appContext.getPackageName());
-            bundle.putString("campaignId", campaignId.toString());
-
-            poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
-
-            this.campaignId = campaignId;
-          }
-        }));
+        .retryWhen(throwableObservable -> throwableObservable.flatMap(
+            throwable -> ReactiveNetwork.observeInternetConnectivity())
+            .flatMap(this::retryIfNetworkAvailable))
+        .firstOrError()
+        .doOnSuccess(this::processCampaign)
+        .subscribe());
   }
 
   private int getVerCode(Context context, String packageName)
@@ -281,17 +272,26 @@ public class PoAManager implements LifeCycleListener.Listener {
    * If the available start process.
    */
   private void checkPreferencesForPackage() {
-    final AppPreferences appPreferences =
-        new AppPreferences(appContext);
-
-    if (foreground && appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
-      Log.d(TAG, "Starting PoA process");
-      startProcess();
-    } else {
-      spHandler.postDelayed(spListener = this::checkPreferencesForPackage,
-          PREFERENCES_LISTENER_DELAY);
+    if (!processing) {
+      final AppPreferences appPreferences = new AppPreferences(appContext);
+      if (foreground && appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
+        Log.d(TAG, "Starting PoA process");
+        startProcess();
+      } else {
+        spHandler.postDelayed(spListener = this::checkPreferencesForPackage,
+            PREFERENCES_LISTENER_DELAY);
+      }
     }
   }
+
+  /**
+   * Return an observable that emits 0 if there is network. Emits empty otherwise.
+   * This is supposed to avoid breaking the chain.
+   */
+  private ObservableSource<? extends Integer> retryIfNetworkAvailable(Boolean hasInternet) {
+    return hasInternet ? Observable.just(0) : Observable.empty();
+  }
+
   @Override public void onBecameForeground(Activity activity) {
     this.compositeDisposable = new CompositeDisposable();
 
@@ -322,9 +322,38 @@ public class PoAManager implements LifeCycleListener.Listener {
     compositeDisposable.dispose();
   }
 
-  private static Completable getCampaignContract(){
-    return addressProxy.getAdsAddress(network).subscribeOn(Schedulers.io()).doOnSuccess(contractAddress -> {
-      PoAManager.campaignContract = new CampaignContractImpl(asfWeb3j, new Address(contractAddress));
-    }).toCompletable();
+  /**
+   * Method to obtain the campaign contract from the address proxy sdk.
+   */
+  private static Completable getCampaignContract() {
+    return addressProxy.getAdsAddress(network)
+        .subscribeOn(Schedulers.io())
+        .doOnSuccess(contractAddress -> {
+          PoAManager.campaignContract =
+              new CampaignContractImpl(asfWeb3j, new Address(contractAddress));
+        })
+        .toCompletable();
+  }
+
+  /**
+   * Process the given campaigns list. In case the list is empty the PoA process is stopped.
+   * Otherwise the register campaign message is send with the first campaign on the list.
+   */
+  private void processCampaign(List<Campaign> campaigns) {
+    if (campaigns.isEmpty()) {
+      Log.d(TAG, "No campaign is available.");
+      stopProcess();
+    } else {
+      BigInteger campaignId = campaigns.get(0)
+          .getId();
+
+      Bundle bundle = new Bundle();
+      bundle.putString("packageName", appContext.getPackageName());
+      bundle.putString("campaignId", campaignId.toString());
+
+      poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
+
+      this.campaignId = campaignId;
+    }
   }
 }
