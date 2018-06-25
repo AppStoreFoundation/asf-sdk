@@ -46,7 +46,8 @@ dependencies {
   api lib.tray
   api lib.reactivenetwork_rx2
 
-  api project(':appcoins-core')
+  api project(path: ':appcoins-contract-proxy')
+
 }
 
 //region Publishing

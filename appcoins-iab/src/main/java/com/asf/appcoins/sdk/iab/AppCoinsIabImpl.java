@@ -12,6 +12,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
@@ -74,7 +75,7 @@ final class AppCoinsIabImpl implements AppCoinsIab {
           } else {
             return Single.error(new IllegalStateException("User didn't install wallet!"));
           }
-        })
+        }).observeOn(AndroidSchedulers.mainThread())
         .toCompletable();
   }
 

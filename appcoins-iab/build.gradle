@@ -44,7 +44,7 @@ dependencies {
 
   implementation lib.support_annotations
 
-  api project(':appcoins-core')
+  api project(':appcoins-contract-proxy')
 }
 
 //region Publishing

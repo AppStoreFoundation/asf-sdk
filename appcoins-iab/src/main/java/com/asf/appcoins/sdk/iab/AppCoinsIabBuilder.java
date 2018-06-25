@@ -60,22 +60,15 @@ public final class AppCoinsIabBuilder {
   }
 
   public AppCoinsIab createAppCoinsIab() {
-
     Integer networkId;
     Web3j web3;
-    String tokenContractAddress;
-    String iabContractAddress;
 
     if (debug) {
       networkId = 3;
       web3 = Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      tokenContractAddress = "0xab949343E6C369C6B17C7ae302c1dEbD4B7B61c3";
-      iabContractAddress = "0xB040e69BD4b1025EF6dA958CAc7464730933dB71";
     } else {
       networkId = 1;
       web3 = Web3jFactory.build(new HttpService("https://mainnet.infura.io/1YsvKO0VH5aBopMYJzcy"));
-      tokenContractAddress = "0x1a7a8bd9106f2b8d977e08582dc7d24c723ab0db";
-      iabContractAddress = "0xb015D9bBabc472BBfC990ED6A0C961a90a482C57";
     }
 
     if (this.scheduler == null) {
@@ -91,8 +84,7 @@ public final class AppCoinsIabBuilder {
     }
 
     if (this.paymentService == null) {
-      this.paymentService = new PaymentService(networkId, skuManager, developerAddress, asfWeb3j,
-          tokenContractAddress, iabContractAddress);
+      this.paymentService = new PaymentService(networkId, skuManager, developerAddress, asfWeb3j);
     }
 
     return new AppCoinsIabImpl(period, scheduler, skuManager, paymentService);

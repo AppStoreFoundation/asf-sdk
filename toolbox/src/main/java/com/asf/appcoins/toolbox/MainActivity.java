@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     .show()))
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess(bdsChannel -> Toast.makeText(this, "Channel Created.", Toast.LENGTH_SHORT)
-                    .show())
+                .show())
             .subscribeOn(Schedulers.io())
             .subscribe(bdsChannel -> this.bdsChannel = bdsChannel));
   }

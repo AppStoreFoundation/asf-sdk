@@ -1,0 +1,43 @@
+apply plugin: 'com.android.library'
+
+android {
+  compileSdkVersion 27
+
+
+
+  defaultConfig {
+    minSdkVersion 21
+    targetSdkVersion 27
+    versionCode 1
+    versionName "1.0"
+
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    buildConfigField 'String', 'MAIN_NETWORK_PROXY_CONTRACT_ADDRESS',
+        "\"" + project.MAIN_NETWORK_PROXY_CONTRACT_ADDRESS + "\""
+    buildConfigField 'String', 'ROPSTEN_NETWORK_PROXY_CONTRACT_ADDRESS',
+        "\"" + project.ROPSTEN_NETWORK_PROXY_CONTRACT_ADDRESS + "\""
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+  compileOptions {
+    targetCompatibility 1.8
+    sourceCompatibility 1.8
+  }
+
+}
+
+dependencies {
+  testImplementation lib.junit
+  androidTestImplementation lib.android_test_runner
+
+
+  api lib.retrofit2
+  api lib.web3j
+  api project(path: ':appcoins-core')
+}
