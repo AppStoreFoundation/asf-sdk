@@ -2,6 +2,7 @@ package com.asf.appcoins.sdk.contractproxy;
 
 import com.asf.appcoins.sdk.contractproxy.proxy.Web3jProvider;
 import com.asf.appcoins.sdk.contractproxy.proxy.Web3jProxyContract;
+import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import java.util.concurrent.ConcurrentHashMap;
 import org.web3j.abi.datatypes.Address;
@@ -16,7 +17,7 @@ public final class AppCoinsAddressProxyBuilder {
   private static final String TAG = AppCoinsAddressProxyBuilder.class.getSimpleName();
 
   public AppCoinsAddressProxySdk createAddressProxySdk() {
-    return createAddressProxySdk(Address.DEFAULT.getValue(), chainId -> {
+    return createAddressProxySdk(Single.just(Address.DEFAULT.getValue()), chainId -> {
       switch (chainId) {
         case 3:
           return Web3jFactory.build(new HttpService("https://ropsten.infura.io/1YsvKO0VH5aBopMYJzcy"));
@@ -26,7 +27,7 @@ public final class AppCoinsAddressProxyBuilder {
     });
   }
 
-  public AppCoinsAddressProxySdk createAddressProxySdk(String contractAddress, @NonNull Web3jProvider web3jProvider) {
+  public AppCoinsAddressProxySdk createAddressProxySdk(Single<String> contractAddress, @NonNull Web3jProvider web3jProvider) {
     return new ContractAddressProvider(contractAddress, new Web3jProxyContract(web3jProvider, chainId -> {
       switch (chainId) {
         case 3:

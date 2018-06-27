@@ -11,11 +11,11 @@ public class ContractAddressProvider implements AppCoinsAddressProxySdk {
   static final String IAB_CONTRACT_ID = "appcoinsiab";
   static final String ADVERTISEMENT_CONTRACT_ID = "advertisement";
 
-  private final String walletAddress;
+  private final Single<String> walletAddress;
   private final Web3jProxyContract web3jProxyContract;
   private final Map<String, String> cache;
 
-  public ContractAddressProvider(String walletAddress,
+  public ContractAddressProvider(Single<String> walletAddress,
       Web3jProxyContract web3jProxyContract, Map<String, String> cache) {
     this.walletAddress = walletAddress;
     this.web3jProxyContract = web3jProxyContract;
@@ -38,7 +38,7 @@ public class ContractAddressProvider implements AppCoinsAddressProxySdk {
   }
 
   private Single<String> getAddress(int chainId, String contractId) {
-    return Single.fromCallable(() -> syncGetContractAddress(chainId, walletAddress, contractId));
+    return walletAddress.map(walletAddress -> syncGetContractAddress(chainId, walletAddress, contractId));
   }
 
   private synchronized String syncGetContractAddress(int chainId, String wallet,
