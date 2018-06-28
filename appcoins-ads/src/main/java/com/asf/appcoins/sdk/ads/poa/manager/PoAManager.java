@@ -24,6 +24,7 @@ import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.SingleObserver;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -245,25 +246,19 @@ public class PoAManager implements LifeCycleListener.Listener {
   private void handleCampaign() {
     String packageName = appContext.getPackageName();
 
-    compositeDisposable.add(ReactiveNetwork.observeInternetConnectivity()
+    ReactiveNetwork.observeInternetConnectivity()
         .subscribeOn(Schedulers.io())
         .filter(hasInternet -> hasInternet)
         .filter(hasInternet -> this.campaignId == null)
-        .flatMapCompletable(__ -> getCampaignContract())
-        .andThen(Observable.fromCallable(() -> getVerCode(appContext, packageName)))
+        .flatMap(__ -> fetchCampaignContract().andThen(
+            Observable.fromCallable(() -> getVerCode(appContext, packageName))))
         .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
         .retryWhen(throwableObservable -> throwableObservable.flatMap(
             throwable -> ReactiveNetwork.observeInternetConnectivity())
             .flatMap(this::retryIfNetworkAvailable))
         .firstOrError()
         .doOnSuccess(this::processCampaign)
-        .subscribe());
-  }
-
-  private int getVerCode(Context context, String packageName)
-      throws PackageManager.NameNotFoundException {
-    return context.getPackageManager()
-        .getPackageInfo(packageName, 0).versionCode;
+        .subscribe();
   }
 
   /**
@@ -325,14 +320,15 @@ public class PoAManager implements LifeCycleListener.Listener {
   /**
    * Method to obtain the campaign contract from the address proxy sdk.
    */
-  private static Completable getCampaignContract() {
+  private static Completable fetchCampaignContract() {
     return addressProxy.getAdsAddress(network)
         .subscribeOn(Schedulers.io())
         .doOnSuccess(contractAddress -> {
           PoAManager.campaignContract =
               new CampaignContractImpl(asfWeb3j, new Address(contractAddress));
         })
-        .toCompletable();
+        .toCompletable()
+        .doOnComplete(() -> Log.d(TAG, "getCampaignContract: on complete"));
   }
 
   /**
@@ -355,5 +351,11 @@ public class PoAManager implements LifeCycleListener.Listener {
 
       this.campaignId = campaignId;
     }
+  }
+
+  private int getVerCode(Context context, String packageName)
+      throws PackageManager.NameNotFoundException {
+    return context.getPackageManager()
+        .getPackageInfo(packageName, 0).versionCode;
   }
 }
