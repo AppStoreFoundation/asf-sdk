@@ -16,7 +16,6 @@ import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContract;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContractImpl;
-import com.asf.appcoins.sdk.contractproxy.AppCoinsAddressProxyBuilder;
 import com.asf.appcoins.sdk.contractproxy.AppCoinsAddressProxySdk;
 import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
@@ -24,7 +23,6 @@ import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.SingleObserver;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -61,7 +59,6 @@ public class PoAManager implements LifeCycleListener.Listener {
   private static Context appContext;
   /** integer used to identify the network to wich we are connected */
   private static int network = 0;
-  private static CampaignContract campaignContract;
   /** Instance of the address proxy sdk */
   private static AppCoinsAddressProxySdk addressProxy;
   /** Instance of the web3j client */
@@ -83,12 +80,21 @@ public class PoAManager implements LifeCycleListener.Listener {
   private int proofsSent = 0;
   /** The campaign ID value */
   private BigInteger campaignId;
+  /** Campaign contact interface */
+  private static CampaignContract campaignContract;
+
 
   private boolean foreground = false;
   private boolean dialogVisible = false;
 
-  public PoAManager(SharedPreferences preferences) {
+  public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
+      int networkId, AsfWeb3j asfWeb3j, AppCoinsAddressProxySdk addressProxy) {
     this.preferences = preferences;
+    PoAManager.poaConnector = connector;
+    PoAManager.appContext = context;
+    PoAManager.network = networkId;
+    PoAManager.asfWeb3j = asfWeb3j;
+    PoAManager.addressProxy = addressProxy;
   }
 
   /**
@@ -105,17 +111,11 @@ public class PoAManager implements LifeCycleListener.Listener {
    * @param connector The PoA service connector used on the communication of the proof of attention.
    */
   public static void init(Context context, PoAServiceConnector connector, int networkId,
-      AsfWeb3j asfWeb3j) {
+      AsfWeb3j asfWeb3j, AppCoinsAddressProxySdk addressProxy) {
     if (instance == null) {
       SharedPreferences preferences =
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
-      instance = new PoAManager(preferences);
-      PoAManager.poaConnector = connector;
-      PoAManager.appContext = context;
-      PoAManager.network = networkId;
-      PoAManager.asfWeb3j = asfWeb3j;
-
-      addressProxy = new AppCoinsAddressProxyBuilder().createAddressProxySdk();
+      instance = new PoAManager(preferences, connector, context, networkId, asfWeb3j, addressProxy);
     }
   }
 
@@ -249,15 +249,15 @@ public class PoAManager implements LifeCycleListener.Listener {
     ReactiveNetwork.observeInternetConnectivity()
         .subscribeOn(Schedulers.io())
         .filter(hasInternet -> hasInternet)
-        .filter(hasInternet -> this.campaignId == null)
-        .flatMap(__ -> fetchCampaignContract().andThen(
-            Observable.fromCallable(() -> getVerCode(appContext, packageName))))
-        .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
+        .filter(__ -> this.campaignId == null)
+        .firstOrError()
+        .flatMapObservable(__-> fetchCampaignContract().andThen(
+                Observable.fromCallable(() -> getVerCode(appContext, packageName))))
+            .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
         .retryWhen(throwableObservable -> throwableObservable.flatMap(
             throwable -> ReactiveNetwork.observeInternetConnectivity())
             .flatMap(this::retryIfNetworkAvailable))
-        .firstOrError()
-        .doOnSuccess(this::processCampaign)
+        .doOnNext(this::processCampaign)
         .subscribe();
   }
 
@@ -320,11 +320,11 @@ public class PoAManager implements LifeCycleListener.Listener {
   /**
    * Method to obtain the campaign contract from the address proxy sdk.
    */
-  private static Completable fetchCampaignContract() {
+  private Completable fetchCampaignContract() {
     return addressProxy.getAdsAddress(network)
         .subscribeOn(Schedulers.io())
         .doOnSuccess(contractAddress -> {
-          PoAManager.campaignContract =
+          campaignContract =
               new CampaignContractImpl(asfWeb3j, new Address(contractAddress));
         })
         .toCompletable()

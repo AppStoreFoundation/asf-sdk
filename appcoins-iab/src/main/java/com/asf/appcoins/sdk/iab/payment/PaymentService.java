@@ -41,13 +41,13 @@ public final class PaymentService {
   private PaymentDetails currentPayment;
 
   public PaymentService(int networkId, SkuManager skuManager, String developerAddress,
-      AsfWeb3j asfWeb3j) {
+      AsfWeb3j asfWeb3j, AppCoinsAddressProxySdk addressProxy) {
     this.networkId = networkId;
     this.skuManager = skuManager;
     this.developerAddress = developerAddress;
     this.asfWeb3j = asfWeb3j;
     this.payments = new HashMap<>(1);
-    this.addressProxy = new AppCoinsAddressProxyBuilder().createAddressProxySdk();
+    this.addressProxy = addressProxy;
   }
 
   public Single<Boolean> buy(String skuId, Activity activity, int defaultRequestCode) {
@@ -175,8 +175,8 @@ public final class PaymentService {
 
     return Observable.zip(getTokenContractAddress, getIabContractAddress,
         (tokenContractAddress, iabContractAddress) -> {
-          Intent intent = buildPaymentIntent(sku, total, tokenContractAddress.toString(),
-              iabContractAddress.toString());
+          Intent intent = buildPaymentIntent(sku, total, tokenContractAddress,
+              iabContractAddress);
 
           currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
               new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));

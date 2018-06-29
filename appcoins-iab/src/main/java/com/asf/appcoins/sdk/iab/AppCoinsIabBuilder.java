@@ -1,5 +1,6 @@
 package com.asf.appcoins.sdk.iab;
 
+import com.asf.appcoins.sdk.contractproxy.AppCoinsAddressProxyBuilder;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3jImpl;
 import com.asf.appcoins.sdk.iab.entity.SKU;
@@ -84,7 +85,8 @@ public final class AppCoinsIabBuilder {
     }
 
     if (this.paymentService == null) {
-      this.paymentService = new PaymentService(networkId, skuManager, developerAddress, asfWeb3j);
+      this.paymentService = new PaymentService(networkId, skuManager, developerAddress, asfWeb3j,
+          new AppCoinsAddressProxyBuilder().createAddressProxySdk());
     }
 
     return new AppCoinsIabImpl(period, scheduler, skuManager, paymentService);
