@@ -246,7 +246,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   private void handleCampaign() {
     String packageName = appContext.getPackageName();
 
-    ReactiveNetwork.observeInternetConnectivity()
+    compositeDisposable.add(ReactiveNetwork.observeInternetConnectivity()
         .subscribeOn(Schedulers.io())
         .filter(hasInternet -> hasInternet)
         .filter(__ -> this.campaignId == null)
@@ -258,7 +258,7 @@ public class PoAManager implements LifeCycleListener.Listener {
             throwable -> ReactiveNetwork.observeInternetConnectivity())
             .flatMap(this::retryIfNetworkAvailable))
         .doOnNext(this::processCampaign)
-        .subscribe();
+        .subscribe());
   }
 
   /**
