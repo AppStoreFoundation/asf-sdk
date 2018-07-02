@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import com.asf.appcoins.sdk.R;
+import com.asf.appcoins.sdk.contractproxy.AppCoinsAddressProxyBuilder;
+import com.asf.appcoins.sdk.contractproxy.AppCoinsAddressProxySdk;
 import com.asf.appcoins.sdk.core.transaction.Transaction;
 import com.asf.appcoins.sdk.core.transaction.Transaction.Status;
 import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
@@ -28,50 +30,29 @@ public final class PaymentService {
   public static final String TRANSACTION_HASH_KEY = "transaction_hash";
   public static final String PRODUCT_NAME = "product_name";
 
-  private static final String WALLET_PACKAGE_NAME = "com.asfoundation.wallet";
-
   private static final int DECIMALS = 18;
   private final int networkId;
   private final SkuManager skuManager;
   private final String developerAddress;
   private final Map<String, PaymentDetails> payments;
   private final AsfWeb3j asfWeb3j;
-  private final String tokenContractAddress;
-  private final String iabContractAddress;
+  private final AppCoinsAddressProxySdk addressProxy;
 
   private PaymentDetails currentPayment;
 
   public PaymentService(int networkId, SkuManager skuManager, String developerAddress,
-      AsfWeb3j asfWeb3j, String tokenContractAddress, String iabContractAddress) {
+      AsfWeb3j asfWeb3j, AppCoinsAddressProxySdk addressProxy) {
     this.networkId = networkId;
     this.skuManager = skuManager;
     this.developerAddress = developerAddress;
     this.asfWeb3j = asfWeb3j;
-    this.iabContractAddress = iabContractAddress;
     this.payments = new HashMap<>(1);
-    this.tokenContractAddress = tokenContractAddress;
+    this.addressProxy = addressProxy;
   }
 
   public Single<Boolean> buy(String skuId, Activity activity, int defaultRequestCode) {
-    SKU sku = skuManager.getSku(skuId);
-    BigDecimal amount = skuManager.getSkuAmount(skuId);
-    BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
-
-    Intent intent = buildPaymentIntent(sku, total, tokenContractAddress, iabContractAddress);
-
-    currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
-        new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
-
     if (WalletUtils.hasWalletInstalled(activity)) {
-      if (payments.containsKey(skuId)) {
-        throw new IllegalArgumentException(
-            "Pending buy action with the same sku found! Did you forget to consume the former?");
-      } else {
-        payments.put(skuId, currentPayment);
-
-        activity.startActivityForResult(intent, defaultRequestCode);
-      }
-      return Single.just(true);
+      return generateBuyIntent(activity, skuId, defaultRequestCode).singleOrError();
     } else {
       return WalletUtils.promptToInstallWallet(activity,
           activity.getString(R.string.install_wallet_from_iab));
@@ -177,5 +158,38 @@ public final class PaymentService {
     }
 
     payments.remove(skuId);
+  }
+
+  private Observable<Boolean> generateBuyIntent(Activity activity, String skuId,
+      int defaultRequestCode) {
+    SKU sku = skuManager.getSku(skuId);
+    BigDecimal amount = skuManager.getSkuAmount(skuId);
+    BigDecimal total = amount.multiply(BigDecimal.TEN.pow(DECIMALS));
+
+    Observable<String> getTokenContractAddress = addressProxy.getAppCoinsAddress(networkId)
+        .toObservable()
+        .subscribeOn(Schedulers.io());
+    Observable<String> getIabContractAddress = addressProxy.getIabAddress(networkId)
+        .toObservable()
+        .subscribeOn(Schedulers.io());
+
+    return Observable.zip(getTokenContractAddress, getIabContractAddress,
+        (tokenContractAddress, iabContractAddress) -> {
+          Intent intent = buildPaymentIntent(sku, total, tokenContractAddress,
+              iabContractAddress);
+
+          currentPayment = new PaymentDetails(PaymentStatus.FAIL, skuId,
+              new Transaction(null, null, developerAddress, total.toString(), Status.PENDING));
+
+          if (payments.containsKey(skuId)) {
+            throw new IllegalArgumentException(
+                "Pending buy action with the same sku found! Did you forget to consume the former?");
+          } else {
+            payments.put(skuId, currentPayment);
+
+            activity.startActivityForResult(intent, defaultRequestCode);
+          }
+          return true;
+        });
   }
 }

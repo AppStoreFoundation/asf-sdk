@@ -5,8 +5,8 @@ import android.content.Context;
 import android.os.Bundle;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.manager.PoAManager;
+import com.asf.appcoins.sdk.contractproxy.AppCoinsAddressProxyBuilder;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
-import org.web3j.abi.datatypes.Address;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -21,16 +21,13 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   private static final String ADS_PREFERENCES = "AppCoinsAds";
 
   private final PoAServiceConnector poaConnector;
-  Address contractAddress;
   AsfWeb3j web3j;
   private Context context;
   private int networkId;
 
-  AppCoinsAdsImpl(PoAServiceConnector poaConnector, int networkId, AsfWeb3j asfWeb3j,
-      Address contractAddress) {
+  AppCoinsAdsImpl(PoAServiceConnector poaConnector, int networkId, AsfWeb3j asfWeb3j) {
     this.poaConnector = poaConnector;
     this.networkId = networkId;
-    this.contractAddress = contractAddress;
     this.web3j = asfWeb3j;
   }
 
@@ -66,7 +63,9 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
 
   @Override public void init(Application application) {
     this.context = application;
-    PoAManager.init(application, poaConnector, networkId, web3j, contractAddress);
+
+    PoAManager.init(application, poaConnector, networkId, web3j,
+        new AppCoinsAddressProxyBuilder().createAddressProxySdk());
     LifeCycleListener.get(application)
         .setListener(PoAManager.get());
   }
