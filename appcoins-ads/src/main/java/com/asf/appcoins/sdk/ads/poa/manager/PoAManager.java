@@ -54,15 +54,15 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** The instance of the manager */
   private static PoAManager instance;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
-  private static PoAServiceConnector poaConnector;
+  private PoAServiceConnector poaConnector;
   /** The application context */
-  private static Context appContext;
+  private Context appContext;
   /** integer used to identify the network to wich we are connected */
-  private static int network = 0;
+  private int network = 0;
   /** Instance of the address proxy sdk */
-  private static AppCoinsAddressProxySdk addressProxy;
+  private AppCoinsAddressProxySdk addressProxy;
   /** Instance of the web3j client */
-  private static AsfWeb3j asfWeb3j;
+  private AsfWeb3j asfWeb3j;
 
   private CompositeDisposable compositeDisposable;
   private final SharedPreferences preferences;
@@ -81,7 +81,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** The campaign ID value */
   private BigInteger campaignId;
   /** Campaign contact interface */
-  private static CampaignContract campaignContract;
+  private CampaignContract campaignContract;
 
 
   private boolean foreground = false;
@@ -90,11 +90,11 @@ public class PoAManager implements LifeCycleListener.Listener {
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AsfWeb3j asfWeb3j, AppCoinsAddressProxySdk addressProxy) {
     this.preferences = preferences;
-    PoAManager.poaConnector = connector;
-    PoAManager.appContext = context;
-    PoAManager.network = networkId;
-    PoAManager.asfWeb3j = asfWeb3j;
-    PoAManager.addressProxy = addressProxy;
+    this.poaConnector = connector;
+    this.appContext = context;
+    this.network = networkId;
+    this.asfWeb3j = asfWeb3j;
+    this.addressProxy = addressProxy;
   }
 
   /**
