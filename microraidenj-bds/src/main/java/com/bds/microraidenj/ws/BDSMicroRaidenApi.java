@@ -21,7 +21,7 @@ import retrofit2.http.Query;
 
 public interface BDSMicroRaidenApi {
 
-  String ENDPOINT = "http://34.240.68.255/microraiden/";
+  String ENDPOINT = "http://52.209.250.255/microraiden/";
 
   static BDSMicroRaidenApi create(boolean debug) {
     OkHttpClient.Builder builder = new OkHttpClient.Builder();
