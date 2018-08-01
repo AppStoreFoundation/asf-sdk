@@ -8,7 +8,7 @@ tokens when your application is being used.
 
 This tutorial will guide you through the process of adding the ASF SDK as a dependency on your project.
 Then for each separate component of the SDK you can **check our wiki pages [IAB SDK](https://github.com/AppStoreFoundation/asf-sdk/wiki/In-App-Billing-(IAB)-SDK)
-and [Advertisement SDK](https://github.com/AppStoreFoundation/asf-sdk/wiki/Advertisement-SDK).**
+and [User Acquisition SDK](https://github.com/AppStoreFoundation/asf-sdk/wiki/Advertisement-SDK).**
 
 The integration should be simple enough to be done in under 10 minutes. If this is not the case for 
 you, let us know. **The SDK is able to work in the mainnet**. You can still use the Ropsten test 
@@ -66,7 +66,7 @@ dependencies {
 }
 ```
 
-As an example, every time there is an update of the SDKs where no further integration needs to be done, the **only thing that should be changed is the version**. For example, after the **release scheduled for the 2nd of May**, the dependencies that should be included in the **app's buildscript** are:
+As an example, every time there is an update of the SDKs where no further integration needs to be done, the **only thing that should be changed is the version**. For example, when the next version is released, the dependencies that should be included in the **app's buildscript** are:
 
 ```
 dependencies {
