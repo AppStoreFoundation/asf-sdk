@@ -53,23 +53,6 @@ And in your **app's buildscript**, add the following dependency:
 
 ```
 dependencies {
-    api 'com.asfoundation:appcoins:0.3.7a'
-}
-```
-
-Or
-
-```
-dependencies {
-    api 'com.asfoundation:appcoins-iab:0.3.7a'
-    api 'com.asfoundation:appcoins-ads:0.3.7a'
-}
-```
-
-As an example, every time there is an update of the SDKs where no further integration needs to be done, the **only thing that should be changed is the version**. For example, when the next version is released, the dependencies that should be included in the **app's buildscript** are:
-
-```
-dependencies {
     api 'com.asfoundation:appcoins:0.3.8a'
 }
 ```
@@ -80,6 +63,23 @@ Or
 dependencies {
     api 'com.asfoundation:appcoins-iab:0.3.8a'
     api 'com.asfoundation:appcoins-ads:0.3.8a'
+}
+```
+
+As an example, every time there is an update of the SDKs where no further integration needs to be done, the **only thing that should be changed is the version**. For example, when the next version is released, the dependencies that should be included in the **app's buildscript** are:
+
+```
+dependencies {
+    api 'com.asfoundation:appcoins:0.3.9a'
+}
+```
+
+Or
+
+```
+dependencies {
+    api 'com.asfoundation:appcoins-iab:0.3.9a'
+    api 'com.asfoundation:appcoins-ads:0.3.9a'
 }
 ```
 
