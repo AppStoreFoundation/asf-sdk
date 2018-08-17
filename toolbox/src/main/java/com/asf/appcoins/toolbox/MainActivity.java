@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
   public void onBuyGasButtonClicked(View arg0) {
     Disposable disposable = appCoinsIab.buy(Skus.SKU_GAS_ID, this)
+        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(() -> {
           Toast.makeText(this, "Buy successfully triggered.", Toast.LENGTH_SHORT)
               .show();
