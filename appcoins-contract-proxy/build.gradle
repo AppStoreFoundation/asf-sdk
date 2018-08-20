@@ -17,6 +17,10 @@ android {
         "\"" + project.MAIN_NETWORK_PROXY_CONTRACT_ADDRESS + "\""
     buildConfigField 'String', 'ROPSTEN_NETWORK_PROXY_CONTRACT_ADDRESS',
         "\"" + project.ROPSTEN_NETWORK_PROXY_CONTRACT_ADDRESS + "\""
+    buildConfigField 'String', 'MAIN_NETWORK_BACKEND_BASE_HOST',
+        "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST + "\""
+    buildConfigField 'String', 'ROPSTEN_NETWORK_BACKEND_BASE_HOST',
+        "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
   }
 
   buildTypes {

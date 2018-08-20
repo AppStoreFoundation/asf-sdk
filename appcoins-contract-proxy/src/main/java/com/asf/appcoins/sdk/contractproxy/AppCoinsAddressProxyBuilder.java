@@ -1,7 +1,6 @@
 package com.asf.appcoins.sdk.contractproxy;
 
 import com.asf.appcoins.sdk.contractproxy.repository.RemoteRepository;
-import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -20,18 +19,14 @@ public final class AppCoinsAddressProxyBuilder {
     String baseHost;
     switch (chainId) {
       case 3:
-        baseHost = "http://52.209.250.255";
+        baseHost = BuildConfig.ROPSTEN_NETWORK_BACKEND_BASE_HOST;
         break;
       default:
-        baseHost = "http://34.254.1.70";
+        baseHost = BuildConfig.MAIN_NETWORK_BACKEND_BASE_HOST;
         break;
     }
-    OkHttpClient client = new OkHttpClient.Builder().connectTimeout(15, TimeUnit.MINUTES)
-        .readTimeout(30, TimeUnit.MINUTES)
-        .writeTimeout(30, TimeUnit.MINUTES)
-        .build();
     return new Retrofit.Builder().baseUrl(baseHost)
-        .client(client)
+        .client(new OkHttpClient.Builder().build())
         .addConverterFactory(JacksonConverterFactory.create())
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .build()

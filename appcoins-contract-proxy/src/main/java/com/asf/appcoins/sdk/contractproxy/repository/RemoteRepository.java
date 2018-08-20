@@ -5,8 +5,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public class RemoteRepository {
-
-  private static final String TAG = RemoteRepository.class.getSimpleName();
   private final ApiProvider apiProvider;
 
   public RemoteRepository(ApiProvider apiProvider) {
@@ -36,10 +34,6 @@ public class RemoteRepository {
     private String wallet;
 
     public ProxyResponse() {
-    }
-
-    private ProxyResponse(String wallet) {
-      this.wallet = wallet;
     }
 
     public String getWallet() {
