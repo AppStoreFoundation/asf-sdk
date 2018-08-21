@@ -23,6 +23,12 @@ android {
   buildTypes {
     release {
       minifyEnabled false
+      buildConfigField 'String', 'BACKEND_BASE_HOST',
+          "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST + "\""
+    }
+    debug{
+      buildConfigField 'String', 'BACKEND_BASE_HOST',
+          "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
     }
   }
 
