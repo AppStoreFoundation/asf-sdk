@@ -1,6 +1,7 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
 import android.support.annotation.NonNull;
+import com.asf.appcoins.sdk.ads.ip.CountryProvider;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import java.util.List;

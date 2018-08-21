@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.poa.campaign;
+package com.asf.appcoins.sdk.ads.ip;
 
 import io.reactivex.Single;
 
