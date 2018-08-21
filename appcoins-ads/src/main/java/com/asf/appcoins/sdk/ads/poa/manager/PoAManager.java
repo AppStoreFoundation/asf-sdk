@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.ip.manager;
+package com.asf.appcoins.sdk.ads.poa.manager;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,8 +18,10 @@ import com.asf.appcoins.sdk.ads.poa.campaign.BdsCampaignService;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignRepository;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignService;
+import com.asf.appcoins.sdk.contractproxy.AppCoinsAddressProxySdk;
 import com.asf.appcoins.sdk.core.util.LogInterceptor;
 import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
+import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import io.reactivex.BackpressureStrategy;

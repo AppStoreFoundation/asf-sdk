@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
-import com.asf.appcoins.sdk.ads.ip.manager.PoAManager;
+import com.asf.appcoins.sdk.ads.poa.manager.PoAManager;
+import com.asf.appcoins.sdk.contractproxy.AppCoinsAddressProxyBuilder;
+import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
