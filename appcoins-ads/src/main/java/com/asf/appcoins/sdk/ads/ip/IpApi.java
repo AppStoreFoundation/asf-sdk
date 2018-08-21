@@ -1,5 +1,6 @@
 package com.asf.appcoins.sdk.ads.ip;
 
+import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.core.util.LogInterceptor;
 import io.reactivex.Single;
 import okhttp3.OkHttpClient;
@@ -10,7 +11,7 @@ import retrofit2.http.GET;
 
 public interface IpApi {
 
-  String ENDPOINT = "http://52.209.250.255/";
+  String ENDPOINT = BuildConfig.BACKEND_BASE_HOST;
 
   static IpApi create() {
     OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new LogInterceptor());
