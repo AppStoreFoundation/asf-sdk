@@ -1,6 +1,6 @@
 ext {
   VERSION_CODE = 14
-  VERSION_NAME = "0.4.4b"
+  VERSION_NAME = "0.4.5b"
   VERSION = VERSION_NAME
   GROUP = "com.asfoundation"
 }
