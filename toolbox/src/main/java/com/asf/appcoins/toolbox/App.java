@@ -1,6 +1,7 @@
 package com.asf.appcoins.toolbox;
 
 import android.app.Application;
+import android.content.pm.PackageManager;
 import com.asf.appcoins.sdk.iab.entity.SKU;
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -15,8 +16,12 @@ public class App extends Application {
 
     AppCoinsIabSingleton.create(DEVELOPER_ADDRESS, buildSkus(), true);
     AdvertisementSdkSingleton.create(this, true);
-    AdvertisementSdkSingleton.getAdsSdk()
-        .init(this);
+    try {
+      AdvertisementSdkSingleton.getAdsSdk()
+          .init(this);
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
   }
 
   private List<SKU> buildSkus() {

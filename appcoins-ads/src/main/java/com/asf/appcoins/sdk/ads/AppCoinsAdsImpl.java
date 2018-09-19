@@ -2,6 +2,7 @@ package com.asf.appcoins.sdk.ads;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.manager.PoAManager;
@@ -21,14 +22,12 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   private static final String ADS_PREFERENCES = "AppCoinsAds";
 
   private final PoAServiceConnector poaConnector;
-  AsfWeb3j web3j;
   private Context context;
   private int networkId;
 
-  AppCoinsAdsImpl(PoAServiceConnector poaConnector, int networkId, AsfWeb3j asfWeb3j) {
+  AppCoinsAdsImpl(PoAServiceConnector poaConnector, int networkId) {
     this.poaConnector = poaConnector;
     this.networkId = networkId;
-    this.web3j = asfWeb3j;
   }
 
   @Override public void handshake() {
@@ -61,11 +60,10 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
     }
   }
 
-  @Override public void init(Application application) {
+  @Override public void init(Application application) throws PackageManager.NameNotFoundException {
     this.context = application;
 
-    PoAManager.init(application, poaConnector, networkId, web3j,
-        new AppCoinsAddressProxyBuilder().createAddressProxySdk());
+    PoAManager.init(application, poaConnector, networkId);
     LifeCycleListener.get(application)
         .setListener(PoAManager.get());
   }
