@@ -1,6 +1,7 @@
 package com.asf.appcoins.sdk.ads;
 
 import android.app.Application;
+import android.content.pm.PackageManager;
 
 /**
  * Created by Joao Raimundo on 01-03-2018.
@@ -42,5 +43,5 @@ public interface AppCoinsAds {
    *
    * @param application The application instance of the app.
    */
-  void init(Application application);
+  void init(Application application) throws PackageManager.NameNotFoundException;
 }

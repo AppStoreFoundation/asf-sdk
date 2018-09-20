@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
@@ -13,25 +14,28 @@ import com.asf.appcoins.sdk.ads.R;
 import com.asf.appcoins.sdk.ads.ip.IpApi;
 import com.asf.appcoins.sdk.ads.ip.IpResponse;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
+import com.asf.appcoins.sdk.ads.poa.campaign.BdsCampaignService;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
-import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContract;
-import com.asf.appcoins.sdk.ads.poa.campaign.CampaignContractImpl;
+import com.asf.appcoins.sdk.ads.poa.campaign.CampaignRepository;
+import com.asf.appcoins.sdk.ads.poa.campaign.CampaignService;
 import com.asf.appcoins.sdk.contractproxy.AppCoinsAddressProxySdk;
+import com.asf.appcoins.sdk.core.util.LogInterceptor;
 import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
-import io.reactivex.Completable;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import java.io.IOException;
 import java.math.BigInteger;
-import java.util.LinkedList;
-import java.util.List;
 import net.grandcentrix.tray.AppPreferences;
-import org.web3j.abi.datatypes.Address;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -53,19 +57,15 @@ public class PoAManager implements LifeCycleListener.Listener {
   private static final int PREFERENCES_LISTENER_DELAY = 1000;
   /** The instance of the manager */
   private static PoAManager instance;
+  private final SharedPreferences preferences;
+  private final CampaignService campaignService;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
   private PoAServiceConnector poaConnector;
   /** The application context */
   private Context appContext;
   /** integer used to identify the network to wich we are connected */
   private int network = 0;
-  /** Instance of the address proxy sdk */
-  private AppCoinsAddressProxySdk addressProxy;
-  /** Instance of the web3j client */
-  private AsfWeb3j asfWeb3j;
-
   private CompositeDisposable compositeDisposable;
-  private final SharedPreferences preferences;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
   /** The handle to keep the runnable tasks that we be running within a certain period */
@@ -80,21 +80,16 @@ public class PoAManager implements LifeCycleListener.Listener {
   private int proofsSent = 0;
   /** The campaign ID value */
   private BigInteger campaignId;
-  /** Campaign contact interface */
-  private CampaignContract campaignContract;
-
-
   private boolean foreground = false;
   private boolean dialogVisible = false;
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
-      int networkId, AsfWeb3j asfWeb3j, AppCoinsAddressProxySdk addressProxy) {
+      int networkId, CampaignService campaignService) {
     this.preferences = preferences;
     this.poaConnector = connector;
     this.appContext = context;
     this.network = networkId;
-    this.asfWeb3j = asfWeb3j;
-    this.addressProxy = addressProxy;
+    this.campaignService = campaignService;
   }
 
   /**
@@ -110,13 +105,43 @@ public class PoAManager implements LifeCycleListener.Listener {
    * @param context The context of the application.
    * @param connector The PoA service connector used on the communication of the proof of attention.
    */
-  public static void init(Context context, PoAServiceConnector connector, int networkId,
-      AsfWeb3j asfWeb3j, AppCoinsAddressProxySdk addressProxy) {
+  public static void init(Context context, PoAServiceConnector connector, int networkId)
+      throws PackageManager.NameNotFoundException {
     if (instance == null) {
       SharedPreferences preferences =
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
-      instance = new PoAManager(preferences, connector, context, networkId, asfWeb3j, addressProxy);
+      String packageName = context.getPackageName();
+      instance = new PoAManager(preferences, connector, context, networkId,
+          createCampaignService(packageName, getVerCode(context, packageName)));
     }
+  }
+
+  @NonNull
+  private static BdsCampaignService createCampaignService(String packageName, int versionCode) {
+    return new BdsCampaignService(packageName, versionCode, new CampaignRepository(createApi()),
+        () -> IpApi.create()
+            .getCountry()
+            .map(IpResponse::getCountryCode));
+  }
+
+  private static CampaignRepository.Api createApi() {
+    OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new LogInterceptor());
+
+    OkHttpClient client = builder.build();
+    Retrofit retrofit =
+        new Retrofit.Builder().addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(JacksonConverterFactory.create(new ObjectMapper()))
+            .client(client)
+            .baseUrl(BuildConfig.BACKEND_BASE_HOST)
+            .build();
+
+    return retrofit.create(CampaignRepository.Api.class);
+  }
+
+  private static int getVerCode(Context context, String packageName)
+      throws PackageManager.NameNotFoundException {
+    return context.getPackageManager()
+        .getPackageInfo(packageName, 0).versionCode;
   }
 
   /**
@@ -210,54 +235,21 @@ public class PoAManager implements LifeCycleListener.Listener {
     }
   }
 
-  public List<Campaign> getActiveCampaigns(String packageName, BigInteger vercode)
-      throws IOException {
-    String countryId = IpApi.create()
-        .myIp()
-        .map(IpResponse::getCountryCode)
-        .subscribeOn(Schedulers.io())
-        .doOnError(throwable -> Log.w(TAG, "createAdvertisementSdk: Failed to get country code!",
-            throwable))
-        .blockingFirst();
-
-    List<BigInteger> campaignsIdsByCountry = campaignContract.getCampaignsByCountry(countryId);
-    List<BigInteger> campaignsIdsByCountryWl = campaignContract.getCampaignsByCountry("WL");
-
-    campaignsIdsByCountry.addAll(campaignsIdsByCountryWl);
-
-    List<Campaign> campaign = new LinkedList<>();
-
-    for (BigInteger bidId : campaignsIdsByCountry) {
-      String campaignPackageName = campaignContract.getPackageNameOfCampaign(bidId);
-      List<BigInteger> vercodes = campaignContract.getVercodesOfCampaign(bidId);
-      boolean campaignValid = campaignContract.isCampaignValid(bidId);
-
-      boolean addCampaign =
-          campaignPackageName.equals(packageName) && vercodes.contains(vercode) && campaignValid;
-
-      if (addCampaign) {
-        campaign.add(new Campaign(bidId, vercodes, countryId));
-      }
-    }
-
-    return campaign;
-  }
-
   private void handleCampaign() {
-    String packageName = appContext.getPackageName();
-
     compositeDisposable.add(ReactiveNetwork.observeInternetConnectivity()
         .subscribeOn(Schedulers.io())
         .filter(hasInternet -> hasInternet)
         .filter(__ -> this.campaignId == null)
         .firstOrError()
-        .flatMapObservable(__-> fetchCampaignContract().andThen(
-                Observable.fromCallable(() -> getVerCode(appContext, packageName))))
-            .map(verCode -> getActiveCampaigns(packageName, BigInteger.valueOf(verCode)))
-        .retryWhen(throwableObservable -> throwableObservable.flatMap(
-            throwable -> ReactiveNetwork.observeInternetConnectivity())
-            .flatMap(this::retryIfNetworkAvailable))
-        .doOnNext(this::processCampaign)
+        .flatMap(__ -> campaignService.getCampaign())
+        .retryWhen(throwableObservable -> throwableObservable.toObservable()
+            .flatMap(throwable -> {
+              throwable.printStackTrace();
+              return ReactiveNetwork.observeInternetConnectivity();
+            })
+            .flatMap(this::retryIfNetworkAvailable)
+            .toFlowable(BackpressureStrategy.LATEST))
+        .doOnSuccess(this::processCampaign)
         .subscribe());
   }
 
@@ -317,45 +309,18 @@ public class PoAManager implements LifeCycleListener.Listener {
     compositeDisposable.dispose();
   }
 
-  /**
-   * Method to obtain the campaign contract from the address proxy sdk.
-   */
-  private Completable fetchCampaignContract() {
-    return addressProxy.getAdsAddress(network)
-        .subscribeOn(Schedulers.io())
-        .doOnSuccess(contractAddress -> {
-          campaignContract =
-              new CampaignContractImpl(asfWeb3j, new Address(contractAddress));
-        })
-        .toCompletable()
-        .doOnComplete(() -> Log.d(TAG, "getCampaignContract: on complete"));
-  }
-
-  /**
-   * Process the given campaigns list. In case the list is empty the PoA process is stopped.
-   * Otherwise the register campaign message is send with the first campaign on the list.
-   */
-  private void processCampaign(List<Campaign> campaigns) {
-    if (campaigns.isEmpty()) {
+  private void processCampaign(Campaign campaign) {
+    if (!campaign.hasCampaign()) {
       Log.d(TAG, "No campaign is available.");
       stopProcess();
     } else {
-      BigInteger campaignId = campaigns.get(0)
-          .getId();
-
       Bundle bundle = new Bundle();
-      bundle.putString("packageName", appContext.getPackageName());
-      bundle.putString("campaignId", campaignId.toString());
-
+      bundle.putString("packageName", campaign.getPackageName());
+      bundle.putString("campaignId", campaign.getId()
+          .toString());
       poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
 
-      this.campaignId = campaignId;
+      this.campaignId = campaign.getId();
     }
-  }
-
-  private int getVerCode(Context context, String packageName)
-      throws PackageManager.NameNotFoundException {
-    return context.getPackageManager()
-        .getPackageInfo(packageName, 0).versionCode;
   }
 }
