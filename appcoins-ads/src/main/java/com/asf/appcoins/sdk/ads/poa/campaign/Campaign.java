@@ -1,32 +1,31 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
 import java.math.BigInteger;
-import java.util.List;
 
 public class Campaign {
 
+  private static final int INVALID_CAMPAIGN = -1;
   private final BigInteger id;
-  private final List<BigInteger> vercodes;
-  /**
-   * An uppercase ISO 3166-1 3-letter code representing the current country.
-   */
-  private final String country;
+  private final String packageName;
 
-  public Campaign(BigInteger id, List<BigInteger> vercodes, String country) {
+  public Campaign(BigInteger id, String packageName) {
     this.id = id;
-    this.vercodes = vercodes;
-    this.country = country;
+    this.packageName = packageName;
+  }
+
+  public static Campaign Empty() {
+    return new Campaign(BigInteger.valueOf(-1), "");
+  }
+
+  public String getPackageName() {
+    return packageName;
+  }
+
+  public boolean hasCampaign() {
+    return this.id.compareTo(BigInteger.valueOf(INVALID_CAMPAIGN)) != 0;
   }
 
   public BigInteger getId() {
     return id;
-  }
-
-  public List<BigInteger> getVercodes() {
-    return vercodes;
-  }
-
-  public String getCountry() {
-    return country;
   }
 }
