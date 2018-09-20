@@ -75,7 +75,7 @@ public class CampaignContractImpl implements CampaignContract {
     }
 
     return handleError(response, "Failed to getCampaignsByCountry!", new ArrayList<BigInteger>());
-    }
+  }
 
   @Override public List<String> getCountryList() {
     Function function = new Function("getCountryList", Collections.emptyList(),
