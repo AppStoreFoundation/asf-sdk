@@ -11,14 +11,18 @@ import retrofit2.http.GET;
 
 public interface IpApi {
 
-  String ENDPOINT = BuildConfig.BACKEND_BASE_HOST;
-
-  static IpApi create() {
+  static IpApi create(boolean isDebug) {
     OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new LogInterceptor());
+    String url;
+    if (isDebug) {
+      url = BuildConfig.DEV_BACKEND_BASE_HOST;
+    } else {
+      url = BuildConfig.PROD_BACKEND_BASE_HOST;
+    }
     Retrofit retrofit = new Retrofit.Builder().addConverterFactory(JacksonConverterFactory.create())
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .client(builder.build())
-        .baseUrl(ENDPOINT)
+        .baseUrl(url)
         .build();
 
     return retrofit.create(IpApi.class);
