@@ -14,6 +14,10 @@ android {
     buildConfigField 'int', 'ADS_POA_NUMBER_OF_PROOFS', project.ADS_POA_NUMBER_OF_PROOFS
     buildConfigField 'int', 'ADS_POA_PROOFS_INTERVAL_IN_MILIS',
         project.ADS_POA_PROOFS_INTERVAL_IN_MILIS
+    buildConfigField 'String', 'PROD_BACKEND_BASE_HOST',
+        "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST + "\""
+    buildConfigField 'String', 'DEV_BACKEND_BASE_HOST',
+        "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
 
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -23,13 +27,8 @@ android {
   buildTypes {
     release {
       minifyEnabled false
-      buildConfigField 'String', 'BACKEND_BASE_HOST',
-          "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST + "\""
     }
-    debug{
-      buildConfigField 'String', 'BACKEND_BASE_HOST',
-          "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
-    }
+    debug {}
   }
 
   lintOptions {
@@ -53,7 +52,6 @@ dependencies {
   api lib.reactivenetwork_rx2
 
   api project(path: ':appcoins-contract-proxy')
-
 }
 
 //region Publishing

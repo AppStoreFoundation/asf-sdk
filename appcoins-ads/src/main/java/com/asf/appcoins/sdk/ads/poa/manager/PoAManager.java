@@ -18,10 +18,8 @@ import com.asf.appcoins.sdk.ads.poa.campaign.BdsCampaignService;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignRepository;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignService;
-import com.asf.appcoins.sdk.contractproxy.AppCoinsAddressProxySdk;
 import com.asf.appcoins.sdk.core.util.LogInterceptor;
 import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
-import com.asf.appcoins.sdk.core.web3.AsfWeb3j;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import io.reactivex.BackpressureStrategy;
@@ -112,27 +110,34 @@ public class PoAManager implements LifeCycleListener.Listener {
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
       String packageName = context.getPackageName();
       instance = new PoAManager(preferences, connector, context, networkId,
-          createCampaignService(packageName, getVerCode(context, packageName)));
+          createCampaignService(packageName, getVerCode(context, packageName), networkId));
     }
   }
 
   @NonNull
-  private static BdsCampaignService createCampaignService(String packageName, int versionCode) {
-    return new BdsCampaignService(packageName, versionCode, new CampaignRepository(createApi()),
-        () -> IpApi.create()
-            .getCountry()
-            .map(IpResponse::getCountryCode));
+  private static BdsCampaignService createCampaignService(String packageName, int versionCode,
+      int networkId) {
+    boolean isDebug = networkId != 1;
+    return new BdsCampaignService(packageName, versionCode,
+        new CampaignRepository(createApi(isDebug)), () -> IpApi.create(isDebug)
+        .getCountry()
+        .map(IpResponse::getCountryCode));
   }
 
-  private static CampaignRepository.Api createApi() {
+  private static CampaignRepository.Api createApi(boolean isDebug) {
     OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new LogInterceptor());
-
+    String url;
+    if (isDebug) {
+      url = BuildConfig.DEV_BACKEND_BASE_HOST;
+    } else {
+      url = BuildConfig.PROD_BACKEND_BASE_HOST;
+    }
     OkHttpClient client = builder.build();
     Retrofit retrofit =
         new Retrofit.Builder().addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(JacksonConverterFactory.create(new ObjectMapper()))
             .client(client)
-            .baseUrl(BuildConfig.BACKEND_BASE_HOST)
+            .baseUrl(url)
             .build();
 
     return retrofit.create(CampaignRepository.Api.class);
