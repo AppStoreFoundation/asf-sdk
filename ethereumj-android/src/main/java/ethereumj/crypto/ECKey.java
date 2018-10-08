@@ -902,6 +902,9 @@ public class ECKey implements Serializable {
    * components can be useful for doing further EC maths on them.
    */
   public static class ECDSASignature {
+
+    private static final int SIGNATURE_HEX_LENGTH = 130;
+
     /**
      * The two components of the signature.
      */
@@ -1029,7 +1032,16 @@ public class ECKey implements Serializable {
     }
 
     public String toHex() {
-      return Hex.toHexString(toByteArray());
+      return normalize(Hex.toHexString(toByteArray()));
+    }
+
+    private String normalize(String s) {
+      StringBuilder builder = new StringBuilder(s);
+
+      for (int i = 0; i < (SIGNATURE_HEX_LENGTH - s.length()); i++) {
+        builder.insert(0, '0');
+      }
+      return builder.toString();
     }
 
     @Override public int hashCode() {
