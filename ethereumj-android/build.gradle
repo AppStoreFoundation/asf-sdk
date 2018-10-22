@@ -66,7 +66,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 publishing {
   publications {
     MyPublication(MavenPublication) {
-      groupId 'com.asfoundation'
+      groupId 'com.blockchainds'
       artifactId project.name
       version project.version
       artifact(sourcesJar)
@@ -99,7 +99,7 @@ bintray {
   key = "${ASF_BINTRAY_KEY}"
   publications = ['MyPublication']
   pkg {
-    repo = 'asf'
+    repo = 'bds'
     name = "${project.name}"
     licenses = ['GPL-3.0']
     vcsUrl = 'https://github.com/AppStoreFoundation/AppCoins-ethereumj'
