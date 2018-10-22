@@ -26,7 +26,6 @@ android {
 }
 
 dependencies {
-  api project(':appcoins-iab')
   api project(':appcoins-ads')
 }
 
@@ -51,7 +50,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 publishing {
   publications {
     MyPublication(MavenPublication) {
-      groupId 'com.asfoundation'
+      groupId 'com.blockchainds'
       artifactId project.name
       version project.version
       artifact(sourcesJar)
@@ -84,10 +83,11 @@ bintray {
   key = "${ASF_BINTRAY_KEY}"
   publications = ['MyPublication']
   pkg {
-    repo = 'asf'
+    repo = 'bds'
     name = "${project.name}"
+    userOrg = "${BDS_BINTRAY_ORG}"
     licenses = ['GPL-3.0']
-    vcsUrl = 'https://github.com/AppStoreFoundation/AppCoins-ethereumj'
+    vcsUrl = 'https://github.com/Aptoide/bds-sdk/appcoins'
 
     version {
       name = project.version

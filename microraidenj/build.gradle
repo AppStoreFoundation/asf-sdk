@@ -65,7 +65,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 publishing {
   publications {
     MyPublication(MavenPublication) {
-      groupId 'com.asfoundation'
+      groupId 'com.blockchainds'
       artifactId project.name
       version project.version
       artifact(sourcesJar)

@@ -21,7 +21,7 @@ public class BdsCampaignService implements CampaignService {
 
   @Override public Single<Campaign> getCampaign() {
     return countryProvider.getCountryCode()
-        .flatMap(countryCode -> repository.getCampaign(packageName, versionCode, countryCode))
+        .flatMap(countryCode -> repository.getCampaign(packageName, versionCode, countryCode, "BDS"))
         .map(campaignResponse -> mapCampaign(campaignResponse.getResult()));
   }
 

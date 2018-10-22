@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import com.asf.appcoins.sdk.core.R;
 import com.asf.appcoins.sdk.core.util.AndroidUtils;
@@ -13,11 +14,14 @@ import io.reactivex.annotations.NonNull;
 public class WalletUtils {
 
   public static boolean hasWalletInstalled(Context context) {
-    Intent intent = new Intent(Intent.ACTION_VIEW);
-    Uri uri = Uri.parse("ethereum:");
-    intent.setData(uri);
+    PackageManager packageManager = context.getPackageManager();
 
-    return AndroidUtils.hasHandlerAvailable(intent, context);
+    try {
+      packageManager.getPackageInfo("com.appcoins.wallet", 0);
+      return true;
+    } catch (PackageManager.NameNotFoundException e) {
+      return false;
+    }
   }
 
   public static Single<Boolean> promptToInstallWallet(Activity activity, String message) {
@@ -42,7 +46,7 @@ public class WalletUtils {
   }
 
   @NonNull private static void gotoStore(Context activity) {
-    String appPackageName = "com.asfoundation.wallet";
+    String appPackageName = "com.appcoins.wallet";
     try {
       activity.startActivity(
           new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));

@@ -12,14 +12,14 @@ public class CampaignRepository {
   }
 
   public Single<CampaignResponse> getCampaign(String packageName, int versionCode,
-      String countryCode) {
-    return api.getCampaign(packageName, versionCode, countryCode, "desc", "price", true);
+      String countryCode, String type) {
+    return api.getCampaign(packageName, versionCode, countryCode, "desc", "price", true, type);
   }
 
   public interface Api {
     @GET("campaign/listall") Single<CampaignResponse> getCampaign(
         @Query("packageName") String packageName, @Query("vercode") int versionCode,
         @Query("countryCode") String countryCode, @Query("sort") String sort,
-        @Query("by") String by, @Query("valid") boolean valid);
+        @Query("by") String by, @Query("valid") boolean valid, @Query("type") String type);
   }
 }
