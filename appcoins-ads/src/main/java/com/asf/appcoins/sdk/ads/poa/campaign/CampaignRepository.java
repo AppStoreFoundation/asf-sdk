@@ -7,13 +7,17 @@ import retrofit2.http.Query;
 public class CampaignRepository {
   private final Api api;
 
+  public enum CampaignType{
+    BDS
+  }
+
   public CampaignRepository(Api api) {
     this.api = api;
   }
 
   public Single<CampaignResponse> getCampaign(String packageName, int versionCode,
-      String countryCode, String type) {
-    return api.getCampaign(packageName, versionCode, countryCode, "desc", "price", true, type);
+      String countryCode, CampaignType type) {
+    return api.getCampaign(packageName, versionCode, countryCode, "desc", "price", true, type.name());
   }
 
   public interface Api {

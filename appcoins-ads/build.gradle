@@ -104,8 +104,8 @@ publishing {
 }
 
 bintray {
-  user = "${ASF_BINTRAY_USER}"
-  key = "${ASF_BINTRAY_KEY}"
+  user = "${BDS_BINTRAY_USER}"
+  key = "${BDS_BINTRAY_KEY}"
   publications = ['MyPublication']
   pkg {
     repo = 'bds'
