@@ -32,7 +32,6 @@ android {
     targetCompatibility TARGET_COMPATIBILITY
     sourceCompatibility SOURCE_COMPATIBILITY
   }
-
 }
 
 dependencies {
