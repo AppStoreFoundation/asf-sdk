@@ -31,8 +31,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void onBuyGasButtonClicked(View arg0) {
-    Toast.makeText(this, "Not implemented", Toast.LENGTH_SHORT)
-        .show();
+    startActivity(EmptyActivity.newIntent(this));
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {
