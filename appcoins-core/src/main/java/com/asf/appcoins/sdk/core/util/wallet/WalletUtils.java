@@ -6,18 +6,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import com.asf.appcoins.sdk.core.BuildConfig;
 import com.asf.appcoins.sdk.core.R;
-import com.asf.appcoins.sdk.core.util.AndroidUtils;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 
 public class WalletUtils {
+  private static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
 
   public static boolean hasWalletInstalled(Context context) {
     PackageManager packageManager = context.getPackageManager();
 
     try {
-      packageManager.getPackageInfo("com.appcoins.wallet", 0);
+      packageManager.getPackageInfo(walletPackageName, 0);
       return true;
     } catch (PackageManager.NameNotFoundException e) {
       return false;
@@ -46,13 +47,12 @@ public class WalletUtils {
   }
 
   @NonNull private static void gotoStore(Context activity) {
-    String appPackageName = "com.appcoins.wallet";
     try {
       activity.startActivity(
-          new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+          new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + walletPackageName)));
     } catch (android.content.ActivityNotFoundException anfe) {
       activity.startActivity(new Intent(Intent.ACTION_VIEW,
-          Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+          Uri.parse("https://play.google.com/store/apps/details?id=" + walletPackageName)));
     }
   }
 }
