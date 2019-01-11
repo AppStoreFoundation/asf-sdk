@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
+
+import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
+import com.appcoins.sdk.android_appcoins_billing.CatapultBillingAppcoinsFactory;
+
 import io.reactivex.disposables.CompositeDisposable;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
   public void onBuyGasButtonClicked(View arg0) {
     Toast.makeText(this, "Not implemented", Toast.LENGTH_SHORT)
         .show();
+    CatapultAppcoinsBilling cab = CatapultBillingAppcoinsFactory.BuildAppcoinsBilling(this);
+    cab.querySkuDetails("ola");
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {

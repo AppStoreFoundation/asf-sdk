@@ -7,11 +7,11 @@ import android.os.RemoteException;
 
 import com.appcoins.billing.AppcoinsBilling;;
 
-public class CatappultAppCoinsBillingService implements AppcoinsBilling {
+public class WalletBillingService implements AppcoinsBilling {
 
     private AppcoinsBilling service;
 
-    public CatappultAppCoinsBillingService(IBinder service){
+    public WalletBillingService(IBinder service){
         this.service = AppcoinsBilling.Stub.asInterface(service);
     }
 
@@ -23,11 +23,6 @@ public class CatappultAppCoinsBillingService implements AppcoinsBilling {
     @Override
     public int isBillingSupported(int apiVersion, String packageName, String type) throws RemoteException {
         return 0;
-    }
-
-    @Override
-    public Bundle getSkuDetails(int apiVersion, String packageName, String type, Bundle skusBundle) throws RemoteException {
-        return null;
     }
 
     @Override
