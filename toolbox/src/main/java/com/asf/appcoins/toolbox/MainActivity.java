@@ -3,6 +3,7 @@ package com.asf.appcoins.toolbox;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     Toast.makeText(this, "Not implemented", Toast.LENGTH_SHORT)
         .show();
     CatapultAppcoinsBilling cab = CatapultBillingAppcoinsFactory.BuildAppcoinsBilling(this);
-    cab.querySkuDetails("ola");
+    cab.startService(result -> Log.d("Resultado",result.getMessage()));
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {
@@ -52,9 +53,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void makePaymentButtonClicked(View view) {
-    if (!checkChannelAvailable()) {
-      return;
-    }
+
   }
 
   public void onCloseChannelButtonClicked(View view) {

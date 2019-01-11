@@ -22,7 +22,7 @@ public class WalletBillingService implements AppcoinsBilling {
 
     @Override
     public int isBillingSupported(int apiVersion, String packageName, String type) throws RemoteException {
-        return 0;
+        return service.isBillingSupported(apiVersion, packageName, type);
     }
 
     @Override

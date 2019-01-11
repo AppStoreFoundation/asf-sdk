@@ -7,12 +7,12 @@ import com.appcoins.sdk.billing.CatapultAppCoinsBillingLogic;
 public class CatapultAppcoinsBilling implements AppcoinsBilling {
 
 
-    private WalletCommunication walletCommunication;
+    private IabHelper iabHelper;
 
     private CatapultAppCoinsBillingLogic catapultAppCoinsBillingLogic;
 
-    public CatapultAppcoinsBilling(WalletCommunication walletCommunication){
-        this.walletCommunication = walletCommunication;
+    public CatapultAppcoinsBilling(IabHelper iabHelper){
+        this.iabHelper = iabHelper;
         catapultAppCoinsBillingLogic = new CatapultAppCoinsBillingLogic();
     }
 
@@ -20,5 +20,9 @@ public class CatapultAppcoinsBilling implements AppcoinsBilling {
     @Override
     public void querySkuDetails(String sku) {
 
+    }
+
+    public void startService(final OnIabSetupFinishedListener listener){
+        iabHelper.startService(listener);
     }
 }
