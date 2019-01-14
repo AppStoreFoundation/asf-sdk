@@ -4,7 +4,7 @@ android {
   compileSdkVersion 28
 
   defaultConfig {
-    applicationId "com.asf.appcoins.toolbox"
+    applicationId "com.appcoins.trivialdrivesample"
 
     minSdkVersion MIN_SDK_VERSION
     targetSdkVersion TARGET_SDK_VERSION

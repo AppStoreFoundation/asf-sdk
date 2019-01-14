@@ -25,6 +25,11 @@
             this.mContext = ctx;
         }
 
+        private boolean mSubscriptionsSupported;
+
+        private boolean mSubscriptionUpdateSupported;
+
+
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d("CONNECTION","Connected");
@@ -52,7 +57,7 @@
 
         private void checkBillingVersionV3INAPP(WalletBillingService service , String packageName , int apiVersion , String type) throws RemoteException {
             int response = mService.isBillingSupported(apiVersion, "com.aptoide.trivialdrivesample", type);
-            Log.d("response",response+"");
+
             if (response != Utils.BILLING_RESPONSE_RESULT_OK)
             {
                 if(listener != null){
