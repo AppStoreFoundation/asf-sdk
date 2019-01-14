@@ -37,5 +37,5 @@ dependencies {
   implementation lib.constraint_layout
   testImplementation lib.junit
   api project(':appcoins')
-  compile project(path: ':android_appcoins_billing')
+  api project(path:':android_appcoins_billing')
 }

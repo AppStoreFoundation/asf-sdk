@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+
 import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
 import com.appcoins.sdk.android_appcoins_billing.CatapultBillingAppcoinsFactory;
 
@@ -36,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public void onBuyGasButtonClicked(View arg0) {
-    Toast.makeText(this, "Not implemented", Toast.LENGTH_SHORT)
-        .show();
-    CatapultAppcoinsBilling cab = CatapultBillingAppcoinsFactory.BuildAppcoinsBilling(this);
-    cab.startService(result -> Log.d("Resultado",result.getMessage()));
+    CatapultAppcoinsBilling cab = CatapultBillingAppcoinsFactory.BuildAppcoinsBilling(this.getApplicationContext());
+    cab.startService(result -> {
+      Log.d("Message",result.getMessage());
+    });
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {
