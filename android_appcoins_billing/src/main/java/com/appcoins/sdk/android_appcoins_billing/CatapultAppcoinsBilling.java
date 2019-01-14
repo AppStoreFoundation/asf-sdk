@@ -22,6 +22,16 @@ public class CatapultAppcoinsBilling implements AppcoinsBilling {
 
     }
 
+    @Override
+    public void queryPurchases(String skuType) {
+
+    }
+
+    @Override
+    public void querySkuDetailsAsync(String sku) {
+
+    }
+
     public void startService(final OnIabSetupFinishedListener listener){
         iabHelper.startService(listener);
     }

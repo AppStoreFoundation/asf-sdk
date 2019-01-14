@@ -34,10 +34,9 @@
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = new WalletBillingService(service);
             try {
-                //TODO Remove Hammered package
-                checkBillingVersionV3INAPP(mService, "com.aptoide.trivialdrivesample", Utils.API_VERSION_V3 , Utils.ITEM_TYPE_INAPP);
-                checkBillingVersionV5SUBS(mService, "com.aptoide.trivialdrivesample" , Utils.API_VERSION_V5 , Utils.ITEM_TYPE_SUBS);
-                checkBillingVersionV3SUBS(mService, "com.aptoide.trivialdrivesample", Utils.API_VERSION_V3 , Utils.ITEM_TYPE_SUBS);
+                checkBillingVersionV3INAPP(mService, mContext.getPackageName(), Utils.API_VERSION_V3 , Utils.ITEM_TYPE_INAPP);
+                checkBillingVersionV5SUBS(mService, mContext.getPackageName() , Utils.API_VERSION_V5 , Utils.ITEM_TYPE_SUBS);
+                checkBillingVersionV3SUBS(mService, mContext.getPackageName(), Utils.API_VERSION_V3 , Utils.ITEM_TYPE_SUBS);
             } catch (RemoteException e) {
                 if (listener != null) {
                     listener.onIabSetupFinished(new IabResult(Utils.IABHELPER_REMOTE_EXCEPTION, "RemoteException while setting up in-app billing."));
@@ -47,12 +46,12 @@
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.d("CONNECTION","Disconnected");
+            Log.d("Message","Disconnected");
         }
 
         @Override
         public void onBindingDied(ComponentName name) {
-            Log.d("CONNECTION","Died");
+            Log.d("Message","Connection Died");
         }
 
         private void checkBillingVersionV3INAPP(WalletBillingService service , String packageName , int apiVersion , String type) throws RemoteException {
@@ -75,10 +74,10 @@
            int response = service.isBillingSupported(apiVersion, packageName, type);
 
             if (response == Utils.BILLING_RESPONSE_RESULT_OK) {
-                Log.d("Connection","Subscription re-signup AVAILABLE.");
+                Log.d("Message","Subscription re-signup AVAILABLE.");
                 mSubscriptionUpdateSupported = true;
             } else {
-                Log.d("Connection","Subscription re-signup not available.");
+                Log.d("Message","Subscription re-signup not available.");
                 mSubscriptionUpdateSupported = false;
             }
         }
@@ -90,10 +89,10 @@
                 // check for v3 subscriptions support
                 int response = service.isBillingSupported(apiVersion, packageName, type);
                 if (response == Utils.BILLING_RESPONSE_RESULT_OK) {
-                    Log.d("Connection","Subscriptions AVAILABLE.");
+                    Log.d("Message","Subscriptions AVAILABLE.");
                     mSubscriptionsSupported = true;
                 } else {
-                    Log.d("Connection","Subscriptions NOT AVAILABLE. Response: " + response);
+                    Log.d("Message","Subscriptions NOT AVAILABLE. Response: " + response);
                     mSubscriptionsSupported = false;
                     mSubscriptionUpdateSupported = false;
                 }
