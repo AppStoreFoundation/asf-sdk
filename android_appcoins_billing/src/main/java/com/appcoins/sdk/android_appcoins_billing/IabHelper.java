@@ -32,12 +32,12 @@
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d("CONNECTION","Connected");
             mService = new WalletBillingService(service);
             try {
+                //TODO Remove Hammered package
                 checkBillingVersionV3INAPP(mService, "com.aptoide.trivialdrivesample", Utils.API_VERSION_V3 , Utils.ITEM_TYPE_INAPP);
-                //checkBillingVersion(mService, mContext.getPackageName() , Utils.API_VERSION_V5 , Utils.ITEM_TYPE_SUBS);
-                //checkBillingVersion(mService, mContext.getPackageName() , Utils.API_VERSION_V3 , Utils.ITEM_TYPE_SUBS);
+                checkBillingVersionV5SUBS(mService, "com.aptoide.trivialdrivesample" , Utils.API_VERSION_V5 , Utils.ITEM_TYPE_SUBS);
+                checkBillingVersionV3SUBS(mService, "com.aptoide.trivialdrivesample", Utils.API_VERSION_V3 , Utils.ITEM_TYPE_SUBS);
             } catch (RemoteException e) {
                 if (listener != null) {
                     listener.onIabSetupFinished(new IabResult(Utils.IABHELPER_REMOTE_EXCEPTION, "RemoteException while setting up in-app billing."));
@@ -56,7 +56,7 @@
         }
 
         private void checkBillingVersionV3INAPP(WalletBillingService service , String packageName , int apiVersion , String type) throws RemoteException {
-            int response = mService.isBillingSupported(apiVersion, "com.aptoide.trivialdrivesample", type);
+            int response = service .isBillingSupported(apiVersion, packageName, type);
 
             if (response != Utils.BILLING_RESPONSE_RESULT_OK)
             {
@@ -72,32 +72,31 @@
 
 
         private void checkBillingVersionV5SUBS(WalletBillingService service , String packageName , int apiVersion , String type) throws RemoteException {
-            int response = mService.isBillingSupported(apiVersion, packageName, type);
+           int response = service.isBillingSupported(apiVersion, packageName, type);
 
-            if (response != Utils.BILLING_RESPONSE_RESULT_OK)
-            {
-                if(listener != null){
-                    listener.onIabSetupFinished(new IabResult(response,"Error checking for billing v3 support."+packageName));
-                }
-            }
-            else
-            {
-                Log.d("Message","In-app billing version 3 supported for " + packageName);
+            if (response == Utils.BILLING_RESPONSE_RESULT_OK) {
+                Log.d("Connection","Subscription re-signup AVAILABLE.");
+                mSubscriptionUpdateSupported = true;
+            } else {
+                Log.d("Connection","Subscription re-signup not available.");
+                mSubscriptionUpdateSupported = false;
             }
         }
 
         private void checkBillingVersionV3SUBS(WalletBillingService service , String packageName , int apiVersion , String type) throws RemoteException {
-            int response = mService.isBillingSupported(apiVersion, packageName, type);
-
-            if (response != Utils.BILLING_RESPONSE_RESULT_OK)
-            {
-                if(listener != null){
-                    listener.onIabSetupFinished(new IabResult(response,"Error checking for billing v3 support."+packageName));
+            if (mSubscriptionUpdateSupported) {
+                mSubscriptionsSupported = true;
+            } else {
+                // check for v3 subscriptions support
+                int response = service.isBillingSupported(apiVersion, packageName, type);
+                if (response == Utils.BILLING_RESPONSE_RESULT_OK) {
+                    Log.d("Connection","Subscriptions AVAILABLE.");
+                    mSubscriptionsSupported = true;
+                } else {
+                    Log.d("Connection","Subscriptions NOT AVAILABLE. Response: " + response);
+                    mSubscriptionsSupported = false;
+                    mSubscriptionUpdateSupported = false;
                 }
-            }
-            else
-            {
-                Log.d("Message","In-app billing version 3 supported for " + packageName);
             }
         }
 
