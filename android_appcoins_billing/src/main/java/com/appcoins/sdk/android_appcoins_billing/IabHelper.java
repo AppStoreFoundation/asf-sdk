@@ -1,34 +1,72 @@
     package com.appcoins.sdk.android_appcoins_billing;
 
-    import android.content.ComponentName;
-    import android.content.Context;
-    import android.content.Intent;
-    import android.content.ServiceConnection;
-    import android.content.pm.ResolveInfo;
-    import android.os.IBinder;
-    import android.os.RemoteException;
-    import android.util.Log;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.pm.ResolveInfo;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.util.Log;
 
-    import com.appcoins.sdk.billing.AppcoinsBilling;
+import com.appcoins.sdk.billing.Inventory;
+import com.appcoins.sdk.billing.SkuDetails;
+import com.appcoins.sdk.billing.SkuDetailsParam;
 
-    import java.util.List;
+import org.json.JSONException;
 
-    public class IabHelper implements ServiceConnection {
+import java.util.ArrayList;
+import java.util.List;
 
+    class IabHelper implements ServiceConnection {
+
+        private final Object mAsyncInProgressLock = new Object();
+        boolean mAsyncInProgress = false;
+        String mAsyncOperation = "";
+        boolean mSetupDone = false;
+        boolean mDisposeAfterAsync = false;
+        boolean mDisposed = false;
         private WalletBillingService mService;
-
         private Context mContext;
-
         private OnIabSetupFinishedListener listener;
+        private boolean mSubscriptionsSupported;
+        private boolean mSubscriptionUpdateSupported;
 
         public IabHelper(Context ctx){
             this.mContext = ctx;
         }
 
-        private boolean mSubscriptionsSupported;
+        public static String getResponseDesc(int code) {
+            String[] iab_msgs = ("0:OK/1:User Canceled/2:Unknown/"
+                    + "3:Billing Unavailable/4:Item unavailable/"
+                    + "5:Developer Error/6:Error/7:Item Already Owned/"
+                    + "8:Item not owned").split("/");
+            String[] iabhelper_msgs = ("0:OK/-1001:Remote exception during initialization/"
+                    + "-1002:Bad response received/"
+                    + "-1003:Purchase signature verification failed/"
+                    + "-1004:Send intent failed/"
+                    + "-1005:User cancelled/"
+                    + "-1006:Unknown purchase response/"
+                    + "-1007:Missing token/"
+                    + "-1008:Unknown error/"
+                    + "-1009:Subscriptions not available/"
+                    + "-1010:Invalid consumption attempt").split("/");
 
-        private boolean mSubscriptionUpdateSupported;
-
+            if (code <= Utils.IABHELPER_ERROR_BASE) {
+                int index = Utils.IABHELPER_ERROR_BASE - code;
+                if (index >= 0 && index < iabhelper_msgs.length) {
+                    return iabhelper_msgs[index];
+                } else {
+                    return String.valueOf(code) + ":Unknown IAB Helper Error";
+                }
+            } else if (code < 0 || code >= iab_msgs.length) {
+                return String.valueOf(code) + ":Unknown";
+            } else {
+                return iab_msgs[code];
+            }
+        }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -37,6 +75,7 @@
                 checkBillingVersionV3INAPP(mService, mContext.getPackageName(), Utils.API_VERSION_V3 , Utils.ITEM_TYPE_INAPP);
                 checkBillingVersionV5SUBS(mService, mContext.getPackageName() , Utils.API_VERSION_V5 , Utils.ITEM_TYPE_SUBS);
                 checkBillingVersionV3SUBS(mService, mContext.getPackageName(), Utils.API_VERSION_V3 , Utils.ITEM_TYPE_SUBS);
+                mSetupDone = true;
             } catch (RemoteException e) {
                 if (listener != null) {
                     listener.onIabSetupFinished(new IabResult(Utils.IABHELPER_REMOTE_EXCEPTION, "RemoteException while setting up in-app billing."));
@@ -69,7 +108,6 @@
             }
         }
 
-
         private void checkBillingVersionV5SUBS(WalletBillingService service , String packageName , int apiVersion , String type) throws RemoteException {
            int response = service.isBillingSupported(apiVersion, packageName, type);
 
@@ -99,8 +137,6 @@
             }
         }
 
-
-
         public void startService(OnIabSetupFinishedListener listener){
 
             Intent serviceIntent = new Intent(Utils.IAB_BIND_ACTION);
@@ -116,5 +152,213 @@
                                   "Billing service unavailable on device."));
                   }
             }
+        }
+
+        public void querySkuDetailsAsync(final SkuDetailsParam skuDetailsParam , final OnSkuDetailsResponseListener onSkuDetailsResponseListener) throws IabAsyncInProgressException {
+            final Handler handler = new Handler();
+            checkSetupDone("queryInventory");
+            flagStartAsync("refresh inventory");
+
+            (new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    IabResult result =
+                            new IabResult(Utils.BILLING_RESPONSE_RESULT_OK, "Inventory refresh successful.");
+                    int response = 0;
+                    Inventory inv = new Inventory();
+                    try {
+
+                     response = querySkuDetails(skuDetailsParam.getItemType(), inv, skuDetailsParam.getMoreItemSkus());
+
+                    } catch (RemoteException e) {
+                        result = new IabResult(Utils.IABHELPER_REMOTE_EXCEPTION, "Remote exception while refreshing inventory.");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (response != Utils.BILLING_RESPONSE_RESULT_OK) {
+                        result = new IabResult(Utils.BILLING_RESPONSE_RESULT_OK, "Error refreshing inventory (querying prices of items).");
+                    }
+
+                    if (mSubscriptionsSupported) {
+                        try {
+                            response = querySkuDetails(Utils.ITEM_TYPE_SUBS, inv, skuDetailsParam.getMoreSubsSkus());
+                        } catch (RemoteException e) {
+                            result = new IabResult(Utils.IABHELPER_REMOTE_EXCEPTION, "Remote exception while refreshing inventory.");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (response != Utils.BILLING_RESPONSE_RESULT_OK) {
+                            result = new IabResult(response, "Error refreshing inventory (querying prices of subscriptions).");
+                        }
+                    }
+
+                    flagEndAsync();
+
+                    final int result_f = response;
+                    final List<SkuDetails> inv_f = inv.getAllSkuDetails();
+
+
+                    if (!mDisposed && listener != null) {
+                        handler.post(new Runnable() {
+                            public void run() {
+                                onSkuDetailsResponseListener.onSkuDetailsResponseListener(result_f, inv_f);
+                            }
+                        });
+                    }
+                }
+            })).start();
+        }
+
+        void checkSetupDone(String operation) {
+            if (!mSetupDone) {
+                Log.e("Error:","Illegal state for operation (" + operation + "): IAB helper is not set up.");
+                throw new IllegalStateException(
+                        "IAB helper is not set up. Can't perform operation: " + operation);
+            }
+        }
+
+        private void flagStartAsync(String operation) throws IabAsyncInProgressException {
+            synchronized (mAsyncInProgressLock) {
+                if (mAsyncInProgress) {
+                    throw new IabAsyncInProgressException("Can't start async operation ("
+                            + operation
+                            + ") because another async operation ("
+                            + mAsyncOperation
+                            + ") is in progress.");
+                }
+                mAsyncOperation = operation;
+                mAsyncInProgress = true;
+                Log.d("Message", "Starting async operation: " + operation);
+            }
+        }
+
+        void flagEndAsync() {
+            synchronized (mAsyncInProgressLock) {
+                Log.d("Message","Ending async operation: " + mAsyncOperation);
+                mAsyncOperation = "";
+                mAsyncInProgress = false;
+                if (mDisposeAfterAsync) {
+                    try {
+                        dispose();
+                    } catch (IabAsyncInProgressException e) {
+                        // Should not be thrown, because we reset mAsyncInProgress immediately before
+                        // calling dispose().
+                    }
+                }
+            }
+        }
+
+        public int querySkuDetails(String itemType, Inventory inv, List<String> moreSkus)
+                throws RemoteException,JSONException {
+
+            Log.d("Message","Querying SKU details.");
+            ArrayList<String> skuList = new ArrayList<String>();
+            skuList.addAll(inv.getAllOwnedSkus(itemType));
+            if (moreSkus != null) {
+                for (String sku : moreSkus) {
+                    if (!skuList.contains(sku)) {
+                        skuList.add(sku);
+                    }
+                }
+            }
+
+            if (skuList.size() == 0) {
+                Log.d("Message","queryPrices: nothing to do because there are no SKUs.");
+                return Utils.BILLING_RESPONSE_RESULT_OK;
+            }
+
+            // Split the sku list in blocks of no more than 20 elements.
+            ArrayList<ArrayList<String>> packs = new ArrayList<ArrayList<String>>();
+            ArrayList<String> tempList;
+            int n = skuList.size() / 20;
+            int mod = skuList.size() % 20;
+            for (int i = 0; i < n; i++) {
+                tempList = new ArrayList<String>();
+                for (String s : skuList.subList(i * 20, i * 20 + 20)) {
+                    tempList.add(s);
+                }
+                packs.add(tempList);
+            }
+            if (mod != 0) {
+                tempList = new ArrayList<String>();
+                for (String s : skuList.subList(n * 20, n * 20 + mod)) {
+                    tempList.add(s);
+                }
+                packs.add(tempList);
+            }
+
+            for (ArrayList<String> skuPartList : packs) {
+                Bundle querySkus = new Bundle();
+                querySkus.putStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST, skuPartList);
+                Bundle skuDetails = mService.getSkuDetails(3, mContext.getPackageName(), itemType, querySkus);
+
+                if (!skuDetails.containsKey(Utils.RESPONSE_GET_SKU_DETAILS_LIST)) {
+                    int response = getResponseCodeFromBundle(skuDetails);
+                    if (response != Utils.BILLING_RESPONSE_RESULT_OK) {
+                        Log.d("Message","getSkuDetails() failed: " + getResponseDesc(response));
+                        return response;
+                    } else {
+                        Log.e("Message","getSkuDetails() returned a bundle with neither an error nor a detail list.");
+                        return Utils.IABHELPER_BAD_RESPONSE;
+                    }
+                }
+
+                ArrayList<String> responseList = skuDetails.getStringArrayList(Utils.RESPONSE_GET_SKU_DETAILS_LIST);
+
+                for (String thisResponse : responseList) {
+                    SkuDetails d = null;
+                    try {
+                        d = new SkuDetails(itemType, thisResponse);
+                    } catch (Exception e) {
+                        throw new JSONException(e.getCause());
+                    }
+                    Log.d("Message","Got sku details: " + d);
+                    inv.addSkuDetails(d);
+                }
+            }
+
+            return Utils.BILLING_RESPONSE_RESULT_OK;
+        }
+
+        private int getResponseCodeFromBundle(Bundle b) {
+            Object o = b.get(Utils.RESPONSE_CODE);
+            if (o == null) {
+                Log.d("Message","Bundle with null response code, assuming OK (known issue)");
+                return Utils.BILLING_RESPONSE_RESULT_OK;
+            } else if (o instanceof Integer) {
+                return ((Integer) o).intValue();
+            } else if (o instanceof Long) {
+                return (int) ((Long) o).longValue();
+            } else {
+                Log.e("Message","Unexpected type for bundle response code.");
+                Log.e("Message",o.getClass()
+                        .getName());
+                throw new RuntimeException("Unexpected type for bundle response code: " + o.getClass()
+                        .getName());
+            }
+        }
+
+        public void dispose() throws IabAsyncInProgressException {
+            synchronized (mAsyncInProgressLock) {
+                if (mAsyncInProgress) {
+                    throw new IabAsyncInProgressException("Can't dispose because an async operation "
+                            + "("
+                            + mAsyncOperation
+                            + ") is in progress.");
+                }
+            }
+            Log.d("Message","Disposing.");
+
+            if (mSetupDone) {
+                Log.d("Message","Unbinding from service.");
+                if (mContext != null) mContext.unbindService(this);
+            }
+            mSetupDone = false;
+            mDisposed = true;
+            mContext = null;
+            mService = null;
         }
     }

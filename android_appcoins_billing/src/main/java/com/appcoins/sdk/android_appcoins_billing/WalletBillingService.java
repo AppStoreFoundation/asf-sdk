@@ -7,7 +7,7 @@ import android.os.RemoteException;
 
 import com.appcoins.billing.AppcoinsBilling;;
 
-public class WalletBillingService implements AppcoinsBilling {
+class WalletBillingService implements AppcoinsBilling {
 
     private AppcoinsBilling service;
 

@@ -22,7 +22,7 @@ public class SkuDetails {
         this(type, jsonSkuDetails);
     }
     */
-    public SkuDetails(String itemType, String jsonSkuDetails) throws JsonParseException {
+    public SkuDetails(String itemType, String jsonSkuDetails) throws Exception {
         mItemType = itemType;
         mJson = jsonSkuDetails;
 
