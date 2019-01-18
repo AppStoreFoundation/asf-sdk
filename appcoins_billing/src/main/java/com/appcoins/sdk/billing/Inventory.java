@@ -1,4 +1,4 @@
-package com.aptoide.iabexample.util;
+package com.appcoins.sdk.billing;
 
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.SkuDetails;
@@ -16,7 +16,7 @@ public class Inventory {
     Map<String,SkuDetails> mSkuMap = new HashMap<String,SkuDetails>();
     Map<String,Purchase> mPurchaseMap = new HashMap<String,Purchase>();
 
-    Inventory() { }
+    public Inventory() { }
 
     /** Returns the listing details for an in-app product. */
     public SkuDetails getSkuDetails(String sku) {
@@ -73,7 +73,7 @@ public class Inventory {
         mSkuMap.put(d.getSku(), d);
     }
 
-    void addPurchase(Purchase p) {
+   public void addPurchase(Purchase p) {
         mPurchaseMap.put(p.getSku(), p);
     }
 }

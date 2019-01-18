@@ -22,7 +22,7 @@ public class Purchase {
     boolean mIsAutoRenewing;
 
     public Purchase(String id, String itemType, String jsonPurchaseInfo, String signature) throws
-            JsonParseException {
+            Exception {
         mItemType = itemType;
         mOriginalJson = jsonPurchaseInfo;
 

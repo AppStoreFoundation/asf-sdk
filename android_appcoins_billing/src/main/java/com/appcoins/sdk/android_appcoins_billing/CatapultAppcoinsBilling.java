@@ -1,7 +1,8 @@
 package com.appcoins.sdk.android_appcoins_billing;
 
 import com.appcoins.sdk.billing.AppcoinsBilling;
-import com.appcoins.sdk.billing.CatapultAppCoinsBillingLogic;
+import com.appcoins.sdk.billing.Inventory;
+import com.appcoins.sdk.billing.PurchasesResult;
 
 
 public class CatapultAppcoinsBilling implements AppcoinsBilling {
@@ -9,11 +10,9 @@ public class CatapultAppcoinsBilling implements AppcoinsBilling {
 
     private IabHelper iabHelper;
 
-    private CatapultAppCoinsBillingLogic catapultAppCoinsBillingLogic;
 
     public CatapultAppcoinsBilling(IabHelper iabHelper){
         this.iabHelper = iabHelper;
-        catapultAppCoinsBillingLogic = new CatapultAppCoinsBillingLogic();
     }
 
 
@@ -23,7 +22,10 @@ public class CatapultAppcoinsBilling implements AppcoinsBilling {
     }
 
     @Override
-    public void queryPurchases(String skuType) {
+    public PurchasesResult queryPurchases(String skuType) {
+
+        Inventory inv = new Inventory();
+        return this.iabHelper.queryPurchases(inv, skuType);
 
     }
 
@@ -36,3 +38,4 @@ public class CatapultAppcoinsBilling implements AppcoinsBilling {
         iabHelper.startService(listener);
     }
 }
+
