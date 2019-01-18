@@ -1,8 +1,11 @@
     package com.appcoins.sdk.android_appcoins_billing;
 
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
@@ -33,10 +36,15 @@ import java.util.List;
         private OnIabSetupFinishedListener listener;
         private boolean mSubscriptionsSupported;
         private boolean mSubscriptionUpdateSupported;
+        private int mRequestCode;
+        private OnIabPurchaseFinishedListener mPurchaseListener;
+        private String mPurchasingItemType;
+
 
         public IabHelper(Context ctx){
             this.mContext = ctx;
         }
+
 
         public static String getResponseDesc(int code) {
             String[] iab_msgs = ("0:OK/1:User Canceled/2:Unknown/"
@@ -361,4 +369,83 @@ import java.util.List;
             mContext = null;
             mService = null;
         }
+
+        public void launchPurchaseFlow(Activity act ,String sku, String itemType, List<String> oldSkus,
+                                       int requestCode, OnIabPurchaseFinishedListener listener, String extraData)
+                throws IabAsyncInProgressException {
+            checkNotDisposed();
+            checkSetupDone("launchPurchaseFlow");
+            flagStartAsync("launchPurchaseFlow");
+            IabResult result;
+
+            if (itemType.equals(Utils.ITEM_TYPE_SUBS) && !mSubscriptionsSupported) {
+                IabResult r =
+                        new IabResult(Utils.IABHELPER_SUBSCRIPTIONS_NOT_AVAILABLE, "Subscriptions are not available.");
+                flagEndAsync();
+                if (listener != null) listener.onIabPurchaseFinished(r, null);
+                return;
+            }
+
+            try {
+                Log.d("Message","Constructing buy intent for " + sku + ", item type: " + itemType);
+                Bundle buyIntentBundle;
+                if (oldSkus == null || oldSkus.isEmpty()) {
+                    // Purchasing a new item or subscription re-signup
+                    buyIntentBundle =
+                            mService.getBuyIntent(3, mContext.getPackageName(), sku, itemType, extraData);
+                } else {
+                    // Subscription upgrade/downgrade
+                    if (!mSubscriptionUpdateSupported) {
+                        IabResult r = new IabResult(Utils.IABHELPER_SUBSCRIPTION_UPDATE_NOT_AVAILABLE,
+                                "Subscription updates are not available.");
+                        flagEndAsync();
+                        if (listener != null) listener.onIabPurchaseFinished(r, null);
+                        return;
+                    }
+                    buyIntentBundle =
+                           mService.getBuyIntentToReplaceSkus(5, mContext.getPackageName(), oldSkus, sku, itemType,
+                                    extraData);
+                }
+                int response = getResponseCodeFromBundle(buyIntentBundle);
+                Log.d("response code: ", response+"");
+                if (response != Utils.BILLING_RESPONSE_RESULT_OK) {
+                    Log.e("Error","Unable to buy item, Error response: " + getResponseDesc(response));
+                    flagEndAsync();
+                    result = new IabResult(response, "Unable to buy item");
+                    if (listener != null) listener.onIabPurchaseFinished(result, null);
+                    return;
+                }
+
+                PendingIntent pendingIntent = buyIntentBundle.getParcelable(Utils.RESPONSE_BUY_INTENT);
+                Log.d("Message","Launching buy intent for " + sku + ". Request code: " + requestCode);
+                mRequestCode = requestCode;
+                mPurchaseListener = listener;
+                mPurchasingItemType = itemType;
+                act.startIntentSenderForResult(pendingIntent.getIntentSender(), requestCode, new Intent(),
+                        Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0));
+
+            } catch (IntentSender.SendIntentException e) {
+                Log.e("Error","SendIntentException while launching purchase flow for sku " + sku);
+                e.printStackTrace();
+                flagEndAsync();
+
+                result = new IabResult(Utils.IABHELPER_SEND_INTENT_FAILED, "Failed to send intent.");
+                if (listener != null) listener.onIabPurchaseFinished(result, null);
+            } catch (RemoteException e) {
+                Log.e("Error","RemoteException while launching purchase flow for sku " + sku);
+                e.printStackTrace();
+                flagEndAsync();
+
+                result = new IabResult(Utils.IABHELPER_REMOTE_EXCEPTION,
+                        "Remote exception while starting purchase flow");
+                if (listener != null) listener.onIabPurchaseFinished(result, null);
+            }
+        }
+
+        private void checkNotDisposed() {
+            if (mDisposed) {
+                throw new IllegalStateException("IabHelper was disposed of, so it cannot be used.");
+            }
+        }
+
     }

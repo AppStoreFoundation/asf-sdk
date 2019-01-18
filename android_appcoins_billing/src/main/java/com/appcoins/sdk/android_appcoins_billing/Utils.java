@@ -20,4 +20,10 @@ class Utils {
     protected static final String RESPONSE_GET_SKU_DETAILS_LIST = "DETAILS_LIST";
     protected static final String RESPONSE_CODE = "RESPONSE_CODE";
     protected static final int IABHELPER_BAD_RESPONSE = -1002;
+    public static final int IABHELPER_SUBSCRIPTIONS_NOT_AVAILABLE = -1009;
+    public static final int IABHELPER_SUBSCRIPTION_UPDATE_NOT_AVAILABLE = -1011;
+    public static final String RESPONSE_BUY_INTENT = "BUY_INTENT";
+    public static final int IABHELPER_SEND_INTENT_FAILED = -1004;
+
+
 }
