@@ -32,18 +32,7 @@ public class WalletBillingService implements AppcoinsBilling {
 
     @Override
     public Bundle getPurchases(int apiVersion, String packageName, String skuType, String continuationToken) throws RemoteException {
-        //return service.getPurchases(apiVersion, packageName, skuType, continuationToken);
-        Bundle b = new Bundle();
-        ArrayList<String> al = new ArrayList<String>();
-        al.add("sku1");
-        al.add("sku2");
-        al.add("sku3");
-        b.putStringArrayList(Utils.RESPONSE_INAPP_ITEM_LIST,al);
-        b.putStringArrayList(Utils.RESPONSE_INAPP_PURCHASE_DATA_LIST,al);
-        b.putStringArrayList(Utils.RESPONSE_INAPP_SIGNATURE_LIST,al);
-        b.putStringArrayList(Utils.RESPONSE_INAPP_PURCHASE_ID_LIST,al);
-        b.putInt(Utils.RESPONSE_CODE, Utils.BILLING_RESPONSE_RESULT_OK);
-        return b;
+        return service.getPurchases(apiVersion, packageName, skuType, continuationToken);
     }
 
     @Override

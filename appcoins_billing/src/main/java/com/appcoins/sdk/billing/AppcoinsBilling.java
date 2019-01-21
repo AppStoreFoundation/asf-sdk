@@ -6,6 +6,9 @@ public interface AppcoinsBilling {
 
     PurchasesResult queryPurchases(String skuType);
 
+    PurchasesResult consumePurchase (Purchase purchase);
+
     void querySkuDetailsAsync(String sku);
 
 }
+

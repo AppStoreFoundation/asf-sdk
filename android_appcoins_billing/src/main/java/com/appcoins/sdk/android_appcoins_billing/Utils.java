@@ -53,6 +53,10 @@ public class Utils {
     public static final String GET_SKU_DETAILS_ITEM_LIST = "ITEM_ID_LIST";
     public static final String GET_SKU_DETAILS_ITEM_TYPE_LIST = "ITEM_TYPE_LIST";
 
-    public static final String IAB_BIND_ACTION = "com.appcoins.wallet.iab.action.BIND";
-    public static final String IAB_BIND_PACKAGE = "com.appcoins.wallet";
+    public static final String IAB_BIND_ACTION = "com.appcoins.wallet.dev.iab.action.BIND";
+    public static final String IAB_BIND_PACKAGE = "com.appcoins.wallet.dev";
+
+    // Has this object been disposed of? (If so, we should ignore callbacks, etc)
+    public static boolean mDisposed = false;
 }
+

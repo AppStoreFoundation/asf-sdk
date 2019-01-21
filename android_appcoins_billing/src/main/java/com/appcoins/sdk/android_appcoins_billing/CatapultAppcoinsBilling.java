@@ -2,6 +2,7 @@ package com.appcoins.sdk.android_appcoins_billing;
 
 import com.appcoins.sdk.billing.AppcoinsBilling;
 import com.appcoins.sdk.billing.Inventory;
+import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
 
 
@@ -30,6 +31,12 @@ public class CatapultAppcoinsBilling implements AppcoinsBilling {
     }
 
     @Override
+    public PurchasesResult consumePurchase (Purchase o){
+        //return this.iabHelper.consumePurchase(o);
+        return null;
+    }
+
+    @Override
     public void querySkuDetailsAsync(String sku) {
 
     }
@@ -38,4 +45,5 @@ public class CatapultAppcoinsBilling implements AppcoinsBilling {
         iabHelper.startService(listener);
     }
 }
+
 

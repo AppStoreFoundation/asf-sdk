@@ -13,6 +13,7 @@ import com.appcoins.sdk.android_appcoins_billing.CatapultBillingAppcoinsFactory;
 import com.appcoins.sdk.android_appcoins_billing.IabHelper;
 import com.appcoins.sdk.android_appcoins_billing.SkuType;
 import com.appcoins.sdk.android_appcoins_billing.Utils;
+import com.appcoins.sdk.billing.Purchase;
 
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -54,8 +55,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onCreateChannelButtonClicked(View view) {
-        Toast.makeText(this, "Not implemented", Toast.LENGTH_SHORT)
-                .show();
+        Purchase o = null;
+        try {
+            o = new Purchase("id", "itemType", "jsonPurchaseInfo","signature");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        cab.consumePurchase(o);
     }
 
     public void makePaymentButtonClicked(View view) {
@@ -74,4 +80,5 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 }
+
 

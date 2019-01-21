@@ -44,9 +44,8 @@ public class Security {
         }
 
         PublicKey key = Security.generatePublicKey(base64PublicKey);
-        //return Security.verify(key, signedData, signature);
-        //TO DO ALTERAR ISTO PARA FALSE
-        return true;
+        return Security.verify(key, signedData, signature);
+
     }
 
     /**

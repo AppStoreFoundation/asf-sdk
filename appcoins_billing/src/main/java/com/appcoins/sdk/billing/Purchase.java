@@ -34,12 +34,17 @@ public class Purchase {
         mPurchaseTime = o.get("purchaseTime").getAsLong();
         mPurchaseState = o.get("purchaseState").getAsInt();
         mDeveloperPayload = o.get("developerPayload").getAsString();
-        mToken = o.get("token").getAsString();
-        if(mToken == null){
-            mToken = o.get("purchaseToken").getAsString();
-        }
+       if(o.get("token") != null){
+           mToken = o.get("token").getAsString();
+       }
 
-        mIsAutoRenewing = o.get("autoRenewing").getAsBoolean();
+
+        if(mToken == null){
+          mToken = o.get("purchaseToken").getAsString();
+        }
+        if(o.get("autoRenewing") != null){
+           mIsAutoRenewing = o.get("autoRenewing").getAsBoolean();
+        }
         mSignature = signature;
         mToken = id;
     }

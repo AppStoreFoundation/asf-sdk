@@ -192,7 +192,7 @@ public class IabHelper implements ServiceConnection {
                         e.printStackTrace();
                     }
 
-                    if (TextUtils.isEmpty(purchase.getToken())) {
+                   if (TextUtils.isEmpty(purchase.getToken())) {
                         logWarn("BUG: empty/null token!");
                         logDebug("Purchase data: " + purchaseData);
                     }
@@ -211,7 +211,6 @@ public class IabHelper implements ServiceConnection {
             continueToken = ownedItems.getString(Utils.INAPP_CONTINUATION_TOKEN);
             logDebug("Continuation token: " + continueToken);
         } while (!TextUtils.isEmpty(continueToken));
-
         purchasesResult.setResponseCode(verificationFailed ? Utils.IABHELPER_VERIFICATION_FAILED : Utils.BILLING_RESPONSE_RESULT_OK);
         return purchasesResult;
     }
@@ -265,15 +264,42 @@ public class IabHelper implements ServiceConnection {
         }
     }
 
-   /* void consume(Purchase itemInfo) throws IabException {
+    void consumePurchase(Purchase itemInfo) throws IabException {
         checkNotDisposed();
-        checkSetupDone("consume");
+        //checkSetupDone("consume");
 
-        if (!itemInfo.mItemType.equals(ITEM_TYPE_INAPP)) {
-            throw new IabException(IABHELPER_INVALID_CONSUMPTION,
-                    "Items of type '" + itemInfo.mItemType + "' can't be consumed.");
+        if (!itemInfo.getItemType().equals(Utils.ITEM_TYPE_INAPP)) {
+            throw new IabException(Utils.IABHELPER_INVALID_CONSUMPTION,
+                    "Items of type '" + itemInfo.getItemType() + "' can't be consumed.");
         }
-        */
+        try {
+            String token = itemInfo.getToken();
+            String sku = itemInfo.getSku();
+            if (token == null || token.equals("")) {
+                logError("Can't consume " + sku + ". No token.");
+                throw new IabException(Utils.IABHELPER_MISSING_TOKEN,
+                        "PurchaseInfo is missing token for sku: " + sku + " " + itemInfo);
+            }
+
+            logDebug("Consuming sku: " + sku + ", token: " + token);
+            int response = mService.consumePurchase(3, mContext.getPackageName(), token);
+            if (response == Utils.BILLING_RESPONSE_RESULT_OK) {
+                logDebug("Successfully consumed sku: " + sku);
+            } else {
+                logDebug("Error consuming consuming sku " + sku + ". " + getResponseDesc(response));
+                throw new IabException(response, "Error consuming sku " + sku);
+            }
+        } catch (RemoteException e) {
+            throw new IabException(Utils.IABHELPER_REMOTE_EXCEPTION,
+                    "Remote exception while consuming. PurchaseInfo: " + itemInfo, e);
+        }
+    }
+
+    private void checkNotDisposed() {
+        if (Utils.mDisposed) {
+            throw new IllegalStateException("IabHelper was disposed of, so it cannot be used.");
+        }
+    }
 
     void logDebug(String msg) {
         if (mDebugLog) Log.d(mDebugTag, msg);
@@ -288,5 +314,6 @@ public class IabHelper implements ServiceConnection {
     }
 
 }
+
 
 
