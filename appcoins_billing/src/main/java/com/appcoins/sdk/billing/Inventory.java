@@ -1,7 +1,4 @@
-package com.aptoide.iabexample.util;
-
-import com.appcoins.sdk.billing.Purchase;
-import com.appcoins.sdk.billing.SkuDetails;
+package com.appcoins.sdk.billing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +13,7 @@ public class Inventory {
     Map<String,SkuDetails> mSkuMap = new HashMap<String,SkuDetails>();
     Map<String,Purchase> mPurchaseMap = new HashMap<String,Purchase>();
 
-    Inventory() { }
+    public Inventory() { }
 
     /** Returns the listing details for an in-app product. */
     public SkuDetails getSkuDetails(String sku) {
@@ -56,7 +53,7 @@ public class Inventory {
     }
 
     /** Returns a list of all owned product IDs of a given type */
-    List<String> getAllOwnedSkus(String itemType) {
+    public List<String> getAllOwnedSkus(String itemType) {
         List<String> result = new ArrayList<String>();
         for (Purchase p : mPurchaseMap.values()) {
             if (p.getItemType().equals(itemType)) result.add(p.getSku());
@@ -64,12 +61,17 @@ public class Inventory {
         return result;
     }
 
+    public List<SkuDetails> getAllSkuDetails() {
+        List<SkuDetails> list = new ArrayList<SkuDetails>(mSkuMap.values());
+        return list;
+    }
+
     /** Returns a list of all purchases. */
     List<Purchase> getAllPurchases() {
         return new ArrayList<Purchase>(mPurchaseMap.values());
     }
 
-    void addSkuDetails(SkuDetails d) {
+    public void addSkuDetails(SkuDetails d) {
         mSkuMap.put(d.getSku(), d);
     }
 

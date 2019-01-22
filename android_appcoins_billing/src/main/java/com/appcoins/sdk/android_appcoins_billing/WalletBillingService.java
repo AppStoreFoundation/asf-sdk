@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 
-import com.appcoins.billing.AppcoinsBilling;;
+import com.appcoins.billing.AppcoinsBilling;;import java.util.List;
 
-public class WalletBillingService implements AppcoinsBilling {
+class WalletBillingService implements AppcoinsBilling {
 
     private AppcoinsBilling service;
 
@@ -27,7 +27,7 @@ public class WalletBillingService implements AppcoinsBilling {
 
     @Override
     public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type, String developerPayload) throws RemoteException {
-        return null;
+        return service.getBuyIntent(apiVersion,packageName,sku,type,developerPayload);
     }
 
     @Override
@@ -43,5 +43,11 @@ public class WalletBillingService implements AppcoinsBilling {
     @Override
     public IBinder asBinder() {
         return null;
+    }
+
+
+    Bundle getBuyIntentToReplaceSkus(int apiVersion, String packageName, List<String> oldSkus, String newSku, String type, String developerPayload) throws
+            RemoteException {
+        return new Bundle();
     }
 }
