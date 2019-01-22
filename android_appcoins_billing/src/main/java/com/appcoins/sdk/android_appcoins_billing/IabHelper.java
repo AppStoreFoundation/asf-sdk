@@ -147,8 +147,10 @@ import java.util.List;
 
         public void startService(OnIabSetupFinishedListener listener){
 
+            //TODO Change to BuildConfig
             Intent serviceIntent = new Intent(Utils.IAB_BIND_ACTION);
             serviceIntent.setPackage(Utils.IAB_BIND_PACKAGE);
+
             this.listener = listener;
 
             List<ResolveInfo> intentServices = mContext.getPackageManager().queryIntentServices(serviceIntent, 0);
@@ -424,6 +426,7 @@ import java.util.List;
                 act.startIntentSenderForResult(pendingIntent.getIntentSender(), requestCode, new Intent(),
                         Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0));
 
+                flagEndAsync();
             } catch (IntentSender.SendIntentException e) {
                 Log.e("Error","SendIntentException while launching purchase flow for sku " + sku);
                 e.printStackTrace();

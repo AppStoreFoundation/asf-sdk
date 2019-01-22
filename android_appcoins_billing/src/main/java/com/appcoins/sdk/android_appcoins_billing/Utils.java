@@ -7,8 +7,8 @@ class Utils {
     protected static int API_VERSION_V3 = 3;
     protected static int API_VERSION_V5 = 5;
 
-    protected static final String IAB_BIND_ACTION = "com.appcoins.wallet.iab.action.BIND";
-    protected static final String IAB_BIND_PACKAGE = "com.appcoins.wallet";
+    protected static final String IAB_BIND_ACTION = "com.appcoins.wallet.dev.iab.action.BIND";
+    protected static final String IAB_BIND_PACKAGE = "com.appcoins.wallet.dev";
 
     protected static final int BILLING_RESPONSE_RESULT_OK = 0;
     protected static final int IABHELPER_ERROR_BASE = -1000;

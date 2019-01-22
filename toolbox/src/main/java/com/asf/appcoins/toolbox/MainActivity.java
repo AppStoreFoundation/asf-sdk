@@ -72,8 +72,10 @@ public class MainActivity extends Activity {
     SkuDetailsParam skuDetailsParam = new SkuDetailsParam();
     skuDetailsParam.setItemType(FeatureType.ITEM_TYPE_INAPP);
     ArrayList <String> al = new ArrayList<String>();
-    al.add("test123");
-    al.add("testreference");
+
+    al.add("gas");
+
+
     skuDetailsParam.setMoreItemSkus(al);
     Log.d("INICIAR SKU ASYNC","Iniciar sku async");
 
@@ -88,17 +90,17 @@ public class MainActivity extends Activity {
           Log.d("Skus: ",sd.getSku());
         }
 
-        al = null;
-        String payload =
-                PayloadHelper.buildIntentPayload(Application.developerAddress,
-                        null);
-        cab.launchPurchaseFlow(MainActivity.this, skuDetailsList.get(0).getSku(), FeatureType.ITEM_TYPE_INAPP, al, 10001, (OnIabPurchaseFinishedListener) (result, info) -> {
-          Log.d("aquiiiiiiiiiiiiiiii: ",".....................");
-          Log.d("result: ",result.getMessage());
-          Log.d("Purchase: ",info.getSku());
-        },payload);
-
-
+        if(skuDetailsList.size() > 0 ) {
+          al = null;
+          String payload =
+                  PayloadHelper.buildIntentPayload(Application.developerAddress,
+                          null);
+          cab.launchPurchaseFlow(MainActivity.this, skuDetailsList.get(0).getSku(), FeatureType.ITEM_TYPE_INAPP, al, 10001, (OnIabPurchaseFinishedListener) (result, info) -> {
+            Log.d("aquiiiiiiiiiiiiiiii: ",".....................");
+            Log.d("result: ",result.getMessage());
+            Log.d("Purchase: ",info.getSku());
+          },payload);
+        }
       }
     });
   }
@@ -117,7 +119,14 @@ public class MainActivity extends Activity {
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     Log.d("Activity Result: ", "onActivityResult(" + requestCode + "," + resultCode + "," + data);
-    
+    Bundle bundle = data.getExtras();
+    if (bundle != null) {
+      for (String key : bundle.keySet()) {
+        Object value = bundle.get(key);
+        Log.d("Message Key",key);
+        Log.d("Message value" ,value.toString());
+      }
+    }
 
   }
 
