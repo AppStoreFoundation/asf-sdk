@@ -1,7 +1,6 @@
 package com.appcoins.sdk.android_appcoins_billing;
 
-public class Utils {
-
+class Utils {
     // Public key for verifying signature, in base64 encoding
     public static String mSignatureBase64 = null;
 
@@ -58,5 +57,6 @@ public class Utils {
 
     // Has this object been disposed of? (If so, we should ignore callbacks, etc)
     public static boolean mDisposed = false;
+
 }
 

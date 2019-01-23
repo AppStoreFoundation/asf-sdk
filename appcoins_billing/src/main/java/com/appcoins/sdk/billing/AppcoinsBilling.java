@@ -1,14 +1,15 @@
 package com.appcoins.sdk.billing;
 
-public interface AppcoinsBilling {
+import java.util.List;
 
-    void querySkuDetails(String sku);
+public interface AppcoinsBilling {
 
     PurchasesResult queryPurchases(String skuType);
 
     PurchasesResult consumePurchase (Purchase purchase);
 
-    void querySkuDetailsAsync(String sku);
+    void querySkuDetailsAsync(SkuDetailsParam skuDetailsParam , ResponseListener onSkuDetailsResponseListener);
 
+    void launchPurchaseFlow(Object act,String sku, String itemType, List<String> oldSkus, int requestCode, ResponseListener listener, String extraData);
 }
 
