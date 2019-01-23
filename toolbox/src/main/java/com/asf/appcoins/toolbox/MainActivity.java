@@ -11,18 +11,18 @@ import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
 import com.appcoins.sdk.android_appcoins_billing.CatapultBillingAppcoinsFactory;
 
 import com.appcoins.sdk.android_appcoins_billing.IabException;
-import com.appcoins.sdk.android_appcoins_billing.IabHelper;
+
 import com.appcoins.sdk.android_appcoins_billing.SkuType;
-import com.appcoins.sdk.android_appcoins_billing.Utils;
+
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
 
 import com.appcoins.sdk.android_appcoins_billing.FeatureType;
-import com.appcoins.sdk.android_appcoins_billing.IabResult;
+
 import com.appcoins.sdk.android_appcoins_billing.OnIabPurchaseFinishedListener;
 import com.appcoins.sdk.android_appcoins_billing.OnSkuDetailsResponseListener;
 import com.appcoins.sdk.android_appcoins_billing.PayloadHelper;
-import com.appcoins.sdk.billing.Purchase;
+
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParam;
 
@@ -35,18 +35,9 @@ public class MainActivity extends Activity {
 
     
   
-    private final CompositeDisposable compositeDisposable;
-    
-  
+  private final CompositeDisposable compositeDisposable;
+
   CatapultAppcoinsBilling cab;
-
-  public void onBuyGasButtonClicked(View arg0) {
-    cab = CatapultBillingAppcoinsFactory.BuildAppcoinsBilling(getApplication().getApplicationContext());
-    cab.startService(result -> {
-      Log.d("Message",result.getMessage());
-
-    });
-  }
 
   
     public MainActivity() {
@@ -63,7 +54,7 @@ public class MainActivity extends Activity {
 
         super.onDestroy();
     }
-
+  
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     Log.d("Activity Result: ", "onActivityResult(" + requestCode + "," + resultCode + "," + data);
     Bundle bundle = data.getExtras();
@@ -76,8 +67,6 @@ public class MainActivity extends Activity {
     }
 
   }
-  
-    CatapultAppcoinsBilling cab;
 
     public void onBuyGasButtonClicked(View arg0) {
         String base64EncodedPublicKey = BuildConfig.IAB_KEY;
@@ -100,13 +89,6 @@ public class MainActivity extends Activity {
     }
 
     public void onCreateChannelButtonClicked(View view) throws IabException {
-        Purchase o = null;
-        try {
-            o = new Purchase("id", "itemType", "jsonPurchaseInfo","signature");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        cab.consumePurchase(o);
     }
 
     public void makePaymentButtonClicked(View view) {
@@ -144,8 +126,6 @@ public class MainActivity extends Activity {
         }
       }
     });
-  }
-return false;
   }
 
 

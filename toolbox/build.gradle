@@ -48,18 +48,6 @@ android {
   }
 
   productFlavors {
-    googleiab {
-      dimension "iab"
-      buildConfigField "String", "IAB_BIND_ACTION",
-              "\"" + project.GOOGLE_IAB_BIND_ACTION + "\""
-      buildConfigField "String", "IAB_KEY",
-              "\"" + project.GOOGLE_IAB_KEY + "\""
-      buildConfigField "String", "IAB_BIND_PACKAGE",
-              "\"" + project.GOOGLE_IAB_BIND_PACKAGE + "\""
-      buildConfigField "String", "IAB_UPDATE_ACTION",
-              "\"" + project.GOOGLE_IAB_UPDATE_ACTION+ "\""
-      manifestPlaceholders = [iabPermission: project.GOOGLE_IAB_PERMISSION]
-    }
 
     appcoinsiab {
       dimension "iab"
@@ -121,4 +109,5 @@ def renameArtifact(defaultConfig) {
     }
   }
 }
+
 

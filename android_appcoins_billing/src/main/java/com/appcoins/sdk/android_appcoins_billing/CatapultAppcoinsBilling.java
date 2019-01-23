@@ -28,7 +28,7 @@ public class CatapultAppcoinsBilling implements AppcoinsBilling {
     public PurchasesResult queryPurchases(String skuType) {
         Inventory inv = new Inventory();
         return this.iabHelper.queryPurchases(inv, skuType);
-
+    }
 
     @Override
     public void querySkuDetailsAsync(SkuDetailsParam skuDetailsParam , ResponseListener onSkuDetailsResponseListener)  {
