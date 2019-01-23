@@ -23,5 +23,11 @@ public PurchasesResult(){}
         this.responseCode = responseCode;
     }
 
+    public List<Purchase> getPurchases() {
+        return purchases;
+    }
 
+    public int getResponseCode() {
+        return responseCode;
+    }
 }

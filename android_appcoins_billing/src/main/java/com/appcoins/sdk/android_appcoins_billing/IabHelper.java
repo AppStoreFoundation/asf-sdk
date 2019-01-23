@@ -192,13 +192,14 @@ public class IabHelper implements ServiceConnection {
                         e.printStackTrace();
                     }
 
-                   if (TextUtils.isEmpty(purchase.getToken())) {
+                    if (TextUtils.isEmpty(purchase.getToken())) {
                         logWarn("BUG: empty/null token!");
                         logDebug("Purchase data: " + purchaseData);
                     }
 
                     // Record ownership and token
                     inv.addPurchase(purchase);
+                    Log.d("Size map inserir",inv.getAllPurchases().size() + "");
                 } else {
                     logWarn("Purchase signature verification **FAILED**. Not adding item.");
                     logDebug("   Purchase data: " + purchaseData);
@@ -211,7 +212,11 @@ public class IabHelper implements ServiceConnection {
             continueToken = ownedItems.getString(Utils.INAPP_CONTINUATION_TOKEN);
             logDebug("Continuation token: " + continueToken);
         } while (!TextUtils.isEmpty(continueToken));
+
         purchasesResult.setResponseCode(verificationFailed ? Utils.IABHELPER_VERIFICATION_FAILED : Utils.BILLING_RESPONSE_RESULT_OK);
+
+        purchasesResult.setPurchases(inv.getAllPurchases());
+
         return purchasesResult;
     }
 
@@ -264,7 +269,7 @@ public class IabHelper implements ServiceConnection {
         }
     }
 
-    void consumePurchase(Purchase itemInfo) throws IabException {
+    public void consume(Purchase itemInfo) throws IabException {
         checkNotDisposed();
         //checkSetupDone("consume");
 
@@ -272,6 +277,7 @@ public class IabHelper implements ServiceConnection {
             throw new IabException(Utils.IABHELPER_INVALID_CONSUMPTION,
                     "Items of type '" + itemInfo.getItemType() + "' can't be consumed.");
         }
+
         try {
             String token = itemInfo.getToken();
             String sku = itemInfo.getSku();

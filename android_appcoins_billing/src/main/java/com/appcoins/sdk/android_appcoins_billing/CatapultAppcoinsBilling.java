@@ -24,15 +24,14 @@ public class CatapultAppcoinsBilling implements AppcoinsBilling {
 
     @Override
     public PurchasesResult queryPurchases(String skuType) {
-
         Inventory inv = new Inventory();
         return this.iabHelper.queryPurchases(inv, skuType);
 
     }
 
     @Override
-    public PurchasesResult consumePurchase (Purchase o){
-        //return this.iabHelper.consumePurchase(o);
+    public PurchasesResult consumePurchase (Purchase purchase){
+        //return this.iabHelper.consume(purchase);
         return null;
     }
 
@@ -45,5 +44,6 @@ public class CatapultAppcoinsBilling implements AppcoinsBilling {
         iabHelper.startService(listener);
     }
 }
+
 
 
