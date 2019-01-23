@@ -5,7 +5,13 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 
-import com.appcoins.billing.AppcoinsBilling;;import java.util.List;
+
+import com.appcoins.billing.AppcoinsBilling;
+import java.util.ArrayList;
+
+import com.appcoins.billing.AppcoinsBilling;
+import java.util.List;
+
 
 class WalletBillingService implements AppcoinsBilling {
 
@@ -16,9 +22,9 @@ class WalletBillingService implements AppcoinsBilling {
     }
 
     @Override
-     public Bundle getSkuDetails(int apiVersion, String packageName, String type, Bundle skusBundle) throws RemoteException {
+    public Bundle getSkuDetails(int apiVersion, String packageName, String type, Bundle skusBundle) throws RemoteException {
         return service.getSkuDetails(apiVersion, packageName, type, skusBundle);
-      }
+    }
 
     @Override
     public int isBillingSupported(int apiVersion, String packageName, String type) throws RemoteException {
@@ -31,8 +37,8 @@ class WalletBillingService implements AppcoinsBilling {
     }
 
     @Override
-    public Bundle getPurchases(int apiVersion, String packageName, String type, String continuationToken) throws RemoteException {
-        return null;
+    public Bundle getPurchases(int apiVersion, String packageName, String skuType, String continuationToken) throws RemoteException {
+        return service.getPurchases(apiVersion, packageName, skuType, continuationToken);
     }
 
     @Override
@@ -51,3 +57,4 @@ class WalletBillingService implements AppcoinsBilling {
         return new Bundle();
     }
 }
+

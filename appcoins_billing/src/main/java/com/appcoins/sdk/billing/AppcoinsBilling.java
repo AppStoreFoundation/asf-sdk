@@ -4,9 +4,12 @@ import java.util.List;
 
 public interface AppcoinsBilling {
 
-    void queryPurchases(String skuType);
+    PurchasesResult queryPurchases(String skuType);
+
+    PurchasesResult consumePurchase (Purchase purchase);
 
     void querySkuDetailsAsync(SkuDetailsParam skuDetailsParam , ResponseListener onSkuDetailsResponseListener);
 
     void launchPurchaseFlow(Object act,String sku, String itemType, List<String> oldSkus, int requestCode, ResponseListener listener, String extraData);
 }
+

@@ -1,5 +1,6 @@
 package com.appcoins.sdk.billing;
-
+import com.appcoins.sdk.billing.Purchase;
+import com.appcoins.sdk.billing.SkuDetails;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +68,7 @@ public class Inventory {
     }
 
     /** Returns a list of all purchases. */
-    List<Purchase> getAllPurchases() {
+    public List<Purchase> getAllPurchases() {
         return new ArrayList<Purchase>(mPurchaseMap.values());
     }
 
@@ -75,7 +76,7 @@ public class Inventory {
         mSkuMap.put(d.getSku(), d);
     }
 
-    void addPurchase(Purchase p) {
+   public void addPurchase(Purchase p) {
         mPurchaseMap.put(p.getSku(), p);
     }
 }
