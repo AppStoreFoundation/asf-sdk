@@ -1,6 +1,6 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.android_appcoins_billing.helpers;
 
-class Utils {
+public class Utils {
 
 
     public static String ITEM_TYPE_INAPP = "inapp";

@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.android_appcoins_billing.helpers;
 
 import android.text.TextUtils;
 import android.util.Base64;

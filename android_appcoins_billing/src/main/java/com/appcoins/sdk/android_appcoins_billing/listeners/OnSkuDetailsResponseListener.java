@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.android_appcoins_billing.listeners;
 
 import com.appcoins.sdk.billing.ResponseListener;
 import com.appcoins.sdk.billing.SkuDetails;

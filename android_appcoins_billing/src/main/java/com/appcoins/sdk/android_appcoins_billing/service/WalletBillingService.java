@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.android_appcoins_billing.service;
 
 
 import android.os.Bundle;
@@ -13,7 +13,7 @@ import com.appcoins.billing.AppcoinsBilling;
 import java.util.List;
 
 
-class WalletBillingService implements AppcoinsBilling {
+public class WalletBillingService implements AppcoinsBilling {
 
     private AppcoinsBilling service;
 
@@ -52,7 +52,7 @@ class WalletBillingService implements AppcoinsBilling {
     }
 
 
-    Bundle getBuyIntentToReplaceSkus(int apiVersion, String packageName, List<String> oldSkus, String newSku, String type, String developerPayload) throws
+    public Bundle getBuyIntentToReplaceSkus(int apiVersion, String packageName, List<String> oldSkus, String newSku, String type, String developerPayload) throws
             RemoteException {
         return new Bundle();
     }

@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.android_appcoins_billing.helpers;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -15,6 +15,13 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.appcoins.sdk.android_appcoins_billing.BuildConfig;
+import com.appcoins.sdk.android_appcoins_billing.types.IabResult;
+import com.appcoins.sdk.android_appcoins_billing.service.WalletBillingService;
+import com.appcoins.sdk.android_appcoins_billing.exception.IabAsyncInProgressException;
+import com.appcoins.sdk.android_appcoins_billing.listeners.OnIabPurchaseFinishedListener;
+import com.appcoins.sdk.android_appcoins_billing.listeners.OnIabSetupFinishedListener;
+import com.appcoins.sdk.android_appcoins_billing.listeners.OnSkuDetailsResponseListener;
 import com.appcoins.sdk.billing.Inventory;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
@@ -26,7 +33,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-class IabHelper implements ServiceConnection {
+public class IabHelper implements ServiceConnection {
 
     private final Object mAsyncInProgressLock = new Object();
     boolean mAsyncInProgress = false;

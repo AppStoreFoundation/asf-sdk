@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.android_appcoins_billing.exception;
 
 public class IabAsyncInProgressException extends Exception{
 

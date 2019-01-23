@@ -1,6 +1,9 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.android_appcoins_billing.helpers;
 
 import android.content.Context;
+
+import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
+import com.appcoins.sdk.android_appcoins_billing.helpers.IabHelper;
 
 public class CatapultBillingAppcoinsFactory {
 

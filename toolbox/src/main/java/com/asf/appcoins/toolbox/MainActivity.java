@@ -8,20 +8,18 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
-import com.appcoins.sdk.android_appcoins_billing.CatapultBillingAppcoinsFactory;
+import com.appcoins.sdk.android_appcoins_billing.helpers.CatapultBillingAppcoinsFactory;
 
-import com.appcoins.sdk.android_appcoins_billing.IabException;
+import com.appcoins.sdk.android_appcoins_billing.exception.IabException;
 
-import com.appcoins.sdk.android_appcoins_billing.SkuType;
+import com.appcoins.sdk.android_appcoins_billing.types.SkuType;
 
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
 
-import com.appcoins.sdk.android_appcoins_billing.FeatureType;
-
-import com.appcoins.sdk.android_appcoins_billing.OnIabPurchaseFinishedListener;
-import com.appcoins.sdk.android_appcoins_billing.OnSkuDetailsResponseListener;
-import com.appcoins.sdk.android_appcoins_billing.PayloadHelper;
+import com.appcoins.sdk.android_appcoins_billing.listeners.OnIabPurchaseFinishedListener;
+import com.appcoins.sdk.android_appcoins_billing.listeners.OnSkuDetailsResponseListener;
+import com.appcoins.sdk.android_appcoins_billing.helpers.PayloadHelper;
 
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParam;
@@ -93,7 +91,7 @@ public class MainActivity extends Activity {
 
     public void makePaymentButtonClicked(View view) {
     SkuDetailsParam skuDetailsParam = new SkuDetailsParam();
-    skuDetailsParam.setItemType(FeatureType.ITEM_TYPE_INAPP);
+    skuDetailsParam.setItemType(SkuType.INAPP);
     ArrayList <String> al = new ArrayList<String>();
 
     al.add("gas");
@@ -118,7 +116,7 @@ public class MainActivity extends Activity {
           String payload =
                   PayloadHelper.buildIntentPayload(Application.developerAddress,
                           null);
-          cab.launchPurchaseFlow(MainActivity.this, skuDetailsList.get(0).getSku(), FeatureType.ITEM_TYPE_INAPP, al, 10001, (OnIabPurchaseFinishedListener) (result, info) -> {
+          cab.launchPurchaseFlow(MainActivity.this, skuDetailsList.get(0).getSku(), SkuType.INAPP, al, 10001, (OnIabPurchaseFinishedListener) (result, info) -> {
             Log.d("aquiiiiiiiiiiiiiiii: ",".....................");
             Log.d("result: ",result.getMessage());
             Log.d("Purchase: ",info.getSku());

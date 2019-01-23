@@ -1,4 +1,6 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.android_appcoins_billing.exception;
+
+import com.appcoins.sdk.android_appcoins_billing.types.IabResult;
 
 /**
  * Exception thrown when something went wrong with in-app billing.
