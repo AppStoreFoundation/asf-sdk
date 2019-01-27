@@ -1,71 +1,78 @@
 package com.appcoins.sdk.billing;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
-
 /**
  * Represents an in-app billing purchase.
  */
 public class Purchase {
-    String mItemType;  // ITEM_TYPE_INAPP or ITEM_TYPE_SUBS
-    String mOrderId;
-    String mPackageName;
-    String mSku;
-    long mPurchaseTime;
-    int mPurchaseState;
-    String mDeveloperPayload;
-    String mToken;
-    String mOriginalJson;
-    String mSignature;
-    boolean mIsAutoRenewing;
+  private final String itemType;  // ITEM_TYPE_INAPP or ITEM_TYPE_SUBS
+  private final String orderId;
+  private final String packageName;
+  private final String sku;
+  private final long purchaseTime;
+  private final int purchaseState;
+  private final String developerPayload;
+  private final String token;
+  private final String originalJson;
+  private final String signature;
+  private final boolean isAutoRenewing;
 
-    public Purchase(String id, String itemType, String jsonPurchaseInfo, String signature) throws
-            Exception {
-        mItemType = itemType;
-        mOriginalJson = jsonPurchaseInfo;
+  public Purchase(String orderId, String itemType, String originalJson, String signature,
+      long purchaseTime, int purchaseState, String developerPayload, String token,
+      String packageName, String sku, boolean isAutoRenewing) {
+    this.itemType = itemType;
+    this.orderId = orderId;
+    this.packageName = packageName;
+    this.sku = sku;
+    this.purchaseTime = purchaseTime;
+    this.purchaseState = purchaseState;
+    this.developerPayload = developerPayload;
+    this.token = token;
+    this.originalJson = originalJson;
+    this.signature = signature;
+    this.isAutoRenewing = isAutoRenewing;
+  }
 
-        JsonObject o = parseJsonObject();
+  public String getItemType() {
+    return itemType;
+  }
 
-        mOrderId = o.get("orderId").getAsString();
-        mPackageName = o.get("packageName").getAsString();
-        mSku = o.get("productId").getAsString();
-        mPurchaseTime = o.get("purchaseTime").getAsLong();
-        mPurchaseState = o.get("purchaseState").getAsInt();
-        mDeveloperPayload = o.get("developerPayload").getAsString();
-       if(o.get("token") != null){
-           mToken = o.get("token").getAsString();
-       }
+  public String getOrderId() {
+    return orderId;
+  }
 
+  public String getPackageName() {
+    return packageName;
+  }
 
-        if(mToken == null){
-          mToken = o.get("purchaseToken").getAsString();
-        }
-        if(o.get("autoRenewing") != null){
-           mIsAutoRenewing = o.get("autoRenewing").getAsBoolean();
-        }
-        mSignature = signature;
-        mToken = id;
-    }
+  public String getSku() {
+    return sku;
+  }
 
-    public String getItemType() { return mItemType; }
-    public String getOrderId() { return mOrderId; }
-    public String getPackageName() { return mPackageName; }
-    public String getSku() { return mSku; }
-    public long getPurchaseTime() { return mPurchaseTime; }
-    public int getPurchaseState() { return mPurchaseState; }
-    public String getDeveloperPayload() { return mDeveloperPayload; }
-    public String getToken() { return mToken; }
-    public String getOriginalJson() { return mOriginalJson; }
-    public String getSignature() { return mSignature; }
-    public boolean isAutoRenewing() { return mIsAutoRenewing; }
+  public long getPurchaseTime() {
+    return purchaseTime;
+  }
 
-    private JsonObject parseJsonObject() throws JsonParseException{
-        JsonElement jelement = new JsonParser().parse(mOriginalJson);
-        return jelement.getAsJsonObject();
-    }
+  public int getPurchaseState() {
+    return purchaseState;
+  }
 
-    @Override
-    public String toString() { return "PurchaseInfo(type:" + mItemType + "):" + mOriginalJson; }
+  public String getDeveloperPayload() {
+    return developerPayload;
+  }
+
+  public String getToken() {
+    return token;
+  }
+
+  public String getOriginalJson() {
+    return originalJson;
+  }
+
+  public String getSignature() {
+    return signature;
+  }
+
+  public boolean isAutoRenewing() {
+    return isAutoRenewing;
+  }
 }

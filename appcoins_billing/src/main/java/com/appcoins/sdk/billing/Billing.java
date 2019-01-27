@@ -2,7 +2,7 @@ package com.appcoins.sdk.billing;
 
 import java.util.List;
 
-public interface AppcoinsBilling {
+public interface Billing {
 
     PurchasesResult queryPurchases(String skuType);
 
