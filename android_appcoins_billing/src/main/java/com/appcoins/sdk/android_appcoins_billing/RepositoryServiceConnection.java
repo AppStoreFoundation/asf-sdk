@@ -7,14 +7,14 @@ import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.util.Log;
-import com.appcoins.sdk.billing.AppCoinsBillingStateListenner;
+import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import java.util.List;
 
 public class RepositoryServiceConnection implements ServiceConnection, RepositoryConnection {
   private static final String TAG = RepositoryServiceConnection.class.getSimpleName();
   private final Context context;
   private final ConnectionLifeCycle connectionLifeCycle;
-  private AppCoinsBillingStateListenner listener;
+  private AppCoinsBillingStateListener listener;
 
   public RepositoryServiceConnection(Context context, ConnectionLifeCycle connectionLifeCycle) {
     this.context = context;
@@ -31,7 +31,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     Log.d(TAG, "onServiceDisconnected() called with: name = [" + name + "]");
   }
 
-  @Override public void startService(final AppCoinsBillingStateListenner listener) {
+  @Override public void startService(final AppCoinsBillingStateListener listener) {
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
 

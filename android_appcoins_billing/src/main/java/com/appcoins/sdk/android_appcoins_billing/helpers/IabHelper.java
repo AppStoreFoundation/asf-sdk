@@ -18,7 +18,7 @@ import com.appcoins.sdk.android_appcoins_billing.listeners.OnIabPurchaseFinished
 import com.appcoins.sdk.android_appcoins_billing.listeners.OnSkuDetailsResponseListener;
 import com.appcoins.sdk.android_appcoins_billing.service.WalletBillingService;
 import com.appcoins.sdk.android_appcoins_billing.types.IabResult;
-import com.appcoins.sdk.billing.AppCoinsBillingStateListenner;
+import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.Inventory;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
@@ -46,7 +46,7 @@ public class IabHelper implements ServiceConnection {
   private OnIabPurchaseFinishedListener mPurchaseListener;
   private String mPurchasingItemType;
   private WalletBillingService mService;
-  private AppCoinsBillingStateListenner listener;
+  private AppCoinsBillingStateListener listener;
   private boolean mSubscriptionsSupported;
   private boolean mSubscriptionUpdateSupported;
 
@@ -126,7 +126,7 @@ public class IabHelper implements ServiceConnection {
     }*/
   }
 
-  public void startService(AppCoinsBillingStateListenner listener) {
+  public void startService(AppCoinsBillingStateListener listener) {
 /*
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);

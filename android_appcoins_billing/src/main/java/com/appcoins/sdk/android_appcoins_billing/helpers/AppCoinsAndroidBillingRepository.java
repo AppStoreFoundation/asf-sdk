@@ -5,7 +5,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import com.appcoins.sdk.android_appcoins_billing.ConnectionLifeCycle;
 import com.appcoins.sdk.android_appcoins_billing.service.WalletBillingService;
-import com.appcoins.sdk.billing.AppCoinsBillingStateListenner;
+import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.Repository;
 import com.appcoins.sdk.billing.ServiceConnectionException;
@@ -23,12 +23,12 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
     this.mapper = mapper;
   }
 
-  @Override public void onConnect(IBinder service, final AppCoinsBillingStateListenner listener) {
+  @Override public void onConnect(IBinder service, final AppCoinsBillingStateListener listener) {
     this.service = new WalletBillingService(service);
     listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_OK);
   }
 
-  @Override public void onDisconnect(final AppCoinsBillingStateListenner listener) {
+  @Override public void onDisconnect(final AppCoinsBillingStateListener listener) {
     service = null;
     listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE);
   }
