@@ -10,7 +10,7 @@ import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
 import com.appcoins.sdk.android_appcoins_billing.exception.IabException;
 import com.appcoins.sdk.android_appcoins_billing.helpers.CatapultBillingAppCoinsFactory;
 import com.appcoins.sdk.android_appcoins_billing.types.SkuType;
-import com.appcoins.sdk.billing.AppCoinsBillingStateListenner;
+import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
 import io.reactivex.disposables.CompositeDisposable;
@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
     compositeDisposable = new CompositeDisposable();
     cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this.getApplicationContext(),
         BuildConfig.IAB_KEY);
-    cab.startService(new AppCoinsBillingStateListenner() {
+    cab.startService(new AppCoinsBillingStateListener() {
       @Override public void onBillingSetupFinished(int responseCode) {
         Log.d("Message: ", responseCode + "");
         PurchasesResult pr = cab.queryPurchases(SkuType.INAPP);
@@ -34,6 +34,10 @@ public class MainActivity extends Activity {
           Log.d("Purchase result token: ", p.getToken());
           Log.d("Purchase result sku: ", p.getSku());
         }
+      }
+
+      @Override public void onBillingServiceDisconnected() {
+        Log.d("Message: ","Disconnected");
       }
     });
   }
