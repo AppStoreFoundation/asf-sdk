@@ -1,29 +1,15 @@
 package com.appcoins.sdk.android_appcoins_billing;
 
-import android.app.Activity;
-import android.util.Log;
-
-import com.appcoins.sdk.android_appcoins_billing.exception.IabAsyncInProgressException;
-import com.appcoins.sdk.android_appcoins_billing.helpers.IabHelper;
-import com.appcoins.sdk.android_appcoins_billing.listeners.OnIabPurchaseFinishedListener;
-import com.appcoins.sdk.android_appcoins_billing.listeners.OnIabSetupFinishedListener;
-import com.appcoins.sdk.android_appcoins_billing.listeners.OnSkuDetailsResponseListener;
+import com.appcoins.sdk.billing.AppCoinsBillingStateListenner;
 import com.appcoins.sdk.billing.Billing;
-
 import com.appcoins.sdk.billing.PurchasesResult;
-import com.appcoins.sdk.billing.ResponseListener;
-import com.appcoins.sdk.billing.SkuDetailsParam;
-
-import java.util.List;
 
 public class CatapultAppcoinsBilling {
 
-  private IabHelper iabHelper;
   private final Billing billing;
   private final RepositoryConnection connection;
 
-  public CatapultAppcoinsBilling(IabHelper iabHelper, Billing billing, RepositoryConnection connection) {
-    this.iabHelper = iabHelper;
+  public CatapultAppcoinsBilling(Billing billing, RepositoryConnection connection) {
     this.billing = billing;
     this.connection = connection;
   }
@@ -32,6 +18,7 @@ public class CatapultAppcoinsBilling {
     return billing.queryPurchases(skuType);
   }
 
+  /*
   public void querySkuDetailsAsync(SkuDetailsParam skuDetailsParam,
       ResponseListener onSkuDetailsResponseListener) {
     try {
@@ -51,10 +38,9 @@ public class CatapultAppcoinsBilling {
 
     }
   }
-
-  public void startService(final OnIabSetupFinishedListener listener) {
-    iabHelper.startService(listener);
-    connection.startService();
+  */
+  public void startService(final AppCoinsBillingStateListenner listener) {
+    connection.startService(listener);
   }
 }
 

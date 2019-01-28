@@ -6,34 +6,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
 import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
-import com.appcoins.sdk.android_appcoins_billing.helpers.CatapultBillingAppCoinsFactory;
-
 import com.appcoins.sdk.android_appcoins_billing.exception.IabException;
-
+import com.appcoins.sdk.android_appcoins_billing.helpers.CatapultBillingAppCoinsFactory;
 import com.appcoins.sdk.android_appcoins_billing.types.SkuType;
-
+import com.appcoins.sdk.billing.AppCoinsBillingStateListenner;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
-
-import com.appcoins.sdk.android_appcoins_billing.listeners.OnIabPurchaseFinishedListener;
-import com.appcoins.sdk.android_appcoins_billing.listeners.OnSkuDetailsResponseListener;
-import com.appcoins.sdk.android_appcoins_billing.helpers.PayloadHelper;
-
-import com.appcoins.sdk.billing.SkuDetails;
-import com.appcoins.sdk.billing.SkuDetailsParam;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import io.reactivex.disposables.CompositeDisposable;
 
 public class MainActivity extends Activity {
 
-  private CompositeDisposable compositeDisposable;
-
   CatapultAppcoinsBilling cab;
+  private CompositeDisposable compositeDisposable;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -41,6 +26,16 @@ public class MainActivity extends Activity {
     compositeDisposable = new CompositeDisposable();
     cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this.getApplicationContext(),
         BuildConfig.IAB_KEY);
+    cab.startService(new AppCoinsBillingStateListenner() {
+      @Override public void onBillingSetupFinished(int responseCode) {
+        Log.d("Message: ", responseCode + "");
+        PurchasesResult pr = cab.queryPurchases(SkuType.INAPP);
+        for (Purchase p : pr.getPurchases()) {
+          Log.d("Purchase result token: ", p.getToken());
+          Log.d("Purchase result sku: ", p.getSku());
+        }
+      }
+    });
   }
 
   @Override protected void onDestroy() {
@@ -62,13 +57,10 @@ public class MainActivity extends Activity {
   }
 
   public void onBuyGasButtonClicked(View arg0) {
-    cab.startService(result -> {
-      Log.d("Message", result.getMessage());
-    });
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {
-    cab.startService(result -> {
+   /* cab.startService(result -> {
       Log.d("Message", result.getMessage());
     });
     PurchasesResult pr = cab.queryPurchases(SkuType.INAPP);
@@ -78,14 +70,14 @@ public class MainActivity extends Activity {
       Log.d("Purchase result token: ", p.getToken());
       Log.d("Purchase result sku: ", p.getSku());
     }
-    Log.d("Purchase result", "-------------------------");
+    Log.d("Purchase result", "-------------------------");    */
   }
 
   public void onCreateChannelButtonClicked(View view) throws IabException {
   }
 
   public void makePaymentButtonClicked(View view) {
-    SkuDetailsParam skuDetailsParam = new SkuDetailsParam();
+   /* SkuDetailsParam skuDetailsParam = new SkuDetailsParam();
     skuDetailsParam.setItemType(SkuType.INAPP);
     ArrayList<String> al = new ArrayList<String>();
 
@@ -117,7 +109,7 @@ public class MainActivity extends Activity {
               }, payload);
         }
       }
-    });
+    });   */
   }
 
   public void onCloseChannelButtonClicked(View view) {
