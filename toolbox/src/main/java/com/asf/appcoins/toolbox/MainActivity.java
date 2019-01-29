@@ -61,6 +61,7 @@ public class MainActivity extends Activity {
   }
 
   public void onBuyGasButtonClicked(View arg0) {
+    startActivity(EmptyActivity.newIntent(this));
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {
