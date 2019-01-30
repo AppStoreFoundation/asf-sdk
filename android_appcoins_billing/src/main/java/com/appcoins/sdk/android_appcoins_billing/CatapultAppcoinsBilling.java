@@ -1,8 +1,18 @@
 package com.appcoins.sdk.android_appcoins_billing;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.content.IntentSender;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.Billing;
+import com.appcoins.sdk.billing.BillingFlowParams;
+import com.appcoins.sdk.billing.ConsumeResponseListener;
 import com.appcoins.sdk.billing.PurchasesResult;
+import com.appcoins.sdk.billing.ServiceConnectionException;
+import com.appcoins.sdk.billing.SkuDetailsParams;
+import com.appcoins.sdk.billing.SkuDetailsResponseListener;
+import java.util.HashMap;
 
 public class CatapultAppcoinsBilling {
 
@@ -18,27 +28,29 @@ public class CatapultAppcoinsBilling {
     return billing.queryPurchases(skuType);
   }
 
-  /*
-  public void querySkuDetailsAsync(SkuDetailsParam skuDetailsParam,
-      ResponseListener onSkuDetailsResponseListener) {
+  public void querySkuDetailsAsync(SkuDetailsParams skuDetailsParams,
+      SkuDetailsResponseListener onSkuDetailsResponseListener) {
+    billing.querySkuDetailsAsync(skuDetailsParams, onSkuDetailsResponseListener);
+  }
+
+  public void consumeAsync(String token, ConsumeResponseListener consumeResponseListener) {
+    billing.consumeAsync(token, consumeResponseListener);
+  }
+
+  public void lauchBillingFlow(Activity activity, BillingFlowParams billingFlowParams) {
     try {
-      iabHelper.querySkuDetailsAsync(skuDetailsParam,
-          (OnSkuDetailsResponseListener) onSkuDetailsResponseListener);
-    } catch (IabAsyncInProgressException e) {
-      Log.e("Message: ", "Error querying inventory. Another async operation in progress.");
+      HashMap<String, Object> hashMap = billing.launchBillingFlow(billingFlowParams);
+      PendingIntent pendingIntent = (PendingIntent) hashMap.get("BUY_INTENT");
+
+      activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
+          billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
+    } catch (IntentSender.SendIntentException e) {
+      e.printStackTrace();
+    } catch (ServiceConnectionException e) {
+      e.printStackTrace();
     }
   }
 
-  public void launchPurchaseFlow(Object act, String sku, String itemType, List<String> oldSkus,
-      int requestCode, ResponseListener listener, String extraData) {
-    try {
-      iabHelper.launchPurchaseFlow((Activity) act, sku, itemType, oldSkus, requestCode,
-          (OnIabPurchaseFinishedListener) listener, extraData);
-    } catch (IabAsyncInProgressException e) {
-
-    }
-  }
-  */
   public void startService(final AppCoinsBillingStateListener listener) {
     connection.startService(listener);
   }

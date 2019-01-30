@@ -8,28 +8,22 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 import com.appcoins.sdk.android_appcoins_billing.exception.IabAsyncInProgressException;
-import com.appcoins.sdk.android_appcoins_billing.listeners.OnIabPurchaseFinishedListener;
-import com.appcoins.sdk.android_appcoins_billing.listeners.OnSkuDetailsResponseListener;
 import com.appcoins.sdk.android_appcoins_billing.service.WalletBillingService;
 import com.appcoins.sdk.android_appcoins_billing.types.IabResult;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.Inventory;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
-import com.appcoins.sdk.billing.SkuDetails;
-import com.appcoins.sdk.billing.SkuDetailsParam;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONException;
 
-public class IabHelper implements ServiceConnection {
-
+public class IabHelper{
+/*
   public static String mSignatureBase64;
   private final Object mAsyncInProgressLock = new Object();
   boolean mAsyncInProgress = false;
@@ -55,7 +49,7 @@ public class IabHelper implements ServiceConnection {
     this.mSignatureBase64 = base64PublicKey;
   }
 
-  @Override public void onServiceConnected(ComponentName name, IBinder service) {
+  @Override public void onServiceConnected(ComponentName name, IBinder service) {*/
 /*    mService = new WalletBillingService(service);
     try {
       checkBillingVersionV3INAPP(mService, mContext.getPackageName(), Utils.API_VERSION_V3,
@@ -71,7 +65,7 @@ public class IabHelper implements ServiceConnection {
             "RemoteException while setting up in-app billing."));
       }
     }*/
-  }
+ /* }
 
   @Override public void onServiceDisconnected(ComponentName name) {
     Log.d("Message", "Disconnected");
@@ -92,7 +86,7 @@ public class IabHelper implements ServiceConnection {
       }
     } else {
       Log.d("Message", "In-app billing version 3 supported for " + packageName);
-    }*/
+    }
   }
 
   private void checkBillingVersionV5SUBS(WalletBillingService service, String packageName,
@@ -105,7 +99,7 @@ public class IabHelper implements ServiceConnection {
     } else {
       Log.d("Message", "Subscription re-signup not available.");
       mSubscriptionUpdateSupported = false;
-    }*/
+    }
   }
 
   private void checkBillingVersionV3SUBS(WalletBillingService service, String packageName,
@@ -123,7 +117,7 @@ public class IabHelper implements ServiceConnection {
         mSubscriptionsSupported = false;
         mSubscriptionUpdateSupported = false;
       }
-    }*/
+    }
   }
 
   public void startService(AppCoinsBillingStateListener listener) {
@@ -141,7 +135,7 @@ public class IabHelper implements ServiceConnection {
         listener.onIabSetupFinished(new IabResult(Utils.BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE,
             "Billing service unavailable on device."));
       }
-    }*/
+    }
   }
 
   public PurchasesResult queryPurchases(Inventory inv, String skuType) {
@@ -229,8 +223,8 @@ public class IabHelper implements ServiceConnection {
 
     return purchasesResult;
   }
-
-  public void querySkuDetailsAsync(final SkuDetailsParam skuDetailsParam,
+/*
+  public void querySkuDetailsAsync(final SkuDetailsParams skuDetailsParams,
       final OnSkuDetailsResponseListener onSkuDetailsResponseListener)
       throws IabAsyncInProgressException {
     final Handler handler = new Handler();
@@ -246,8 +240,8 @@ public class IabHelper implements ServiceConnection {
         Inventory inv = new Inventory();
         try {
 
-          response = querySkuDetails(skuDetailsParam.getItemType(), inv,
-              skuDetailsParam.getMoreItemSkus());
+          response = querySkuDetails(skuDetailsParams.getItemType(), inv,
+              skuDetailsParams.getMoreItemSkus());
         } catch (RemoteException e) {
           result = new IabResult(Utils.IABHELPER_REMOTE_EXCEPTION,
               "Remote exception while refreshing inventory.");
@@ -263,7 +257,7 @@ public class IabHelper implements ServiceConnection {
         if (mSubscriptionsSupported) {
           try {
             response =
-                querySkuDetails(Utils.ITEM_TYPE_SUBS, inv, skuDetailsParam.getMoreSubsSkus());
+                querySkuDetails(Utils.ITEM_TYPE_SUBS, inv, skuDetailsParams.getMoreSubsSkus());
           } catch (RemoteException e) {
             result = new IabResult(Utils.IABHELPER_REMOTE_EXCEPTION,
                 "Remote exception while refreshing inventory.");
@@ -331,14 +325,14 @@ public class IabHelper implements ServiceConnection {
       }
     }
   }
-
+/*
   public int querySkuDetails(String itemType, Inventory inv, List<String> moreSkus)
       throws RemoteException, JSONException {
 
     Log.d("Message", "Querying SKU details.");
     ArrayList<String> skuList = new ArrayList<String>();
-    skuList.addAll(inv.getAllOwnedSkus(itemType));
-    if (moreSkus != null) {
+      skuList.addAll(inv.getAllOwnedSkus(itemType));
+      if (moreSkus != null) {
       for (String sku : moreSkus) {
         if (!skuList.contains(sku)) {
           skuList.add(sku);
@@ -534,6 +528,8 @@ public class IabHelper implements ServiceConnection {
   void logWarn(String msg) {
     Log.w(mDebugTag, "In-app billing warning: " + msg);
   }
+  */
+
 }
 
 

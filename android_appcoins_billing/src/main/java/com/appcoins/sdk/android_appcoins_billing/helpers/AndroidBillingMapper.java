@@ -3,20 +3,20 @@ package com.appcoins.sdk.android_appcoins_billing.helpers;
 import android.os.Bundle;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
-import com.google.gson.Gson;
+import com.appcoins.sdk.billing.SkuDetails;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 class AndroidBillingMapper {
-  private final Gson gson;
+  private final JsonParser jsonParser;
 
-  public AndroidBillingMapper(Gson gson) {
-    this.gson = gson;
+  public AndroidBillingMapper(JsonParser jsonParser) {
+    this.jsonParser = jsonParser;
   }
 
-  //hacking check if this map is correct
   public PurchasesResult map(Bundle bundle, String skuType) {
     int responseCode = bundle.getInt("RESPONSE_CODE");
     ArrayList<String> purchaseDataList =
@@ -32,7 +32,7 @@ class AndroidBillingMapper {
       String signature = signatureList.get(i);
       String id = idsList.get(i);
 
-      JsonObject jsonElement = new JsonParser().parse(purchaseData)
+      JsonObject jsonElement = jsonParser.parse(purchaseData)
           .getAsJsonObject();
       String orderId = jsonElement.get("orderId")
           .getAsString();
@@ -67,5 +67,59 @@ class AndroidBillingMapper {
     }
 
     return new PurchasesResult(list, responseCode);
+  }
+
+  public Bundle mapArrayListToBundleSkuDetails(List<String> skus) {
+    Bundle bundle = new Bundle();
+    bundle.putStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST, (ArrayList<String>) skus);
+    return bundle;
+  }
+
+  public HashMap<String, Object> mapBundleToHashMapSkuDetails(String skuType, Bundle bundle) {
+    HashMap<String, Object> hashMap = new HashMap<String, Object>();
+    ArrayList<SkuDetails> arrayList = new ArrayList<SkuDetails>();
+
+    if (bundle.containsKey("DETAILS_LIST")) {
+      ArrayList<String> responseList = bundle.getStringArrayList("DETAILS_LIST");
+      for (String value : responseList) {
+        SkuDetails skuDetails = parseSkuDetails(skuType, value);
+        arrayList.add(skuDetails);
+      }
+    }
+
+    hashMap.put("RESPONSE_CODE", bundle.get("RESPONSE_CODE"));
+    hashMap.put("DETAILS_LIST", arrayList);
+
+    return hashMap;
+  }
+
+  public SkuDetails parseSkuDetails(String skuType, String skuDetailsData) {
+    JsonObject jsonElement = jsonParser.parse(skuDetailsData)
+        .getAsJsonObject();
+
+    String sku = jsonElement.get("productId")
+        .getAsString();
+    String type = jsonElement.get("type")
+        .getAsString();
+    String price = jsonElement.get("price")
+        .getAsString();
+    Long priceAmountMicros = jsonElement.get("price_amount_micros")
+        .getAsLong();
+    String priceCurrencyCode = jsonElement.get("price_currency_code")
+        .getAsString();
+    String title = jsonElement.get("title")
+        .getAsString();
+    String description = jsonElement.get("description")
+        .getAsString();
+
+    return new SkuDetails(skuType, sku, type, price, priceAmountMicros, priceCurrencyCode, title,
+        description);
+  }
+
+  public HashMap<String, Object> mapBundleToHashMapGetIntent(Bundle bundle) {
+    HashMap<String, Object> hashMap = new HashMap<String, Object>();
+    hashMap.put("RESPONSE_CODE", bundle.get("RESPONSE_CODE"));
+    hashMap.put("BUY_INTENT", bundle.getParcelable("BUY_INTENT"));
+    return hashMap;
   }
 }

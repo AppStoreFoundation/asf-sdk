@@ -2,7 +2,7 @@ package com.appcoins.sdk.billing;
 
 import java.util.List;
 
-public class SkuDetailsParam {
+public class SkuDetailsParams {
 
     private String itemType;
 

@@ -1,7 +1,7 @@
 package com.appcoins.sdk.billing;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 
 public class AppCoinsBilling implements Billing {
   private final Repository repository;
@@ -19,14 +19,29 @@ public class AppCoinsBilling implements Billing {
     }
   }
 
-  @Override public void querySkuDetailsAsync(SkuDetailsParam skuDetailsParam,
-      ResponseListener onSkuDetailsResponseListener) {
-
+  @Override public void querySkuDetailsAsync(SkuDetailsParams skuDetailsParams,
+      SkuDetailsResponseListener onSkuDetailsResponseListener) {
+    SkuDetailsAsync skuDetailsAsync =
+        new SkuDetailsAsync(skuDetailsParams, onSkuDetailsResponseListener, repository);
+    skuDetailsAsync.run();
   }
 
-  @Override
-  public void launchPurchaseFlow(Object act, String sku, String itemType, List<String> oldSkus,
-      int requestCode, ResponseListener listener, String extraData) {
+  @Override public void consumeAsync(String purchaseToken, ConsumeResponseListener listener) {
+    ConsumeAsync consumeAsync = new ConsumeAsync(purchaseToken, listener, repository);
+    consumeAsync.run();
+  }
 
+  @Override public HashMap<String, Object> launchBillingFlow(BillingFlowParams params) throws ServiceConnectionException {
+    try {
+
+      HashMap<String, Object> result =
+          repository.launchBillingFlow(params.getSkuType(), params.getSku(),params.getPayload());
+
+      return result;
+
+    } catch (ServiceConnectionException e) {
+      e.printStackTrace();
+      throw new ServiceConnectionException();
+    }
   }
 }

@@ -1,13 +1,16 @@
 package com.appcoins.sdk.billing;
 
-import java.util.List;
+import java.util.HashMap;
 
 public interface Billing {
 
     PurchasesResult queryPurchases(String skuType);
 
-    void querySkuDetailsAsync(SkuDetailsParam skuDetailsParam , ResponseListener onSkuDetailsResponseListener);
+    void querySkuDetailsAsync(SkuDetailsParams skuDetailsParams, SkuDetailsResponseListener onSkuDetailsResponseListener);
 
-    void launchPurchaseFlow(Object act,String sku, String itemType, List<String> oldSkus, int requestCode, ResponseListener listener, String extraData);
+    void consumeAsync(String purchaseToken, ConsumeResponseListener listener);
+
+    HashMap<String, Object> launchBillingFlow(BillingFlowParams params)
+        throws ServiceConnectionException;
 }
 
