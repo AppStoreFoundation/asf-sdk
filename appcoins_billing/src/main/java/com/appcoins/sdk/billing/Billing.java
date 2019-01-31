@@ -10,7 +10,7 @@ public interface Billing {
 
     void consumeAsync(String purchaseToken, ConsumeResponseListener listener);
 
-    HashMap<String, Object> launchBillingFlow(BillingFlowParams params)
+    HashMap<String, Object> launchBillingFlow(BillingFlowParams params, String payload)
         throws ServiceConnectionException;
 }
 

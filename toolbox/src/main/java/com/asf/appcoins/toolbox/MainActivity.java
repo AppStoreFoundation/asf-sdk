@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
 import com.appcoins.sdk.android_appcoins_billing.helpers.CatapultBillingAppCoinsFactory;
+import com.appcoins.sdk.android_appcoins_billing.helpers.PayloadHelper;
 import com.appcoins.sdk.android_appcoins_billing.types.SkuType;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.BillingFlowParams;
@@ -60,17 +61,18 @@ public class MainActivity extends Activity {
       if (bundle != null) {
         for (String key : bundle.keySet()) {
           Object value = bundle.get(key);
-          Log.d("Message Key", key);
-          Log.d("Message value", value.toString());
+          if (value != null) {
+            Log.d("Message Key", key);
+            Log.d("Message value", value.toString());
+          }
         }
       }
     }
   }
 
   public void onBuyGasButtonClicked(View arg0) {
-    String payload = buildIntentPayload(Application.developerAddress, null);
     BillingFlowParams billingFlowParams =
-        new BillingFlowParams("gas", SkuType.inapp.toString(), 10001, payload);
+        new BillingFlowParams("gas", SkuType.inapp.toString(), 10001, null, null, null);
     cab.lauchBillingFlow(this, billingFlowParams);
   }
 
@@ -121,18 +123,6 @@ public class MainActivity extends Activity {
     } else {
       Log.d("Message:", "No purchase tokens available");
     }
-  }
-
-  public static String buildIntentPayload(@NonNull String developerAddress,
-      String developerPayload) {
-    Uri.Builder builder = new Uri.Builder();
-    builder.scheme("appcoins")
-        .authority("appcoins.io")
-        .appendQueryParameter("address", developerAddress);
-    if (developerPayload != null) {
-      builder.appendQueryParameter("payload", developerPayload);
-    }
-    return builder.toString();
   }
 
   public void onCloseChannelButtonClicked(View view) {
