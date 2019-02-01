@@ -1,6 +1,13 @@
 package com.appcoins.sdk.billing;
 
+
 public class BillingFlowParams {
+
+  private String orderReference;
+
+  private String developerPayload;
+
+  private String origin;
 
   private final String sku;
 
@@ -8,13 +15,13 @@ public class BillingFlowParams {
 
   private final int requestCode;
 
-  private final String payload;
-
-  public BillingFlowParams(String sku, String skuType, int requestCode, String payload) {
+  public BillingFlowParams(String sku, String skuType, int requestCode, String orderReference, String developerPayload, String origin) {
     this.sku = sku;
     this.skuType = skuType;
     this.requestCode = requestCode;
-    this.payload = payload;
+    this.orderReference = orderReference;
+    this.developerPayload = developerPayload;
+    this.origin = origin;
   }
 
   public String getSku() {
@@ -29,7 +36,15 @@ public class BillingFlowParams {
     return requestCode;
   }
 
-  public String getPayload() {
-    return payload;
+  public String getOrderReference() {
+    return orderReference;
+  }
+
+  public String getDeveloperPayload() {
+    return developerPayload;
+  }
+
+  public String getOrigin() {
+    return origin;
   }
 }

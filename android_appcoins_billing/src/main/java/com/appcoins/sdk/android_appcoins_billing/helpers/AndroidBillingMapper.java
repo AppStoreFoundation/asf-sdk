@@ -44,8 +44,12 @@ class AndroidBillingMapper {
           .getAsLong();
       int purchaseState = jsonElement.get("purchaseState")
           .getAsInt();
-      String developerPayload = jsonElement.get("developerPayload")
-          .getAsString();
+
+      String developerPayload = null;
+      if (jsonElement.get("developerPayload") != null) {
+        developerPayload = jsonElement.get("developerPayload")
+            .getAsString();
+      }
       String token = null;
       if (jsonElement.get("token") != null) {
         token = jsonElement.get("token")

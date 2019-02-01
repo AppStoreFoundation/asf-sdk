@@ -31,14 +31,15 @@ public class AppCoinsBilling implements Billing {
     consumeAsync.run();
   }
 
-  @Override public HashMap<String, Object> launchBillingFlow(BillingFlowParams params) throws ServiceConnectionException {
+  @Override
+  public HashMap<String, Object> launchBillingFlow(BillingFlowParams params, String payload)
+      throws ServiceConnectionException {
     try {
 
       HashMap<String, Object> result =
-          repository.launchBillingFlow(params.getSkuType(), params.getSku(),params.getPayload());
+          repository.launchBillingFlow(params.getSkuType(), params.getSku(), payload);
 
       return result;
-
     } catch (ServiceConnectionException e) {
       e.printStackTrace();
       throw new ServiceConnectionException();
