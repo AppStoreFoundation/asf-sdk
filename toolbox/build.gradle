@@ -1,20 +1,21 @@
 apply plugin: 'com.android.application'
 
 android {
-  compileSdkVersion 28
+  compileSdkVersion COMPILE_SDK_VERSION
   buildToolsVersion '28.0.3'
 
   flavorDimensions "iab", "network"
 
   defaultConfig {
     applicationId "com.appcoins.trivialdrivesample"
-    minSdkVersion 21
-    targetSdkVersion 27
-    versionCode 11
-    versionName "1.3.4"
+    targetSdkVersion COMPILE_SDK_VERSION
+    minSdkVersion MIN_SDK_VERSION
     multiDexEnabled true
-  }
+    versionCode 1
+    versionName "1.0"
 
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+  }
   compileOptions {
     sourceCompatibility 1.8
     targetCompatibility 1.8
@@ -33,7 +34,7 @@ android {
     debug {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//      applicationIdSuffix ".debug"
+      //      applicationIdSuffix ".debug"
       applicationVariants.all { variant -> renameArtifact(defaultConfig)
       }
     }
@@ -52,28 +53,30 @@ android {
     appcoinsiab {
       dimension "iab"
       buildConfigField "String", "IAB_UPDATE_ACTION",
-              "\"" + project.APPCOINS_IAB_UPDATE_ACTION + "\""
+          "\"" + project.APPCOINS_IAB_UPDATE_ACTION + "\""
       applicationVariants.all { variant ->
         if (variant.buildType.getName().equalsIgnoreCase("debug")) {
           buildConfigField "String", "IAB_BIND_ACTION",
-                  "\"" + project.APPCOINS_DEV_IAB_BIND_ACTION + "\""
+              "\"" + project.APPCOINS_DEV_IAB_BIND_ACTION + "\""
           buildConfigField "String", "IAB_BIND_PACKAGE",
-                  "\"" + project.APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
+              "\"" + project.APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
           buildConfigField "String", "IAB_WALLET_ADDR",
-                  "\"" + project.APPCOINS_DEV_IAB_WALLET_ADDR + "\""
+              "\"" + project.APPCOINS_DEV_IAB_WALLET_ADDR + "\""
           buildConfigField "String", "IAB_KEY",
-                  "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
-          variant.getMergedFlavor().manifestPlaceholders = [iabPermission: project.APPCOINS_IAB_PERMISSION]
+              "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
+          variant.getMergedFlavor().manifestPlaceholders =
+              [iabPermission: project.APPCOINS_IAB_PERMISSION]
         } else {
           buildConfigField "String", "IAB_KEY",
-                  "\"" + project.APPCOINS_IAB_KEY + "\""
+              "\"" + project.APPCOINS_IAB_KEY + "\""
           buildConfigField "String", "IAB_BIND_ACTION",
-                  "\"" + project.APPCOINS_IAB_BIND_ACTION + "\""
+              "\"" + project.APPCOINS_IAB_BIND_ACTION + "\""
           buildConfigField "String", "IAB_BIND_PACKAGE",
-                  "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
+              "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
           buildConfigField "String", "IAB_WALLET_ADDR",
-                  "\"" + project.APPCOINS_IAB_WALLET_ADDR + "\""
-          variant.getMergedFlavor().manifestPlaceholders = [iabPermission: project.APPCOINS_IAB_PERMISSION]
+              "\"" + project.APPCOINS_IAB_WALLET_ADDR + "\""
+          variant.getMergedFlavor().manifestPlaceholders =
+              [iabPermission: project.APPCOINS_IAB_PERMISSION]
         }
       }
     }

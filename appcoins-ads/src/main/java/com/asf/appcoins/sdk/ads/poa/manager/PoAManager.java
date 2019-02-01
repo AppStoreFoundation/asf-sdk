@@ -80,6 +80,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   private BigInteger campaignId;
   private boolean foreground = false;
   private boolean dialogVisible = false;
+  boolean fromBackground = false;
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, CampaignService campaignService) {
@@ -205,6 +206,7 @@ public class PoAManager implements LifeCycleListener.Listener {
     final AppPreferences appPreferences = new AppPreferences(appContext);
     appPreferences.remove(PREFERENCE_WALLET_PCKG_NAME);
     poaConnector.disconnectFromService(appContext);
+    compositeDisposable.clear();
   }
 
   /**
@@ -213,31 +215,52 @@ public class PoAManager implements LifeCycleListener.Listener {
    * If all proofs were sent, it stops the process.
    */
   private void sendProof() {
-    // Connection to service may already been done, but we still need to make sure that it is
-    // connected. In case no connection is not yet done, the message is stored to be sent as soon as
-    // the connection is done.
-    poaConnector.connectToService(appContext);
-    // send proof
-    long timestamp = System.currentTimeMillis();
-    Bundle bundle = new Bundle();
-    bundle.putString("packageName", appContext.getPackageName());
-    bundle.putLong("timeStamp", timestamp);
-    poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
-    proofsSent++;
-    Log.e(TAG, "Proof " + proofsSent + " sent!");
-    // schedule the next proof sending
-    if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
-      handler.postDelayed(sendProof = this::sendProof,
-          BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
+    if (foreground) {
+      if (fromBackground) {
+        fromBackground = false;
+
+        if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+          postponeSendProof();
+        }
+
+        Log.e(TAG, "Proof " + (proofsSent + 1) + " skipped! Came from background!");
+      } else {
+        // Connection to service may already been done, but we still need to make sure that it is
+        // connected. In case no connection is not yet done, the message is stored to be sent as soon as
+        // the connection is done.
+        poaConnector.connectToService(appContext);
+        // send proof
+        long timestamp = System.currentTimeMillis();
+        Bundle bundle = new Bundle();
+        bundle.putString("packageName", appContext.getPackageName());
+        bundle.putLong("timeStamp", timestamp);
+        poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
+        proofsSent++;
+        Log.e(TAG, "Proof " + proofsSent + " sent!");
+        // schedule the next proof sending
+        if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+          postponeSendProof();
+        } else {
+          // or stop the process
+          if (campaignId != null && !preferences.contains(FINISHED_KEY)) {
+            preferences.edit()
+                .putBoolean(FINISHED_KEY, true)
+                .apply();
+            finishProcess();
+          }
+        }
+      }
     } else {
-      // or stop the process
-      if (campaignId != null && !preferences.contains(FINISHED_KEY)) {
-        preferences.edit()
-            .putBoolean(FINISHED_KEY, true)
-            .apply();
-        finishProcess();
+      if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+        postponeSendProof();
+
+        Log.e(TAG, "Proof " + (proofsSent + 1) + " skipped! Application is background!");
       }
     }
+  }
+
+  private void postponeSendProof() {
+    handler.postDelayed(sendProof = this::sendProof, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
   }
 
   private void handleCampaign() {
@@ -285,33 +308,33 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   @Override public void onBecameForeground(Activity activity) {
-    this.compositeDisposable = new CompositeDisposable();
-
     foreground = true;
 
-    if (!preferences.getBoolean(FINISHED_KEY, false)) {
-      if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
-        Disposable disposable = WalletUtils.promptToInstallWallet(activity,
-            activity.getString(R.string.install_wallet_from_ads))
-            .toCompletable()
-            .doOnSubscribe(disposable1 -> dialogVisible = true)
-            .doOnComplete(() -> dialogVisible = false)
-            .subscribe(() -> {
-            }, Throwable::printStackTrace);
-      } else {
-        // start handshake
-        poaConnector.startHandshake(appContext, network);
+    if (!processing) {
+      this.compositeDisposable = new CompositeDisposable();
 
-        checkPreferencesForPackage();
+      if (!preferences.getBoolean(FINISHED_KEY, false)) {
+        if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
+          Disposable disposable = WalletUtils.promptToInstallWallet(activity,
+              activity.getString(R.string.install_wallet_from_ads))
+              .toCompletable()
+              .doOnSubscribe(disposable1 -> dialogVisible = true)
+              .doOnComplete(() -> dialogVisible = false)
+              .subscribe(() -> {
+              }, Throwable::printStackTrace);
+        } else {
+          // start handshake
+          poaConnector.startHandshake(appContext, network);
+
+          checkPreferencesForPackage();
+        }
       }
     }
   }
 
   @Override public void onBecameBackground() {
     foreground = false;
-
-    stopProcess();
-    compositeDisposable.dispose();
+    fromBackground = true;
   }
 
   private void processCampaign(Campaign campaign) {
