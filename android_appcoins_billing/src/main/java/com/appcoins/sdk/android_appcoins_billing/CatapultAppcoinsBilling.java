@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.util.Log;
 import com.appcoins.sdk.android_appcoins_billing.helpers.PayloadHelper;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.Billing;
@@ -38,20 +39,24 @@ public class CatapultAppcoinsBilling {
     billing.consumeAsync(token, consumeResponseListener);
   }
 
-  public void lauchBillingFlow(Activity activity, BillingFlowParams billingFlowParams) {
+  public void launchBillingFlow(Activity activity, BillingFlowParams billingFlowParams)
+      throws ServiceConnectionException {
     try {
       String payload = PayloadHelper.buildIntentPayload(billingFlowParams.getOrderReference(),
           billingFlowParams.getDeveloperPayload(), billingFlowParams.getOrigin());
 
+      Log.d("Message: ",payload );
+
       HashMap<String, Object> hashMap = billing.launchBillingFlow(billingFlowParams, payload);
 
       PendingIntent pendingIntent = (PendingIntent) hashMap.get("BUY_INTENT");
+
       activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
           billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
     } catch (IntentSender.SendIntentException e) {
-      e.printStackTrace();
+      throw new ServiceConnectionException(e.getMessage());
     } catch (ServiceConnectionException e) {
-      e.printStackTrace();
+      throw new ServiceConnectionException(e.getMessage());
     }
   }
 

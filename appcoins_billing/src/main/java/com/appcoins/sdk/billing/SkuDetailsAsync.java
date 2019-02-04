@@ -20,13 +20,12 @@ public class SkuDetailsAsync implements Runnable {
 
   @Override public void run() {
     try {
-      HashMap<String, Object> response = getSkuDetails();
-      List<SkuDetails> listResponse = (List<SkuDetails>) response.get(DETAILS_LIST);
+      SkuDetailsResult response = getSkuDetails();
 
-      if (listResponse == null) {
+      if (response.getSkuDetailsList() == null || response.getSkuDetailsList().size() == 0) {
         skuDetailsResponseListener.onSkuDetailsResponse(-1, new ArrayList<SkuDetails>());
       } else {
-        skuDetailsResponseListener.onSkuDetailsResponse(0, listResponse);
+        skuDetailsResponseListener.onSkuDetailsResponse(0, response.getSkuDetailsList());
       }
 
     } catch (ServiceConnectionException e) {
@@ -35,7 +34,7 @@ public class SkuDetailsAsync implements Runnable {
     }
   }
 
-  private HashMap<String, Object> getSkuDetails() throws ServiceConnectionException {
+  private SkuDetailsResult getSkuDetails() throws ServiceConnectionException {
     return repository.querySkuDetailsAsync(skuDetailsParams.getItemType(),
         skuDetailsParams.getMoreItemSkus());
   }

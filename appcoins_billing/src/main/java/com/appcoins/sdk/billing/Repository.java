@@ -7,7 +7,7 @@ public interface Repository {
 
   PurchasesResult getPurchases(String skuType) throws ServiceConnectionException;
 
-  HashMap<String, Object> querySkuDetailsAsync(String skuType, List<String> sku)
+  SkuDetailsResult querySkuDetailsAsync(String skuType, List<String> sku)
       throws ServiceConnectionException;
 
   int consumeAsync(String purchaseToken) throws ServiceConnectionException;

@@ -1,9 +1,11 @@
 package com.appcoins.sdk.android_appcoins_billing.helpers;
 
 import android.os.Bundle;
+import android.util.Log;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.SkuDetails;
+import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.ArrayList;
@@ -79,7 +81,7 @@ class AndroidBillingMapper {
     return bundle;
   }
 
-  public HashMap<String, Object> mapBundleToHashMapSkuDetails(String skuType, Bundle bundle) {
+  public SkuDetailsResult mapBundleToHashMapSkuDetails(String skuType, Bundle bundle) {
     HashMap<String, Object> hashMap = new HashMap<String, Object>();
     ArrayList<SkuDetails> arrayList = new ArrayList<SkuDetails>();
 
@@ -90,11 +92,10 @@ class AndroidBillingMapper {
         arrayList.add(skuDetails);
       }
     }
+    int responseCode = (int)bundle.get("RESPONSE_CODE");
+    SkuDetailsResult skuDetailsResult = new SkuDetailsResult(arrayList,responseCode);
 
-    hashMap.put("RESPONSE_CODE", bundle.get("RESPONSE_CODE"));
-    hashMap.put("DETAILS_LIST", arrayList);
-
-    return hashMap;
+    return skuDetailsResult;
   }
 
   public SkuDetails parseSkuDetails(String skuType, String skuDetailsData) {

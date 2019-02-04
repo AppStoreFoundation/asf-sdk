@@ -2,21 +2,19 @@ package com.asf.appcoins.toolbox;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
 import com.appcoins.sdk.android_appcoins_billing.helpers.CatapultBillingAppCoinsFactory;
-import com.appcoins.sdk.android_appcoins_billing.helpers.PayloadHelper;
 import com.appcoins.sdk.android_appcoins_billing.types.SkuType;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.ConsumeResponseListener;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
+import com.appcoins.sdk.billing.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.SkuDetailsResponseListener;
@@ -70,10 +68,14 @@ public class MainActivity extends Activity {
     }
   }
 
-  public void onBuyGasButtonClicked(View arg0) {
+  public void onBuyGasButtonClicked(View arg0){
     BillingFlowParams billingFlowParams =
         new BillingFlowParams("gas", SkuType.inapp.toString(), 10001, null, null, null);
-    cab.lauchBillingFlow(this, billingFlowParams);
+    try {
+      cab.launchBillingFlow(this, billingFlowParams);
+    } catch (ServiceConnectionException e) {
+      e.printStackTrace();
+    }
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {

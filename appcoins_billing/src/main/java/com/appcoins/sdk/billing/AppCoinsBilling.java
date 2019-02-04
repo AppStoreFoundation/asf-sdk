@@ -42,7 +42,7 @@ public class AppCoinsBilling implements Billing {
       return result;
     } catch (ServiceConnectionException e) {
       e.printStackTrace();
-      throw new ServiceConnectionException();
+      throw new ServiceConnectionException(e.getMessage());
     }
   }
 }
