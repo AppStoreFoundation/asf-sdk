@@ -1,17 +1,24 @@
 package com.appcoins.sdk.billing;
 
+
 import java.util.Collections;
 import java.util.HashMap;
 
 public class AppCoinsBilling implements Billing {
   private final Repository repository;
+  private final String base64PublicKey;
 
-  public AppCoinsBilling(Repository repository) {
+
+  public AppCoinsBilling(Repository repository, String base64PublicKey) {
     this.repository = repository;
+    this.base64PublicKey = base64PublicKey;
   }
 
   @Override public PurchasesResult queryPurchases(String skuType) {
     try {
+      //if(Security.verifyPurchase()){
+
+      //}
       return repository.getPurchases(skuType);
     } catch (ServiceConnectionException e) {
       e.printStackTrace();
