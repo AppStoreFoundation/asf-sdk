@@ -2,16 +2,25 @@ package com.asf.appcoins.toolbox;
 
 import android.app.Application;
 import android.content.pm.PackageManager;
+import com.asf.appcoins.sdk.ads.AppCoinsAds;
 
 public class App extends Application {
+
+  private final String developerAddress = BuildConfig.IAB_WALLET_ADDR;
+
+  private static AppCoinsAds adsSdk;
+
 
   @Override public void onCreate() {
     super.onCreate();
 
     AdvertisementSdkSingleton.create(this, true);
+
     try {
-      AdvertisementSdkSingleton.getAdsSdk()
-          .init(this);
+
+      adsSdk = AdvertisementSdkSingleton.getAdsSdk();
+      adsSdk.init(this);
+
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }

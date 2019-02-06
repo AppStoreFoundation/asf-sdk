@@ -18,8 +18,6 @@ import com.asf.appcoins.sdk.ads.poa.campaign.BdsCampaignService;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignRepository;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignService;
-import com.asf.appcoins.sdk.core.util.LogInterceptor;
-import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import io.reactivex.BackpressureStrategy;
@@ -126,7 +124,8 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   private static CampaignRepository.Api createApi(boolean isDebug) {
-    OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new LogInterceptor());
+    //TODO interceptor novo
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
     String url;
     if (isDebug) {
       url = BuildConfig.DEV_BACKEND_BASE_HOST;

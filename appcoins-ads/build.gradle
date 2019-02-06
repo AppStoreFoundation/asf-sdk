@@ -25,10 +25,16 @@ android {
   }
 
   buildTypes {
+    debug {
+      minifyEnabled false
+      buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
+          project.BDS_WALLET_PACKAGE_NAME_DEV
+    }
     release {
+      buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
+          project.BDS_WALLET_PACKAGE_NAME
       minifyEnabled false
     }
-    debug {}
   }
 
   lintOptions {
@@ -51,7 +57,6 @@ dependencies {
   api lib.tray
   api lib.reactivenetwork_rx2
 
-  api project(path: ':appcoins-contract-proxy')
 }
 
 //region Publishing
