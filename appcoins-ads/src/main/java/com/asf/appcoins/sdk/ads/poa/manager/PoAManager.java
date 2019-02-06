@@ -112,7 +112,7 @@ public class PoAManager implements LifeCycleListener.Listener {
           createCampaignService(packageName, getVerCode(context, packageName), networkId));
     }
   }
-
+  //TODO - mudar-  metodo onde e usado o getCountry
   @NonNull
   private static BdsCampaignService createCampaignService(String packageName, int versionCode,
       int networkId) {
@@ -262,6 +262,7 @@ public class PoAManager implements LifeCycleListener.Listener {
     handler.postDelayed(sendProof = this::sendProof, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
   }
 
+  //TODO - mudar- o getCampain e usado aqui
   private void handleCampaign() {
     compositeDisposable.add(ReactiveNetwork.observeInternetConnectivity()
         .subscribeOn(Schedulers.io())

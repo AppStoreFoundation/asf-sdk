@@ -18,7 +18,7 @@ public class BdsCampaignService implements CampaignService {
     this.repository = repository;
     this.countryProvider = countryProvider;
   }
-
+  //TODO -mudar -
   @Override public Single<Campaign> getCampaign() {
     return countryProvider.getCountryCode()
         .flatMap(countryCode -> repository.getCampaign(packageName, versionCode, countryCode,
