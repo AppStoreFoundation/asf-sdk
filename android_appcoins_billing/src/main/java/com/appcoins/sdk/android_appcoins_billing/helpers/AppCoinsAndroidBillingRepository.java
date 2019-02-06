@@ -42,8 +42,10 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
     }
     try {
       Bundle purchases = service.getPurchases(apiVersion, packageName, skuType, null);
-      Log.d("Message", purchases.size() + "");
-      return mapper.map(purchases, skuType);
+      PurchasesResult pr = mapper.map(purchases, skuType);
+      Log.d("purchases Size", " mapper size "+ pr.getPurchases().size());
+
+      return pr;
     } catch (RemoteException e) {
       e.printStackTrace();
       throw new ServiceConnectionException();

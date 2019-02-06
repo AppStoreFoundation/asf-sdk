@@ -1,8 +1,10 @@
 package com.appcoins.sdk.android_appcoins_billing.helpers;
 
 import android.os.Bundle;
+import android.util.Log;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
+import com.appcoins.sdk.billing.Security;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
