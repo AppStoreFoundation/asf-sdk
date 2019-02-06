@@ -2,7 +2,7 @@ package com.appcoins.net;
 
 public class AppcoinsClient implements AppcoinsConnectionQuerys {
 
-  public AppcoinsClient(){
+  public AppcoinsClient() {
 
   }
 

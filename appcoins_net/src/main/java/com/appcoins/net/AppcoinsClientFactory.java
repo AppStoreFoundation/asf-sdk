@@ -2,7 +2,7 @@ package com.appcoins.net;
 
 public class AppcoinsClientFactory {
 
-  public static AppcoinsClient build(){
+  public static AppcoinsClient build() {
 
   }
 }

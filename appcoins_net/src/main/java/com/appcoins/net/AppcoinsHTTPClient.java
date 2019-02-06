@@ -2,7 +2,7 @@ package com.appcoins.net;
 
 public class AppcoinsHTTPClient implements AppcoinsConnection {
 
-  public AppcoinsHTTPClient(){
+  public AppcoinsHTTPClient() {
 
   }
 
