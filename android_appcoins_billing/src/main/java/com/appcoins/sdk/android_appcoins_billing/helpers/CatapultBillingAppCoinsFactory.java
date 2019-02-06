@@ -16,7 +16,7 @@ public class CatapultBillingAppCoinsFactory {
             .getPackageName(), new AndroidBillingMapper(new JsonParser()));
     RepositoryServiceConnection connection = new RepositoryServiceConnection(context, repository);
 
-    return new CatapultAppcoinsBilling(new AppCoinsBilling(repository), connection);
+    return new CatapultAppcoinsBilling(new AppCoinsBilling(repository, base64PublicKey), connection);
   }
 }
 

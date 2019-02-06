@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
+import com.appcoins.sdk.billing.Security;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.google.gson.JsonObject;
