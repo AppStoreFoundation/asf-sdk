@@ -9,14 +9,9 @@ public class AppcoinsClient implements AppcoinsConnection {
   }
 
   @Override
-  public void getCampaign(String packageName, int versionCode, String countryCode, String sort,
-      String by, boolean valid, String type) {
-
-    QueryParams queryParams =
-        new QueryParams(packageName, Integer.toString(versionCode), countryCode, sort, by,
-            Boolean.toString(valid), type);
-
-    appcoinsHTTPCLient.Get(queryParams);
-
+  public void getCampaign(QueryParams queryParams) {
+    //MapperParams
+    appcoinsHTTPCLient.Get(null);
+    //MapperResponse
   }
 }
