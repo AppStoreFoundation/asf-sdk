@@ -6,8 +6,10 @@ public class AppcoinsHTTPClient implements AppcoinsConnectionQuerys {
 
   }
 
+  public void startService() {
+  }
+
   @Override public String Get(String params) {
     return null;
   }
-
 }

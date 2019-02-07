@@ -8,10 +8,11 @@ public class AppcoinsClient implements AppcoinsConnection {
     this.appcoinsHTTPCLient = appcoinsHTTPCLient;
   }
 
-  @Override
-  public void getCampaign(QueryParams queryParams) {
-    //MapperParams
-    appcoinsHTTPCLient.Get(null);
-    //MapperResponse
+  @Override public String getCampaign(QueryParams queryParams) {
+    GetCampaignOperation getCampaignOperation = new GetCampaignOperation();
+
+    String response = appcoinsHTTPCLient.Get(getCampaignOperation.mapParams(queryParams));
+
+    return getCampaignOperation.mapResponse(response);
   }
 }

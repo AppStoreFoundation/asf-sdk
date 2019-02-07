@@ -2,8 +2,8 @@ package com.appcoins.net;
 
 public abstract class Operation {
 
-  public abstract String mapParams();
+  public abstract String mapParams(QueryParams queryParams);
 
-  public abstract String mapResponse();
+  public abstract String mapResponse(String response);
 
 }
