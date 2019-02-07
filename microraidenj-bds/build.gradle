@@ -36,7 +36,7 @@ dependencies {
   testImplementation lib.junit
   testImplementation lib.mockito_core
   androidTestImplementation lib.android_test_runner
-
+  //TODO REMOVER RETROFIT
   api lib.retrofit2
   api lib.web3j
 

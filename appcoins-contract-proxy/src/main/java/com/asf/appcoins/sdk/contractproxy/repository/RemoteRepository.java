@@ -27,6 +27,7 @@ public class RemoteRepository {
   }
 
   public interface Api {
+    //TODO REMOVER RETROFIT
     @GET("appc/proxyaddress") Single<ProxyResponse> getAddress(@Query("contract") String contract);
   }
 

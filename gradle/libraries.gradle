@@ -23,7 +23,7 @@ lib.spongycastle_prov = "com.madgag.spongycastle:prov:${ver.spongycastle_prov}"
 
 lib.jackson = ["com.fasterxml.jackson.core:jackson-databind:${ver.jackson}",
                "com.fasterxml.jackson.core:jackson-annotations:${ver.jackson}"]
-
+//TODO REMOVER RETROFIT
 lib.retrofit2 = ["com.squareup.retrofit2:retrofit:${ver.retrofit2}",
                  "com.squareup.retrofit2:adapter-rxjava2:${ver.retrofit2}",
                  "com.squareup.retrofit2:converter-jackson:${ver.retrofit2}"]

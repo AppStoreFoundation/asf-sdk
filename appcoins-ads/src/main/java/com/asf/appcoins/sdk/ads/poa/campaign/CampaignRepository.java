@@ -20,7 +20,7 @@ public class CampaignRepository {
   public enum CampaignType {
     BDS
   }
-
+  //TODO REMOVER RETROFIT
   public interface Api {
     @GET("campaign/listall") Single<CampaignResponse> getCampaign(
         @Query("packageName") String packageName, @Query("vercode") int versionCode,
