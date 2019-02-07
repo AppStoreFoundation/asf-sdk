@@ -17,14 +17,17 @@ public class AppcoinsHTTPClient implements AppcoinsConnectionQuerys {
   }
 
   @Override public String Get(String params) throws IOException {
-    concat = params;
-    urlConnection = new URL(serviceUrl + concat);
+    concat = serviceUrl + params;
+    urlConnection = new URL(concat);
     URLConnection yc = urlConnection.openConnection();
     BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
     String inputLine;
+    String response = "";
     while ((inputLine = in.readLine()) != null) {
-      in.close();
+      response += inputLine;
     }
-    return inputLine;
+
+    in.close();
+    return response;
   }
 }

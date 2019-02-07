@@ -75,6 +75,8 @@ android {
               "\"" + project.APPCOINS_DEV_IAB_WALLET_ADDR + "\""
           buildConfigField "String", "IAB_KEY",
               "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
+          buildConfigField "String", "ROPSTEN_NETWORK_BACKEND_BASE_HOST",
+              "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
           variant.getMergedFlavor().manifestPlaceholders = [iabPermission: project.APPCOINS_IAB_PERMISSION]
         } else {
           buildConfigField "String", "IAB_KEY",
@@ -85,6 +87,8 @@ android {
               "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
           buildConfigField "String", "IAB_WALLET_ADDR",
               "\"" + project.APPCOINS_IAB_WALLET_ADDR + "\""
+          buildConfigField "String", "ROPSTEN_NETWORK_BACKEND_BASE_HOST",
+              "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
           variant.getMergedFlavor().manifestPlaceholders = [iabPermission: project.APPCOINS_IAB_PERMISSION]
         }
       }
@@ -109,6 +113,7 @@ dependencies {
   api "com.google.code.gson:gson:2.8.2"
   api project(path: ':appcoins-ads')
   api lib.constraint_layout
+  compile project(path: ':appcoins_net')
 }
 
 def renameArtifact(defaultConfig) {

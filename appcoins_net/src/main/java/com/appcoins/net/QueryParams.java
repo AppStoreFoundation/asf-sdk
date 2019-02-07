@@ -1,6 +1,6 @@
 package com.appcoins.net;
 
-class QueryParams {
+public class QueryParams {
   private final String packageName;
   private final String versionCode;
   private final String countryCode;

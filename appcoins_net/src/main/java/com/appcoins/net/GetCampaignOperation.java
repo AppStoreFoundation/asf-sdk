@@ -11,7 +11,7 @@ public class GetCampaignOperation extends Operation {
   public static final String TYPE = "type";
 
   @Override public String mapParams(QueryParams queryParams) {
-    return "?"
+    return "/campaign/listall?"
         + PACKAGE_NAME
         + "="
         + queryParams.getPackageName()
