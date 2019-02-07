@@ -56,7 +56,7 @@ dependencies {
   api lib.retrofit2
   api lib.tray
   api lib.reactivenetwork_rx2
-
+  compile project(path: ':appcoins_net')
 }
 
 //region Publishing

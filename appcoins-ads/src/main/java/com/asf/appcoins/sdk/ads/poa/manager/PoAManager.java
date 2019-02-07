@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import com.appcoins.net.AppcoinsClient;
+import com.appcoins.net.AppcoinsClientFactory;
+import com.appcoins.net.QueryParams;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
 import com.asf.appcoins.sdk.ads.R;
@@ -112,10 +115,10 @@ public class PoAManager implements LifeCycleListener.Listener {
           createCampaignService(packageName, getVerCode(context, packageName), networkId));
     }
   }
+
   //TODO - mudar-  metodo onde e usado o getCountry
-  @NonNull
-  private static BdsCampaignService createCampaignService(String packageName, int versionCode,
-      int networkId) {
+  @NonNull private static BdsCampaignService createCampaignService(String packageName,
+      int versionCode, int networkId) {
     boolean isDebug = networkId != 1;
     return new BdsCampaignService(packageName, versionCode,
         new CampaignRepository(createApi(isDebug)), () -> IpApi.create(isDebug)
@@ -279,6 +282,20 @@ public class PoAManager implements LifeCycleListener.Listener {
             .toFlowable(BackpressureStrategy.LATEST))
         .doOnSuccess(this::processCampaign)
         .subscribe());
+
+    Runnable runnable = () -> {
+      AppcoinsClient appcoinsClient =
+          AppcoinsClientFactory.build(BuildConfig.DEV_BACKEND_BASE_HOST);
+      QueryParams queryParams =
+          new QueryParams("com.appcoins.trivialdrivesample.test", "13", "PT", "desc", "price",
+              "true", "BDS");
+      String response = appcoinsClient.getCampaign(queryParams);
+
+      Log.d("Respomse: ", response);
+    };
+
+    Thread t = new Thread(runnable);
+    t.start();
   }
 
   /**
