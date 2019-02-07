@@ -20,17 +20,18 @@ public class BdsCampaignService implements CampaignService {
   }
   //TODO -mudar -
   @Override public Single<Campaign> getCampaign() {
-    return countryProvider.getCountryCode()
+    /*return countryProvider.getCountryCode()
         .flatMap(countryCode -> repository.getCampaign(packageName, versionCode, countryCode,
             CampaignRepository.CampaignType.BDS))
-        .map(campaignResponse -> mapCampaign(campaignResponse.getResult()));
+        .map(campaignResponse -> mapCampaign(campaignResponse.getResult()));*/
+    return null;
   }
 
-  @NonNull private Campaign mapCampaign(List<CampaignResponse.CampaignEntry> campaignResponse) {
+  /*@NonNull private Campaign mapCampaign(List<CampaignResponse.CampaignEntry> campaignResponse) {
     if (campaignResponse.isEmpty()) {
       return Campaign.Empty();
     }
     return new Campaign(BigInteger.valueOf(campaignResponse.get(0)
         .getBidId()), packageName);
-  }
+  }*/
 }

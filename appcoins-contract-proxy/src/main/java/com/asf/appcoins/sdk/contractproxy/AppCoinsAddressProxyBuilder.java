@@ -2,9 +2,9 @@ package com.asf.appcoins.sdk.contractproxy;
 
 import com.asf.appcoins.sdk.contractproxy.repository.RemoteRepository;
 import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.jackson.JacksonConverterFactory;
+//import retrofit2.Retrofit;
+//import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+//import retrofit2.converter.jackson.JacksonConverterFactory;
 
 /**
  * Created by Joao Raimundo on 01-03-2018.
@@ -26,11 +26,13 @@ public final class AppCoinsAddressProxyBuilder {
         break;
     }
     //TODO REMOVER RETROFIT
-    return new Retrofit.Builder().baseUrl(baseHost)
+    /*return new Retrofit.Builder().baseUrl(baseHost)
         .client(new OkHttpClient.Builder().build())
         .addConverterFactory(JacksonConverterFactory.create())
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .build()
         .create(RemoteRepository.Api.class);
+  }*/
+    return null;
   }
 }

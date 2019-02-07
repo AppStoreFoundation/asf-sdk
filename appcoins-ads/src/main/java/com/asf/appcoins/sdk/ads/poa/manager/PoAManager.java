@@ -21,7 +21,6 @@ import com.asf.appcoins.sdk.ads.poa.campaign.BdsCampaignService;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignRepository;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
@@ -31,10 +30,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import java.math.BigInteger;
 import net.grandcentrix.tray.AppPreferences;
-import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -120,31 +115,33 @@ public class PoAManager implements LifeCycleListener.Listener {
   @NonNull private static BdsCampaignService createCampaignService(String packageName,
       int versionCode, int networkId) {
     boolean isDebug = networkId != 1;
-    return new BdsCampaignService(packageName, versionCode,
+    /*return new BdsCampaignService(packageName, versionCode,
         new CampaignRepository(createApi(isDebug)), () -> IpApi.create(isDebug)
         .getCountry()
-        .map(IpResponse::getCountryCode));
+        .map(IpResponse::getCountryCode));*/
+    return null;
   }
 
   private static CampaignRepository.Api createApi(boolean isDebug) {
     //TODO interceptor novo
-    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+   // OkHttpClient.Builder builder = new OkHttpClient.Builder();
     String url;
     if (isDebug) {
       url = BuildConfig.DEV_BACKEND_BASE_HOST;
     } else {
       url = BuildConfig.PROD_BACKEND_BASE_HOST;
     }
-    OkHttpClient client = builder.build();
+    //OkHttpClient client = builder.build();
     //TODO REMOVER RETROFIT
-    Retrofit retrofit =
+    /*Retrofit retrofit =
         new Retrofit.Builder().addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(JacksonConverterFactory.create(new ObjectMapper()))
             .client(client)
             .baseUrl(url)
             .build();
 
-    return retrofit.create(CampaignRepository.Api.class);
+    return retrofit.create(CampaignRepository.Api.class);*/
+    return null;
   }
 
   private static int getVerCode(Context context, String packageName)
