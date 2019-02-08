@@ -1,5 +1,7 @@
 package com.appcoins.net;
 
+import java.util.HashMap;
+
 public class GetCampaignOperation extends Operation {
 
   public static final String PACKAGE_NAME = "packageName";
@@ -41,8 +43,9 @@ public class GetCampaignOperation extends Operation {
         + queryParams.getType();
   }
 
-  @Override public String mapResponse(String response) {
+  @Override public AppcoinsClientResponse mapResponse(String response) {
     //TODO
-    return response;
+    AppcoinsClientResponse appcoinsClientResponse = new AppcoinsClientResponse();
+    return appcoinsClientResponse;
   }
 }

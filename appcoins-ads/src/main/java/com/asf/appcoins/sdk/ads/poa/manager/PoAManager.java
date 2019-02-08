@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import com.appcoins.net.AppcoinsClient;
 import com.appcoins.net.AppcoinsClientFactory;
+import com.appcoins.net.AppcoinsClientResponse;
 import com.appcoins.net.QueryParams;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
@@ -21,6 +22,7 @@ import com.asf.appcoins.sdk.ads.poa.campaign.BdsCampaignService;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignRepository;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignService;
+import com.asf.appcoins.sdk.ads.poa.campaign.CampainMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import io.reactivex.BackpressureStrategy;
@@ -32,6 +34,7 @@ import io.reactivex.schedulers.Schedulers;
 import java.math.BigInteger;
 import net.grandcentrix.tray.AppPreferences;
 import okhttp3.OkHttpClient;
+import org.json.JSONException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -289,9 +292,14 @@ public class PoAManager implements LifeCycleListener.Listener {
       QueryParams queryParams =
           new QueryParams("com.appcoins.trivialdrivesample.test", "13", "PT", "desc", "price",
               "true", "BDS");
-      String response = appcoinsClient.getCampaign(queryParams);
+      AppcoinsClientResponse response = appcoinsClient.getCampaign(queryParams);
 
-      Log.d("Respomse: ", response);
+      Campaign campaign = null;
+      try {
+        campaign = CampainMapper.mapCampaign(response);
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
     };
 
     Thread t = new Thread(runnable);

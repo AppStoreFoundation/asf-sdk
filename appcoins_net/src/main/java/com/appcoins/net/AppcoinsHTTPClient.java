@@ -28,6 +28,8 @@ public class AppcoinsHTTPClient implements AppcoinsConnectionQuerys {
     }
 
     in.close();
+    yc.getInputStream().close();
+
     return response;
   }
 }
