@@ -31,7 +31,7 @@ public interface BDSMicroRaidenApi {
     }
 
     OkHttpClient client = builder.build();
-
+    //TODO REMOVER RETROFIT
     Retrofit retrofit =
         new Retrofit.Builder().addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(createDefaultConverter())

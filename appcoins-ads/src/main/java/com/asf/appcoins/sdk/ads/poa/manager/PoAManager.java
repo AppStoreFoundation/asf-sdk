@@ -139,6 +139,7 @@ public class PoAManager implements LifeCycleListener.Listener {
       url = BuildConfig.PROD_BACKEND_BASE_HOST;
     }
     OkHttpClient client = builder.build();
+    //TODO REMOVER RETROFIT
     Retrofit retrofit =
         new Retrofit.Builder().addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(JacksonConverterFactory.create(new ObjectMapper()))

@@ -19,6 +19,7 @@ public interface IpApi {
     } else {
       url = BuildConfig.PROD_BACKEND_BASE_HOST;
     }
+    //TODO REMOVER RETROFIT
     Retrofit retrofit = new Retrofit.Builder().addConverterFactory(JacksonConverterFactory.create())
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .client(builder.build())
