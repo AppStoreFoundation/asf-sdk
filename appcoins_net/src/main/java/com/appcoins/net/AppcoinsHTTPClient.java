@@ -3,8 +3,8 @@ package com.appcoins.net;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
 public class AppcoinsHTTPClient implements AppcoinsConnectionQuerys {
 
@@ -17,17 +17,32 @@ public class AppcoinsHTTPClient implements AppcoinsConnectionQuerys {
   }
 
   @Override public String Get(String params) throws IOException {
-    concat = serviceUrl + params;
-    urlConnection = new URL(concat);
-    URLConnection yc = urlConnection.openConnection();
-    BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
-    String inputLine;
-    String response = "";
-    while ((inputLine = in.readLine()) != null) {
-      response += inputLine;
-    }
+    try {
+      concat = serviceUrl + params;
 
-    in.close();
-    return response;
+      urlConnection = new URL(concat);
+      HttpURLConnection connection = (HttpURLConnection) urlConnection.openConnection();
+      connection.setRequestMethod("GET");
+      connection.connect();
+      int code = connection.getResponseCode();
+
+      if (!(code >= 200 && code < 400)) {
+        connection.getErrorStream();
+      } else {
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+        String response = "";
+        while ((inputLine = in.readLine()) != null) {
+          response += inputLine;
+        }
+        in.close();
+        connection.disconnect();
+        return response;
+      }
+      return params;
+    } catch (IOException e) {
+      throw new IOException("Invalid Url");
+    }
   }
 }

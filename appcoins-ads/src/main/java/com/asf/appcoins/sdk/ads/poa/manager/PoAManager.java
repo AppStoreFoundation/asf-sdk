@@ -265,7 +265,7 @@ public class PoAManager implements LifeCycleListener.Listener {
 
   //TODO - mudar- o getCampain e usado aqui
   private void handleCampaign() {
-    compositeDisposable.add(ReactiveNetwork.observeInternetConnectivity()
+    /*compositeDisposable.add(ReactiveNetwork.observeInternetConnectivity()
         .subscribeOn(Schedulers.io())
         .filter(hasInternet -> hasInternet)
         .filter(__ -> this.campaignId == null)
@@ -279,7 +279,7 @@ public class PoAManager implements LifeCycleListener.Listener {
             .flatMap(this::retryIfNetworkAvailable)
             .toFlowable(BackpressureStrategy.LATEST))
         .doOnSuccess(this::processCampaign)
-        .subscribe());
+        .subscribe());*/
 
     Runnable runnable = () -> {
       AppcoinsClient appcoinsClient =
@@ -288,8 +288,11 @@ public class PoAManager implements LifeCycleListener.Listener {
           new QueryParams("com.appcoins.trivialdrivesample.test", "13", "PT", "desc", "price",
               "true", "BDS");
       String response = appcoinsClient.getCampaign(queryParams);
-
-      Log.d("Respomse: ", response);
+      if(response == null){
+        Log.d("Respomse: ", "LINK IS BROKEN");
+      } else {
+        Log.d("Respomse: ", response);
+      }
     };
 
     Thread t = new Thread(runnable);
