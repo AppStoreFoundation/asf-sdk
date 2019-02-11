@@ -12,19 +12,15 @@ public class GetCampaignOperation extends Operation {
   public static final String VALID = "valid";
   public static final String TYPE = "type";
 
-  @Override public String mapParams(QueryParams queryParams) {
+  @Override public String mapParams(String packageName,String versionCode,QueryParams queryParams) {
     return "/campaign/listall?"
         + PACKAGE_NAME
         + "="
-        + queryParams.getPackageName()
+        + packageName
         + "&"
         + VER_CODE
         + "="
-        + queryParams.getVersionCode()
-        + "&"
-        + COUNTRY_CODE
-        + "="
-        + queryParams.getCountryCode()
+        + versionCode
         + "&"
         + SORT
         + "="
