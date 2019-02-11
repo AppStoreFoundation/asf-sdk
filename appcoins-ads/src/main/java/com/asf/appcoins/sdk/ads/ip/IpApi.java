@@ -19,10 +19,10 @@ public interface IpApi {
         .baseUrl(url)
         .build();
 
-    return retrofit.create(IpApi.class);*/
+    return retrofit.create(IpApi.class);
     return null;
   }
-  
+  */
   //@GET("exchange/countrycode") Single<IpResponse> getCountry();
 
 }

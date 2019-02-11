@@ -32,9 +32,10 @@ public class BdsCampaignService implements CampaignService {
     /*return countryProvider.getCountryCode()
         .flatMap(countryCode -> repository.getCampaign(packageName, versionCode, countryCode,
             CampaignRepository.CampaignType.BDS))
-        .map(campaignResponse -> mapCampaign(campaignResponse.getResult()));*/
+        .map(campaignResponse -> mapCampaign(campaignResponse.getResult()));
     return null;
   }
+  */
 
   /*@NonNull private Campaign mapCampaign(List<CampaignResponse.CampaignEntry> campaignResponse) {
     return new Campaign(BigInteger.valueOf(campaignResponse.get(0)

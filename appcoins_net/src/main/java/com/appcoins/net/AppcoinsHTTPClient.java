@@ -20,7 +20,16 @@ public class AppcoinsHTTPClient implements Runnable, AppcoinsConnectionQuerys {
     this.getResponseHandler = getResponseHandler;
   }
 
-  @Override public String Get(String params) throws IOException {
+  @Override public void run() {
+    try {
+      String response = Get();
+      getResponseHandler.getResponseHandler(response);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override public String Get() throws IOException {
     try {
       concat = serviceUrl + params;
 
@@ -51,15 +60,6 @@ public class AppcoinsHTTPClient implements Runnable, AppcoinsConnectionQuerys {
       return params;
     } catch (IOException e) {
       throw new IOException("Invalid Url");
-    }
-  }
-
-  @Override public void run() {
-    try {
-      String response = Get();
-      getResponseHandler.getResponseHandler(response);
-    } catch (IOException e) {
-      e.printStackTrace();
     }
   }
 }
