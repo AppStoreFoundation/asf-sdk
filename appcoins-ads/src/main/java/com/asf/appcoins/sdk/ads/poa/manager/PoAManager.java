@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import com.appcoins.net.AppcoinsClient;
 import com.appcoins.net.AppcoinsClientFactory;
+import com.appcoins.net.AppcoinsClientResponse;
 import com.appcoins.net.QueryParams;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
@@ -30,6 +31,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import java.math.BigInteger;
 import net.grandcentrix.tray.AppPreferences;
+
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -287,11 +289,14 @@ public class PoAManager implements LifeCycleListener.Listener {
       QueryParams queryParams =
           new QueryParams("com.appcoins.trivialdrivesample.test", "13", "PT", "desc", "price",
               "true", "BDS");
-      String response = appcoinsClient.getCampaign(queryParams);
-      if(response == null){
-        Log.d("Respomse: ", "LINK IS BROKEN");
-      } else {
-        Log.d("Respomse: ", response);
+
+      AppcoinsClientResponse response = appcoinsClient.getCampaign(queryParams);
+
+      Campaign campaign = null;
+      try {
+        campaign = CampainMapper.mapCampaign(response);
+      } catch (JSONException e) {
+        e.printStackTrace();
       }
     };
 

@@ -10,7 +10,7 @@ public class AppcoinsClient implements AppcoinsConnection {
     this.appcoinsHTTPCLient = appcoinsHTTPCLient;
   }
 
-  @Override public String getCampaign(QueryParams queryParams) {
+  @Override public AppcoinsClientResponse getCampaign(QueryParams queryParams) {
     GetCampaignOperation getCampaignOperation = new GetCampaignOperation();
 
     String response = null;
