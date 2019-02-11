@@ -45,7 +45,7 @@ public class GetCampaignOperation extends Operation {
 
   @Override public AppcoinsClientResponse mapResponse(String response) {
     //TODO
-    AppcoinsClientResponse appcoinsClientResponse = new AppcoinsClientResponse();
+    AppcoinsClientResponse appcoinsClientResponse = new AppcoinsClientResponse(response);
     return appcoinsClientResponse;
   }
 }
