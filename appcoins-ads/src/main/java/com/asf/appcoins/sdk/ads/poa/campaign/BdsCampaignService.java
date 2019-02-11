@@ -1,11 +1,7 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
-import android.support.annotation.NonNull;
-import io.reactivex.Single;
-import java.math.BigInteger;
-import java.util.List;
-
 public class BdsCampaignService implements CampaignService {
+  /*
   private final String packageName;
   private final int versionCode;
   private final CampaignRepository repository;
@@ -18,14 +14,17 @@ public class BdsCampaignService implements CampaignService {
     this.repository = repository;
     this.countryProvider = countryProvider;
   }
-  //TODO -mudar -
-  @Override public Single<Campaign> getCampaign() {
+  */
+
+  @Override public Campaign getCampaign() {
+    return null;
+    /*
     return countryProvider.getCountryCode()
         .flatMap(countryCode -> repository.getCampaign(packageName, versionCode, countryCode,
             CampaignRepository.CampaignType.BDS))
-        .map(campaignResponse -> mapCampaign(campaignResponse.getResult()));
+        .map(campaignResponse -> mapCampaign(campaignResponse.getResult()));*/
   }
-
+  /*
   @NonNull private Campaign mapCampaign(List<CampaignResponse.CampaignEntry> campaignResponse) {
     if (campaignResponse.isEmpty()) {
       return Campaign.Empty();
@@ -33,4 +32,5 @@ public class BdsCampaignService implements CampaignService {
     return new Campaign(BigInteger.valueOf(campaignResponse.get(0)
         .getBidId()), packageName);
   }
+  */
 }

@@ -1,6 +1,5 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 public class CampaignResponse {
@@ -17,7 +16,7 @@ public class CampaignResponse {
     this.result = result;
   }
 
-  @JsonIgnoreProperties(ignoreUnknown = true) public static class CampaignEntry {
+  public static class CampaignEntry {
     private int bidId;
 
     public CampaignEntry() {

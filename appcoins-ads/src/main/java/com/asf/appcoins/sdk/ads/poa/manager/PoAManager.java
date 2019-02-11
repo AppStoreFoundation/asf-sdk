@@ -10,34 +10,17 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import com.appcoins.net.AppcoinsClient;
 import com.appcoins.net.AppcoinsClientFactory;
-import com.appcoins.net.AppcoinsClientResponse;
 import com.appcoins.net.QueryParams;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
 import com.asf.appcoins.sdk.ads.R;
-import com.asf.appcoins.sdk.ads.ip.IpApi;
-import com.asf.appcoins.sdk.ads.ip.IpResponse;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
-import com.asf.appcoins.sdk.ads.poa.campaign.BdsCampaignService;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
-import com.asf.appcoins.sdk.ads.poa.campaign.CampaignRepository;
-import com.asf.appcoins.sdk.ads.poa.campaign.CampaignService;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampainMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
+//import io.reactivex.disposables.CompositeDisposable;
 import java.math.BigInteger;
 import net.grandcentrix.tray.AppPreferences;
-import okhttp3.OkHttpClient;
 import org.json.JSONException;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -60,14 +43,14 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** The instance of the manager */
   private static PoAManager instance;
   private final SharedPreferences preferences;
-  private final CampaignService campaignService;
+  private final AppcoinsClient appcoinsClient;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
   private PoAServiceConnector poaConnector;
   /** The application context */
   private Context appContext;
   /** integer used to identify the network to wich we are connected */
   private int network = 0;
-  private CompositeDisposable compositeDisposable;
+  //private CompositeDisposable compositeDisposable;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
   /** The handle to keep the runnable tasks that we be running within a certain period */
@@ -87,12 +70,12 @@ public class PoAManager implements LifeCycleListener.Listener {
   boolean fromBackground = false;
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
-      int networkId, CampaignService campaignService) {
+      int networkId, AppcoinsClient appcoinsClient) {
     this.preferences = preferences;
     this.poaConnector = connector;
     this.appContext = context;
     this.network = networkId;
-    this.campaignService = campaignService;
+    this.appcoinsClient = appcoinsClient;
   }
 
   /**
@@ -115,39 +98,24 @@ public class PoAManager implements LifeCycleListener.Listener {
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
       String packageName = context.getPackageName();
       instance = new PoAManager(preferences, connector, context, networkId,
-          createCampaignService(packageName, getVerCode(context, packageName), networkId));
+          createAppCoinsClient(packageName, getVerCode(context, packageName), networkId));
     }
   }
 
   //TODO - mudar-  metodo onde e usado o getCountry
-  @NonNull private static BdsCampaignService createCampaignService(String packageName,
-      int versionCode, int networkId) {
+  @NonNull private static AppcoinsClient createAppCoinsClient(String packageName, int versionCode,
+      int networkId) {
     boolean isDebug = networkId != 1;
-    return new BdsCampaignService(packageName, versionCode,
-        new CampaignRepository(createApi(isDebug)), () -> IpApi.create(isDebug)
-        .getCountry()
-        .map(IpResponse::getCountryCode));
-  }
 
-  private static CampaignRepository.Api createApi(boolean isDebug) {
-    //TODO interceptor novo
-    OkHttpClient.Builder builder = new OkHttpClient.Builder();
     String url;
+
     if (isDebug) {
       url = BuildConfig.DEV_BACKEND_BASE_HOST;
     } else {
       url = BuildConfig.PROD_BACKEND_BASE_HOST;
     }
-    OkHttpClient client = builder.build();
-    //TODO REMOVER RETROFIT
-    Retrofit retrofit =
-        new Retrofit.Builder().addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(JacksonConverterFactory.create(new ObjectMapper()))
-            .client(client)
-            .baseUrl(url)
-            .build();
 
-    return retrofit.create(CampaignRepository.Api.class);
+    return AppcoinsClientFactory.build(url, packageName, versionCode);
   }
 
   private static int getVerCode(Context context, String packageName)
@@ -212,7 +180,7 @@ public class PoAManager implements LifeCycleListener.Listener {
     final AppPreferences appPreferences = new AppPreferences(appContext);
     appPreferences.remove(PREFERENCE_WALLET_PCKG_NAME);
     poaConnector.disconnectFromService(appContext);
-    compositeDisposable.clear();
+    //compositeDisposable.clear();
   }
 
   /**
@@ -269,42 +237,23 @@ public class PoAManager implements LifeCycleListener.Listener {
     handler.postDelayed(sendProof = this::sendProof, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
   }
 
-  //TODO - mudar- o getCampain e usado aqui
   private void handleCampaign() {
-    compositeDisposable.add(ReactiveNetwork.observeInternetConnectivity()
-        .subscribeOn(Schedulers.io())
-        .filter(hasInternet -> hasInternet)
-        .filter(__ -> this.campaignId == null)
-        .firstOrError()
-        .flatMap(__ -> campaignService.getCampaign())
-        .retryWhen(throwableObservable -> throwableObservable.toObservable()
-            .flatMap(throwable -> {
-              throwable.printStackTrace();
-              return ReactiveNetwork.observeInternetConnectivity();
-            })
-            .flatMap(this::retryIfNetworkAvailable)
-            .toFlowable(BackpressureStrategy.LATEST))
-        .doOnSuccess(this::processCampaign)
-        .subscribe());
-
-    Runnable runnable = () -> {
-      AppcoinsClient appcoinsClient =
-          AppcoinsClientFactory.build(BuildConfig.DEV_BACKEND_BASE_HOST);
-      QueryParams queryParams =
-          new QueryParams("com.appcoins.trivialdrivesample.test", "13", "PT", "desc", "price",
-              "true", "BDS");
-      AppcoinsClientResponse response = appcoinsClient.getCampaign(queryParams);
-
-      Campaign campaign = null;
-      try {
-        campaign = CampainMapper.mapCampaign(response);
-      } catch (JSONException e) {
-        e.printStackTrace();
+    Log.d("Message:", "Start Checking Campaign------------------------------");
+    if (campaignId == null) {
+      if (appcoinsClient.checkNetworkAvailable() && appcoinsClient.checkConnectivity()) {
+        QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
+        Log.d("Message:", "Connecting -----------------------------");
+        appcoinsClient.getCampaign(queryParams, appcoinsClientResponse -> {
+          try {
+            Log.d("Message:", "Mapping------------------------------");
+            Campaign campaign = CampainMapper.mapCampaign(appcoinsClientResponse);
+            processCampaign(campaign);
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+        });
       }
-    };
-
-    Thread t = new Thread(runnable);
-    t.start();
+    }
   }
 
   /**
@@ -325,22 +274,19 @@ public class PoAManager implements LifeCycleListener.Listener {
     }
   }
 
-  /**
-   * Return an observable that emits 0 if there is network. Emits empty otherwise.
-   * This is supposed to avoid breaking the chain.
-   */
-  private ObservableSource<? extends Integer> retryIfNetworkAvailable(Boolean hasInternet) {
-    return hasInternet ? Observable.just(0) : Observable.empty();
-  }
-
   @Override public void onBecameForeground(Activity activity) {
     foreground = true;
 
     if (!processing) {
-      this.compositeDisposable = new CompositeDisposable();
+      //this.compositeDisposable = new CompositeDisposable();
 
       if (!preferences.getBoolean(FINISHED_KEY, false)) {
         if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
+          dialogVisible = true;
+
+          WalletUtils.promptToInstallWallet(activity,
+              activity.getString(R.string.install_wallet_from_ads), value -> dialogVisible = value);
+          /*
           Disposable disposable = WalletUtils.promptToInstallWallet(activity,
               activity.getString(R.string.install_wallet_from_ads))
               .toCompletable()
@@ -348,6 +294,7 @@ public class PoAManager implements LifeCycleListener.Listener {
               .doOnComplete(() -> dialogVisible = false)
               .subscribe(() -> {
               }, Throwable::printStackTrace);
+              */
         } else {
           // start handshake
           poaConnector.startHandshake(appContext, network);

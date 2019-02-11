@@ -1,26 +1,40 @@
 package com.appcoins.net;
 
-import java.io.IOException;
-
 public class AppcoinsClient implements AppcoinsConnection {
 
-  private final AppcoinsHTTPClient appcoinsHTTPCLient;
+  private final String packageName;
+  private final int versionCode;
+  private String serviceUrl;
 
-  public AppcoinsClient(AppcoinsHTTPClient appcoinsHTTPCLient) {
-    this.appcoinsHTTPCLient = appcoinsHTTPCLient;
+  public AppcoinsClient(String packageName, int versionCode, String serviceUrl) {
+    this.packageName = packageName;
+    this.versionCode = versionCode;
+    this.serviceUrl = serviceUrl;
   }
 
-  @Override public AppcoinsClientResponse getCampaign(QueryParams queryParams) {
+  @Override public void getCampaign(QueryParams queryParams,
+      ClientResponseHandler clientResponseHandler) {
     GetCampaignOperation getCampaignOperation = new GetCampaignOperation();
 
-    String response = null;
-    //TODO Response handling
-    try {
-      response = appcoinsHTTPCLient.Get(getCampaignOperation.mapParams(queryParams));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    AppcoinsHTTPClient appcoinsHTTPClient =
+        new AppcoinsHTTPClient(serviceUrl, getCampaignOperation.mapParams(packageName,Integer.toString(versionCode),queryParams),
+            response -> {
+              AppcoinsClientResponse appcoinsClientResponse =
+                  getCampaignOperation.mapResponse(response);
+              clientResponseHandler.clientResponseHandler(appcoinsClientResponse);
+            });
 
-    return getCampaignOperation.mapResponse(response);
+    Thread operation = new Thread(appcoinsHTTPClient);
+    operation.start();
+  }
+
+  @Override public boolean checkConnectivity() {
+    //TODO
+    return true;
+  }
+
+  @Override public boolean checkNetworkAvailable() {
+    //TODO
+    return true;
   }
 }

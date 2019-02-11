@@ -1,10 +1,7 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
-import io.reactivex.Single;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
-
 public class CampaignRepository {
+  /*
   private final Api api;
 
   public CampaignRepository(Api api) {
@@ -27,4 +24,5 @@ public class CampaignRepository {
         @Query("countryCode") String countryCode, @Query("sort") String sort,
         @Query("by") String by, @Query("valid") boolean valid, @Query("type") String type);
   }
+  */
 }

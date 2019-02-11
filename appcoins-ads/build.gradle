@@ -52,11 +52,8 @@ dependencies {
   testImplementation lib.mockito_core
 
   androidTestImplementation lib.android_test_runner
-  //TODO REMOVER RETROFIT
-  api lib.retrofit2
   api lib.tray
-  api lib.reactivenetwork_rx2
-  compile project(path: ':appcoins_net')
+  implementation project(path: ':appcoins_net')
 }
 
 //region Publishing

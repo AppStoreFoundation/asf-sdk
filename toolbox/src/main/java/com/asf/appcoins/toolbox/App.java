@@ -4,9 +4,6 @@ import android.app.Application;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
-import com.appcoins.net.AppcoinsClient;
-import com.appcoins.net.AppcoinsClientFactory;
-import com.appcoins.net.QueryParams;
 import com.asf.appcoins.sdk.ads.AppCoinsAds;
 
 public class App extends Application {

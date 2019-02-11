@@ -2,5 +2,9 @@ package com.appcoins.net;
 
 interface AppcoinsConnection {
 
-  AppcoinsClientResponse getCampaign(QueryParams queryParams);
+  void getCampaign(QueryParams queryParams, ClientResponseHandler getCampaignResponseHandler);
+
+  boolean checkConnectivity();
+
+  boolean checkNetworkAvailable();
 }

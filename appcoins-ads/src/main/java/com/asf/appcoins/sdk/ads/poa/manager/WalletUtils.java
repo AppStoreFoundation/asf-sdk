@@ -8,8 +8,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.R;
-import io.reactivex.Single;
-import io.reactivex.annotations.NonNull;
 
 public class WalletUtils {
 
@@ -26,6 +24,8 @@ public class WalletUtils {
     }
   }
 
+/*
+//duvidas
   public static Single<Boolean> promptToInstallWallet(Activity activity, String message) {
     return showWalletInstallDialog(activity, message).doOnSuccess(aBoolean -> {
       if (aBoolean) {
@@ -33,7 +33,14 @@ public class WalletUtils {
       }
     });
   }
+*/
 
+  public static void promptToInstallWallet(Activity activity, String message,
+      DialogVisibleListener dialogVisibleListener) {
+    showWalletInstallDialog(activity, message, activity, dialogVisibleListener);
+  }
+/*
+  //duvidas
   private static Single<Boolean> showWalletInstallDialog(Context context, String message) {
     return Single.create(emitter -> {
       AlertDialog.Builder builder;
@@ -46,7 +53,36 @@ public class WalletUtils {
           .show();
     });
   }
+*/
 
+  //duvidas
+  private static void showWalletInstallDialog(Context context, String message, Activity activity,
+      DialogVisibleListener dialogVisibleListener) {
+
+    AlertDialog.Builder builder;
+    builder = new AlertDialog.Builder(context);
+    builder.setTitle(R.string.wallet_missing);
+    builder.setMessage(message);
+
+    builder.setPositiveButton(R.string.install, (dialog, id) -> {
+      try {
+        activity.startActivity(
+            new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + walletPackageName)));
+      } catch (android.content.ActivityNotFoundException anfe) {
+        activity.startActivity(new Intent(Intent.ACTION_VIEW,
+            Uri.parse("https://play.google.com/store/apps/details?id=" + walletPackageName)));
+      }
+      dialogVisibleListener.OnDialogVisibleListener(false);
+    });
+
+    builder.setNegativeButton(R.string.skip,
+        (dialog, id) -> dialogVisibleListener.OnDialogVisibleListener(false));
+
+    builder.setIcon(android.R.drawable.ic_dialog_alert);
+    builder.show();
+  }
+
+/*
     @NonNull private static void gotoStore(Context activity) {
       try {
         activity.startActivity(
@@ -56,4 +92,10 @@ public class WalletUtils {
             Uri.parse("https://play.google.com/store/apps/details?id=" + walletPackageName)));
       }
     }
+*/
+/*
+  private static void gotoStore(Context activity) {
+
+  }
+  */
 }
