@@ -26,6 +26,10 @@ public class AppcoinsHTTPClient implements AppcoinsConnectionQuerys {
       connection.connect();
       int code = connection.getResponseCode();
 
+      String path = null;
+      LogIntercept logIntercept = new LogIntercept(connection);
+      path = logIntercept.requestPath(connection);
+
       if (!(code >= 200 && code < 400)) {
         connection.getErrorStream();
       } else {
