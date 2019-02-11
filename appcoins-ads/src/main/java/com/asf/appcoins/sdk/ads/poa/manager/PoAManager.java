@@ -16,6 +16,7 @@ import com.asf.appcoins.sdk.ads.LifeCycleListener;
 import com.asf.appcoins.sdk.ads.R;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
+
 import com.asf.appcoins.sdk.ads.poa.campaign.CampainMapper;
 //import io.reactivex.disposables.CompositeDisposable;
 import java.math.BigInteger;
@@ -102,19 +103,15 @@ public class PoAManager implements LifeCycleListener.Listener {
     }
   }
 
-  //TODO - mudar-  metodo onde e usado o getCountry
-  @NonNull private static AppcoinsClient createAppCoinsClient(String packageName, int versionCode,
+  private static AppcoinsClient createAppCoinsClient(String packageName, int versionCode,
       int networkId) {
     boolean isDebug = networkId != 1;
-
     String url;
-
     if (isDebug) {
       url = BuildConfig.DEV_BACKEND_BASE_HOST;
     } else {
       url = BuildConfig.PROD_BACKEND_BASE_HOST;
     }
-
     return AppcoinsClientFactory.build(url, packageName, versionCode);
   }
 
@@ -238,6 +235,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   private void handleCampaign() {
+
     Log.d("Message:", "Start Checking Campaign------------------------------");
     if (campaignId == null) {
       if (appcoinsClient.checkNetworkAvailable() && appcoinsClient.checkConnectivity()) {

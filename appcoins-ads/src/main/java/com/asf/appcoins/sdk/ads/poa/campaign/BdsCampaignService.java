@@ -14,6 +14,7 @@ public class BdsCampaignService implements CampaignService {
     this.repository = repository;
     this.countryProvider = countryProvider;
   }
+
   */
 
   @Override public Campaign getCampaign() {
@@ -25,12 +26,22 @@ public class BdsCampaignService implements CampaignService {
         .map(campaignResponse -> mapCampaign(campaignResponse.getResult()));*/
   }
   /*
-  @NonNull private Campaign mapCampaign(List<CampaignResponse.CampaignEntry> campaignResponse) {
-    if (campaignResponse.isEmpty()) {
-      return Campaign.Empty();
-    }
+
+  //TODO -mudar -
+  @Override public Single<Campaign> getCampaign() {
+    /*return countryProvider.getCountryCode()
+        .flatMap(countryCode -> repository.getCampaign(packageName, versionCode, countryCode,
+            CampaignRepository.CampaignType.BDS))
+        .map(campaignResponse -> mapCampaign(campaignResponse.getResult()));*/
+    return null;
+  }
+
+  /*@NonNull private Campaign mapCampaign(List<CampaignResponse.CampaignEntry> campaignResponse) {
     return new Campaign(BigInteger.valueOf(campaignResponse.get(0)
         .getBidId()), packageName);
+
   }
   */
+
+
 }
