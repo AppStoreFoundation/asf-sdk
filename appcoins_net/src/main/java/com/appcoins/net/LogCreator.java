@@ -12,17 +12,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LogIntercept {
+public class LogCreator {
 
-  private HttpURLConnection connection;
+  public static String Intercept(HttpURLConnection connection, String response) throws IOException {
 
-  public LogIntercept(HttpURLConnection connection) {
-  }
-
-  public static String requestPath(HttpURLConnection connection) throws IOException {
+    StringBuilder logBuilder = new StringBuilder();
+    logBuilder.append("<---BEGIN REQUEST-->");
+    logBuilder.append("\n");
+    String urlpath = URLEncoder.encode(connection.toString(), "UTF-8");
+    logBuilder.append(urlpath);
+    logBuilder.append(response);
 
     //Connection details
-    String path = connection.getResponseCode() + "" //200
+   /* String path = connection.getResponseCode() + "" //200
         + connection.getResponseMessage();
     String urlpath = URLEncoder.encode(connection.toString(), "UTF-8");
     StringBuilder logBuilder = new StringBuilder();
@@ -46,8 +48,11 @@ public class LogIntercept {
     }
     logBuilder.append("\n=============== END Headers ===============\n");
 
-    logBuilder.toString();
-    return path;
+    //Response Details
+    //String response = appcoinsHTTPClient.getResponse();
+    //logBuilder.append(response);*/
+
+    return logBuilder.toString();
   }
 
   private String requestDecodedPath(URL urlConnection) {

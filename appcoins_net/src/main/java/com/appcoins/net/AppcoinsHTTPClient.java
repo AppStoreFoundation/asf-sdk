@@ -10,14 +10,17 @@ public class AppcoinsHTTPClient implements Runnable, AppcoinsConnectionQuerys {
 
   private final String serviceUrl;
   private final String params;
+  private final Interceptor interceptor;
   private GetResponseHandler getResponseHandler;
   private URL urlConnection;
   private String concat;
 
-  public AppcoinsHTTPClient(String serviceUrl , String params , GetResponseHandler getResponseHandler) {
+  public AppcoinsHTTPClient(String serviceUrl, Interceptor interceptor, String params,
+      GetResponseHandler getResponseHandler) {
     this.serviceUrl = serviceUrl;
     this.params = params;
     this.getResponseHandler = getResponseHandler;
+    this.interceptor = interceptor;
   }
 
   @Override public void run() {
@@ -40,8 +43,6 @@ public class AppcoinsHTTPClient implements Runnable, AppcoinsConnectionQuerys {
       int code = connection.getResponseCode();
 
       String path = null;
-      LogIntercept logIntercept = new LogIntercept(connection);
-      path = logIntercept.requestPath(connection);
 
       if (!(code >= 200 && code < 400)) {
         connection.getErrorStream();
@@ -53,6 +54,9 @@ public class AppcoinsHTTPClient implements Runnable, AppcoinsConnectionQuerys {
         while ((inputLine = in.readLine()) != null) {
           response += inputLine;
         }
+
+        String log = LogCreator.Intercept(connection, response);
+        interceptor.OnInterceptPublish(log);
         in.close();
         connection.disconnect();
         return response;

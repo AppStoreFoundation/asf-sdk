@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import com.appcoins.net.AppcoinsClient;
 import com.appcoins.net.AppcoinsClientFactory;
+import com.appcoins.net.Interceptor;
 import com.appcoins.net.QueryParams;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
@@ -18,7 +19,6 @@ import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 
 import com.asf.appcoins.sdk.ads.poa.campaign.CampainMapper;
-//import io.reactivex.disposables.CompositeDisposable;
 import java.math.BigInteger;
 import net.grandcentrix.tray.AppPreferences;
 import org.json.JSONException;
@@ -112,7 +112,7 @@ public class PoAManager implements LifeCycleListener.Listener {
     } else {
       url = BuildConfig.PROD_BACKEND_BASE_HOST;
     }
-    return AppcoinsClientFactory.build(url, packageName, versionCode);
+    return AppcoinsClientFactory.build(url, packageName, versionCode, new LogInterceptor());
   }
 
   private static int getVerCode(Context context, String packageName)
@@ -236,14 +236,12 @@ public class PoAManager implements LifeCycleListener.Listener {
 
   private void handleCampaign() {
 
-    Log.d("Message:", "Start Checking Campaign------------------------------");
+
     if (campaignId == null) {
       if (appcoinsClient.checkNetworkAvailable() && appcoinsClient.checkConnectivity()) {
         QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
-        Log.d("Message:", "Connecting -----------------------------");
         appcoinsClient.getCampaign(queryParams, appcoinsClientResponse -> {
           try {
-            Log.d("Message:", "Mapping------------------------------");
             Campaign campaign = CampainMapper.mapCampaign(appcoinsClientResponse);
             processCampaign(campaign);
           } catch (JSONException e) {
