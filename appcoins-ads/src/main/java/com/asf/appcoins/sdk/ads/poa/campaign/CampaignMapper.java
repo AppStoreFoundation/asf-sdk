@@ -18,7 +18,7 @@ public class CampaignMapper {
         return campaign;
       }
     }
-    return new Campaign(new BigInteger("0"),"");
+    return new Campaign(new BigInteger("-1"),"");
   }
 
   public static String GetIntValue(String paramName, String response) {
