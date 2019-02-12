@@ -53,7 +53,7 @@ dependencies {
 
   androidTestImplementation lib.android_test_runner
   api lib.tray
-  implementation project(path: ':appcoins_net')
+  api project(path: ':appcoins_net')
 }
 
 //region Publishing
