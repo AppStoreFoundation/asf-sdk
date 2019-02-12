@@ -15,7 +15,8 @@ public class LogCreator {
 
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
-  public static String Intercept(HttpURLConnection connection, String response) throws IOException {
+  public static String Intercept(Map<String, List<String>> requestProperties, HttpURLConnection connection, String response,
+      long tookMs) throws IOException {
 
     //Url details
     StringBuilder logBuilder = new StringBuilder();
@@ -28,15 +29,23 @@ public class LogCreator {
 
     //Header details
     logBuilder.append("\n=============== Headers ===============\n");
-    logBuilder.append(connection.getRequestProperties());
 
+    for (Map.Entry<String, List<String>> header : requestProperties.entrySet()) {
+      List<String> list = header.getValue();
+
+      if (header.getKey() != null) {
+        logBuilder.append(header.getKey())
+            .append(" : ");
+      }
+
+      for (String values : list) {
+        logBuilder.append(values);
+      }
+
+      logBuilder.append("\n");
+    }
 
     logBuilder.append("\n=============== END Headers ===============\n");
-
-    //Response Details
-    long startNs = System.nanoTime();
-    connection.getRequestMethod();
-    long tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs);
 
     logBuilder.append("\n");
     logBuilder.append("Response timeout: ")
@@ -57,8 +66,7 @@ public class LogCreator {
 
     logBuilder.append("\n=============== Headers ===============\n");
 
-    Map<String, List<String>> headers;
-    headers = connection.getHeaderFields();
+    Map<String, List<String>> headers = connection.getHeaderFields();
     for (Map.Entry<String, List<String>> header : headers.entrySet()) {
       List<String> list = header.getValue();
 

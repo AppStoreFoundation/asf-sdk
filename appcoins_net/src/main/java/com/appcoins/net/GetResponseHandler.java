@@ -1,5 +1,5 @@
 package com.appcoins.net;
 
 public interface GetResponseHandler {
-  void getResponseHandler(String response);
+  void getResponseHandler(Object response);
 }

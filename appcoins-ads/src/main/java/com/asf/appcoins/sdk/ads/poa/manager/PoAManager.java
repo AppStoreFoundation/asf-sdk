@@ -6,22 +6,19 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import com.appcoins.net.AppcoinsClient;
 import com.appcoins.net.AppcoinsClientFactory;
-import com.appcoins.net.Interceptor;
+import com.appcoins.net.AppcoinsClientResponsePing;
 import com.appcoins.net.QueryParams;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
 import com.asf.appcoins.sdk.ads.R;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
-
-import com.asf.appcoins.sdk.ads.poa.campaign.CampainMapper;
+import com.asf.appcoins.sdk.ads.poa.campaign.CampaignMapper;
 import java.math.BigInteger;
 import net.grandcentrix.tray.AppPreferences;
-import org.json.JSONException;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -137,10 +134,6 @@ public class PoAManager implements LifeCycleListener.Listener {
     poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
 
     handleCampaign();
-
-    if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
-      sendProof();
-    }
   }
 
   /**
@@ -236,19 +229,24 @@ public class PoAManager implements LifeCycleListener.Listener {
 
   private void handleCampaign() {
 
-
     if (campaignId == null) {
-      if (appcoinsClient.checkNetworkAvailable() && appcoinsClient.checkConnectivity()) {
-        QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
-        appcoinsClient.getCampaign(queryParams, appcoinsClientResponse -> {
-          try {
-            Campaign campaign = CampainMapper.mapCampaign(appcoinsClientResponse);
+      appcoinsClient.checkConnectivity(appcoinsClientResponsePing -> {
+
+        AppcoinsClientResponsePing pingResponse =
+            (AppcoinsClientResponsePing) appcoinsClientResponsePing;
+
+        if (pingResponse.HasConnection()) {
+
+          QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
+
+          appcoinsClient.getCampaign(queryParams, appcoinsClientResponse -> {
+            Campaign campaign = CampaignMapper.mapCampaign(appcoinsClientResponse);
             processCampaign(campaign);
-          } catch (JSONException e) {
-            e.printStackTrace();
-          }
-        });
-      }
+          });
+        } else {
+          Log.d("Message:", "No Connectivity Available");
+        }
+      });
     }
   }
 
@@ -282,15 +280,6 @@ public class PoAManager implements LifeCycleListener.Listener {
 
           WalletUtils.promptToInstallWallet(activity,
               activity.getString(R.string.install_wallet_from_ads), value -> dialogVisible = value);
-          /*
-          Disposable disposable = WalletUtils.promptToInstallWallet(activity,
-              activity.getString(R.string.install_wallet_from_ads))
-              .toCompletable()
-              .doOnSubscribe(disposable1 -> dialogVisible = true)
-              .doOnComplete(() -> dialogVisible = false)
-              .subscribe(() -> {
-              }, Throwable::printStackTrace);
-              */
         } else {
           // start handshake
           poaConnector.startHandshake(appContext, network);
@@ -318,6 +307,14 @@ public class PoAManager implements LifeCycleListener.Listener {
       poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
 
       this.campaignId = campaign.getId();
+
+      initiateProofSending();
+    }
+  }
+
+  private void initiateProofSending() {
+    if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+      sendProof();
     }
   }
 }

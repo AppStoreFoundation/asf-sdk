@@ -11,4 +11,5 @@ public class AppcoinsClientResponse {
   public String getMsg() {
     return msg;
   }
+
 }

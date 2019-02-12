@@ -40,7 +40,7 @@ public class GetCampaignOperation extends Operation {
   }
 
   @Override public AppcoinsClientResponse mapResponse(String response) {
-    AppcoinsClientResponse appcoinsClientResponse = new AppcoinsClientResponse(response);
+    AppcoinsClientResponse appcoinsClientResponse = new AppcoinsClientResponse((String)response);
     return appcoinsClientResponse;
   }
 }

@@ -21,23 +21,29 @@ public class AppcoinsClient implements AppcoinsConnection {
 
     AppcoinsHTTPClient appcoinsHTTPClient = new AppcoinsHTTPClient(serviceUrl, interceptor,
         getCampaignOperation.mapParams(packageName, Integer.toString(versionCode), queryParams),
-        response -> {
-          AppcoinsClientResponse appcoinsClientResponse =
-              getCampaignOperation.mapResponse(response);
-          clientResponseHandler.clientResponseHandler(appcoinsClientResponse);
-        });
+        AppcoinsHTTPClient.GET_CONNECTION, response -> {
+
+      AppcoinsClientResponse appcoinsClientResponse =
+          getCampaignOperation.mapResponse((String) response);
+      clientResponseHandler.clientResponseHandler(appcoinsClientResponse);
+
+    });
 
     Thread operation = new Thread(appcoinsHTTPClient);
     operation.start();
   }
 
-  @Override public boolean checkConnectivity() {
-    //TODO
-    return true;
-  }
+  @Override public void checkConnectivity(ClientResponseHandler clientResponseHandler) {
+    AppcoinsHTTPClient appcoinsHTTPClient =
+        new AppcoinsHTTPClient(serviceUrl, interceptor, null, AppcoinsHTTPClient.PING_CONNECTION,
+            response -> {
 
-  @Override public boolean checkNetworkAvailable() {
-    //TODO
-    return true;
+              AppcoinsClientResponse appcoinsClientResponse =
+                  new AppcoinsClientResponsePing((boolean) response);
+              clientResponseHandler.clientResponseHandler(appcoinsClientResponse);
+
+        });
+    Thread operation = new Thread(appcoinsHTTPClient);
+    operation.start();
   }
 }

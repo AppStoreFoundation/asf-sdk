@@ -4,7 +4,5 @@ interface AppcoinsConnection {
 
   void getCampaign(QueryParams queryParams, ClientResponseHandler getCampaignResponseHandler);
 
-  boolean checkConnectivity();
-
-  boolean checkNetworkAvailable();
+  void checkConnectivity(ClientResponseHandler clientResponseHandler);
 }
