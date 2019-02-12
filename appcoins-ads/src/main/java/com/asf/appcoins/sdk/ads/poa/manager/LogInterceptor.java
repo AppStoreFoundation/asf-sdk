@@ -4,7 +4,10 @@ import android.util.Log;
 import com.appcoins.net.Interceptor;
 
 public class LogInterceptor implements Interceptor {
+
+  private static final String TAG = "HTTP_TRACE";
+
   @Override public void OnInterceptPublish(String log) {
-    Log.d("messaggeee", log);
+    Log.d(TAG, log);
   }
 }
