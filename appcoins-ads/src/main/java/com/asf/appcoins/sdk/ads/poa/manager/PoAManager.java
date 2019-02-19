@@ -7,9 +7,9 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import com.appcoins.net.AppcoinsClient;
-import com.appcoins.net.AppcoinsClientFactory;
-import com.appcoins.net.AppcoinsClientResponsePing;
+import com.appcoins.net.AppCoinsClient;
+import com.appcoins.net.AppCoinsClientFactory;
+import com.appcoins.net.AppCoinsClientResponsePing;
 import com.appcoins.net.QueryParams;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
@@ -41,14 +41,13 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** The instance of the manager */
   private static PoAManager instance;
   private final SharedPreferences preferences;
-  private final AppcoinsClient appcoinsClient;
+  private final AppCoinsClient appcoinsClient;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
   private PoAServiceConnector poaConnector;
   /** The application context */
   private Context appContext;
   /** integer used to identify the network to wich we are connected */
   private int network = 0;
-  //private CompositeDisposable compositeDisposable;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
   /** The handle to keep the runnable tasks that we be running within a certain period */
@@ -68,7 +67,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   boolean fromBackground = false;
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
-      int networkId, AppcoinsClient appcoinsClient) {
+      int networkId, AppCoinsClient appcoinsClient) {
     this.preferences = preferences;
     this.poaConnector = connector;
     this.appContext = context;
@@ -100,7 +99,7 @@ public class PoAManager implements LifeCycleListener.Listener {
     }
   }
 
-  private static AppcoinsClient createAppCoinsClient(String packageName, int versionCode,
+  private static AppCoinsClient createAppCoinsClient(String packageName, int versionCode,
       int networkId) {
     boolean isDebug = networkId != 1;
     String url;
@@ -109,7 +108,7 @@ public class PoAManager implements LifeCycleListener.Listener {
     } else {
       url = BuildConfig.PROD_BACKEND_BASE_HOST;
     }
-    return AppcoinsClientFactory.build(url, packageName, versionCode, new LogInterceptor());
+    return AppCoinsClientFactory.build(url, packageName, versionCode, new LogInterceptor());
   }
 
   private static int getVerCode(Context context, String packageName)
@@ -170,7 +169,6 @@ public class PoAManager implements LifeCycleListener.Listener {
     final AppPreferences appPreferences = new AppPreferences(appContext);
     appPreferences.remove(PREFERENCE_WALLET_PCKG_NAME);
     poaConnector.disconnectFromService(appContext);
-    //compositeDisposable.clear();
   }
 
   /**
@@ -232,10 +230,11 @@ public class PoAManager implements LifeCycleListener.Listener {
     if (campaignId == null) {
       appcoinsClient.checkConnectivity(appcoinsClientResponsePing -> {
 
-        AppcoinsClientResponsePing pingResponse =
-            (AppcoinsClientResponsePing) appcoinsClientResponsePing;
+        AppCoinsClientResponsePing pingResponse =
+            (AppCoinsClientResponsePing) appcoinsClientResponsePing;
 
         if (pingResponse.HasConnection()) {
+          Log.d("Message:", "Connectivity Available");
 
           QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
 
@@ -244,7 +243,7 @@ public class PoAManager implements LifeCycleListener.Listener {
             processCampaign(campaign);
           });
         } else {
-          Log.d("Message:", "No Connectivity Available");
+          Log.d("Message:", "No Connectivity Available: Delayed.");
         }
       });
     }
@@ -272,8 +271,6 @@ public class PoAManager implements LifeCycleListener.Listener {
     foreground = true;
 
     if (!processing) {
-      //this.compositeDisposable = new CompositeDisposable();
-
       if (!preferences.getBoolean(FINISHED_KEY, false)) {
         if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
           dialogVisible = true;

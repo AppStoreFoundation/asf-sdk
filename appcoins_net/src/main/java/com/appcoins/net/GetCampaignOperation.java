@@ -1,7 +1,5 @@
 package com.appcoins.net;
 
-import java.util.HashMap;
-
 public class GetCampaignOperation extends Operation {
 
   public static final String PACKAGE_NAME = "packageName";
@@ -12,7 +10,8 @@ public class GetCampaignOperation extends Operation {
   public static final String VALID = "valid";
   public static final String TYPE = "type";
 
-  @Override public String mapParams(String packageName,String versionCode,QueryParams queryParams) {
+  @Override
+  public String mapParams(String packageName, String versionCode, QueryParams queryParams) {
     return "/campaign/listall?"
         + PACKAGE_NAME
         + "="
@@ -39,8 +38,12 @@ public class GetCampaignOperation extends Operation {
         + queryParams.getType();
   }
 
-  @Override public AppcoinsClientResponse mapResponse(String response) {
-    AppcoinsClientResponse appcoinsClientResponse = new AppcoinsClientResponse((String)response);
+  public static String getRequestCampaignPath() {
+    return "/campaign/listall";
+  }
+
+  @Override public AppCoinsClientResponse mapResponse(String response) {
+    AppCoinsClientResponse appcoinsClientResponse = new AppCoinsClientResponse((String) response);
     return appcoinsClientResponse;
   }
 }

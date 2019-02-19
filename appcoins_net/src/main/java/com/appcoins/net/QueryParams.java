@@ -7,8 +7,7 @@ public class QueryParams {
   private final String valid;
   private final String type;
 
-  public QueryParams(String sort,
-      String by, String valid, String type) {
+  public QueryParams(String sort, String by, String valid, String type) {
     this.sort = sort;
     this.by = by;
     this.valid = valid;

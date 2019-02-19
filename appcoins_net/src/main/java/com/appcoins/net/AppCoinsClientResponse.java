@@ -1,15 +1,14 @@
 package com.appcoins.net;
 
-public class AppcoinsClientResponse {
+public class AppCoinsClientResponse {
 
   private String msg;
 
-  public AppcoinsClientResponse(String msg) {
+  public AppCoinsClientResponse(String msg) {
     this.msg = msg;
   }
 
   public String getMsg() {
     return msg;
   }
-
 }

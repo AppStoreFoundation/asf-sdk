@@ -8,8 +8,6 @@ import com.asf.appcoins.sdk.ads.AppCoinsAds;
 
 public class App extends Application {
 
-  private final String developerAddress = BuildConfig.IAB_WALLET_ADDR;
-
   private static AppCoinsAds adsSdk;
 
   @Override public void onCreate() {

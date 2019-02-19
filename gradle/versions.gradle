@@ -41,7 +41,6 @@ ver.spongycastle_prov = "1.58.0.0"
 ver.jackson = "2.9.5"
 
 // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
-//TODO REMOVER RETROFIT
 ver.retrofit2 = "2.4.0"
 
 ver.tray = "0.12.0"

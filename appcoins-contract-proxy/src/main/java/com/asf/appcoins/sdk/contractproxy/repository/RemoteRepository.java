@@ -1,8 +1,8 @@
 package com.asf.appcoins.sdk.contractproxy.repository;
 
 import io.reactivex.Single;
-//import retrofit2.http.GET;
-//import retrofit2.http.Query;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 public class RemoteRepository {
   private final ApiProvider apiProvider;
@@ -12,10 +12,9 @@ public class RemoteRepository {
   }
 
   public Single<String> getAddress(Contracts contract, int chainId) {
-    return null;
-    // apiProvider.getApi(chainId)
-        //.getAddress(contract.value)
-        //.map(ProxyResponse::getWallet);
+    return apiProvider.getApi(chainId)
+        .getAddress(contract.value)
+        .map(ProxyResponse::getWallet);
   }
 
   public enum Contracts {
@@ -28,8 +27,7 @@ public class RemoteRepository {
   }
 
   public interface Api {
-    //TODO REMOVER RETROFIT
-   // @GET("appc/proxyaddress") Single<ProxyResponse> getAddress(@Query("contract") String contract);
+    @GET("appc/proxyaddress") Single<ProxyResponse> getAddress(@Query("contract") String contract);
   }
 
   private static class ProxyResponse {

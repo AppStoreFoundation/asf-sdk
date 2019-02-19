@@ -1,10 +1,10 @@
 package com.appcoins.net;
 
-public class AppcoinsClientResponsePing extends AppcoinsClientResponse {
+public class AppCoinsClientResponsePing extends AppCoinsClientResponse {
 
   private boolean hasConnection;
 
-  public AppcoinsClientResponsePing(boolean hasConnection) {
+  public AppCoinsClientResponsePing(boolean hasConnection) {
     super(null);
     this.hasConnection = hasConnection;
   }

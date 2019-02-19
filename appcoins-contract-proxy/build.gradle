@@ -39,6 +39,7 @@ dependencies {
   testImplementation lib.mockito_core
   androidTestImplementation lib.android_test_runner
 
+  api lib.retrofit2
   api lib.web3j
   api project(path: ':appcoins-core')
 }

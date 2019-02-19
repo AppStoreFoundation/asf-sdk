@@ -54,5 +54,4 @@ public class WalletUtils {
     builder.setIcon(android.R.drawable.ic_dialog_alert);
     builder.show();
   }
-
 }

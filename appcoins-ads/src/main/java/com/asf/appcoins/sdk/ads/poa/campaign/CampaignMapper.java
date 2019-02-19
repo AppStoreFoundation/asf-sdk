@@ -1,15 +1,15 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
-import com.appcoins.net.AppcoinsClientResponse;
+import com.appcoins.net.AppCoinsClientResponse;
 import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CampaignMapper {
 
-  public static Campaign mapCampaign(AppcoinsClientResponse response) {
+  public static Campaign mapCampaign(AppCoinsClientResponse response) {
     String jsonResponse = response.getMsg();
-    String bigIdString = GetIntValue("bidId", jsonResponse);
+    String bigIdString = GetBigIntValue("bidId", jsonResponse);
     if (!bigIdString.isEmpty()) {
       BigInteger bigId = new BigInteger(bigIdString);
       String packageName = GetStringValue("packageName", jsonResponse);
@@ -18,10 +18,10 @@ public class CampaignMapper {
         return campaign;
       }
     }
-    return new Campaign(new BigInteger("-1"),"");
+    return new Campaign(new BigInteger("-1"), "");
   }
 
-  public static String GetIntValue(String paramName, String response) {
+  public static String GetBigIntValue(String paramName, String response) {
 
     String patternStr = "(?:\"" + paramName + "\"" + "[\\s]*:[\\s]*)([\\d]*)";
 
@@ -35,23 +35,6 @@ public class CampaignMapper {
     }
 
     return "";
-  }
-
-  public static float GetFloatValue(String paramName, String response) {
-
-    String patternStr = "(?:\"" + paramName + "\"" + "[\\s]*:[\\s]*)([\\d]*(.|,)?[\\d]*)";
-
-    Pattern pattern = Pattern.compile(patternStr);
-    Matcher matcher = pattern.matcher(response);
-    boolean found = matcher.find();
-
-    if (found) {
-      String val = matcher.group(1);
-      return Float.parseFloat(val);
-    }
-
-    //TODO throw error
-    return -1.0f;
   }
 
   private static String GetStringValue(String paramName, String response) {
@@ -70,7 +53,6 @@ public class CampaignMapper {
       return val;
     }
 
-    //TODO throw error
     return "";
   }
 }

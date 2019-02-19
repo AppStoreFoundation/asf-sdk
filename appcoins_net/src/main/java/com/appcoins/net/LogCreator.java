@@ -5,18 +5,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class LogCreator {
 
   private static final Charset UTF8 = Charset.forName("UTF-8");
 
-  public static String Intercept(Map<String, List<String>> requestProperties, HttpURLConnection connection, String response,
-      long tookMs) throws IOException {
+  public static String Intercept(Map<String, List<String>> requestProperties,
+      HttpURLConnection connection, String response, long tookMs) throws IOException {
 
     //Url details
     StringBuilder logBuilder = new StringBuilder();

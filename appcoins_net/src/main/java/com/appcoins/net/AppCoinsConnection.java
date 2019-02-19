@@ -1,6 +1,6 @@
 package com.appcoins.net;
 
-interface AppcoinsConnection {
+interface AppCoinsConnection {
 
   void getCampaign(QueryParams queryParams, ClientResponseHandler getCampaignResponseHandler);
 
