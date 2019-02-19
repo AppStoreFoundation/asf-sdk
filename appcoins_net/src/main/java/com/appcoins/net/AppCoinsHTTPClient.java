@@ -63,8 +63,14 @@ public class AppCoinsHTTPClient implements Runnable {
 
     String log = LogCreator.Intercept(requestProperties, connection, response, tookMs);
     interceptor.OnInterceptPublish(log);
-    in.close();
-    connection.disconnect();
+
+    if(in != null){
+      in.close();
+    }
+
+    if(connection != null){
+      connection.disconnect();
+    }
 
     return response;
   }
