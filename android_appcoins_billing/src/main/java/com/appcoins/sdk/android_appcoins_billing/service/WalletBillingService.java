@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import com.appcoins.billing.AppcoinsBilling;
-import java.util.List;
 
 public class WalletBillingService implements AppcoinsBilling {
 
@@ -42,11 +41,6 @@ public class WalletBillingService implements AppcoinsBilling {
 
   @Override public IBinder asBinder() {
     return null;
-  }
-
-  public Bundle getBuyIntentToReplaceSkus(int apiVersion, String packageName, List<String> oldSkus,
-      String newSku, String type, String developerPayload) throws RemoteException {
-    return new Bundle();
   }
 }
 

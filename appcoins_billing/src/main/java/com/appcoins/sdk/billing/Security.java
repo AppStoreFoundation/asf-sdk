@@ -8,7 +8,6 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 
 /**
  * Security-related methods. For a secure implementation, all of this code
@@ -26,45 +25,39 @@ public class Security {
   private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
 
   /**
-   * Verifies that the data was signed with the given signature, and returns
+   * Verifies that the data was signed with the given Signature, and returns
    * the verified purchase. The data is in JSON format and signed
    * with a private key. The data also contains the {@link PurchaseState}
    * and product ID of the purchase.
    *
-   * @param base64PublicKey the base64-encoded public key to use for verifying.
+   * @param base64DecodedPublicKey the base64-decoded public key to use for verifying.
    * @param signedData the signed JSON string (signed, not encrypted)
-   * @param signature the signature for the data, signed with the private key
+   * @param decodedSignature the Signature for the data, signed with the private key
    */
-  public static boolean verifyPurchase(String base64PublicKey, String signedData, String signature)
-      throws IllegalArgumentException {
-    if (signedData.isEmpty() || base64PublicKey.isEmpty() || signature.isEmpty()) {
-      //Log.e(TAG, "Purchase verification failed: missing data.");
+  public static boolean verifyPurchase(byte[] base64DecodedPublicKey, String signedData, byte[] decodedSignature) {
+    if (signedData.isEmpty() || base64DecodedPublicKey.length <= 0 || decodedSignature.length <= 0) {
       return false;
     }
 
-    PublicKey key = Security.generatePublicKey(base64PublicKey);
+    PublicKey key = Security.generatePublicKey(base64DecodedPublicKey);
 
-    return Security.verify(key, signedData, signature);
+    return Security.verify(key, signedData, decodedSignature);
   }
 
   /**
    * Generates a PublicKey instance from a string containing the
-   * Base64-encoded public key.
+   * Base64-decoded public key.
    *
-   * @param encodedPublicKey Base64-encoded public key
+   * @param base64DecodedPublicKey Base64-decoded public key
    *
-   * @throws IllegalArgumentException if encodedPublicKey is invalid
+   * @throws IllegalArgumentException if decodedPublicKey is invalid
    */
-  public static PublicKey generatePublicKey(String encodedPublicKey)
-      throws IllegalArgumentException, RuntimeException {
+  public static PublicKey generatePublicKey(byte[] base64DecodedPublicKey) throws RuntimeException {
     try {
-
-      byte[] decodedKey = Base64.getMimeDecoder()
-          .decode(encodedPublicKey);
 
       KeyFactory keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
 
-      return keyFactory.generatePublic(new X509EncodedKeySpec(decodedKey));
+      return keyFactory.generatePublic(new X509EncodedKeySpec(base64DecodedPublicKey));
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     } catch (InvalidKeySpecException e) {
@@ -79,24 +72,16 @@ public class Security {
    *
    * @param publicKey public key associated with the developer account
    * @param signedData signed data from server
-   * @param signature server signature
+   * @param decodedSignature server signature
    *
    * @return true if the data and signature match
    */
-  public static boolean verify(PublicKey publicKey, String signedData, String signature) {
-    byte[] signatureBytes;
-    try {
-      signatureBytes = Base64.getMimeDecoder()
-          .decode(signature);
-    } catch (IllegalArgumentException e) {
-      //Log.e(TAG, "Base64 decoding failed.");
-      return false;
-    }
+  public static boolean verify(PublicKey publicKey, String signedData, byte[] decodedSignature) {
     try {
       Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);
       sig.initVerify(publicKey);
       sig.update(signedData.getBytes());
-      if (!sig.verify(signatureBytes)) {
+      if (!sig.verify(decodedSignature)) {
         //Log.e(TAG, "Signature verification failed.");
         return false;
       }

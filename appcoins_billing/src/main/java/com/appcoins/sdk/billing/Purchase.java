@@ -13,10 +13,10 @@ public class Purchase {
   private final String developerPayload;
   private final String token;
   private final String originalJson;
-  private final String signature;
+  private final byte [] signature;
   private final boolean isAutoRenewing;
 
-  public Purchase(String orderId, String itemType, String originalJson, String signature,
+  public Purchase(String orderId, String itemType, String originalJson, byte [] signature,
       long purchaseTime, int purchaseState, String developerPayload, String token,
       String packageName, String sku, boolean isAutoRenewing) {
     this.itemType = itemType;
@@ -68,7 +68,7 @@ public class Purchase {
     return originalJson;
   }
 
-  public String getSignature() {
+  public byte[] getSignature() {
     return signature;
   }
 

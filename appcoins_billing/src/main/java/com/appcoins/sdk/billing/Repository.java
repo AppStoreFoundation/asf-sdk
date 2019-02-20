@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing;
 
-import java.util.HashMap;
 import java.util.List;
 
 public interface Repository {
@@ -12,7 +11,7 @@ public interface Repository {
 
   int consumeAsync(String purchaseToken) throws ServiceConnectionException;
 
-  HashMap<String, Object> launchBillingFlow(String skuType,String sku, String payload)
+  LaunchBillingFlowResult launchBillingFlow(String skuType,String sku, String payload)
       throws ServiceConnectionException;
 
 }

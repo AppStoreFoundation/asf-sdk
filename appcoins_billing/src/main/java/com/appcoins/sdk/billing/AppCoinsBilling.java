@@ -2,45 +2,40 @@ package com.appcoins.sdk.billing;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import sun.rmi.runtime.Log;
 
 public class AppCoinsBilling implements Billing {
   private final Repository repository;
-  private final String base64PublicKey;
+  private final byte[] base64DecodedPublicKey;
 
-  public AppCoinsBilling(Repository repository, String base64PublicKey) {
+  public AppCoinsBilling(Repository repository, byte[] base64DecodedPublicKey) {
     this.repository = repository;
-    this.base64PublicKey = base64PublicKey;
+    this.base64DecodedPublicKey = base64DecodedPublicKey;
   }
 
   @Override public PurchasesResult queryPurchases(String skuType) {
     try {
-      PurchasesResult pr = repository.getPurchases(skuType);
+      PurchasesResult purchasesResult = repository.getPurchases(skuType);
       ArrayList<Purchase> invalidPurchase = new ArrayList<Purchase>();
 
-      for (Purchase purchase : pr.getPurchases()) {
+      for (Purchase purchase : purchasesResult.getPurchases()) {
         String purchaseData = purchase.getOriginalJson();
-        String signature = purchase.getSignature();
+        byte[] decodeSignature = purchase.getSignature();
 
-        try {
-          if (!Security.verifyPurchase(base64PublicKey, purchaseData, signature)) {
-            invalidPurchase.add(purchase);
-          }
-        } catch (IllegalArgumentException e) {
+        if (!Security.verifyPurchase(base64DecodedPublicKey, purchaseData, decodeSignature)) {
           invalidPurchase.add(purchase);
+          return new PurchasesResult(Collections.emptyList(), ErrorCode.ERROR.getValue());
         }
       }
 
       if (invalidPurchase.size() > 0) {
-        pr.getPurchases()
+        purchasesResult.getPurchases()
             .removeAll(invalidPurchase);
       }
 
-      return pr;
+      return purchasesResult;
     } catch (ServiceConnectionException e) {
       e.printStackTrace();
-      return new PurchasesResult(Collections.emptyList(), -1);
+      return new PurchasesResult(Collections.emptyList(), ErrorCode.SERVICE_UNAVAILABLE.getValue());
     }
   }
 
@@ -48,20 +43,22 @@ public class AppCoinsBilling implements Billing {
       SkuDetailsResponseListener onSkuDetailsResponseListener) {
     SkuDetailsAsync skuDetailsAsync =
         new SkuDetailsAsync(skuDetailsParams, onSkuDetailsResponseListener, repository);
-    skuDetailsAsync.run();
+    Thread t = new Thread(skuDetailsAsync);
+    t.start();
   }
 
   @Override public void consumeAsync(String purchaseToken, ConsumeResponseListener listener) {
     ConsumeAsync consumeAsync = new ConsumeAsync(purchaseToken, listener, repository);
-    consumeAsync.run();
+    Thread t = new Thread(consumeAsync);
+    t.start();
   }
 
   @Override
-  public HashMap<String, Object> launchBillingFlow(BillingFlowParams params, String payload)
+  public LaunchBillingFlowResult launchBillingFlow(BillingFlowParams params, String payload)
       throws ServiceConnectionException {
     try {
 
-      HashMap<String, Object> result =
+      LaunchBillingFlowResult result =
           repository.launchBillingFlow(params.getSkuType(), params.getSku(), payload);
 
       return result;

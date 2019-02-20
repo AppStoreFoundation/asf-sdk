@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
         BuildConfig.IAB_KEY);
 
     final Activity activity = this;
-    cab.startService(new AppCoinsBillingStateListener() {
+    cab.startConnection(new AppCoinsBillingStateListener() {
       @Override public void onBillingSetupFinished(int responseCode) {
         Log.d("Message: ", "Connected-" + responseCode + "");
       }
@@ -118,7 +118,7 @@ public class MainActivity extends Activity {
     if (token != null) {
       cab.consumeAsync(token, new ConsumeResponseListener() {
         @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
-          Log.d("consume response: ", responseCode + " " + purchaseToken);
+          Log.d("consume response: ", responseCode + " " + "Consumed purchase with token: " + purchaseToken);
           token = null;
         }
       });

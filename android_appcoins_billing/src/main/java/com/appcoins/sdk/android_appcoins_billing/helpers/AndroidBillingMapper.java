@@ -1,10 +1,10 @@
 package com.appcoins.sdk.android_appcoins_billing.helpers;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.util.Base64;
+import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
-import com.appcoins.sdk.billing.Security;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.google.gson.JsonObject;
@@ -20,7 +20,7 @@ class AndroidBillingMapper {
     this.jsonParser = jsonParser;
   }
 
-  public PurchasesResult map(Bundle bundle, String skuType) {
+  public PurchasesResult mapPurchases(Bundle bundle, String skuType) {
     int responseCode = bundle.getInt("RESPONSE_CODE");
     ArrayList<String> purchaseDataList =
         bundle.getStringArrayList(Utils.RESPONSE_INAPP_PURCHASE_DATA_LIST);
@@ -68,9 +68,11 @@ class AndroidBillingMapper {
         isAutoRenewing = jsonElement.get("autoRenewing")
             .getAsBoolean();
       }
-
-      list.add(new Purchase(id, skuType, purchaseData, signature, purchaseTime, purchaseState,
-          developerPayload, token, packageName, sku, isAutoRenewing));
+      //Base64 decoded string
+      byte[] decodedSignature = Base64.decode(signature, Base64.DEFAULT);
+      list.add(
+          new Purchase(id, skuType, purchaseData, decodedSignature, purchaseTime, purchaseState,
+              developerPayload, token, packageName, sku, isAutoRenewing));
     }
 
     return new PurchasesResult(list, responseCode);
@@ -93,8 +95,8 @@ class AndroidBillingMapper {
         arrayList.add(skuDetails);
       }
     }
-    int responseCode = (int)bundle.get("RESPONSE_CODE");
-    SkuDetailsResult skuDetailsResult = new SkuDetailsResult(arrayList,responseCode);
+    int responseCode = (int) bundle.get("RESPONSE_CODE");
+    SkuDetailsResult skuDetailsResult = new SkuDetailsResult(arrayList, responseCode);
 
     return skuDetailsResult;
   }
@@ -122,10 +124,11 @@ class AndroidBillingMapper {
         description);
   }
 
-  public HashMap<String, Object> mapBundleToHashMapGetIntent(Bundle bundle) {
-    HashMap<String, Object> hashMap = new HashMap<String, Object>();
-    hashMap.put("RESPONSE_CODE", bundle.get("RESPONSE_CODE"));
-    hashMap.put("BUY_INTENT", bundle.getParcelable("BUY_INTENT"));
-    return hashMap;
+  public LaunchBillingFlowResult mapBundleToHashMapGetIntent(Bundle bundle) {
+
+    LaunchBillingFlowResult launchBillingFlowResult =
+        new LaunchBillingFlowResult(bundle.get("RESPONSE_CODE"),
+            bundle.getParcelable("BUY_INTENT"));
+    return launchBillingFlowResult;
   }
 }

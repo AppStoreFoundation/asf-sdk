@@ -1,7 +1,5 @@
 package com.appcoins.sdk.billing;
 
-import java.util.HashMap;
-
 public interface Billing {
 
     PurchasesResult queryPurchases(String skuType);
@@ -10,7 +8,7 @@ public interface Billing {
 
     void consumeAsync(String purchaseToken, ConsumeResponseListener listener);
 
-    HashMap<String, Object> launchBillingFlow(BillingFlowParams params, String payload)
+    LaunchBillingFlowResult launchBillingFlow(BillingFlowParams params, String payload)
         throws ServiceConnectionException;
 }
 

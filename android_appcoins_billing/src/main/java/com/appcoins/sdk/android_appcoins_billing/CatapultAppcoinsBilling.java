@@ -10,11 +10,11 @@ import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.Billing;
 import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.ConsumeResponseListener;
+import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.SkuDetailsResponseListener;
-import java.util.HashMap;
 
 public class CatapultAppcoinsBilling {
 
@@ -45,11 +45,11 @@ public class CatapultAppcoinsBilling {
       String payload = PayloadHelper.buildIntentPayload(billingFlowParams.getOrderReference(),
           billingFlowParams.getDeveloperPayload(), billingFlowParams.getOrigin());
 
-      Log.d("Message: ",payload );
+      Log.d("Message: ", payload);
 
-      HashMap<String, Object> hashMap = billing.launchBillingFlow(billingFlowParams, payload);
+      LaunchBillingFlowResult launchBillingFlowResult = billing.launchBillingFlow(billingFlowParams, payload);
 
-      PendingIntent pendingIntent = (PendingIntent) hashMap.get("BUY_INTENT");
+      PendingIntent pendingIntent = (PendingIntent) launchBillingFlowResult.getBuyIntent();
 
       activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
           billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
@@ -60,8 +60,8 @@ public class CatapultAppcoinsBilling {
     }
   }
 
-  public void startService(final AppCoinsBillingStateListener listener) {
-    connection.startService(listener);
+  public void startConnection(final AppCoinsBillingStateListener listener) {
+    connection.startConnection(listener);
   }
 }
 

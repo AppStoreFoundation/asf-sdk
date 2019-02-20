@@ -31,7 +31,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     Log.d(TAG, "onServiceDisconnected() called with: name = [" + name + "]");
   }
 
-  @Override public void startService(final AppCoinsBillingStateListener listener) {
+  @Override public void startConnection(final AppCoinsBillingStateListener listener) {
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
 
@@ -44,7 +44,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     }
   }
 
-  @Override public void stopService() {
+  @Override public void endConnection() {
     context.unbindService(this);
   }
 }
