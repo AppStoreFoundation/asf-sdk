@@ -47,7 +47,6 @@ public class CampaignMapper {
 
     if (found) {
       String val = matcher.group(1);
-      //TODO should remove quotes and commas on the regex itself!
       val = val.replaceAll("\"", "");
       val = val.replaceAll(",", "");
       return val;
