@@ -1,6 +1,7 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
-import com.appcoins.net.AppCoinsClientResponse;
+import android.util.Log;
+import com.asf.appcoins.sdk.ads.net.AppCoinsClientResponse;
 import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,8 +40,7 @@ public class CampaignMapper {
 
   private static String GetStringValue(String paramName, String response) {
 
-    String patternStr = "(?:\"" + paramName + "\"" + "[\\s]*:[\\s]*)(.*)";
-
+    String patternStr = "(?:\"" + paramName + "\"" + "[\\s]*:[\\s]*)(\".*?\")";
     Pattern pattern = Pattern.compile(patternStr);
     Matcher matcher = pattern.matcher(response);
     boolean found = matcher.find();
@@ -49,6 +49,7 @@ public class CampaignMapper {
       String val = matcher.group(1);
       val = val.replaceAll("\"", "");
       val = val.replaceAll(",", "");
+      Log.d("Message",val);
       return val;
     }
 

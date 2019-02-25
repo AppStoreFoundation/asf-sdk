@@ -1,4 +1,4 @@
-package com.appcoins.net;
+package com.asf.appcoins.sdk.ads.net;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
