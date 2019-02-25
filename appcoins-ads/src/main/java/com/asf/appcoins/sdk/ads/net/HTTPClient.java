@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class AppCoinsHTTPClient implements Runnable {
+public class HTTPClient implements Runnable {
 
   protected final String serviceUrl;
   protected final String params;
@@ -18,7 +18,7 @@ public class AppCoinsHTTPClient implements Runnable {
   protected URL urlConnection;
   protected String concat;
 
-  public AppCoinsHTTPClient(String serviceUrl, Interceptor interceptor, String params,
+  public HTTPClient(String serviceUrl, Interceptor interceptor, String params,
       GetResponseHandler getResponseHandler) {
     this.serviceUrl = serviceUrl;
     this.params = params;

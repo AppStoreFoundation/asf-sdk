@@ -5,9 +5,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class AppCoinsPingClient extends AppCoinsHTTPClient implements Runnable {
+public class PingClient extends HTTPClient implements Runnable {
 
-  public AppCoinsPingClient(String serviceUrl, Interceptor interceptor,
+  public PingClient(String serviceUrl, Interceptor interceptor,
       GetResponseHandler getResponseHandler) {
     super(serviceUrl, interceptor, null, getResponseHandler);
   }

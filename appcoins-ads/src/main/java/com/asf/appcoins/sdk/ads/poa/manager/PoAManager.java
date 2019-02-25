@@ -226,7 +226,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   private void handleCampaign() {
-
+    //REMOVE LAMBDA
     if (campaignId == null) {
       appcoinsClient.checkConnectivity(appcoinsClientResponsePing -> {
 

@@ -19,7 +19,7 @@ public class AppCoinsClient implements AppCoinsConnection {
   public void getCampaign(QueryParams queryParams, ClientResponseHandler clientResponseHandler) {
     GetCampaignOperation getCampaignOperation = new GetCampaignOperation();
 
-    AppCoinsHTTPClient appcoinsHTTPClient = new AppCoinsHTTPClient(serviceUrl, interceptor,
+    HTTPClient appcoinsHTTPClient = new HTTPClient(serviceUrl, interceptor,
         getCampaignOperation.mapParams(packageName, Integer.toString(versionCode), queryParams),
         response -> {
 
@@ -34,8 +34,8 @@ public class AppCoinsClient implements AppCoinsConnection {
 
   @Override public void checkConnectivity(ClientResponseHandler clientResponseHandler) {
     String pathUrl = GetCampaignOperation.getRequestCampaignPath();
-    AppCoinsHTTPClient appcoinsHTTPClient =
-        new AppCoinsPingClient(serviceUrl + pathUrl, interceptor, response -> {
+    HTTPClient appcoinsHTTPClient =
+        new PingClient(serviceUrl + pathUrl, interceptor, response -> {
 
           AppCoinsClientResponse appcoinsClientResponse =
               new AppCoinsClientResponsePing((boolean) response);
