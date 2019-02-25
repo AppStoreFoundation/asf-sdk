@@ -1,5 +1,8 @@
-package com.asf.appcoins.sdk.ads.net;
+package com.asf.appcoins.sdk.ads.net.threads;
 
+import com.asf.appcoins.sdk.ads.net.GetResponseHandler;
+import com.asf.appcoins.sdk.ads.net.Interceptor;
+import com.asf.appcoins.sdk.ads.net.LogCreator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

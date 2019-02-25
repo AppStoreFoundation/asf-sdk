@@ -1,5 +1,10 @@
 package com.asf.appcoins.sdk.ads.net;
 
+import com.asf.appcoins.sdk.ads.net.responses.ConnectivityResponseHandler;
+import com.asf.appcoins.sdk.ads.net.responses.HTTPResponseHandler;
+import com.asf.appcoins.sdk.ads.net.threads.HTTPClient;
+import com.asf.appcoins.sdk.ads.net.threads.PingClient;
+
 public class AppCoinsClient implements AppCoinsConnection {
 
   private final String packageName;
@@ -19,14 +24,11 @@ public class AppCoinsClient implements AppCoinsConnection {
   public void getCampaign(QueryParams queryParams, ClientResponseHandler clientResponseHandler) {
     GetCampaignOperation getCampaignOperation = new GetCampaignOperation();
 
+    HTTPResponseHandler httpResponseHandler =
+        new HTTPResponseHandler(getCampaignOperation, clientResponseHandler);
     HTTPClient appcoinsHTTPClient = new HTTPClient(serviceUrl, interceptor,
         getCampaignOperation.mapParams(packageName, Integer.toString(versionCode), queryParams),
-        response -> {
-
-          AppCoinsClientResponse appcoinsClientResponse =
-              getCampaignOperation.mapResponse((String) response);
-          clientResponseHandler.clientResponseHandler(appcoinsClientResponse);
-        });
+        httpResponseHandler);
 
     Thread operation = new Thread(appcoinsHTTPClient);
     operation.start();
@@ -34,13 +36,8 @@ public class AppCoinsClient implements AppCoinsConnection {
 
   @Override public void checkConnectivity(ClientResponseHandler clientResponseHandler) {
     String pathUrl = GetCampaignOperation.getRequestCampaignPath();
-    HTTPClient appcoinsHTTPClient =
-        new PingClient(serviceUrl + pathUrl, interceptor, response -> {
-
-          AppCoinsClientResponse appcoinsClientResponse =
-              new AppCoinsClientResponsePing((boolean) response);
-          clientResponseHandler.clientResponseHandler(appcoinsClientResponse);
-        });
+    ConnectivityResponseHandler connectivityResponseHandler = new ConnectivityResponseHandler(clientResponseHandler);
+    HTTPClient appcoinsHTTPClient = new PingClient(serviceUrl + pathUrl, interceptor, connectivityResponseHandler);
     Thread operation = new Thread(appcoinsHTTPClient);
     operation.start();
   }

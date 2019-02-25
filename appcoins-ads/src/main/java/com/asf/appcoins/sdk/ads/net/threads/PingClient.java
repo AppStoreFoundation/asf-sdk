@@ -1,5 +1,7 @@
-package com.asf.appcoins.sdk.ads.net;
+package com.asf.appcoins.sdk.ads.net.threads;
 
+import com.asf.appcoins.sdk.ads.net.GetResponseHandler;
+import com.asf.appcoins.sdk.ads.net.Interceptor;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
