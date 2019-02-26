@@ -95,6 +95,7 @@ public class LogCreator {
       //String query = URLDecoder.decode(urlConnection.toString(), "UTF-8");
       return path;
     } catch (Exception ex) {
+      ex.printStackTrace();
       /* Quality */
     }
     return null;

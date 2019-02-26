@@ -257,14 +257,13 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   @Override public void onBecameForeground(Activity activity) {
+
     foreground = true;
-    WalletUtils walletUtils = new WalletUtils(appContext, activity, this);
     if (!processing) {
       if (!preferences.getBoolean(FINISHED_KEY, false)) {
-        if (!walletUtils.hasWalletInstalled() && !dialogVisible) {
+        if (!WalletUtils.hasWalletInstalled(appContext) && !dialogVisible) {
           dialogVisible = true;
-
-          walletUtils.promptToInstallWallet(activity.getString(R.string.install_wallet_from_ads));
+          WalletUtils.promptToInstallWallet(activity,appContext,activity.getString(R.string.install_wallet_from_ads),this);
         } else {
           // start handshake
           poaConnector.startHandshake(appContext, network);
@@ -273,6 +272,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
         }
       }
     }
+
   }
 
   @Override public void onBecameBackground() {
