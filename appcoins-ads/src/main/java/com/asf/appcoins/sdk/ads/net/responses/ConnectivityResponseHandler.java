@@ -1,10 +1,5 @@
 package com.asf.appcoins.sdk.ads.net.responses;
 
-import com.asf.appcoins.sdk.ads.net.AppCoinsClientResponse;
-import com.asf.appcoins.sdk.ads.net.AppCoinsClientResponsePing;
-import com.asf.appcoins.sdk.ads.net.ClientResponseHandler;
-import com.asf.appcoins.sdk.ads.net.GetResponseHandler;
-
 public class ConnectivityResponseHandler implements GetResponseHandler {
   private ClientResponseHandler clientResponseHandler;
 

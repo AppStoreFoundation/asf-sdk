@@ -11,7 +11,7 @@ import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
 import com.asf.appcoins.sdk.ads.R;
 import com.asf.appcoins.sdk.ads.net.AppCoinsClient;
-import com.asf.appcoins.sdk.ads.net.AppCoinsClientResponse;
+import com.asf.appcoins.sdk.ads.net.responses.AppCoinsClientResponse;
 import com.asf.appcoins.sdk.ads.net.QueryParams;
 import com.asf.appcoins.sdk.ads.net.listeners.CheckConnectivityResponseListener;
 import com.asf.appcoins.sdk.ads.net.listeners.GetCampaignResponseListener;
@@ -55,11 +55,11 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private int network = 0;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
-  /** The handle to keep the runnable tasks that we be running within a certain period */
+  /** The handleRetryConnection to keep the runnable tasks that we be running within a certain period */
   private Handler handler = new Handler();
   /** The runnnable taks that will be trigger periodically */
   private Runnable sendProof;
-  /** The handle to keep the runnable tasks that we be running within a certain period */
+  /** The handleRetryConnection to keep the runnable tasks that we be running within a certain period */
   private Handler spHandler = new Handler();
   /** The runnnable taks that will be trigger periodically */
   private Runnable spListener;
@@ -70,6 +70,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private boolean foreground = false;
   private boolean dialogVisible = false;
   boolean fromBackground = false;
+  private Handler handleRetryConnection = new Handler();
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -113,7 +114,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     } else {
       url = BuildConfig.PROD_BACKEND_BASE_HOST;
     }
-    return new AppCoinsClient(packageName,versionCode,url, new LogInterceptor());
+    return new AppCoinsClient(packageName, versionCode, url, new LogInterceptor());
   }
 
   private static int getVerCode(Context context, String packageName)
@@ -237,7 +238,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private void handleCampaign() {
     ConnectivityResponse connectivityResponse = new ConnectivityResponse(this);
     if (campaignId == null) {
-      Log.d("a testar conectividade","testingggg");
       appcoinsClient.checkConnectivity(connectivityResponse);
     }
   }
@@ -270,7 +270,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       if (!preferences.getBoolean(FINISHED_KEY, false)) {
         if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
           dialogVisible = true;
-          WalletUtils.promptToInstallWallet(activity,activity,activity.getString(R.string.install_wallet_from_ads),this);
+          WalletUtils.promptToInstallWallet(activity, activity,
+              activity.getString(R.string.install_wallet_from_ads), this);
         } else {
           // start handshake
           poaConnector.startHandshake(appContext, network);
@@ -279,7 +280,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
         }
       }
     }
-
   }
 
   @Override public void onBecameBackground() {
@@ -310,8 +310,17 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     }
   }
 
+  @Override public void OnDialogVisibleListener(boolean value) {
+    dialogVisible = value;
+  }
+
+  /*
+   * @Param value -> true if there is connectivity,false otherwise.
+   * Method that the response of the function checkConnectivity.
+   * If there is connectivity executes GetCampaign
+   * If not retry in x mills until regainings Connectivity.
+   */
   @Override public void responseConnectivity(boolean value) {
-    Log.d("a testar value ",value+"");
     if (value) {
       Log.d("Message:", "Connectivity Available");
       QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
@@ -320,17 +329,18 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     } else {
       Log.d("Message:", "Connectivity Not available Available");
       CheckConnectivityRetry checkConnectivityRetry = new CheckConnectivityRetry(this);
-      Handler handle = new Handler();
-      handle.postDelayed(checkConnectivityRetry,10000);
+      handleRetryConnection.postDelayed(checkConnectivityRetry,
+          BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS);
     }
   }
 
+  /*
+   * @Param value -> response object from the GetCampaign service.
+   * Method that handles the GetCampaignService response.
+   * If not retry in x mills until regainings Connectivity.
+   */
   @Override public void responseGetCampaign(AppCoinsClientResponse appCoinsClientResponse) {
     Campaign campaign = CampaignMapper.mapCampaign(appCoinsClientResponse);
     processCampaign(campaign);
-  }
-
-  @Override public void OnDialogVisibleListener(boolean value) {
-    dialogVisible = value;
   }
 }

@@ -1,7 +1,7 @@
 package com.asf.appcoins.sdk.ads.poa.manager;
 
 import android.util.Log;
-import com.asf.appcoins.sdk.ads.net.Interceptor;
+import com.asf.appcoins.sdk.ads.net.logs.Interceptor;
 
 public class LogInterceptor implements Interceptor {
 

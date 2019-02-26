@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.net;
+package com.asf.appcoins.sdk.ads.net.responses;
 
 public class AppCoinsClientResponsePing extends AppCoinsClientResponse {
 

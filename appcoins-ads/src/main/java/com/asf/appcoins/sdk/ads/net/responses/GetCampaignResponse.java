@@ -1,7 +1,5 @@
 package com.asf.appcoins.sdk.ads.net.responses;
 
-import com.asf.appcoins.sdk.ads.net.AppCoinsClientResponse;
-import com.asf.appcoins.sdk.ads.net.ClientResponseHandler;
 import com.asf.appcoins.sdk.ads.net.listeners.GetCampaignResponseListener;
 
 public class GetCampaignResponse implements ClientResponseHandler {

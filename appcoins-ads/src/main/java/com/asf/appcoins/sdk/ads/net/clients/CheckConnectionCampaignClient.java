@@ -1,17 +1,19 @@
-package com.asf.appcoins.sdk.ads.net.threads;
+package com.asf.appcoins.sdk.ads.net.clients;
 
-import com.asf.appcoins.sdk.ads.net.GetResponseHandler;
-import com.asf.appcoins.sdk.ads.net.Interceptor;
+import com.asf.appcoins.sdk.ads.net.responses.GetResponseHandler;
+import com.asf.appcoins.sdk.ads.net.logs.Interceptor;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PingClient extends HTTPClient implements Runnable {
+public class CheckConnectionCampaignClient extends GetCampaignHTTPClient implements Runnable {
 
-  public PingClient(String serviceUrl, Interceptor interceptor,
+  private static final String SERVICE_URL_PATH = "/campaign/listall";
+
+  public CheckConnectionCampaignClient(String packageName,int versionCode,String serviceUrl, Interceptor interceptor,
       GetResponseHandler getResponseHandler) {
-    super(serviceUrl, interceptor, null, getResponseHandler);
+    super(packageName, versionCode, serviceUrl, interceptor, null, getResponseHandler);
   }
 
   @Override public void run() {
@@ -25,7 +27,7 @@ public class PingClient extends HTTPClient implements Runnable {
     URL url = null;
     HttpURLConnection urlConnection = null;
     try {
-      url = new URL(serviceUrl);
+      url = new URL(serviceUrl+SERVICE_URL_PATH);
       urlConnection = (HttpURLConnection) url.openConnection();
 
       int responseCode = urlConnection.getResponseCode();
