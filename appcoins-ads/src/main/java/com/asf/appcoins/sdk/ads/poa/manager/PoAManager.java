@@ -250,7 +250,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
         Log.d(TAG, "Starting PoA process");
         startProcess();
       } else {
-        checkPreferencesForPackage();
+        //checkPreferencesForPackage();
         spHandler.postDelayed(spListener, PREFERENCES_LISTENER_DELAY);
       }
     }
