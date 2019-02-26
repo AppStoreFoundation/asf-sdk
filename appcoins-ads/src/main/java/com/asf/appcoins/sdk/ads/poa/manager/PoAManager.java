@@ -227,13 +227,17 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   private void postponeSendProof() {
-    sendProof();
-    handler.postDelayed(sendProof, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
+    handler.postDelayed(new Runnable() {
+      @Override public void run() {
+        sendProof();
+      }
+    }, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
   }
 
   private void handleCampaign() {
     ConnectivityResponse connectivityResponse = new ConnectivityResponse(this);
     if (campaignId == null) {
+      Log.d("a testar conectividade","testingggg");
       appcoinsClient.checkConnectivity(connectivityResponse);
     }
   }
@@ -250,8 +254,11 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
         Log.d(TAG, "Starting PoA process");
         startProcess();
       } else {
-        //checkPreferencesForPackage();
-        spHandler.postDelayed(spListener, PREFERENCES_LISTENER_DELAY);
+        spHandler.postDelayed(new Runnable() {
+          @Override public void run() {
+            checkPreferencesForPackage();
+          }
+        }, PREFERENCES_LISTENER_DELAY);
       }
     }
   }
@@ -304,12 +311,14 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   @Override public void responseConnectivity(boolean value) {
+    Log.d("a testar value ",value+"");
     if (value) {
       Log.d("Message:", "Connectivity Available");
       QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
       GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
       appcoinsClient.getCampaign(queryParams, getCampaignResponse);
     } else {
+      Log.d("Message:", "Connectivity Not available Available");
       CheckConnectivityRetry checkConnectivityRetry = new CheckConnectivityRetry(this);
       Handler handle = new Handler();
       handle.postDelayed(checkConnectivityRetry,10000);
