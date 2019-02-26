@@ -261,9 +261,9 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     foreground = true;
     if (!processing) {
       if (!preferences.getBoolean(FINISHED_KEY, false)) {
-        if (!WalletUtils.hasWalletInstalled(appContext) && !dialogVisible) {
+        if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
           dialogVisible = true;
-          WalletUtils.promptToInstallWallet(activity,appContext,activity.getString(R.string.install_wallet_from_ads),this);
+          WalletUtils.promptToInstallWallet(activity,activity,activity.getString(R.string.install_wallet_from_ads),this);
         } else {
           // start handshake
           poaConnector.startHandshake(appContext, network);
