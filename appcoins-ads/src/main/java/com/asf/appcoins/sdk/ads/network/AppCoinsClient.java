@@ -1,10 +1,10 @@
-package com.asf.appcoins.sdk.ads.net;
+package com.asf.appcoins.sdk.ads.network;
 
-import com.asf.appcoins.sdk.ads.net.responses.ClientResponseHandler;
-import com.asf.appcoins.sdk.ads.net.responses.ConnectivityResponseHandler;
-import com.asf.appcoins.sdk.ads.net.responses.HTTPResponseHandler;
-import com.asf.appcoins.sdk.ads.net.clients.GetCampaignHTTPClient;
-import com.asf.appcoins.sdk.ads.net.clients.CheckConnectionCampaignClient;
+import com.asf.appcoins.sdk.ads.network.responses.ClientResponseHandler;
+import com.asf.appcoins.sdk.ads.network.responses.ConnectivityResponseHandler;
+import com.asf.appcoins.sdk.ads.network.responses.HTTPResponseHandler;
+import com.asf.appcoins.sdk.ads.network.clients.GetCampaignHTTPClient;
+import com.asf.appcoins.sdk.ads.network.clients.CheckConnectionCampaignClient;
 
 public class AppCoinsClient {
 

@@ -1,6 +1,6 @@
-package com.asf.appcoins.sdk.ads.net.responses;
+package com.asf.appcoins.sdk.ads.network.responses;
 
-import com.asf.appcoins.sdk.ads.net.listeners.CheckConnectivityResponseListener;
+import com.asf.appcoins.sdk.ads.network.listeners.CheckConnectivityResponseListener;
 
 public class ConnectivityResponse implements ClientResponseHandler {
 

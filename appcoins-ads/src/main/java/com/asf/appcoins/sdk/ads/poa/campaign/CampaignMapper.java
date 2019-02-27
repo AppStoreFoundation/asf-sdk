@@ -1,7 +1,6 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
-import android.util.Log;
-import com.asf.appcoins.sdk.ads.net.responses.AppCoinsClientResponse;
+import com.asf.appcoins.sdk.ads.network.responses.AppCoinsClientResponse;
 import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

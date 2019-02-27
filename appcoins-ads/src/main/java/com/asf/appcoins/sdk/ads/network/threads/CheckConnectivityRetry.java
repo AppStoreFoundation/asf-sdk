@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.net.threads;
+package com.asf.appcoins.sdk.ads.network.threads;
 
 import com.asf.appcoins.sdk.ads.poa.manager.PoAManager;
 

@@ -1,6 +1,6 @@
-package com.asf.appcoins.sdk.ads.net.responses;
+package com.asf.appcoins.sdk.ads.network.responses;
 
-import com.asf.appcoins.sdk.ads.net.listeners.GetCampaignResponseListener;
+import com.asf.appcoins.sdk.ads.network.listeners.GetCampaignResponseListener;
 
 public class GetCampaignResponse implements ClientResponseHandler {
   private GetCampaignResponseListener getCampaignResponseListener;
