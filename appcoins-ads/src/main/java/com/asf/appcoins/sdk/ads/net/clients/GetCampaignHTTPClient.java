@@ -1,5 +1,10 @@
-package com.appcoins.net;
+package com.asf.appcoins.sdk.ads.net.clients;
 
+import android.net.Uri;
+import com.asf.appcoins.sdk.ads.net.QueryParams;
+import com.asf.appcoins.sdk.ads.net.Interceptor;
+import com.asf.appcoins.sdk.ads.net.LogCreator;
+import com.asf.appcoins.sdk.ads.net.responses.GetResponseHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,17 +14,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class AppCoinsHTTPClient implements Runnable {
+public class GetCampaignHTTPClient implements Runnable {
 
+  public static final String PACKAGE_NAME = "packageName";
+  public static final String VER_CODE = "vercode";
+  public static final String COUNTRY_CODE = "countryCode";
+  public static final String SORT = "sort";
+  public static final String BY = "by";
+  public static final String VALID = "valid";
+  public static final String TYPE = "type";
+
+  private String packageName;
+  private int versionCode;
   protected final String serviceUrl;
-  protected final String params;
+  protected final QueryParams params;
   protected final Interceptor interceptor;
   protected GetResponseHandler getResponseHandler;
   protected URL urlConnection;
   protected String concat;
 
-  public AppCoinsHTTPClient(String serviceUrl, Interceptor interceptor, String params,
-      GetResponseHandler getResponseHandler) {
+  public GetCampaignHTTPClient(String packageName, int versionCode, String serviceUrl, Interceptor interceptor,
+      QueryParams params, GetResponseHandler getResponseHandler) {
+    this.packageName = packageName;
+    this.versionCode = versionCode;
     this.serviceUrl = serviceUrl;
     this.params = params;
     this.getResponseHandler = getResponseHandler;
@@ -42,9 +59,7 @@ public class AppCoinsHTTPClient implements Runnable {
 
     long time = System.nanoTime();
 
-    concat = serviceUrl + params;
-
-    urlConnection = new URL(concat);
+    urlConnection = new URL(buildURL());
 
     HttpURLConnection connection = (HttpURLConnection) urlConnection.openConnection();
     connection.setRequestMethod("GET");
@@ -64,15 +79,28 @@ public class AppCoinsHTTPClient implements Runnable {
     String log = LogCreator.Intercept(requestProperties, connection, response, tookMs);
     interceptor.OnInterceptPublish(log);
 
-    if(in != null){
+    if (in != null) {
       in.close();
     }
 
-    if(connection != null){
+    if (connection != null) {
       connection.disconnect();
     }
 
     return response;
+  }
+
+  private String buildURL(){
+    Uri campaignUri = Uri.parse(serviceUrl+"/campaign/listall?")
+        .buildUpon()
+        .appendQueryParameter(PACKAGE_NAME, packageName)
+        .appendQueryParameter(VER_CODE, versionCode + "")
+        .appendQueryParameter(SORT, params.getSort())
+        .appendQueryParameter(BY, params.getBy())
+        .appendQueryParameter(VALID, params.getValid())
+        .appendQueryParameter(TYPE, params.getType())
+        .build();
+    return campaignUri.toString();
   }
 }
 

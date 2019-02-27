@@ -7,13 +7,17 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import com.appcoins.net.AppCoinsClient;
-import com.appcoins.net.AppCoinsClientFactory;
-import com.appcoins.net.AppCoinsClientResponsePing;
-import com.appcoins.net.QueryParams;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
 import com.asf.appcoins.sdk.ads.R;
+import com.asf.appcoins.sdk.ads.net.AppCoinsClient;
+import com.asf.appcoins.sdk.ads.net.responses.AppCoinsClientResponse;
+import com.asf.appcoins.sdk.ads.net.QueryParams;
+import com.asf.appcoins.sdk.ads.net.listeners.CheckConnectivityResponseListener;
+import com.asf.appcoins.sdk.ads.net.listeners.GetCampaignResponseListener;
+import com.asf.appcoins.sdk.ads.net.responses.ConnectivityResponse;
+import com.asf.appcoins.sdk.ads.net.responses.GetCampaignResponse;
+import com.asf.appcoins.sdk.ads.net.threads.CheckConnectivityRetry;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignMapper;
@@ -33,7 +37,8 @@ import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PREFERENCE_WALLET
  * Created by Joao Raimundo on 06/04/2018.
  */
 
-public class PoAManager implements LifeCycleListener.Listener {
+public class PoAManager implements LifeCycleListener.Listener, CheckConnectivityResponseListener,
+    GetCampaignResponseListener, DialogVisibleListener {
 
   public static final String TAG = PoAManager.class.getName();
   private static final String FINISHED_KEY = "finished";
@@ -50,11 +55,11 @@ public class PoAManager implements LifeCycleListener.Listener {
   private int network = 0;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
-  /** The handle to keep the runnable tasks that we be running within a certain period */
+  /** The handleRetryConnection to keep the runnable tasks that we be running within a certain period */
   private Handler handler = new Handler();
   /** The runnnable taks that will be trigger periodically */
   private Runnable sendProof;
-  /** The handle to keep the runnable tasks that we be running within a certain period */
+  /** The handleRetryConnection to keep the runnable tasks that we be running within a certain period */
   private Handler spHandler = new Handler();
   /** The runnnable taks that will be trigger periodically */
   private Runnable spListener;
@@ -65,6 +70,7 @@ public class PoAManager implements LifeCycleListener.Listener {
   private boolean foreground = false;
   private boolean dialogVisible = false;
   boolean fromBackground = false;
+  private Handler handleRetryConnection = new Handler();
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -108,7 +114,7 @@ public class PoAManager implements LifeCycleListener.Listener {
     } else {
       url = BuildConfig.PROD_BACKEND_BASE_HOST;
     }
-    return AppCoinsClientFactory.build(url, packageName, versionCode, new LogInterceptor());
+    return new AppCoinsClient(packageName, versionCode, url, new LogInterceptor());
   }
 
   private static int getVerCode(Context context, String packageName)
@@ -222,30 +228,17 @@ public class PoAManager implements LifeCycleListener.Listener {
   }
 
   private void postponeSendProof() {
-    handler.postDelayed(sendProof = this::sendProof, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
+    handler.postDelayed(new Runnable() {
+      @Override public void run() {
+        sendProof();
+      }
+    }, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
   }
 
   private void handleCampaign() {
-
+    ConnectivityResponse connectivityResponse = new ConnectivityResponse(this);
     if (campaignId == null) {
-      appcoinsClient.checkConnectivity(appcoinsClientResponsePing -> {
-
-        AppCoinsClientResponsePing pingResponse =
-            (AppCoinsClientResponsePing) appcoinsClientResponsePing;
-
-        if (pingResponse.HasConnection()) {
-          Log.d("Message:", "Connectivity Available");
-
-          QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
-
-          appcoinsClient.getCampaign(queryParams, appcoinsClientResponse -> {
-            Campaign campaign = CampaignMapper.mapCampaign(appcoinsClientResponse);
-            processCampaign(campaign);
-          });
-        } else {
-          Log.d("Message:", "No Connectivity Available: Delayed.");
-        }
-      });
+      appcoinsClient.checkConnectivity(connectivityResponse);
     }
   }
 
@@ -261,22 +254,24 @@ public class PoAManager implements LifeCycleListener.Listener {
         Log.d(TAG, "Starting PoA process");
         startProcess();
       } else {
-        spHandler.postDelayed(spListener = this::checkPreferencesForPackage,
-            PREFERENCES_LISTENER_DELAY);
+        spHandler.postDelayed(new Runnable() {
+          @Override public void run() {
+            checkPreferencesForPackage();
+          }
+        }, PREFERENCES_LISTENER_DELAY);
       }
     }
   }
 
   @Override public void onBecameForeground(Activity activity) {
-    foreground = true;
 
+    foreground = true;
     if (!processing) {
       if (!preferences.getBoolean(FINISHED_KEY, false)) {
         if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
           dialogVisible = true;
-
-          WalletUtils.promptToInstallWallet(activity,
-              activity.getString(R.string.install_wallet_from_ads), value -> dialogVisible = value);
+          WalletUtils.promptToInstallWallet(activity, activity,
+              activity.getString(R.string.install_wallet_from_ads), this);
         } else {
           // start handshake
           poaConnector.startHandshake(appContext, network);
@@ -313,5 +308,39 @@ public class PoAManager implements LifeCycleListener.Listener {
     if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
       sendProof();
     }
+  }
+
+  @Override public void OnDialogVisibleListener(boolean value) {
+    dialogVisible = value;
+  }
+
+  /*
+   * @Param value -> true if there is connectivity,false otherwise.
+   * Method that the response of the function checkConnectivity.
+   * If there is connectivity executes GetCampaign
+   * If not retry in x mills until regainings Connectivity.
+   */
+  @Override public void responseConnectivity(boolean value) {
+    if (value) {
+      Log.d("Message:", "Connectivity Available");
+      QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
+      GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
+      appcoinsClient.getCampaign(queryParams, getCampaignResponse);
+    } else {
+      Log.d("Message:", "Connectivity Not available Available");
+      CheckConnectivityRetry checkConnectivityRetry = new CheckConnectivityRetry(this);
+      handleRetryConnection.postDelayed(checkConnectivityRetry,
+          BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS);
+    }
+  }
+
+  /*
+   * @Param value -> response object from the GetCampaign service.
+   * Method that handles the GetCampaignService response.
+   * If not retry in x mills until regainings Connectivity.
+   */
+  @Override public void responseGetCampaign(AppCoinsClientResponse appCoinsClientResponse) {
+    Campaign campaign = CampaignMapper.mapCampaign(appCoinsClientResponse);
+    processCampaign(campaign);
   }
 }
