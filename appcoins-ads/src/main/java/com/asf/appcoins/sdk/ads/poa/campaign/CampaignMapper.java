@@ -41,6 +41,7 @@ public class CampaignMapper {
   private static String GetStringValue(String paramName, String response) {
 
     String patternStr = "(?:\"" + paramName + "\"" + "[\\s]*:[\\s]*)(\".*?\")";
+
     Pattern pattern = Pattern.compile(patternStr);
     Matcher matcher = pattern.matcher(response);
     boolean found = matcher.find();
@@ -48,8 +49,6 @@ public class CampaignMapper {
     if (found) {
       String val = matcher.group(1);
       val = val.replaceAll("\"", "");
-      val = val.replaceAll(",", "");
-      Log.d("Message",val);
       return val;
     }
 
