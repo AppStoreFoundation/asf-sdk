@@ -2,8 +2,8 @@ package com.asf.appcoins.sdk.ads.net.clients;
 
 import android.net.Uri;
 import com.asf.appcoins.sdk.ads.net.QueryParams;
-import com.asf.appcoins.sdk.ads.net.logs.Interceptor;
-import com.asf.appcoins.sdk.ads.net.logs.LogCreator;
+import com.asf.appcoins.sdk.ads.net.Interceptor;
+import com.asf.appcoins.sdk.ads.net.LogCreator;
 import com.asf.appcoins.sdk.ads.net.responses.GetResponseHandler;
 import java.io.BufferedReader;
 import java.io.IOException;

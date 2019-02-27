@@ -1,6 +1,5 @@
 package com.asf.appcoins.sdk.ads.net;
 
-import com.asf.appcoins.sdk.ads.net.logs.Interceptor;
 import com.asf.appcoins.sdk.ads.net.responses.ClientResponseHandler;
 import com.asf.appcoins.sdk.ads.net.responses.ConnectivityResponseHandler;
 import com.asf.appcoins.sdk.ads.net.responses.HTTPResponseHandler;
