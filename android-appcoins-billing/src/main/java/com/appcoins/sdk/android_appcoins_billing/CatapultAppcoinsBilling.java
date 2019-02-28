@@ -10,6 +10,7 @@ import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.Billing;
 import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.ConsumeResponseListener;
+import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.ServiceConnectionException;
@@ -39,25 +40,28 @@ public class CatapultAppcoinsBilling {
     billing.consumeAsync(token, consumeResponseListener);
   }
 
-  public void launchBillingFlow(Activity activity, BillingFlowParams billingFlowParams)
-      throws ServiceConnectionException {
+  public int launchBillingFlow(Activity activity, BillingFlowParams billingFlowParams) {
     try {
       String payload = PayloadHelper.buildIntentPayload(billingFlowParams.getOrderReference(),
           billingFlowParams.getDeveloperPayload(), billingFlowParams.getOrigin());
 
       Log.d("Message: ", payload);
 
-      LaunchBillingFlowResult launchBillingFlowResult = billing.launchBillingFlow(billingFlowParams, payload);
+      LaunchBillingFlowResult launchBillingFlowResult =
+          billing.launchBillingFlow(billingFlowParams, payload);
 
       PendingIntent pendingIntent = (PendingIntent) launchBillingFlowResult.getBuyIntent();
 
       activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
           billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
+    } catch (NullPointerException e) {
+      return ResponseCode.ERROR.getValue();
     } catch (IntentSender.SendIntentException e) {
-      throw new ServiceConnectionException(e.getMessage());
+      return ResponseCode.ERROR.getValue();
     } catch (ServiceConnectionException e) {
-      throw new ServiceConnectionException(e.getMessage());
+      return ResponseCode.SERVICE_UNAVAILABLE.getValue();
     }
+    return ResponseCode.OK.getValue();
   }
 
   public void startConnection(final AppCoinsBillingStateListener listener) {

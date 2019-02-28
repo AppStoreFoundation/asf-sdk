@@ -16,14 +16,13 @@ public class AppCoinsBilling implements Billing {
     try {
       PurchasesResult purchasesResult = repository.getPurchases(skuType);
       ArrayList<Purchase> invalidPurchase = new ArrayList<Purchase>();
-
       for (Purchase purchase : purchasesResult.getPurchases()) {
         String purchaseData = purchase.getOriginalJson();
         byte[] decodeSignature = purchase.getSignature();
 
         if (!Security.verifyPurchase(base64DecodedPublicKey, purchaseData, decodeSignature)) {
           invalidPurchase.add(purchase);
-          return new PurchasesResult(Collections.emptyList(), ErrorCode.ERROR.getValue());
+          return new PurchasesResult(Collections.emptyList(), ResponseCode.ERROR.getValue());
         }
       }
 
@@ -31,11 +30,9 @@ public class AppCoinsBilling implements Billing {
         purchasesResult.getPurchases()
             .removeAll(invalidPurchase);
       }
-
       return purchasesResult;
     } catch (ServiceConnectionException e) {
-      e.printStackTrace();
-      return new PurchasesResult(Collections.emptyList(), ErrorCode.SERVICE_UNAVAILABLE.getValue());
+      return new PurchasesResult(Collections.emptyList(), ResponseCode.SERVICE_UNAVAILABLE.getValue());
     }
   }
 

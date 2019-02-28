@@ -15,7 +15,7 @@ public class ConsumeAsync implements Runnable {
   @Override public void run() {
 
     if (token == null || token.isEmpty()) {
-      listener.onConsumeResponse(-1, null);
+      listener.onConsumeResponse(ResponseCode.DEVELOPER_ERROR.getValue(), null);
     }
 
     try {
@@ -23,7 +23,7 @@ public class ConsumeAsync implements Runnable {
 
       listener.onConsumeResponse(response, token);
     } catch (ServiceConnectionException e) {
-      e.printStackTrace();
+     ResponseCode.SERVICE_UNAVAILABLE.getValue();
     }
   }
 }

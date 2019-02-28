@@ -1,8 +1,6 @@
 package com.appcoins.sdk.billing;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class SkuDetailsAsync implements Runnable {
 
@@ -23,14 +21,14 @@ public class SkuDetailsAsync implements Runnable {
       SkuDetailsResult response = getSkuDetails();
 
       if (response.getSkuDetailsList() == null || response.getSkuDetailsList().size() == 0) {
-        skuDetailsResponseListener.onSkuDetailsResponse(-1, new ArrayList<SkuDetails>());
+        skuDetailsResponseListener.onSkuDetailsResponse(ResponseCode.DEVELOPER_ERROR.getValue(), new ArrayList<SkuDetails>());
       } else {
-        skuDetailsResponseListener.onSkuDetailsResponse(0, response.getSkuDetailsList());
+        skuDetailsResponseListener.onSkuDetailsResponse(ResponseCode.OK.getValue(), response.getSkuDetailsList());
       }
 
     } catch (ServiceConnectionException e) {
       e.printStackTrace();
-      skuDetailsResponseListener.onSkuDetailsResponse(-1, new ArrayList<SkuDetails>());
+      skuDetailsResponseListener.onSkuDetailsResponse(ResponseCode.SERVICE_UNAVAILABLE.getValue(), new ArrayList<SkuDetails>());
     }
   }
 

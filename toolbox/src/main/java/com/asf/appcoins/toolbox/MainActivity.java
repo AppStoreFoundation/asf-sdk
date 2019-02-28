@@ -14,7 +14,6 @@ import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.ConsumeResponseListener;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
-import com.appcoins.sdk.billing.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.SkuDetailsResponseListener;
@@ -68,14 +67,11 @@ public class MainActivity extends Activity {
     }
   }
 
-  public void onBuyGasButtonClicked(View arg0){
+  public void onBuyGasButtonClicked(View arg0) {
     BillingFlowParams billingFlowParams =
         new BillingFlowParams("gas", SkuType.inapp.toString(), 10001, null, null, null);
-    try {
-      cab.launchBillingFlow(this, billingFlowParams);
-    } catch (ServiceConnectionException e) {
-      e.printStackTrace();
-    }
+    int launchBillingFlowResponse = cab.launchBillingFlow(this, billingFlowParams);
+    Log.d("BillingFlowResponse: ", launchBillingFlowResponse + "");
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {
@@ -118,7 +114,8 @@ public class MainActivity extends Activity {
     if (token != null) {
       cab.consumeAsync(token, new ConsumeResponseListener() {
         @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
-          Log.d("consume response: ", responseCode + " " + "Consumed purchase with token: " + purchaseToken);
+          Log.d("consume response: ",
+              responseCode + " " + "Consumed purchase with token: " + purchaseToken);
           token = null;
         }
       });
