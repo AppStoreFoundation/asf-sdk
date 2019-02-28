@@ -7,7 +7,7 @@ android {
   flavorDimensions "iab", "network"
 
   defaultConfig {
-    applicationId "com.appcoins.trivialdrivesample"
+    applicationId "com.appcoins.toolbox"
     minSdkVersion 21
     targetSdkVersion 28
     versionCode 11
@@ -33,7 +33,6 @@ android {
     debug {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//      applicationIdSuffix ".debug"
       applicationVariants.all { variant -> renameArtifact(defaultConfig)
       }
     }
@@ -99,7 +98,7 @@ dependencies {
   implementation lib.constraint_layout
   testImplementation lib.junit
   api project(':appcoins')
-  api project(path: ':android_appcoins_billing')
+  api project(path: ':android-appcoins-billing')
 }
 
 def renameArtifact(defaultConfig) {
