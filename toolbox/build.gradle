@@ -4,20 +4,18 @@ android {
   compileSdkVersion 28
   buildToolsVersion '28.0.3'
 
-  flavorDimensions "iab", "network"
-
   defaultConfig {
-    applicationId "com.appcoins.trivialdrivesample"
-    minSdkVersion 21
-    targetSdkVersion 28
+    applicationId "com.appcoins.trivialdrivesample.test"
+    minSdkVersion MIN_SDK_VERSION
+    targetSdkVersion TARGET_SDK_VERSION
     versionCode 13
     versionName "1.3.6"
     multiDexEnabled true
   }
 
   compileOptions {
-    sourceCompatibility 1.8
-    targetCompatibility 1.8
+    sourceCompatibility SOURCE_COMPATIBILITY
+    targetCompatibility TARGET_COMPATIBILITY
   }
 
   signingConfigs {
@@ -33,7 +31,6 @@ android {
     debug {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      //      applicationIdSuffix ".debug"
       applicationVariants.all { variant -> renameArtifact(defaultConfig)
       }
     }
@@ -46,81 +43,8 @@ android {
       }
     }
   }
-
-  productFlavors {
-    googleiab {
-      dimension "iab"
-      buildConfigField "String", "IAB_BIND_ACTION",
-          "\"" + project.GOOGLE_IAB_BIND_ACTION + "\""
-      buildConfigField "String", "IAB_KEY",
-          "\"" + project.GOOGLE_IAB_KEY + "\""
-      buildConfigField "String", "IAB_BIND_PACKAGE",
-          "\"" + project.GOOGLE_IAB_BIND_PACKAGE + "\""
-      buildConfigField "String", "IAB_UPDATE_ACTION",
-          "\"" + project.GOOGLE_IAB_UPDATE_ACTION+ "\""
-      manifestPlaceholders = [iabPermission: project.GOOGLE_IAB_PERMISSION]
-    }
-
-    appcoinsiab {
-      dimension "iab"
-      buildConfigField "String", "IAB_UPDATE_ACTION",
-          "\"" + project.APPCOINS_IAB_UPDATE_ACTION + "\""
-      applicationVariants.all { variant ->
-        if (variant.buildType.getName().equalsIgnoreCase("debug")) {
-          buildConfigField "String", "IAB_BIND_ACTION",
-              "\"" + project.APPCOINS_DEV_IAB_BIND_ACTION + "\""
-          buildConfigField "String", "IAB_BIND_PACKAGE",
-              "\"" + project.APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
-          buildConfigField "String", "IAB_WALLET_ADDR",
-              "\"" + project.APPCOINS_DEV_IAB_WALLET_ADDR + "\""
-          buildConfigField "String", "IAB_KEY",
-              "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
-          buildConfigField "String", "ROPSTEN_NETWORK_BACKEND_BASE_HOST",
-              "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
-          variant.getMergedFlavor().manifestPlaceholders = [iabPermission: project.APPCOINS_IAB_PERMISSION]
-        } else {
-          buildConfigField "String", "IAB_KEY",
-              "\"" + project.APPCOINS_IAB_KEY + "\""
-          buildConfigField "String", "IAB_BIND_ACTION",
-              "\"" + project.APPCOINS_IAB_BIND_ACTION + "\""
-          buildConfigField "String", "IAB_BIND_PACKAGE",
-              "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
-          buildConfigField "String", "IAB_WALLET_ADDR",
-              "\"" + project.APPCOINS_IAB_WALLET_ADDR + "\""
-          buildConfigField "String", "ROPSTEN_NETWORK_BACKEND_BASE_HOST",
-              "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
-          variant.getMergedFlavor().manifestPlaceholders = [iabPermission: project.APPCOINS_IAB_PERMISSION]
-        }
-      }
-    }
-
-    mainNetwork {
-      dimension "network"
-      buildConfigField "boolean", "TEST_NETWORK", "false"
-    }
-
-    ropstenNetwork {
-      dimension "network"
-      applicationIdSuffix ".test"
-      buildConfigField "boolean", "TEST_NETWORK", "true"
-    }
-  }
 }
 
 dependencies {
-  api 'com.android.support:appcompat-v7:28.0.0'
-  api 'com.google.code.gson:gson:2.8.2'
-  api "com.google.code.gson:gson:2.8.2"
   api project(path: ':appcoins-ads')
-  api lib.reactivenetwork_rx2
-  api lib.constraint_layout
-}
-
-def renameArtifact(defaultConfig) {
-  android.applicationVariants.all { variant ->
-    variant.outputs.all {
-      def fileName = "trivial-drive-appcoins-sample-${defaultConfig.versionName}_${variant.name}"
-      outputFileName = new File("${fileName}.apk")
-    }
-  }
 }

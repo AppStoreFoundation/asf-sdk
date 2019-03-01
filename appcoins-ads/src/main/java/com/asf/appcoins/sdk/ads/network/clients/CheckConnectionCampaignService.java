@@ -7,11 +7,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class CheckConnectionCampaignClient extends GetCampaignHTTPClient implements Runnable {
+public class CheckConnectionCampaignService extends CampaignService implements Runnable {
 
   private static final String SERVICE_URL_PATH = "/campaign/listall";
 
-  public CheckConnectionCampaignClient(String packageName,int versionCode,String serviceUrl, Interceptor interceptor,
+  public CheckConnectionCampaignService(String packageName,int versionCode,String serviceUrl, Interceptor interceptor,
       GetResponseHandler getResponseHandler) {
     super(packageName, versionCode, serviceUrl, interceptor, null, getResponseHandler);
   }

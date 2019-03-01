@@ -71,6 +71,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private boolean dialogVisible = false;
   boolean fromBackground = false;
   private Handler handleRetryConnection = new Handler();
+  private int connectionRetrys = 0;
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -328,9 +329,16 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       appcoinsClient.getCampaign(queryParams, getCampaignResponse);
     } else {
       Log.d("Message:", "Connectivity Not available Available");
-      CheckConnectivityRetry checkConnectivityRetry = new CheckConnectivityRetry(this);
-      handleRetryConnection.postDelayed(checkConnectivityRetry,
-          BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS);
+      if(connectionRetrys < BuildConfig.ADS_CONNECTION_RETRYS_NUMBER){
+        connectionRetrys++;
+        int delayedTime = connectionRetrys*BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS;
+        CheckConnectivityRetry checkConnectivityRetry = new CheckConnectivityRetry(this);
+        handleRetryConnection.postDelayed(checkConnectivityRetry,
+            delayedTime);
+      }
+      else{
+        Log.d("Message:", "Connectivity Retry exceeded..");
+      }
     }
   }
 

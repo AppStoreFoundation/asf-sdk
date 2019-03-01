@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class GetCampaignHTTPClient implements Runnable {
+public class CampaignService implements Runnable {
 
   public static final String PACKAGE_NAME = "packageName";
   public static final String VER_CODE = "vercode";
@@ -33,7 +33,7 @@ public class GetCampaignHTTPClient implements Runnable {
   protected URL urlConnection;
   protected String concat;
 
-  public GetCampaignHTTPClient(String packageName, int versionCode, String serviceUrl, Interceptor interceptor,
+  public CampaignService(String packageName, int versionCode, String serviceUrl, Interceptor interceptor,
       QueryParams params, GetResponseHandler getResponseHandler) {
     this.packageName = packageName;
     this.versionCode = versionCode;
@@ -94,7 +94,7 @@ public class GetCampaignHTTPClient implements Runnable {
     Uri campaignUri = Uri.parse(serviceUrl+"/campaign/listall?")
         .buildUpon()
         .appendQueryParameter(PACKAGE_NAME, packageName)
-        .appendQueryParameter(VER_CODE, versionCode + "")
+        .appendQueryParameter(VER_CODE, Integer.toString(versionCode))
         .appendQueryParameter(SORT, params.getSort())
         .appendQueryParameter(BY, params.getBy())
         .appendQueryParameter(VALID, params.getValid())

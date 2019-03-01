@@ -3,8 +3,8 @@ package com.asf.appcoins.sdk.ads.network;
 import com.asf.appcoins.sdk.ads.network.responses.ClientResponseHandler;
 import com.asf.appcoins.sdk.ads.network.responses.ConnectivityResponseHandler;
 import com.asf.appcoins.sdk.ads.network.responses.HTTPResponseHandler;
-import com.asf.appcoins.sdk.ads.network.clients.GetCampaignHTTPClient;
-import com.asf.appcoins.sdk.ads.network.clients.CheckConnectionCampaignClient;
+import com.asf.appcoins.sdk.ads.network.clients.CampaignService;
+import com.asf.appcoins.sdk.ads.network.clients.CheckConnectionCampaignService;
 
 public class AppCoinsClient {
 
@@ -23,8 +23,8 @@ public class AppCoinsClient {
 
   public void getCampaign(QueryParams queryParams, ClientResponseHandler clientResponseHandler) {
     HTTPResponseHandler httpResponseHandler = new HTTPResponseHandler(clientResponseHandler);
-    GetCampaignHTTPClient appcoinsHTTPClient =
-        new GetCampaignHTTPClient(packageName, versionCode, serviceUrl, interceptor, queryParams,
+    CampaignService appcoinsHTTPClient =
+        new CampaignService(packageName, versionCode, serviceUrl, interceptor, queryParams,
             httpResponseHandler);
 
     Thread operation = new Thread(appcoinsHTTPClient);
@@ -34,8 +34,8 @@ public class AppCoinsClient {
   public void checkConnectivity(ClientResponseHandler clientResponseHandler) {
     ConnectivityResponseHandler connectivityResponseHandler =
         new ConnectivityResponseHandler(clientResponseHandler);
-    GetCampaignHTTPClient appcoinsHTTPClient =
-        new CheckConnectionCampaignClient(packageName, versionCode, serviceUrl, interceptor,
+    CampaignService appcoinsHTTPClient =
+        new CheckConnectionCampaignService(packageName, versionCode, serviceUrl, interceptor,
             connectivityResponseHandler);
 
     Thread operation = new Thread(appcoinsHTTPClient);
