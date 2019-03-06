@@ -1,50 +1,43 @@
 apply plugin: 'com.android.application'
 
 android {
-  compileSdkVersion 28
-  buildToolsVersion '28.0.3'
+  compileSdkVersion COMPILE_SDK_VERSION
 
   defaultConfig {
-    applicationId "com.appcoins.trivialdrivesample.test"
+    applicationId "com.appcoins.toolbox"
+
     minSdkVersion MIN_SDK_VERSION
     targetSdkVersion TARGET_SDK_VERSION
-    versionCode 13
-    versionName "1.3.6"
-    multiDexEnabled true
-  }
 
-  compileOptions {
-    sourceCompatibility SOURCE_COMPATIBILITY
-    targetCompatibility TARGET_COMPATIBILITY
-  }
+    versionCode 1
+    versionName "1.0"
 
-  signingConfigs {
-    release {
-      storeFile = file(project.APPCOINS_WALLET_STORE_FILE)
-      storePassword = project.APPCOINS_WALLET_STORE_PASSWORD
-      keyAlias = project.APPCOINS_WALLET_KEY_ALIAS
-      keyPassword = project.APPCOINS_WALLET_KEY_PASSWORD
-    }
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
   }
 
   buildTypes {
-    debug {
+    release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      applicationVariants.all { variant -> renameArtifact(defaultConfig)
-      }
     }
+  }
 
-    release {
-      minifyEnabled true
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      signingConfig signingConfigs.release
-      applicationVariants.all { variant -> renameArtifact(defaultConfig)
-      }
-    }
+  compileOptions {
+    targetCompatibility TARGET_COMPATIBILITY
+    sourceCompatibility SOURCE_COMPATIBILITY
+  }
+
+  lintOptions {
+    warning 'InvalidPackage'
   }
 }
 
 dependencies {
-  api project(path: ':appcoins-ads')
+  implementation lib.appcompat_v7
+  implementation lib.constraint_layout
+
+  testImplementation lib.junit
+  
+  api project(':appcoins-contract-proxy')
+  api project(':appcoins-ads')
 }
