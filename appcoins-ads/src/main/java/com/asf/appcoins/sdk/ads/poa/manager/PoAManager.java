@@ -55,11 +55,11 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private int network = 0;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
-  /** The handleRetryConnection to keep the runnable tasks that we be running within a certain period */
+  /** The handle to keep the runnable tasks that we be running within a certain period */
   private Handler handler = new Handler();
   /** The runnnable taks that will be trigger periodically */
   private Runnable sendProof;
-  /** The handleRetryConnection to keep the runnable tasks that we be running within a certain period */
+  /** The handle to keep the runnable tasks that we be running within a certain period */
   private Handler spHandler = new Handler();
   /** The runnnable taks that will be trigger periodically */
   private Runnable spListener;
