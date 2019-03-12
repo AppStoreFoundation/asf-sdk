@@ -37,6 +37,7 @@ dependencies {
   implementation lib.constraint_layout
 
   testImplementation lib.junit
-
-  api project(':appcoins')
+  
+  api project(':appcoins-contract-proxy')
+  api project(':appcoins-ads')
 }

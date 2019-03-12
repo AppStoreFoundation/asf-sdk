@@ -14,6 +14,10 @@ android {
     buildConfigField 'int', 'ADS_POA_NUMBER_OF_PROOFS', project.ADS_POA_NUMBER_OF_PROOFS
     buildConfigField 'int', 'ADS_POA_PROOFS_INTERVAL_IN_MILIS',
         project.ADS_POA_PROOFS_INTERVAL_IN_MILIS
+    buildConfigField 'int', 'ADS_CONNECTIVITY_RETRY_IN_MILLS',
+        project.ADS_CONNECTIVITY_RETRY_IN_MILLS
+    buildConfigField 'int', 'ADS_CONNECTION_RETRYS_NUMBER',
+        project.ADS_CONNECTION_RETRYS_NUMBER
     buildConfigField 'String', 'PROD_BACKEND_BASE_HOST',
         "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST + "\""
     buildConfigField 'String', 'DEV_BACKEND_BASE_HOST',
@@ -25,19 +29,20 @@ android {
   }
 
   buildTypes {
+    debug {
+      minifyEnabled false
+      buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
+          project.BDS_WALLET_PACKAGE_NAME_DEV
+    }
     release {
+      buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
+          project.BDS_WALLET_PACKAGE_NAME
       minifyEnabled false
     }
-    debug {}
   }
 
   lintOptions {
     warning 'InvalidPackage'
-  }
-
-  compileOptions {
-    targetCompatibility TARGET_COMPATIBILITY
-    sourceCompatibility SOURCE_COMPATIBILITY
   }
 }
 
@@ -46,12 +51,7 @@ dependencies {
   testImplementation lib.mockito_core
 
   androidTestImplementation lib.android_test_runner
-
-  api lib.retrofit2
   api lib.tray
-  api lib.reactivenetwork_rx2
-
-  api project(path: ':appcoins-contract-proxy')
 }
 
 //region Publishing

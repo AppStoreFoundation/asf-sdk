@@ -1,2 +1,7 @@
 <resources>
+  <string name="wallet_missing">APPC Wallet Missing</string>
+  <string name="install">INSTALL</string>
+  <string name="skip">SKIP</string>
+  <string name="install_wallet_from_ads">To get your reward in AppCoins, you need to install the AppCoins BDS Wallet.</string>
+  <string name="install_wallet_from_iab">To complete your purchase, you have to install an AppCoins wallet</string>
 </resources>
