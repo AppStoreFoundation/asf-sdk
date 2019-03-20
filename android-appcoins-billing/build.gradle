@@ -30,8 +30,6 @@ android {
         }
     }
 
-
-
     productFlavors {
         appcoinsiab {
             dimension "iab"
@@ -64,8 +62,6 @@ android {
     }
 }
 
-
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -75,13 +71,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     api project(path: ':appcoins-billing')
-}
-
-def renameArtifact(defaultConfig) {
-    android.libraryVariants.all { variant ->
-        variant.outputs.all {
-            def fileName = "trivial-drive-appcoins-sample-${defaultConfig.versionName}_${variant.name}"
-            outputFileName = new File("${fileName}.apk")
-        }
-    }
 }
