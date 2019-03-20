@@ -23,7 +23,7 @@ public class ConsumeAsync implements Runnable {
 
       listener.onConsumeResponse(response, token);
     } catch (ServiceConnectionException e) {
-     ResponseCode.SERVICE_UNAVAILABLE.getValue();
+      listener.onConsumeResponse(ResponseCode.SERVICE_UNAVAILABLE.getValue(), null);
     }
   }
 }
