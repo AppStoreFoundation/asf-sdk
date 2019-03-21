@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import com.appcoins.sdk.android_appcoins_billing.AppcoinsBillingClient;
 import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
 import com.appcoins.sdk.android_appcoins_billing.helpers.CatapultBillingAppCoinsFactory;
 import com.appcoins.sdk.android_appcoins_billing.types.SkuType;
@@ -23,9 +24,10 @@ import java.util.List;
 
 public class MainActivity extends Activity {
 
-  CatapultAppcoinsBilling cab;
+  private AppcoinsBillingClient cab;
   private CompositeDisposable compositeDisposable;
   private String token = null;
+  private AppCoinsBillingStateListener listener;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -35,7 +37,7 @@ public class MainActivity extends Activity {
         BuildConfig.IAB_KEY);
 
     final Activity activity = this;
-    cab.startConnection(new AppCoinsBillingStateListener() {
+    listener = new AppCoinsBillingStateListener() {
       @Override public void onBillingSetupFinished(int responseCode) {
         Log.d("Message: ", "Connected-" + responseCode + "");
       }
@@ -43,7 +45,8 @@ public class MainActivity extends Activity {
       @Override public void onBillingServiceDisconnected() {
         Log.d("Message: ", "Disconnected");
       }
-    });
+    };
+    cab.startConnection(listener);
   }
 
   @Override protected void onDestroy() {
@@ -53,7 +56,7 @@ public class MainActivity extends Activity {
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     Log.d("Activity Result: ", "onActivityResult(" + requestCode + "," + resultCode + "," + data);
-    if (data.getExtras() != null) {
+    if (data != null && data.getExtras() != null) {
       Bundle bundle = data.getExtras();
       if (bundle != null) {
         for (String key : bundle.keySet()) {
@@ -125,14 +128,19 @@ public class MainActivity extends Activity {
   }
 
   public void onCloseChannelButtonClicked(View view) {
-    Toast.makeText(this, "Not implemented", Toast.LENGTH_SHORT)
-        .show();
+    cab.endConnection();
   }
 
   private boolean checkChannelAvailable() {
-    Toast.makeText(this, "No channel available.", Toast.LENGTH_SHORT)
-        .show();
+    return cab.isReady();
+  }
 
-    return false;
+  public void checkChannelAvailable(View view) {
+    Toast.makeText(this, "Is Ready: " + checkChannelAvailable(), Toast.LENGTH_SHORT)
+        .show();
+  }
+
+  public void onOpenChannelButtonClicked(View view) {
+    cab.startConnection(listener);
   }
 }

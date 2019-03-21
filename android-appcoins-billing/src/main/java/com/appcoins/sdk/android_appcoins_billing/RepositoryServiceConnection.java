@@ -29,6 +29,15 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
 
   @Override public void onServiceDisconnected(ComponentName name) {
     Log.d(TAG, "onServiceDisconnected() called with: name = [" + name + "]");
+    connectionLifeCycle.onDisconnect(listener);
+  }
+
+  @Override public void onBindingDied(ComponentName name) {
+    connectionLifeCycle.onDisconnect(listener);
+  }
+
+  @Override public void onNullBinding(ComponentName name) {
+    connectionLifeCycle.onDisconnect(listener);
   }
 
   @Override public void startConnection(final AppCoinsBillingStateListener listener) {
@@ -46,5 +55,6 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
 
   @Override public void endConnection() {
     context.unbindService(this);
+    connectionLifeCycle.onDisconnect(listener);
   }
 }

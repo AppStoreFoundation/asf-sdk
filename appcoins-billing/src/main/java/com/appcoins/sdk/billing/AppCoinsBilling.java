@@ -64,4 +64,8 @@ public class AppCoinsBilling implements Billing {
       throw new ServiceConnectionException(e.getMessage());
     }
   }
+
+  @Override public boolean isReady() {
+    return repository.isReady();
+  }
 }

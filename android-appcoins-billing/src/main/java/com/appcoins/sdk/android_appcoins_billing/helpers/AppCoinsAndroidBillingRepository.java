@@ -38,7 +38,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   }
 
   @Override public PurchasesResult getPurchases(String skuType) throws ServiceConnectionException {
-    if (service == null) {
+    if (!isReady()) {
       throw new ServiceConnectionException();
     }
     try {
@@ -56,7 +56,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
 
   @Override public SkuDetailsResult querySkuDetailsAsync(String skuType, List<String> sku)
       throws ServiceConnectionException {
-    if (service == null) {
+    if (!isReady()) {
       throw new ServiceConnectionException();
     }
 
@@ -73,7 +73,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   }
 
   @Override public int consumeAsync(String purchaseToken) throws ServiceConnectionException {
-    if (service == null) {
+    if (!isReady()) {
       throw new ServiceConnectionException();
     }
     try {
@@ -87,7 +87,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   @Override
   public LaunchBillingFlowResult launchBillingFlow(String skuType, String sku, String payload)
       throws ServiceConnectionException {
-    if (service == null) {
+    if (!isReady()) {
       throw new ServiceConnectionException();
     }
     try {
@@ -99,5 +99,9 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
       e.printStackTrace();
       throw new ServiceConnectionException(e.getMessage());
     }
+  }
+
+  @Override public boolean isReady() {
+    return service != null;
   }
 }

@@ -10,5 +10,7 @@ public interface Billing {
 
     LaunchBillingFlowResult launchBillingFlow(BillingFlowParams params, String payload)
         throws ServiceConnectionException;
+
+  boolean isReady();
 }
 

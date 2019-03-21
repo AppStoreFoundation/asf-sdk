@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -57,5 +58,25 @@
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toBottomOf="@id/makePaymentButton"
       />
+  <Button
+      android:id="@+id/isReady"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:onClick="checkChannelAvailable"
+      android:text="@string/is_ready"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/buyButton"
+      />
+
+  <Button
+      android:id="@+id/openChannelButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:onClick="onOpenChannelButtonClicked"
+      android:text="@string/openChannelButton"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/isReady"
+      />
+
 
 </android.support.constraint.ConstraintLayout>

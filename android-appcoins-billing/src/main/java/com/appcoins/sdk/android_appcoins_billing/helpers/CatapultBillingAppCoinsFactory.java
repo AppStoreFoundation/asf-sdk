@@ -2,6 +2,7 @@ package com.appcoins.sdk.android_appcoins_billing.helpers;
 
 import android.content.Context;
 import android.util.Base64;
+import com.appcoins.sdk.android_appcoins_billing.AppcoinsBillingClient;
 import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
 import com.appcoins.sdk.android_appcoins_billing.RepositoryServiceConnection;
 import com.appcoins.sdk.billing.AppCoinsBilling;
@@ -9,7 +10,7 @@ import com.google.gson.JsonParser;
 
 public class CatapultBillingAppCoinsFactory {
 
-  public static CatapultAppcoinsBilling BuildAppcoinsBilling(Context context,
+  public static AppcoinsBillingClient BuildAppcoinsBilling(Context context,
       String base64PublicKey) {
 
     AppCoinsAndroidBillingRepository repository = new AppCoinsAndroidBillingRepository(3,

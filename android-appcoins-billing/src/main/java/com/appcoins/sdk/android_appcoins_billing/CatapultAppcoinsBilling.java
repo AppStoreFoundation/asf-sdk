@@ -17,7 +17,7 @@ import com.appcoins.sdk.billing.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.SkuDetailsResponseListener;
 
-public class CatapultAppcoinsBilling {
+public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
   private final Billing billing;
   private final RepositoryConnection connection;
@@ -27,20 +27,21 @@ public class CatapultAppcoinsBilling {
     this.connection = connection;
   }
 
-  public PurchasesResult queryPurchases(String skuType) {
+  @Override public PurchasesResult queryPurchases(String skuType) {
     return billing.queryPurchases(skuType);
   }
 
-  public void querySkuDetailsAsync(SkuDetailsParams skuDetailsParams,
+  @Override public void querySkuDetailsAsync(SkuDetailsParams skuDetailsParams,
       SkuDetailsResponseListener onSkuDetailsResponseListener) {
     billing.querySkuDetailsAsync(skuDetailsParams, onSkuDetailsResponseListener);
   }
 
+  @Override
   public void consumeAsync(String token, ConsumeResponseListener consumeResponseListener) {
     billing.consumeAsync(token, consumeResponseListener);
   }
 
-  public int launchBillingFlow(Activity activity, BillingFlowParams billingFlowParams) {
+  @Override public int launchBillingFlow(Activity activity, BillingFlowParams billingFlowParams) {
     try {
       String payload = PayloadHelper.buildIntentPayload(billingFlowParams.getOrderReference(),
           billingFlowParams.getDeveloperPayload(), billingFlowParams.getOrigin());
@@ -64,8 +65,20 @@ public class CatapultAppcoinsBilling {
     return ResponseCode.OK.getValue();
   }
 
-  public void startConnection(final AppCoinsBillingStateListener listener) {
-    connection.startConnection(listener);
+  @Override public void startConnection(final AppCoinsBillingStateListener listener) {
+    if (!isReady()) {
+      connection.startConnection(listener);
+    }
+  }
+
+  @Override public void endConnection() {
+    if (isReady()) {
+      connection.endConnection();
+    }
+  }
+
+  @Override public boolean isReady() {
+    return billing.isReady();
   }
 }
 

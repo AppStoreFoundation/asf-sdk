@@ -14,4 +14,5 @@ public interface Repository {
   LaunchBillingFlowResult launchBillingFlow(String skuType,String sku, String payload)
       throws ServiceConnectionException;
 
+  boolean isReady();
 }
