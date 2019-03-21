@@ -2,96 +2,63 @@ apply plugin: 'com.android.application'
 
 android {
   compileSdkVersion COMPILE_SDK_VERSION
-  buildToolsVersion '28.0.3'
-
-  flavorDimensions "iab", "network"
 
   defaultConfig {
     applicationId "com.appcoins.toolbox"
+
     minSdkVersion MIN_SDK_VERSION
     targetSdkVersion TARGET_SDK_VERSION
-    versionCode VERSION_CODE
-    versionName VERSION_NAME
-    multiDexEnabled true
-  }
 
-  compileOptions {
-    sourceCompatibility SOURCE_COMPATIBILITY
-    targetCompatibility TARGET_COMPATIBILITY
-  }
+    versionCode 1
+    versionName "1.0"
 
-  signingConfigs {
-    release {
-      storeFile = file(project.APPCOINS_WALLET_STORE_FILE)
-      storePassword = project.APPCOINS_WALLET_STORE_PASSWORD
-      keyAlias = project.APPCOINS_WALLET_KEY_ALIAS
-      keyPassword = project.APPCOINS_WALLET_KEY_PASSWORD
-    }
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    buildConfigField "String", "IAB_KEY",
+        "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
   }
 
   buildTypes {
-    debug {
+    release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      applicationVariants.all { variant -> renameArtifact(defaultConfig)
-      }
-    }
-
-    release {
-      minifyEnabled true
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      signingConfig signingConfigs.release
-      applicationVariants.all { variant -> renameArtifact(defaultConfig)
-      }
     }
   }
 
-  productFlavors {
-    appcoinsiab {
-      dimension "iab"
-      buildConfigField "String", "IAB_UPDATE_ACTION",
-              "\"" + project.APPCOINS_IAB_UPDATE_ACTION + "\""
-      applicationVariants.all { variant ->
-        if (variant.buildType.getName().equalsIgnoreCase("debug")) {
-          buildConfigField "String", "IAB_KEY",
-                  "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
-        } else {
-          buildConfigField "String", "IAB_KEY",
-                  "\"" + project.APPCOINS_IAB_KEY + "\""
-        }
-      }
-    }
+  compileOptions {
+    targetCompatibility TARGET_COMPATIBILITY
+    sourceCompatibility SOURCE_COMPATIBILITY
+  }
 
-    mainNetwork {
-      dimension "network"
-      buildConfigField "boolean", "TEST_NETWORK", "false"
-    }
-
-    ropstenNetwork {
-      dimension "network"
-      applicationIdSuffix ".test"
-      buildConfigField "boolean", "TEST_NETWORK", "true"
-    }
+  lintOptions {
+    warning 'InvalidPackage'
   }
 }
 
 dependencies {
-
   implementation 'com.android.support:appcompat-v7:28.0.0'
-  implementation 'com.google.code.gson:gson:2.8.2'
   implementation lib.constraint_layout
+
   testImplementation lib.junit
-  api project(':appcoins')
-  api project(path: ':android-appcoins-billing')
+
+  api project(':android-appcoins-billing')
+  api project(':appcoins-ads')
 }
 
-def renameArtifact(defaultConfig) {
-  android.applicationVariants.all { variant ->
-    variant.outputs.all {
-      def fileName = "trivial-drive-appcoins-sample-${defaultConfig.versionName}_${variant.name}"
-      outputFileName = new File("${fileName}.apk")
-    }
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
