@@ -2,6 +2,7 @@ package com.appcoins.sdk.billing;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class AppCoinsBilling implements Billing {
   private final Repository repository;
@@ -15,6 +16,11 @@ public class AppCoinsBilling implements Billing {
   @Override public PurchasesResult queryPurchases(String skuType) {
     try {
       PurchasesResult purchasesResult = repository.getPurchases(skuType);
+
+      if(purchasesResult.getResponseCode() != ResponseCode.OK.getValue()){
+        return new PurchasesResult(new ArrayList<Purchase>(),purchasesResult.getResponseCode());
+      }
+
       ArrayList<Purchase> invalidPurchase = new ArrayList<Purchase>();
       for (Purchase purchase : purchasesResult.getPurchases()) {
         String purchaseData = purchase.getOriginalJson();

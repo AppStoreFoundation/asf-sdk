@@ -20,15 +20,19 @@ public class SkuDetailsAsync implements Runnable {
     try {
       SkuDetailsResult response = getSkuDetails();
 
-      if (response.getSkuDetailsList() == null || response.getSkuDetailsList().size() == 0) {
-        skuDetailsResponseListener.onSkuDetailsResponse(ResponseCode.DEVELOPER_ERROR.getValue(), new ArrayList<SkuDetails>());
+      if (response.getSkuDetailsList() == null
+          || response.getSkuDetailsList()
+          .size() == 0) {
+        skuDetailsResponseListener.onSkuDetailsResponse(response.getResponseCode(),
+            new ArrayList<SkuDetails>());
       } else {
-        skuDetailsResponseListener.onSkuDetailsResponse(ResponseCode.OK.getValue(), response.getSkuDetailsList());
+        skuDetailsResponseListener.onSkuDetailsResponse(response.getResponseCode(),
+            response.getSkuDetailsList());
       }
-
     } catch (ServiceConnectionException e) {
       e.printStackTrace();
-      skuDetailsResponseListener.onSkuDetailsResponse(ResponseCode.SERVICE_UNAVAILABLE.getValue(), new ArrayList<SkuDetails>());
+      skuDetailsResponseListener.onSkuDetailsResponse(ResponseCode.SERVICE_UNAVAILABLE.getValue(),
+          new ArrayList<SkuDetails>());
     }
   }
 

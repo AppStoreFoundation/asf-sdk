@@ -42,6 +42,8 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
   }
 
   @Override public int launchBillingFlow(Activity activity, BillingFlowParams billingFlowParams) {
+
+    int responseCode;
     try {
       String payload = PayloadHelper.buildIntentPayload(billingFlowParams.getOrderReference(),
           billingFlowParams.getDeveloperPayload(), billingFlowParams.getOrigin());
@@ -51,10 +53,16 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
       LaunchBillingFlowResult launchBillingFlowResult =
           billing.launchBillingFlow(billingFlowParams, payload);
 
-      PendingIntent pendingIntent = (PendingIntent) launchBillingFlowResult.getBuyIntent();
+      responseCode = (int)launchBillingFlowResult.getResponseCode();
 
-      activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
-          billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
+      if(responseCode != ResponseCode.OK.getValue()){
+        return responseCode;
+      }
+
+    PendingIntent pendingIntent = (PendingIntent) launchBillingFlowResult.getBuyIntent();
+    activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
+        billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
+
     } catch (NullPointerException e) {
       return ResponseCode.ERROR.getValue();
     } catch (IntentSender.SendIntentException e) {
