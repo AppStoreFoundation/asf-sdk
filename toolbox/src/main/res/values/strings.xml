@@ -9,4 +9,10 @@
   <string name="createChannelButton">Create Channel</string>
   <string name="makePaymentButton">Make Payment</string>
   <string name="closeChannelButton">Close Channel</string>
+  <string name="openChannelButton">Open Channel</string>
+  <string name="launch_billing_flow">Launch Billing Flow</string>
+  <string name="query_purchases">Query Purchases</string>
+  <string name="sku_details">Sku Details</string>
+  <string name="consume">Consume</string>
+  <string name="is_ready">Is Ready</string>
 </resources>
