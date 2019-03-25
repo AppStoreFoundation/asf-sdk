@@ -25,11 +25,13 @@ public final class AppCoinsAddressProxyBuilder {
         baseHost = BuildConfig.MAIN_NETWORK_BACKEND_BASE_HOST;
         break;
     }
+
     return new Retrofit.Builder().baseUrl(baseHost)
         .client(new OkHttpClient.Builder().build())
         .addConverterFactory(JacksonConverterFactory.create())
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .build()
         .create(RemoteRepository.Api.class);
+
   }
 }

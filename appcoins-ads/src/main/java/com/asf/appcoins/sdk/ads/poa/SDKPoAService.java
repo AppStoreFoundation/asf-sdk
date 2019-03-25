@@ -23,15 +23,14 @@ public class SDKPoAService extends Service {
   @Override public int onStartCommand(Intent intent, int flags, int startId) {
     if (intent != null) {
       if (intent.hasExtra(PARAM_WALLET_PACKAGE_NAME)) {
-        Log.d(TAG, "Received wallet package name: " + intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME));
+        Log.d(TAG,
+            "Received wallet package name: " + intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME));
         // intent received that contains the wallet that answered to our broadcast
         // TODO Add logic to handle possible multiple intents received.
         // create a preference accessor. This is for global app preferences.
-        final AppPreferences appPreferences = new AppPreferences(
-            getApplicationContext());
+        final AppPreferences appPreferences = new AppPreferences(getApplicationContext());
         String packageName = intent.getStringExtra(PARAM_WALLET_PACKAGE_NAME);
         appPreferences.put(PREFERENCE_WALLET_PCKG_NAME, packageName);
-
       }
     }
     stopSelf(startId);
