@@ -102,26 +102,32 @@ class AndroidBillingMapper {
   }
 
   public SkuDetails parseSkuDetails(String skuType, String skuDetailsData) {
-    JsonObject jsonElement = jsonParser.parse(skuDetailsData)
-        .getAsJsonObject();
+    if(skuDetailsData != ""){
+      JsonObject jsonElement = jsonParser.parse(skuDetailsData)
+          .getAsJsonObject();
 
-    String sku = jsonElement.get("productId")
-        .getAsString();
-    String type = jsonElement.get("type")
-        .getAsString();
-    String price = jsonElement.get("price")
-        .getAsString();
-    Long priceAmountMicros = jsonElement.get("price_amount_micros")
-        .getAsLong();
-    String priceCurrencyCode = jsonElement.get("price_currency_code")
-        .getAsString();
-    String title = jsonElement.get("title")
-        .getAsString();
-    String description = jsonElement.get("description")
-        .getAsString();
+      String sku = jsonElement.get("productId")
+          .getAsString();
+      String type = jsonElement.get("type")
+          .getAsString();
+      String price = jsonElement.get("price")
+          .getAsString();
+      Long priceAmountMicros = jsonElement.get("price_amount_micros")
+          .getAsLong();
+      String priceCurrencyCode = jsonElement.get("price_currency_code")
+          .getAsString();
+      String title = jsonElement.get("title")
+          .getAsString();
+      String description = jsonElement.get("description")
+          .getAsString();
 
-    return new SkuDetails(skuType, sku, type, price, priceAmountMicros, priceCurrencyCode, title,
-        description);
+      return new SkuDetails(skuType, sku, type, price, priceAmountMicros, priceCurrencyCode, title,
+          description);
+    }
+    else{
+      return new SkuDetails(skuType, "", "", "", 0, "", "",
+          "");
+    }
   }
 
   public LaunchBillingFlowResult mapBundleToHashMapGetIntent(Bundle bundle) {

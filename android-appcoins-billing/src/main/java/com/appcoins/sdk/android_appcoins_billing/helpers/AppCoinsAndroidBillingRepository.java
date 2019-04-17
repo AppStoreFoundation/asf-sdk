@@ -8,12 +8,14 @@ import android.util.Log;
 import com.appcoins.sdk.android_appcoins_billing.ConnectionLifeCycle;
 import com.appcoins.sdk.android_appcoins_billing.service.WalletBillingService;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
+import com.appcoins.sdk.billing.GetSkuDetailsService;
 import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.Repository;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.ServiceConnectionException;
+import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +26,15 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   private final AndroidBillingMapper billingMapper;
   private final Context context;
   private WalletBillingService service;
+  private GetSkuDetailsService getSkuDetailsService;
 
   public AppCoinsAndroidBillingRepository(int apiVersion, String packageName,
-      AndroidBillingMapper billingMapper, Context context) {
+      AndroidBillingMapper billingMapper, Context context , GetSkuDetailsService getSkuDetailsService) {
     this.apiVersion = apiVersion;
     this.packageName = packageName;
     this.billingMapper = billingMapper;
     this.context = context;
+    this.getSkuDetailsService = getSkuDetailsService;
   }
 
   @Override public void onConnect(IBinder service, final AppCoinsBillingStateListener listener) {
@@ -77,6 +81,13 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
 
   @Override public SkuDetailsResult querySkuDetailsAsync(String skuType, List<String> sku)
       throws ServiceConnectionException {
+
+    if (!WalletUtils.hasWalletInstalled(context)) {
+      String response = getSkuDetailsService.getSkuDetailsForPackageName(packageName);
+      //SkuDetailsResult skuDetailsResult = billingMapper.mapBundleToHashMapSkuDetails(skuType,response);
+      return new SkuDetailsResult(new ArrayList<SkuDetails>(),ResponseCode.OK.getValue());
+    }
+
     if (!isReady()) {
       throw new ServiceConnectionException();
     }
