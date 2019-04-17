@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
 import com.appcoins.sdk.android_appcoins_billing.ConnectionLifeCycle;
 import com.appcoins.sdk.android_appcoins_billing.service.WalletBillingService;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
@@ -29,7 +28,8 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   private GetSkuDetailsService getSkuDetailsService;
 
   public AppCoinsAndroidBillingRepository(int apiVersion, String packageName,
-      AndroidBillingMapper billingMapper, Context context , GetSkuDetailsService getSkuDetailsService) {
+      AndroidBillingMapper billingMapper, Context context,
+      GetSkuDetailsService getSkuDetailsService) {
     this.apiVersion = apiVersion;
     this.packageName = packageName;
     this.billingMapper = billingMapper;
@@ -69,8 +69,6 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
     try {
       Bundle purchases = service.getPurchases(apiVersion, packageName, skuType, null);
       PurchasesResult purchasesResult = billingMapper.mapPurchases(purchases, skuType);
-      Log.d("purchases Size", " billingMapper size " + purchasesResult.getPurchases()
-          .size());
 
       return purchasesResult;
     } catch (RemoteException e) {
@@ -85,7 +83,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
     if (!WalletUtils.hasWalletInstalled(context)) {
       String response = getSkuDetailsService.getSkuDetailsForPackageName(packageName);
       //SkuDetailsResult skuDetailsResult = billingMapper.mapBundleToHashMapSkuDetails(skuType,response);
-      return new SkuDetailsResult(new ArrayList<SkuDetails>(),ResponseCode.OK.getValue());
+      return new SkuDetailsResult(new ArrayList<SkuDetails>(), ResponseCode.OK.getValue());
     }
 
     if (!isReady()) {
@@ -123,6 +121,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   @Override
   public LaunchBillingFlowResult launchBillingFlow(String skuType, String sku, String payload)
       throws ServiceConnectionException {
+
     if (!isReady()) {
       throw new ServiceConnectionException();
     }

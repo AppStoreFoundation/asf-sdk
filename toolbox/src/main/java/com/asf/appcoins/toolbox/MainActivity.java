@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import com.appcoins.sdk.android_appcoins_billing.AppcoinsBillingClient;
-import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
 import com.appcoins.sdk.android_appcoins_billing.helpers.CatapultBillingAppCoinsFactory;
 import com.appcoins.sdk.android_appcoins_billing.types.SkuType;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
@@ -30,8 +29,7 @@ public class MainActivity extends Activity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this.getApplicationContext(),
-        BuildConfig.IAB_KEY);
+    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(getApplicationContext(),BuildConfig.IAB_KEY);
 
     final Activity activity = this;
     listener = new AppCoinsBillingStateListener() {

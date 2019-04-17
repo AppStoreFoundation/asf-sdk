@@ -1,5 +1,6 @@
 package com.appcoins.sdk.android_appcoins_billing.helpers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Base64;
 import com.appcoins.sdk.android_appcoins_billing.AppcoinsBillingClient;

@@ -54,7 +54,7 @@ public class GetSkuDetailsService {
   }
 
   private String buildURL(String packageName) {
-    return serviceUrl + "inapp/8.20180518/packages/{packageName}/products".replaceFirst(
-        "{packageName}", packageName);
+    return serviceUrl + "/inapp/8.20180518/packages/packageName/products".replaceFirst(
+        "packageName", packageName);
   }
 }
