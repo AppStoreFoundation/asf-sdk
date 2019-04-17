@@ -1,7 +1,6 @@
 package com.appcoins.sdk.android_appcoins_billing.helpers;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import com.appcoins.billing.AppcoinsBilling;
 
 /**
@@ -30,8 +29,8 @@ public class PayloadHelper {
    *
    * @return The final developers payload to be sent
    */
-  public static String buildIntentPayload(@Nullable String orderReference,
-      @Nullable String developerPayload, String origin) {
+  public static String buildIntentPayload(final String orderReference,
+      final String developerPayload, String origin) {
     Uri.Builder builder = new Uri.Builder();
     builder.scheme(SCHEME)
         .authority("appcoins.io");
@@ -45,43 +44,5 @@ public class PayloadHelper {
       builder.appendQueryParameter(ORIGIN_PARAMETER, origin);
     }
     return builder.toString();
-  }
-
-  /**
-   * Given a uri string validate if it is part of the expected scheme and if so return the
-   * addition payload content.
-   *
-   * @param uriString The payload uri content
-   *
-   * @return The additional payload content
-   */
-  public static String getPayload(String uriString) {
-    Uri uri = checkRequirements(uriString);
-    if (uri == null) return null;
-    return uri.getQueryParameter(PAYLOAD_PARAMETER);
-  }
-
-  @Nullable private static Uri checkRequirements(String uriString) {
-    if (uriString == null) {
-      return null;
-    }
-    Uri uri = Uri.parse(uriString);
-    if (!uri.getScheme()
-        .equalsIgnoreCase(SCHEME)) {
-      throw new IllegalArgumentException();
-    }
-    return uri;
-  }
-
-  public static String getOrderReference(String uriString) {
-    Uri uri = checkRequirements(uriString);
-    if (uri == null) return null;
-    return uri.getQueryParameter(ORDER_PARAMETER);
-  }
-
-  public static String getOrigin(String uriString) {
-    Uri uri = checkRequirements(uriString);
-    if (uri == null) return null;
-    return uri.getQueryParameter(ORIGIN_PARAMETER);
   }
 }

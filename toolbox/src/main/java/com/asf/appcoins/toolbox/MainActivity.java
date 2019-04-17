@@ -18,21 +18,18 @@ import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.SkuDetailsResponseListener;
-import io.reactivex.disposables.CompositeDisposable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
 
   private AppcoinsBillingClient cab;
-  private CompositeDisposable compositeDisposable;
   private String token = null;
   private AppCoinsBillingStateListener listener;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    compositeDisposable = new CompositeDisposable();
     cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this.getApplicationContext(),
         BuildConfig.IAB_KEY);
 
@@ -50,7 +47,6 @@ public class MainActivity extends Activity {
   }
 
   @Override protected void onDestroy() {
-    compositeDisposable.dispose();
     super.onDestroy();
   }
 
