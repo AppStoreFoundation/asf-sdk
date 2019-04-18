@@ -21,17 +21,15 @@ import java.util.List;
 class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycle {
   private final int apiVersion;
   private final String packageName;
-  private final AndroidBillingMapper billingMapper;
   private final Context context;
   private WalletBillingService service;
   private GetSkuDetailsService getSkuDetailsService;
 
   public AppCoinsAndroidBillingRepository(int apiVersion, String packageName,
-      AndroidBillingMapper billingMapper, Context context,
+       Context context,
       GetSkuDetailsService getSkuDetailsService) {
     this.apiVersion = apiVersion;
     this.packageName = packageName;
-    this.billingMapper = billingMapper;
     this.context = context;
     this.getSkuDetailsService = getSkuDetailsService;
   }
@@ -67,7 +65,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
     }
     try {
       Bundle purchases = service.getPurchases(apiVersion, packageName, skuType, null);
-      PurchasesResult purchasesResult = billingMapper.mapPurchases(purchases, skuType);
+      PurchasesResult purchasesResult = AndroidBillingMapper.mapPurchases(purchases, skuType);
 
       return purchasesResult;
     } catch (RemoteException e) {
@@ -81,7 +79,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
 
     if (!WalletUtils.hasWalletInstalled(context)) {
       String response = getSkuDetailsService.getSkuDetailsForPackageName(packageName, sku);
-      SkuDetailsResult skuDetailsResult = billingMapper.mapSkuDetailsFromWS(skuType, response, sku);
+      SkuDetailsResult skuDetailsResult = AndroidBillingMapper.mapSkuDetailsFromWS(skuType, response, sku);
       return skuDetailsResult;
     }
 
@@ -89,11 +87,11 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
       throw new ServiceConnectionException();
     }
 
-    Bundle bundle = billingMapper.mapArrayListToBundleSkuDetails(sku);
+    Bundle bundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(sku);
     try {
       Bundle response = service.getSkuDetails(apiVersion, packageName, skuType, bundle);
       SkuDetailsResult skuDetailsResult =
-          billingMapper.mapBundleToHashMapSkuDetails(skuType, response);
+          AndroidBillingMapper.mapBundleToHashMapSkuDetails(skuType, response);
 
       return skuDetailsResult;
     } catch (RemoteException e) {
@@ -128,7 +126,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
 
       Bundle response = service.getBuyIntent(apiVersion, packageName, sku, skuType, payload);
 
-      return billingMapper.mapBundleToHashMapGetIntent(response);
+      return AndroidBillingMapper.mapBundleToHashMapGetIntent(response);
     } catch (RemoteException e) {
       e.printStackTrace();
       throw new ServiceConnectionException(e.getMessage());
