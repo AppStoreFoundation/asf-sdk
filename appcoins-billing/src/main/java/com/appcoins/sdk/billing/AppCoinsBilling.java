@@ -2,7 +2,6 @@ package com.appcoins.sdk.billing;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class AppCoinsBilling implements Billing {
   private final Repository repository;
@@ -17,8 +16,8 @@ public class AppCoinsBilling implements Billing {
     try {
       PurchasesResult purchasesResult = repository.getPurchases(skuType);
 
-      if(purchasesResult.getResponseCode() != ResponseCode.OK.getValue()){
-        return new PurchasesResult(new ArrayList<Purchase>(),purchasesResult.getResponseCode());
+      if (purchasesResult.getResponseCode() != ResponseCode.OK.getValue()) {
+        return new PurchasesResult(new ArrayList<Purchase>(), purchasesResult.getResponseCode());
       }
 
       ArrayList<Purchase> invalidPurchase = new ArrayList<Purchase>();
@@ -38,7 +37,8 @@ public class AppCoinsBilling implements Billing {
       }
       return purchasesResult;
     } catch (ServiceConnectionException e) {
-      return new PurchasesResult(Collections.emptyList(), ResponseCode.SERVICE_UNAVAILABLE.getValue());
+      return new PurchasesResult(Collections.emptyList(),
+          ResponseCode.SERVICE_UNAVAILABLE.getValue());
     }
   }
 

@@ -28,10 +28,14 @@ android {
       minifyEnabled false
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
           project.BDS_WALLET_PACKAGE_NAME_DEV
+      buildConfigField 'String', 'HOST_WS',
+          "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
     }
     release {
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
           project.BDS_WALLET_PACKAGE_NAME
+      buildConfigField 'String', 'HOST_WS',
+          "\"" +project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
@@ -67,7 +71,7 @@ android {
               "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
           buildConfigField "String", "IAB_WALLET_ADDR",
               "\"" + project.APPCOINS_IAB_WALLET_ADDR + "\""
-          buildConfigField 'String', 'MAIN_NETWORK_BACKEND_BASE_HOST_WS',
+          buildConfigField 'String', 'NETWORK_BACKEND_BASE_HOST_WS',
               "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
           buildConfigField 'String', 'ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS',
               "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""

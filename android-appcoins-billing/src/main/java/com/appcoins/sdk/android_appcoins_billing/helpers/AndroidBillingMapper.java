@@ -5,6 +5,7 @@ import android.util.Base64;
 import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
+import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.google.gson.JsonObject;
@@ -131,7 +132,9 @@ class AndroidBillingMapper {
     }
   }
 
-  public SkuDetailsResult mapSkuDetailsFromWS(String skuType, String skuDetailsresponse) {
+  public SkuDetailsResult mapSkuDetailsFromWS(String skuType, String skuDetailsresponse ,List<String> skus) {
+    ArrayList<SkuDetails> arrayList = new ArrayList<SkuDetails>();
+
     if (skuDetailsresponse != "") {
       try {
         JSONObject jsonElement = new JSONObject(skuDetailsresponse);
@@ -141,33 +144,33 @@ class AndroidBillingMapper {
 
           String sku = obj.getString("name");
 
-          JSONObject packObj = obj.getJSONObject("package");
           JSONObject priceObj = obj.getJSONObject("price");
-          JSONObject fiat = priceObj.getJSONArray("fiat")
-              .getJSONObject(0);
+          JSONObject fiat = priceObj.getJSONObject("fiat");
 
-          String type = "";
+          String type = skuType;
           String price = fiat.getString("value");
 
           Long priceAmountMicros = priceObj.getLong("appc");
 
-          String priceCurrencyCode = fiat.getJSONArray("currency")
-              .getJSONObject(0)
+          String priceCurrencyCode = fiat.getJSONObject("currency")
               .getString("code");
 
-          String title = jsonElement.getString("title");
+          String title = obj.getString("label");
 
-          String description = jsonElement.getString("description");
+          String description = obj.getString("description");
 
-          //String price =
-          //SkuDetails skuDetails = new SkuDetails(skuType, sku, type, price, priceAmountMicros, priceCurrencyCode, title,
-          //description);
+          SkuDetails skuDetails =
+              new SkuDetails(skuType, sku, type, price, priceAmountMicros, priceCurrencyCode, title,
+                  description);
+
+          arrayList.add(skuDetails);
         }
       } catch (JSONException e) {
         e.printStackTrace();
       }
     }
-    return null;
+
+    return new SkuDetailsResult(arrayList, ResponseCode.OK.getValue());
   }
 
   public LaunchBillingFlowResult mapBundleToHashMapGetIntent(Bundle bundle) {

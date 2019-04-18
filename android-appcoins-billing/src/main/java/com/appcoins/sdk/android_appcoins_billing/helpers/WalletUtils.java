@@ -21,7 +21,6 @@ public class WalletUtils {
       packageManager.getPackageInfo(walletPackageName, 0);
       return true;
     } catch (PackageManager.NameNotFoundException e) {
-      e.printStackTrace();
       return false;
     }
   }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
 import com.appcoins.sdk.android_appcoins_billing.ConnectionLifeCycle;
 import com.appcoins.sdk.android_appcoins_billing.service.WalletBillingService;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
@@ -15,7 +14,6 @@ import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.Repository;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.ServiceConnectionException;
-import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,10 +80,9 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
       throws ServiceConnectionException {
 
     if (!WalletUtils.hasWalletInstalled(context)) {
-      String response = getSkuDetailsService.getSkuDetailsForPackageName(packageName);
-      Log.d("Response WS: ",response);
-      SkuDetailsResult skuDetailsResult = billingMapper.mapSkuDetailsFromWS(skuType,response);
-      return new SkuDetailsResult(new ArrayList<SkuDetails>(), ResponseCode.OK.getValue());
+      String response = getSkuDetailsService.getSkuDetailsForPackageName(packageName, sku);
+      SkuDetailsResult skuDetailsResult = billingMapper.mapSkuDetailsFromWS(skuType, response, sku);
+      return skuDetailsResult;
     }
 
     if (!isReady()) {

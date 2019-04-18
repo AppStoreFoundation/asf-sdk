@@ -15,14 +15,7 @@ public class CatapultBillingAppCoinsFactory {
 
   public static AppcoinsBillingClient BuildAppcoinsBilling(Context context,
       String base64PublicKey) {
-    boolean isDebug = BuildConfig.DEBUG;
-    GetSkuDetailsService getSkuDetailsService;
-
-    if (isDebug) {
-      getSkuDetailsService = new GetSkuDetailsService(BuildConfig.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS);
-    } else {
-      getSkuDetailsService = new GetSkuDetailsService(BuildConfig.MAIN_NETWORK_BACKEND_BASE_HOST_WS);
-    }
+    GetSkuDetailsService getSkuDetailsService = new GetSkuDetailsService(BuildConfig.HOST_WS);
 
     AppCoinsAndroidBillingRepository repository = new AppCoinsAndroidBillingRepository(3,
         context.getApplicationContext()

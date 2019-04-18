@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.List;
 
 public class GetSkuDetailsService {
 
@@ -16,11 +17,11 @@ public class GetSkuDetailsService {
     this.serviceUrl = serviceUrl;
   }
 
-  public String getSkuDetailsForPackageName(String packageName) {
+  public String getSkuDetailsForPackageName(final String packageName, final List <String> sku) {
     String response = "";
     URL url = null;
     try {
-      url = new URL(buildURL(packageName));
+      url = new URL(buildURL(packageName,sku));
 
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
@@ -53,8 +54,12 @@ public class GetSkuDetailsService {
     return response;
   }
 
-  private String buildURL(String packageName) {
-    return serviceUrl + "/inapp/8.20180518/packages/packageName/products".replaceFirst(
+  private String buildURL(String packageName, List<String> sku) {
+    String url = serviceUrl + "/inapp/8.20180518/packages/packageName/products?names=".replaceFirst(
         "packageName", packageName);
+    for (String skuName : sku) {
+      url += skuName + ",";
+    }
+    return url.substring(0, url.length() - 1);
   }
 }
