@@ -52,10 +52,10 @@ android {
               "\"" + project.APPCOINS_DEV_IAB_WALLET_ADDR + "\""
           buildConfigField "String", "IAB_KEY",
               "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
-          buildConfigField 'String', 'PROD_BACKEND_BASE_HOST',
-              "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST + "\""
-          buildConfigField 'String', 'DEV_BACKEND_BASE_HOST',
-              "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
+          buildConfigField 'String', 'MAIN_NETWORK_BACKEND_BASE_HOST_WS',
+              "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+          buildConfigField 'String', 'ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS',
+              "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
           variant.getMergedFlavor().manifestPlaceholders =
               [iabPermission: project.APPCOINS_IAB_PERMISSION]
         } else {
@@ -67,10 +67,10 @@ android {
               "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
           buildConfigField "String", "IAB_WALLET_ADDR",
               "\"" + project.APPCOINS_IAB_WALLET_ADDR + "\""
-          buildConfigField 'String', 'PROD_BACKEND_BASE_HOST',
-              "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST + "\""
-          buildConfigField 'String', 'DEV_BACKEND_BASE_HOST',
-              "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
+          buildConfigField 'String', 'MAIN_NETWORK_BACKEND_BASE_HOST_WS',
+              "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+          buildConfigField 'String', 'ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS',
+              "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
           variant.getMergedFlavor().manifestPlaceholders =
               [iabPermission: project.APPCOINS_IAB_PERMISSION]
         }

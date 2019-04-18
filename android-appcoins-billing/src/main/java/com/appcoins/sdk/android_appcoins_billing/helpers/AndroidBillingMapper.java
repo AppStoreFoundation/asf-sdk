@@ -12,6 +12,9 @@ import com.google.gson.JsonParser;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 class AndroidBillingMapper {
   private final JsonParser jsonParser;
@@ -102,7 +105,7 @@ class AndroidBillingMapper {
   }
 
   public SkuDetails parseSkuDetails(String skuType, String skuDetailsData) {
-    if(skuDetailsData != ""){
+    if (skuDetailsData != "") {
       JsonObject jsonElement = jsonParser.parse(skuDetailsData)
           .getAsJsonObject();
 
@@ -123,11 +126,48 @@ class AndroidBillingMapper {
 
       return new SkuDetails(skuType, sku, type, price, priceAmountMicros, priceCurrencyCode, title,
           description);
+    } else {
+      return new SkuDetails(skuType, "", "", "", 0, "", "", "");
     }
-    else{
-      return new SkuDetails(skuType, "", "", "", 0, "", "",
-          "");
+  }
+
+  public SkuDetailsResult mapSkuDetailsFromWS(String skuType, String skuDetailsresponse) {
+    if (skuDetailsresponse != "") {
+      try {
+        JSONObject jsonElement = new JSONObject(skuDetailsresponse);
+        JSONArray items = jsonElement.getJSONArray("items");
+        for (int i = 0; i < items.length(); i++) {
+          JSONObject obj = items.getJSONObject(i);
+
+          String sku = obj.getString("name");
+
+          JSONObject packObj = obj.getJSONObject("package");
+          JSONObject priceObj = obj.getJSONObject("price");
+          JSONObject fiat = priceObj.getJSONArray("fiat")
+              .getJSONObject(0);
+
+          String type = "";
+          String price = fiat.getString("value");
+
+          Long priceAmountMicros = priceObj.getLong("appc");
+
+          String priceCurrencyCode = fiat.getJSONArray("currency")
+              .getJSONObject(0)
+              .getString("code");
+
+          String title = jsonElement.getString("title");
+
+          String description = jsonElement.getString("description");
+
+          //String price =
+          //SkuDetails skuDetails = new SkuDetails(skuType, sku, type, price, priceAmountMicros, priceCurrencyCode, title,
+          //description);
+        }
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
     }
+    return null;
   }
 
   public LaunchBillingFlowResult mapBundleToHashMapGetIntent(Bundle bundle) {

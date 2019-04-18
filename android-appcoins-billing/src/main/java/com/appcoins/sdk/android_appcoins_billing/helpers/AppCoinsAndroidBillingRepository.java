@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import com.appcoins.sdk.android_appcoins_billing.ConnectionLifeCycle;
 import com.appcoins.sdk.android_appcoins_billing.service.WalletBillingService;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
@@ -82,7 +83,8 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
 
     if (!WalletUtils.hasWalletInstalled(context)) {
       String response = getSkuDetailsService.getSkuDetailsForPackageName(packageName);
-      //SkuDetailsResult skuDetailsResult = billingMapper.mapBundleToHashMapSkuDetails(skuType,response);
+      Log.d("Response WS: ",response);
+      SkuDetailsResult skuDetailsResult = billingMapper.mapSkuDetailsFromWS(skuType,response);
       return new SkuDetailsResult(new ArrayList<SkuDetails>(), ResponseCode.OK.getValue());
     }
 
