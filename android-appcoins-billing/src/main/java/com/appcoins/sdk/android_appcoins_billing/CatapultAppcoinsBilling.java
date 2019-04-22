@@ -5,7 +5,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.util.Log;
-import com.appcoins.sdk.android_appcoins_billing.helpers.DialogVisibleListener;
+import com.appcoins.sdk.android_appcoins_billing.helpers.DialogVisibilityListener;
 import com.appcoins.sdk.android_appcoins_billing.helpers.PayloadHelper;
 import com.appcoins.sdk.android_appcoins_billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
@@ -19,7 +19,7 @@ import com.appcoins.sdk.billing.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.SkuDetailsResponseListener;
 
-public class CatapultAppcoinsBilling implements AppcoinsBillingClient , DialogVisibleListener {
+public class CatapultAppcoinsBilling implements AppcoinsBillingClient , DialogVisibilityListener {
 
   private final Billing billing;
   private final RepositoryConnection connection;
@@ -100,7 +100,7 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient , DialogVi
     return billing.isReady();
   }
 
-  @Override public void OnDialogVisibleListener(boolean value) {
+  @Override public void onDialogVisibleListener(boolean value) {
     dialogVisible = value;
   }
 }

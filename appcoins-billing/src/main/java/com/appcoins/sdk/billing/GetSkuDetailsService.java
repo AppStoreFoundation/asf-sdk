@@ -11,6 +11,8 @@ import java.util.List;
 
 public class GetSkuDetailsService {
 
+  private final static String URL_PATH = "/inapp/8.20180518/packages/packageName/products?names=";
+
   private final String serviceUrl;
 
   public GetSkuDetailsService(final String serviceUrl) {
@@ -55,7 +57,7 @@ public class GetSkuDetailsService {
   }
 
   private String buildURL(String packageName, List<String> sku) {
-    String url = serviceUrl + "/inapp/8.20180518/packages/packageName/products?names=".replaceFirst(
+    String url = serviceUrl + URL_PATH.replaceFirst(
         "packageName", packageName);
     for (String skuName : sku) {
       url += skuName + ",";

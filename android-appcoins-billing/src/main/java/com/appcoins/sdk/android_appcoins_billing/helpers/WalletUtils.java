@@ -26,11 +26,11 @@ public class WalletUtils {
   }
 
   public static void promptToInstallWallet(Activity activity, Context context, String message,
-      DialogVisibleListener dialogVisibleListener) {
-    showWalletInstallDialog(activity,context,message,dialogVisibleListener);
+      DialogVisibilityListener dialogVisibilityListener) {
+    showWalletInstallDialog(activity,context,message, dialogVisibilityListener);
   }
 
-  private static void showWalletInstallDialog( final Activity activity,Context context,String message,final DialogVisibleListener dialogVisibleListener) {
+  private static void showWalletInstallDialog( final Activity activity,Context context,String message,final DialogVisibilityListener dialogVisibilityListener) {
 
     AlertDialog.Builder builder;
     builder = new AlertDialog.Builder(context);
@@ -44,7 +44,7 @@ public class WalletUtils {
     });
     builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialogInterface, int i) {
-        dialogVisibleListener.OnDialogVisibleListener(false);
+        dialogVisibilityListener.onDialogVisibleListener(false);
       }
     });
     builder.setIcon(android.R.drawable.ic_dialog_alert);

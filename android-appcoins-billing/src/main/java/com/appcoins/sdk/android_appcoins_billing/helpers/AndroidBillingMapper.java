@@ -2,6 +2,7 @@ package com.appcoins.sdk.android_appcoins_billing.helpers;
 
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
@@ -47,7 +48,7 @@ class AndroidBillingMapper {
             developerPayload = jsonElement.getString("developerPayload");
           }
         } catch (org.json.JSONException e) {
-
+          Log.d("JSON:", " Field error" + e.getLocalizedMessage());
         }
 
         String token = null;
@@ -56,7 +57,7 @@ class AndroidBillingMapper {
             token = jsonElement.getString("token");
           }
         } catch (org.json.JSONException e) {
-
+          Log.d("JSON:", " Field error " + e.getLocalizedMessage());
         }
 
         if (token == null) {
@@ -68,7 +69,7 @@ class AndroidBillingMapper {
             isAutoRenewing = jsonElement.getBoolean("autoRenewing");
           }
         } catch (org.json.JSONException e) {
-
+          Log.d("JSON:", " Field error " + e.getLocalizedMessage());
         }
         //Base64 decoded string
         byte[] decodedSignature = Base64.decode(signature, Base64.DEFAULT);
