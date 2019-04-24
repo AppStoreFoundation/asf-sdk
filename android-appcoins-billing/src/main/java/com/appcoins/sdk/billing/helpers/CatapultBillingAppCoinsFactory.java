@@ -2,8 +2,8 @@ package com.appcoins.sdk.billing.helpers;
 
 import android.content.Context;
 import android.util.Base64;
+import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.billing.AppcoinsBillingClient;
-import com.appcoins.sdk.billing.BuildConfig;
 import com.appcoins.sdk.billing.CatapultAppcoinsBilling;
 import com.appcoins.sdk.billing.RepositoryServiceConnection;
 import com.appcoins.sdk.billing.AppCoinsBilling;

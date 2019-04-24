@@ -5,11 +5,12 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.util.Log;
+import com.appcoins.sdk.android.billing.R;
 import com.appcoins.sdk.billing.helpers.DialogVisibilityListener;
 import com.appcoins.sdk.billing.helpers.PayloadHelper;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 
-public class CatapultAppcoinsBilling implements AppcoinsBillingClient , DialogVisibilityListener {
+public class CatapultAppcoinsBilling implements AppcoinsBillingClient, DialogVisibilityListener {
 
   private final Billing billing;
   private final RepositoryConnection connection;
@@ -43,7 +44,6 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient , DialogVi
       return ResponseCode.OK.getValue();
     }
 
-
     int responseCode;
     try {
       String payload = PayloadHelper.buildIntentPayload(billingFlowParams.getOrderReference(),
@@ -54,16 +54,15 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient , DialogVi
       LaunchBillingFlowResult launchBillingFlowResult =
           billing.launchBillingFlow(billingFlowParams, payload);
 
-      responseCode = (int)launchBillingFlowResult.getResponseCode();
+      responseCode = (int) launchBillingFlowResult.getResponseCode();
 
-      if(responseCode != ResponseCode.OK.getValue()){
+      if (responseCode != ResponseCode.OK.getValue()) {
         return responseCode;
       }
 
-    PendingIntent pendingIntent = (PendingIntent) launchBillingFlowResult.getBuyIntent();
-    activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
-        billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
-
+      PendingIntent pendingIntent = (PendingIntent) launchBillingFlowResult.getBuyIntent();
+      activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
+          billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
     } catch (NullPointerException e) {
       return ResponseCode.ERROR.getValue();
     } catch (IntentSender.SendIntentException e) {
@@ -75,9 +74,9 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient , DialogVi
   }
 
   @Override public void startConnection(final AppCoinsBillingStateListener listener) {
-      if (!isReady()) {
-        connection.startConnection(listener);
-      }
+    if (!isReady()) {
+      connection.startConnection(listener);
+    }
   }
 
   @Override public void endConnection() {
