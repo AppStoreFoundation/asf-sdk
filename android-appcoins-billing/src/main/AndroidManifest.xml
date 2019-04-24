@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.appcoins.sdk.billing">
-  <uses-permission android:name="com.appcoins.BILLING" />
-  </manifest>
+    package="com.appcoins.sdk.android_appcoins_billing">
+
+  <uses-permission android:name="com.appcoins.BILLING"/>
+</manifest>
