@@ -1,7 +1,6 @@
 rootProject.name = 'bds-sdk'
 
-include ':appcoins', ':appcoins-billing', ':android-appcoins-billing'
-include ':appcoins-core'
+include ':appcoins'
+include ':appcoins-billing', ':android-appcoins-billing'
 include ':appcoins-ads'
 include ':toolbox'
-include ':appcoins-contract-proxy'
