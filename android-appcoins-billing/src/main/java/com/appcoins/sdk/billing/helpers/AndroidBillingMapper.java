@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing.helpers;
+package com.appcoins.sdk.billing.helpers;
 
 import android.os.Bundle;
 import android.util.Base64;
@@ -176,5 +176,19 @@ class AndroidBillingMapper {
     }
 
     return new SkuDetailsResult(arrayList, ResponseCode.OK.getValue());
+  }
+
+  public static String mapIsBillingSupportedPackageName(String isBillingSupportedResponse){
+    String packageName = "";
+    try {
+      JSONObject jsonElement = new JSONObject(isBillingSupportedResponse);
+      if (jsonElement.getString("name") != null) {
+        packageName = jsonElement.getString("name");
+      }
+    } catch (org.json.JSONException e) {
+      Log.d("JSON:", " Field error " + e.getLocalizedMessage());
+      packageName = "";
+    }
+    return packageName;
   }
 }

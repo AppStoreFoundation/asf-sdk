@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing.helpers;
+package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.content.DialogInterface;
-import com.appcoins.sdk.android_appcoins_billing.BuildConfig;
-import com.appcoins.sdk.android_appcoins_billing.R;
+import com.appcoins.sdk.billing.BuildConfig;
+import com.appcoins.sdk.billing.R;
 
 public class WalletUtils {
 

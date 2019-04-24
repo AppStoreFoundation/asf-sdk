@@ -1,23 +1,13 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.billing;
 
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.util.Log;
-import com.appcoins.sdk.android_appcoins_billing.helpers.DialogVisibilityListener;
-import com.appcoins.sdk.android_appcoins_billing.helpers.PayloadHelper;
-import com.appcoins.sdk.android_appcoins_billing.helpers.WalletUtils;
-import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
-import com.appcoins.sdk.billing.Billing;
-import com.appcoins.sdk.billing.BillingFlowParams;
-import com.appcoins.sdk.billing.ConsumeResponseListener;
-import com.appcoins.sdk.billing.ResponseCode;
-import com.appcoins.sdk.billing.LaunchBillingFlowResult;
-import com.appcoins.sdk.billing.PurchasesResult;
-import com.appcoins.sdk.billing.ServiceConnectionException;
-import com.appcoins.sdk.billing.SkuDetailsParams;
-import com.appcoins.sdk.billing.SkuDetailsResponseListener;
+import com.appcoins.sdk.billing.helpers.DialogVisibilityListener;
+import com.appcoins.sdk.billing.helpers.PayloadHelper;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 
 public class CatapultAppcoinsBilling implements AppcoinsBillingClient , DialogVisibilityListener {
 
@@ -85,9 +75,9 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient , DialogVi
   }
 
   @Override public void startConnection(final AppCoinsBillingStateListener listener) {
-    if (!isReady()) {
-      connection.startConnection(listener);
-    }
+      if (!isReady()) {
+        connection.startConnection(listener);
+      }
   }
 
   @Override public void endConnection() {

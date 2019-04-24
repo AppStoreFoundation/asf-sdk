@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing.helpers;
+package com.appcoins.sdk.billing.helpers;
 
 public interface DialogVisibilityListener {
 

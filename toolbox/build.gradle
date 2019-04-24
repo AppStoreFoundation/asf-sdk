@@ -41,6 +41,5 @@ dependencies {
   implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
   api project(':android-appcoins-billing')
-  //api project(':appcoins-contract-proxy')
- // api project(':appcoins-ads')
+  api project(path: ':appcoins-ads')
 }

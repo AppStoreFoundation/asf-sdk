@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing.helpers;
+package com.appcoins.sdk.billing.helpers;
 
 import android.net.Uri;
 import com.appcoins.billing.AppcoinsBilling;

@@ -6,10 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-import com.appcoins.sdk.android_appcoins_billing.AppcoinsBillingClient;
-import com.appcoins.sdk.android_appcoins_billing.helpers.CatapultBillingAppCoinsFactory;
-import com.appcoins.sdk.android_appcoins_billing.types.SkuType;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
+import com.appcoins.sdk.billing.AppcoinsBillingClient;
 import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.ConsumeResponseListener;
 import com.appcoins.sdk.billing.Purchase;
@@ -17,6 +15,8 @@ import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.SkuDetailsResponseListener;
+import com.appcoins.sdk.billing.helpers.CatapultBillingAppCoinsFactory;
+import com.appcoins.sdk.billing.types.SkuType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,12 +29,13 @@ public class MainActivity extends Activity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(getApplicationContext(),BuildConfig.IAB_KEY);
+    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(getApplicationContext(),
+        BuildConfig.IAB_KEY);
 
     final Activity activity = this;
     listener = new AppCoinsBillingStateListener() {
       @Override public void onBillingSetupFinished(int responseCode) {
-        Log.d("Message: ", "Connected-" + responseCode + "");
+        Log.d("Is Billing Setup Finished: ", "Connected-" + responseCode + "");
       }
 
       @Override public void onBillingServiceDisconnected() {

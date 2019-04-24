@@ -1,13 +1,12 @@
-package com.appcoins.sdk.android_appcoins_billing.helpers;
+package com.appcoins.sdk.billing.helpers;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import com.appcoins.sdk.android_appcoins_billing.ConnectionLifeCycle;
-import com.appcoins.sdk.android_appcoins_billing.service.WalletBillingService;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
-import com.appcoins.sdk.billing.GetSkuDetailsService;
+import com.appcoins.sdk.billing.ConnectionLifeCycle;
+import com.appcoins.sdk.billing.IsBillingSupportedServiceListenner;
 import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
@@ -15,6 +14,9 @@ import com.appcoins.sdk.billing.Repository;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetailsResult;
+import com.appcoins.sdk.billing.WSServiceController;
+import com.appcoins.sdk.billing.service.WalletBillingService;
+import com.appcoins.sdk.billing.types.SkuType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,34 +24,44 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   private final int apiVersion;
   private final String packageName;
   private final Context context;
+  private WSServiceController wsServiceController;
   private WalletBillingService service;
-  private GetSkuDetailsService getSkuDetailsService;
 
-  public AppCoinsAndroidBillingRepository(int apiVersion, String packageName,
-       Context context,
-      GetSkuDetailsService getSkuDetailsService) {
+  public AppCoinsAndroidBillingRepository(int apiVersion, String packageName, Context context,
+      WSServiceController wsServiceController) {
     this.apiVersion = apiVersion;
     this.packageName = packageName;
     this.context = context;
-    this.getSkuDetailsService = getSkuDetailsService;
+    this.wsServiceController = wsServiceController;
   }
 
   @Override public void onConnect(IBinder service, final AppCoinsBillingStateListener listener) {
-    if (!WalletUtils.hasWalletInstalled(context)) {
-      listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_OK);
-    } else {
-      this.service = new WalletBillingService(service);
-      listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_OK);
-    }
+    this.service = new WalletBillingService(service);
+    listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_OK);
   }
 
   @Override public void onDisconnect(final AppCoinsBillingStateListener listener) {
-    if (!WalletUtils.hasWalletInstalled(context)) {
-      listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE);
-    } else {
-      service = null;
-      listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE);
-    }
+    service = null;
+    listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE);
+  }
+
+  @Override public void onWalletNotInstalled(final AppCoinsBillingStateListener listener) {
+
+    wsServiceController.IsBillingSupportedService(packageName, SkuType.inapp.toString(),
+        new IsBillingSupportedServiceListenner() {
+          @Override public void onIsBillingSupportedServiceListenner(String response) {
+            String packageNameWs = AndroidBillingMapper.mapIsBillingSupportedPackageName(response);
+            if (packageNameWs == "") {
+              listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE);
+            } else {
+              if (packageNameWs.equals(packageName)) {
+                listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_OK);
+              } else {
+                listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE);
+              }
+            }
+          }
+        });
   }
 
   @Override public PurchasesResult getPurchases(String skuType) throws ServiceConnectionException {
@@ -78,8 +90,9 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
       throws ServiceConnectionException {
 
     if (!WalletUtils.hasWalletInstalled(context)) {
-      String response = getSkuDetailsService.getSkuDetailsForPackageName(packageName, sku);
-      SkuDetailsResult skuDetailsResult = AndroidBillingMapper.mapSkuDetailsFromWS(skuType, response, sku);
+      String response = wsServiceController.GetSkuDetailsService(packageName, skuType, sku);
+      SkuDetailsResult skuDetailsResult =
+          AndroidBillingMapper.mapSkuDetailsFromWS(skuType, response, sku);
       return skuDetailsResult;
     }
 
@@ -134,9 +147,6 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   }
 
   @Override public boolean isReady() {
-    if (!WalletUtils.hasWalletInstalled(context)) {
-      return true;
-    }
     return service != null;
   }
 }

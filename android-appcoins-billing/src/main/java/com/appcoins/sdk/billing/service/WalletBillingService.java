@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing.service;
+package com.appcoins.sdk.billing.service;
 
 import android.os.Bundle;
 import android.os.IBinder;
