@@ -1,6 +1,11 @@
 package com.appcoins.sdk.billing;
 
 import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+import com.appcoins.sdk.billing.helpers.Utils;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
+import java.util.ArrayList;
 
 public interface AppcoinsBillingClient {
   PurchasesResult queryPurchases(String skuType);

@@ -8,6 +8,7 @@ import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.util.Log;
 import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
   private final Context context;
   private final ConnectionLifeCycle connectionLifeCycle;
   private AppCoinsBillingStateListener listener;
+  private boolean hasWalletInstalled;
 
   public RepositoryServiceConnection(Context context, ConnectionLifeCycle connectionLifeCycle) {
     this.context = context;
@@ -42,24 +44,31 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
   }
 
   @Override public void startConnection(final AppCoinsBillingStateListener listener) {
-    if (!WalletUtils.hasWalletInstalled(context)) {
-      connectionLifeCycle.onWalletNotInstalled(listener);
+    this.listener = listener;
+
+    if (!WalletUtils.hasWalletInstalled()) {
+      onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
+      hasWalletInstalled = false;
+      return;
+    }
+
+    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
+    serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
+
+    List<ResolveInfo> intentServices = context.getPackageManager()
+        .queryIntentServices(serviceIntent, 0);
+    if (intentServices != null && !intentServices.isEmpty()) {
+      hasWalletInstalled = true;
+      context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
     } else {
-      Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
-      serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
-
-      this.listener = listener;
-
-      List<ResolveInfo> intentServices = context.getPackageManager()
-          .queryIntentServices(serviceIntent, 0);
-      if (intentServices != null && !intentServices.isEmpty()) {
-        context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
-      }
+      listener.onBillingSetupFinished(ResponseCode.SERVICE_UNAVAILABLE.getValue());
     }
   }
 
   @Override public void endConnection() {
-    context.unbindService(this);
+    if (hasWalletInstalled) {
+      context.unbindService(this);
+    }
     connectionLifeCycle.onDisconnect(listener);
   }
 }

@@ -5,16 +5,13 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.util.Log;
-import com.appcoins.sdk.android.billing.R;
-import com.appcoins.sdk.billing.helpers.DialogVisibilityListener;
 import com.appcoins.sdk.billing.helpers.PayloadHelper;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 
-public class CatapultAppcoinsBilling implements AppcoinsBillingClient, DialogVisibilityListener {
+public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
   private final Billing billing;
   private final RepositoryConnection connection;
-  private boolean dialogVisible;
 
   public CatapultAppcoinsBilling(Billing billing, RepositoryConnection connection) {
     this.billing = billing;
@@ -35,12 +32,10 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient, DialogVis
     billing.consumeAsync(token, consumeResponseListener);
   }
 
-  @Override public int launchBillingFlow(Activity activity, BillingFlowParams billingFlowParams) {
+  @Override public int launchBillingFlow(Activity activity,BillingFlowParams billingFlowParams) {
 
-    if (!WalletUtils.hasWalletInstalled(activity.getApplicationContext())) {
-      dialogVisible = true;
-      WalletUtils.promptToInstallWallet(activity, activity,
-          activity.getString(R.string.install_wallet_from_iab), this);
+    if(!WalletUtils.hasWalletInstalled()){
+      WalletUtils.promptToInstallWallet();
       return ResponseCode.OK.getValue();
     }
 
@@ -87,10 +82,6 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient, DialogVis
 
   @Override public boolean isReady() {
     return billing.isReady();
-  }
-
-  @Override public void onDialogVisibleListener(boolean value) {
-    dialogVisible = value;
   }
 }
 

@@ -16,7 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-class AndroidBillingMapper {
+public class AndroidBillingMapper {
 
   public static PurchasesResult mapPurchases(Bundle bundle, String skuType) {
     int responseCode = bundle.getInt("RESPONSE_CODE");
@@ -136,8 +136,7 @@ class AndroidBillingMapper {
     return launchBillingFlowResult;
   }
 
-  public static SkuDetailsResult mapSkuDetailsFromWS(String skuType, String skuDetailsresponse,
-      List<String> skus) {
+  public static SkuDetailsResult mapSkuDetailsFromWS(String skuType, String skuDetailsresponse) {
     ArrayList<SkuDetails> arrayList = new ArrayList<SkuDetails>();
 
     if (skuDetailsresponse != "") {
@@ -191,4 +190,6 @@ class AndroidBillingMapper {
     }
     return packageName;
   }
+
+
 }

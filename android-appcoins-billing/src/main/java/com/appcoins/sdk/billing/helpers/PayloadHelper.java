@@ -1,11 +1,11 @@
 package com.appcoins.sdk.billing.helpers;
 
 import android.net.Uri;
-import com.appcoins.billing.AppcoinsBilling;
+import com.appcoins.sdk.billing.AppcoinsBillingClient;
 
 /**
  * Intent payload helper class that provide a way to send the developers wallet address together
- * with an already existent developers payload when using {@link AppcoinsBilling#getBuyIntent}.
+ * with an already existent developers payload when using {@link AppcoinsBillingClient.AppcoinsBilling#getBuyIntent}.
  *
  * The use of this helper is mandatory even if there is no  existing payload, because it allows for
  * a payment to be delivered to the developers ethereum address.
@@ -20,7 +20,7 @@ public class PayloadHelper {
   private static final String ORIGIN_PARAMETER = "origin";
 
   /**
-   * Method to build the payload required on the {@link AppcoinsBilling#getBuyIntent} method.
+   * Method to build the payload required on the {@link AppcoinsBillingClient.AppcoinsBilling#getBuyIntent} method.
    *
    * @param developerPayload The additional payload to be sent
    * @param origin payment origin (BDS, UNITY,EXTERNAL)

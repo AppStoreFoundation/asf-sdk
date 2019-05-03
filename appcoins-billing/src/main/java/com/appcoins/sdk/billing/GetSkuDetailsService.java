@@ -49,10 +49,13 @@ public class GetSkuDetailsService {
       }
     } catch (MalformedURLException e) {
       response = "";
+      e.printStackTrace();
     } catch (ProtocolException e) {
       response = "";
+      e.printStackTrace();
     } catch (IOException e) {
       response = "";
+      e.printStackTrace();
     }
 
     return response;
