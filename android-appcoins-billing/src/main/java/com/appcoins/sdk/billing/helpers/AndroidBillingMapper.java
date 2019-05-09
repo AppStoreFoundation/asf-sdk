@@ -131,8 +131,9 @@ public class AndroidBillingMapper {
   public static LaunchBillingFlowResult mapBundleToHashMapGetIntent(Bundle bundle) {
 
     LaunchBillingFlowResult launchBillingFlowResult =
-        new LaunchBillingFlowResult(bundle.get("RESPONSE_CODE"),
-            bundle.getParcelable("BUY_INTENT"));
+        new LaunchBillingFlowResult(bundle.get("RESPONSE_CODE"), bundle.getParcelable("BUY_INTENT"),
+            !bundle.containsKey(Utils.HAS_WALLET_INSTALLED));
+
     return launchBillingFlowResult;
   }
 
@@ -177,7 +178,7 @@ public class AndroidBillingMapper {
     return new SkuDetailsResult(arrayList, ResponseCode.OK.getValue());
   }
 
-  public static String mapIsBillingSupportedPackageName(String isBillingSupportedResponse){
+  public static String mapIsBillingSupportedPackageName(String isBillingSupportedResponse) {
     String packageName = "";
     try {
       JSONObject jsonElement = new JSONObject(isBillingSupportedResponse);
@@ -190,6 +191,4 @@ public class AndroidBillingMapper {
     }
     return packageName;
   }
-
-
 }

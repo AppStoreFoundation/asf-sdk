@@ -11,7 +11,7 @@ public class WalletBillingService implements AppcoinsBilling {
   private AppcoinsBilling service;
 
   public WalletBillingService(IBinder service) {
-     this.service = AppcoinsBillingStubHelper.Stub.AsInterface(service);
+     this.service = AppcoinsBillingStubHelper.Stub.asInterface(service);
   }
 
   @Override

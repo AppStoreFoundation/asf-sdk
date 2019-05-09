@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.util.Log;
 import com.appcoins.sdk.billing.helpers.PayloadHelper;
-import com.appcoins.sdk.billing.helpers.WalletUtils;
 
 public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
@@ -32,12 +31,7 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
     billing.consumeAsync(token, consumeResponseListener);
   }
 
-  @Override public int launchBillingFlow(Activity activity,BillingFlowParams billingFlowParams) {
-
-    if(!WalletUtils.hasWalletInstalled()){
-      WalletUtils.promptToInstallWallet();
-      return ResponseCode.OK.getValue();
-    }
+  @Override public int launchBillingFlow(Activity activity, BillingFlowParams billingFlowParams) {
 
     int responseCode;
     try {
@@ -51,7 +45,8 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
       responseCode = (int) launchBillingFlowResult.getResponseCode();
 
-      if (responseCode != ResponseCode.OK.getValue()) {
+      if (responseCode != ResponseCode.OK.getValue()
+          || !launchBillingFlowResult.isHasWalletInstalled()) {
         return responseCode;
       }
 

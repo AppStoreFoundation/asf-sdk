@@ -46,12 +46,6 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
   @Override public void startConnection(final AppCoinsBillingStateListener listener) {
     this.listener = listener;
 
-    if (!WalletUtils.hasWalletInstalled()) {
-      onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
-      hasWalletInstalled = false;
-      return;
-    }
-
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
 
@@ -61,7 +55,8 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
       hasWalletInstalled = true;
       context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
     } else {
-      listener.onBillingSetupFinished(ResponseCode.SERVICE_UNAVAILABLE.getValue());
+      hasWalletInstalled = false;
+      onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
     }
   }
 

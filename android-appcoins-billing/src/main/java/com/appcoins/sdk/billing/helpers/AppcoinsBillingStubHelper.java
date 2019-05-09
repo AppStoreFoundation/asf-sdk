@@ -7,7 +7,7 @@ import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.WSServiceController;
 import java.util.ArrayList;
 
-public class AppcoinsBillingStubHelper extends android.os.Binder implements AppcoinsBilling {
+public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
     return 0;
@@ -24,7 +24,10 @@ public class AppcoinsBillingStubHelper extends android.os.Binder implements Appc
 
   @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
       String developerPayload) {
+    WalletUtils.promptToInstallWallet();
     Bundle response = new Bundle();
+    response.putString(Utils.HAS_WALLET_INSTALLED, "");
+    response.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
     return response;
   }
 
@@ -53,7 +56,7 @@ public class AppcoinsBillingStubHelper extends android.os.Binder implements Appc
 
   public static abstract class Stub {
 
-    public static AppcoinsBilling AsInterface(IBinder service) {
+    public static AppcoinsBilling asInterface(IBinder service) {
       if (!WalletUtils.hasWalletInstalled()) {
         return new AppcoinsBillingStubHelper();
       } else {

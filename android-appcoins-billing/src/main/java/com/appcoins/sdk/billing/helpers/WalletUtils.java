@@ -22,8 +22,6 @@ public class WalletUtils {
 
   public static Context context;
 
-  public static Activity act;
-
   public static void setContext(Context cont) {
     context = cont;
   }
@@ -40,6 +38,7 @@ public class WalletUtils {
   }
 
   public static void promptToInstallWallet() {
+    final Activity act;
     try {
        act = getActivity();
     } catch (Exception e) {

@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -19,14 +18,12 @@ import java.util.List;
 class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycle {
   private final int apiVersion;
   private final String packageName;
-  private final Context context;
   private WalletBillingService service;
   private boolean isServiceReady;
 
   public AppCoinsAndroidBillingRepository(int apiVersion, String packageName, Context context) {
     this.apiVersion = apiVersion;
     this.packageName = packageName;
-    this.context = context;
   }
 
   @Override public void onConnect(IBinder service, final AppCoinsBillingStateListener listener) {
