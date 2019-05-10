@@ -21,7 +21,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   private WalletBillingService service;
   private boolean isServiceReady;
 
-  public AppCoinsAndroidBillingRepository(int apiVersion, String packageName, Context context) {
+  public AppCoinsAndroidBillingRepository(int apiVersion, String packageName) {
     this.apiVersion = apiVersion;
     this.packageName = packageName;
   }
