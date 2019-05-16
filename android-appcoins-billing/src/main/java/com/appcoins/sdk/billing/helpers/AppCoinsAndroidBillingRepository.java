@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -54,7 +53,8 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
     }
   }
 
-  @Override public SkuDetailsResult querySkuDetailsAsync(String skuType, List<String> sku)
+  @Override
+  public SkuDetailsResult querySkuDetailsAsync(final String skuType, final List<String> sku)
       throws ServiceConnectionException {
 
     if (!isReady()) {
@@ -62,9 +62,11 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
     }
 
     Bundle bundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(sku);
-    try {
-      Bundle response = service.getSkuDetails(apiVersion, packageName, skuType, bundle);
 
+    Bundle response;
+
+    try {
+      response = service.getSkuDetails(apiVersion, packageName, skuType, bundle);
       if (response.containsKey(Utils.NO_WALLET_SKU_DETAILS)) {
         return AndroidBillingMapper.mapSkuDetailsFromWS(skuType,
             response.getString(Utils.NO_WALLET_SKU_DETAILS));
@@ -72,7 +74,8 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
         return AndroidBillingMapper.mapBundleToHashMapSkuDetails(skuType, response);
       }
     } catch (RemoteException e) {
-      throw new ServiceConnectionException(e.getMessage());
+      e.printStackTrace();
+      throw new ServiceConnectionException();
     }
   }
 
@@ -110,4 +113,5 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   @Override public boolean isReady() {
     return isServiceReady;
   }
+
 }

@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class WalletUtils {
 
-  private static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
+  public static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
 
   public static Context context;
 
@@ -50,27 +50,31 @@ public class WalletUtils {
       return;
     }
 
-    AlertDialog.Builder builder;
-    builder = new AlertDialog.Builder(act);
-    builder.setTitle(R.string.wallet_missing);
-    builder.setMessage(act.getString(R.string.install_wallet_from_iab));
-    Log.d("String name: ",act.getString(R.string.install_wallet_from_iab));
+    act.runOnUiThread(new Runnable() {
+      @Override public void run() {
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(act);
+        builder.setTitle(R.string.wallet_missing);
+        builder.setMessage(act.getString(R.string.install_wallet_from_iab));
+        Log.d("String name: ",act.getString(R.string.install_wallet_from_iab));
 
-    builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
-      @Override public void onClick(DialogInterface dialog, int which) {
-        act.startActivity(
-            new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + walletPackageName)));
+        builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+          @Override public void onClick(DialogInterface dialog, int which) {
+            act.startActivity(
+                new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + walletPackageName)));
+          }
+        });
+
+        builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
+          @Override public void onClick(DialogInterface dialogInterface, int i) {
+            dialogInterface.cancel();
+          }
+        });
+
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+        builder.show();
       }
     });
-
-    builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
-      @Override public void onClick(DialogInterface dialogInterface, int i) {
-        dialogInterface.cancel();
-      }
-    });
-
-    builder.setIcon(android.R.drawable.ic_dialog_alert);
-    builder.show();
   }
 
   private static Activity getActivity() throws Exception{

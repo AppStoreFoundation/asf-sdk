@@ -16,15 +16,13 @@ public class CatapultBillingAppCoinsFactory {
 
     WSServiceController.setWsUrl(BuildConfig.HOST_WS);
 
-    AppCoinsAndroidBillingRepository repository = new AppCoinsAndroidBillingRepository(3,
+    AppCoinsAndroidBillingRepository repository = new AppCoinsAndroidBillingRepository(Utils.API_VERSION,
         context.getApplicationContext()
-            .getPackageName(), context.getApplicationContext());
+            .getPackageName());
 
     RepositoryServiceConnection connection = new RepositoryServiceConnection(context, repository);
-
     WalletUtils.setContext(context);
 
-    //Base64 Decoded Public Key
     byte[] base64DecodedPublicKey = Base64.decode(base64PublicKey, Base64.DEFAULT);
 
     return new CatapultAppcoinsBilling(new AppCoinsBilling(repository, base64DecodedPublicKey),

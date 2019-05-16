@@ -68,24 +68,40 @@ public class MainActivity extends Activity {
   public void onBuyGasButtonClicked(View arg0) {
     BillingFlowParams billingFlowParams =
         new BillingFlowParams("gas", SkuType.inapp.toString(), 10001, null, null, null);
-    int launchBillingFlowResponse = cab.launchBillingFlow(this, billingFlowParams);
-    Log.d("BillingFlowResponse: ", launchBillingFlowResponse + "");
+
+   Activity act = this;
+    Thread t = new Thread(new Runnable() {
+      @Override public void run() {
+        int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
+        Log.d("BillingFlowResponse: ", launchBillingFlowResponse + "");
+      }
+    });
+  t.start();
+
+
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {
-    PurchasesResult pr = cab.queryPurchases(SkuType.inapp.toString());
-    if (pr.getPurchases()
-        .size() > 0) {
-      for (Purchase p : pr.getPurchases()) {
-        Log.d("Purchase result token: ", p.getToken());
-        Log.d("Purchase result sku: ", p.getSku());
+
+    Thread t = new Thread(new Runnable() {
+      @Override public void run() {
+        PurchasesResult pr = cab.queryPurchases(SkuType.inapp.toString());
+        if (pr.getPurchases()
+            .size() > 0) {
+          for (Purchase p : pr.getPurchases()) {
+            Log.d("Purchase result token: ", p.getToken());
+            Log.d("Purchase result sku: ", p.getSku());
+          }
+          token = pr.getPurchases()
+              .get(0)
+              .getToken();
+        } else {
+          Log.d("Message:", "No Available Purchases");
+        }
       }
-      token = pr.getPurchases()
-          .get(0)
-          .getToken();
-    } else {
-      Log.d("Message:", "No Available Purchases");
-    }
+    });
+    t.start();
+
   }
 
   public void onCreateChannelButtonClicked(View view) {
@@ -97,29 +113,45 @@ public class MainActivity extends Activity {
 
     skuDetailsParams.setMoreItemSkus(al);
 
-    cab.querySkuDetailsAsync(skuDetailsParams, new SkuDetailsResponseListener() {
-      @Override
-      public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
-        Log.d("responseCode: ", responseCode + "");
-        for (SkuDetails sd : skuDetailsList) {
-          Log.d("SkuDetails: ", sd.getSku() + "");
-        }
+    Thread t = new Thread(new Runnable() {
+      @Override public void run() {
+        cab.querySkuDetailsAsync(skuDetailsParams, new SkuDetailsResponseListener() {
+          @Override
+          public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
+            Log.d("responseCode: ", responseCode + "");
+            for (SkuDetails sd : skuDetailsList) {
+              Log.d("SkuDetails: ", sd.getSku() + "");
+            }
+          }
+        });
       }
     });
+
+    t.start();;
+
   }
 
   public void makePaymentButtonClicked(View view) {
-    if (token != null) {
-      cab.consumeAsync(token, new ConsumeResponseListener() {
-        @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
-          Log.d("consume response: ",
-              responseCode + " " + "Consumed purchase with token: " + purchaseToken);
-          token = null;
-        }
-      });
-    } else {
-      Log.d("Message:", "No purchase tokens available");
-    }
+
+    Thread t = new Thread(new Runnable() {
+      @Override public void run() {
+
+        if (token != null) {
+        cab.consumeAsync(token, new ConsumeResponseListener() {
+          @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
+            Log.d("consume response: ",
+                responseCode + " " + "Consumed purchase with token: " + purchaseToken);
+            token = null;
+          }
+        });
+      } else {
+        Log.d("Message:", "No purchase tokens available");
+      }
+      }
+    });
+
+    t.start();
+
   }
 
   public void onCloseChannelButtonClicked(View view) {
