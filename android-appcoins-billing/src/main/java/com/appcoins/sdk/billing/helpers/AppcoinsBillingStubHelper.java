@@ -1,5 +1,6 @@
 package com.appcoins.sdk.billing.helpers;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -96,7 +97,19 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         return response;
       }
     } else {
-      WalletUtils.promptToInstallWallet();
+      try {
+        Activity act = WalletUtils.getActivity();
+        act.runOnUiThread(new Runnable() {
+          @Override public void run() {
+            WalletUtils.promptToInstallWallet();
+          }
+        });
+      } catch (Exception e) {
+        Bundle response = new Bundle();
+        response.putInt(Utils.RESPONSE_CODE, ResponseCode.ERROR.getValue());
+        return response;
+      }
+
       Bundle response = new Bundle();
       response.putString(Utils.HAS_WALLET_INSTALLED, "");
       response.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());

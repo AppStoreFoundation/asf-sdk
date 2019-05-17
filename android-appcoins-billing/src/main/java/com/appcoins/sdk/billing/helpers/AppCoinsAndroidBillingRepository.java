@@ -75,7 +75,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
       }
     } catch (RemoteException e) {
       e.printStackTrace();
-      throw new ServiceConnectionException();
+      throw new ServiceConnectionException(e.getMessage());
     }
   }
 
