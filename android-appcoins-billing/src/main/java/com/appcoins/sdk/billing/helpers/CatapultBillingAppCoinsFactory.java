@@ -14,8 +14,6 @@ public class CatapultBillingAppCoinsFactory {
   public static AppcoinsBillingClient BuildAppcoinsBilling(Context context,
       String base64PublicKey) {
 
-    WSServiceController.setWsUrl(BuildConfig.HOST_WS);
-
     AppCoinsAndroidBillingRepository repository = new AppCoinsAndroidBillingRepository(3,
         context.getApplicationContext()
             .getPackageName(), context.getApplicationContext());
