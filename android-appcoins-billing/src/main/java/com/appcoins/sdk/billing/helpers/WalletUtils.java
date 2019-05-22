@@ -2,7 +2,6 @@ package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,12 +12,10 @@ import android.util.Log;
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.android.billing.R;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 
 public class WalletUtils {
 
-  private static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
+  public static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
 
   public static Context context;
 
@@ -40,21 +37,20 @@ public class WalletUtils {
   public static void promptToInstallWallet() {
     final Activity act;
     try {
-       act = getActivity();
+      act = getActivity();
     } catch (Exception e) {
       e.printStackTrace();
       return;
     }
 
-    if(act == null){
+    if (act == null) {
       return;
     }
-
     AlertDialog.Builder builder;
     builder = new AlertDialog.Builder(act);
     builder.setTitle(R.string.wallet_missing);
     builder.setMessage(act.getString(R.string.install_wallet_from_iab));
-    Log.d("String name: ",act.getString(R.string.install_wallet_from_iab));
+    Log.d("String name: ", act.getString(R.string.install_wallet_from_iab));
 
     builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialog, int which) {
@@ -73,7 +69,7 @@ public class WalletUtils {
     builder.show();
   }
 
-  private static Activity getActivity() throws Exception{
+  public static Activity getActivity() throws Exception {
     Class activityThreadClass = Class.forName("android.app.ActivityThread");
     Object activityThread = activityThreadClass.getMethod("currentActivityThread")
         .invoke(null);

@@ -49,6 +49,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
 
+
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
     if (intentServices != null && !intentServices.isEmpty()) {
