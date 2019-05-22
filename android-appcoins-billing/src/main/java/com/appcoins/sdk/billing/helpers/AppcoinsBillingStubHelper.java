@@ -21,7 +21,7 @@ import static android.content.ContentValues.TAG;
 
 public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
-  private Object lockThread;
+  private final Object lockThread;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private boolean isServiceBound = false;
 
@@ -49,7 +49,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     }
   }
 
-  @Override public synchronized Bundle getSkuDetails(final int apiVersion, final String packageName,
+  @Override public Bundle getSkuDetails(final int apiVersion, final String packageName,
       final String type, final Bundle skusBundle) {
 
     Bundle responseWs = new Bundle();
@@ -74,7 +74,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     return responseWs;
   }
 
-  @Override public synchronized Bundle getBuyIntent(int apiVersion, String packageName, String sku,
+  @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku,
       String type, String developerPayload) {
     if (WalletUtils.hasWalletInstalled()) {
       try {
@@ -113,7 +113,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     }
   }
 
-  @Override public synchronized Bundle getPurchases(int apiVersion, String packageName, String type,
+  @Override public Bundle getPurchases(int apiVersion, String packageName, String type,
       String continuationToken) {
     Bundle bundleResponse = new Bundle();
     if (WalletUtils.hasWalletInstalled()) {
@@ -145,7 +145,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     return bundleResponse;
   }
 
-  @Override public synchronized int consumePurchase(int apiVersion, String packageName,
+  @Override public int consumePurchase(int apiVersion, String packageName,
       String purchaseToken) {
 
     if (WalletUtils.hasWalletInstalled()) {
