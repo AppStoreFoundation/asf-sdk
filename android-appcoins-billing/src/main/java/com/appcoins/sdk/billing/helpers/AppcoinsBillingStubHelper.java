@@ -49,8 +49,9 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     }
   }
 
-  @Override public Bundle getSkuDetails(final int apiVersion, final String packageName,
-      final String type, final Bundle skusBundle) {
+  @Override
+  public Bundle getSkuDetails(final int apiVersion, final String packageName, final String type,
+      final Bundle skusBundle) {
 
     Bundle responseWs = new Bundle();
     if (WalletUtils.hasWalletInstalled()) {
@@ -67,15 +68,15 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
       }
     } else {
-      ArrayList<String> sku = (ArrayList<String>) skusBundle.get(Utils.GET_SKU_DETAILS_ITEM_LIST);
-      String response = WSServiceController.GetSkuDetailsService(packageName, sku);
+      List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
+      String response = WSServiceController.getSkuDetailsService(packageName, packageName, sku);
       responseWs.putString(Utils.NO_WALLET_SKU_DETAILS, response);
     }
     return responseWs;
   }
 
-  @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku,
-      String type, String developerPayload) {
+  @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
+      String developerPayload) {
     if (WalletUtils.hasWalletInstalled()) {
       try {
         synchronized (lockThread) {
@@ -145,8 +146,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     return bundleResponse;
   }
 
-  @Override public int consumePurchase(int apiVersion, String packageName,
-      String purchaseToken) {
+  @Override public int consumePurchase(int apiVersion, String packageName, String purchaseToken) {
 
     if (WalletUtils.hasWalletInstalled()) {
       try {
