@@ -1,51 +1,50 @@
-package com.appcoins.sdk.android_appcoins_billing.helpers;
+package com.appcoins.sdk.billing.helpers;
 
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
-import com.appcoins.sdk.android_appcoins_billing.ConnectionLifeCycle;
-import com.appcoins.sdk.android_appcoins_billing.service.WalletBillingService;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
+import com.appcoins.sdk.billing.ConnectionLifeCycle;
 import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.Repository;
+import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetailsResult;
+import com.appcoins.sdk.billing.service.WalletBillingService;
 import java.util.List;
 
 class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycle {
   private final int apiVersion;
   private final String packageName;
-  private final AndroidBillingMapper billingMapper;
   private WalletBillingService service;
+  private boolean isServiceReady;
 
-  public AppCoinsAndroidBillingRepository(int apiVersion, String packageName,
-      AndroidBillingMapper billingMapper) {
+  public AppCoinsAndroidBillingRepository(int apiVersion, String packageName) {
     this.apiVersion = apiVersion;
     this.packageName = packageName;
-    this.billingMapper = billingMapper;
   }
 
   @Override public void onConnect(IBinder service, final AppCoinsBillingStateListener listener) {
     this.service = new WalletBillingService(service);
-    listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_OK);
+    isServiceReady = true;
+    listener.onBillingSetupFinished(ResponseCode.OK.getValue());
   }
 
   @Override public void onDisconnect(final AppCoinsBillingStateListener listener) {
     service = null;
-    listener.onBillingSetupFinished(Utils.BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE);
+    listener.onBillingSetupFinished(ResponseCode.SERVICE_DISCONNECTED.getValue());
+    isServiceReady = false;
   }
 
   @Override public PurchasesResult getPurchases(String skuType) throws ServiceConnectionException {
+
     if (!isReady()) {
       throw new ServiceConnectionException();
     }
     try {
       Bundle purchases = service.getPurchases(apiVersion, packageName, skuType, null);
-      PurchasesResult purchasesResult = billingMapper.mapPurchases(purchases, skuType);
-      Log.d("purchases Size", " billingMapper size " + purchasesResult.getPurchases()
-          .size());
+      PurchasesResult purchasesResult = AndroidBillingMapper.mapPurchases(purchases, skuType);
 
       return purchasesResult;
     } catch (RemoteException e) {
@@ -54,25 +53,34 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
     }
   }
 
-  @Override public SkuDetailsResult querySkuDetailsAsync(String skuType, List<String> sku)
+  @Override
+  public SkuDetailsResult querySkuDetailsAsync(final String skuType, final List<String> sku)
       throws ServiceConnectionException {
+
     if (!isReady()) {
       throw new ServiceConnectionException();
     }
 
-    Bundle bundle = billingMapper.mapArrayListToBundleSkuDetails(sku);
-    try {
-      Bundle response = service.getSkuDetails(apiVersion, packageName, skuType, bundle);
-      SkuDetailsResult skuDetailsResult =
-          billingMapper.mapBundleToHashMapSkuDetails(skuType, response);
+    Bundle bundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(sku);
 
-      return skuDetailsResult;
+    Bundle response;
+
+    try {
+      response = service.getSkuDetails(apiVersion, packageName, skuType, bundle);
+      if (response.containsKey(Utils.NO_WALLET_SKU_DETAILS)) {
+        return AndroidBillingMapper.mapSkuDetailsFromWS(skuType,
+            response.getString(Utils.NO_WALLET_SKU_DETAILS));
+      } else {
+        return AndroidBillingMapper.mapBundleToHashMapSkuDetails(skuType, response);
+      }
     } catch (RemoteException e) {
+      e.printStackTrace();
       throw new ServiceConnectionException(e.getMessage());
     }
   }
 
   @Override public int consumeAsync(String purchaseToken) throws ServiceConnectionException {
+
     if (!isReady()) {
       throw new ServiceConnectionException();
     }
@@ -87,6 +95,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   @Override
   public LaunchBillingFlowResult launchBillingFlow(String skuType, String sku, String payload)
       throws ServiceConnectionException {
+
     if (!isReady()) {
       throw new ServiceConnectionException();
     }
@@ -94,7 +103,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
 
       Bundle response = service.getBuyIntent(apiVersion, packageName, sku, skuType, payload);
 
-      return billingMapper.mapBundleToHashMapGetIntent(response);
+      return AndroidBillingMapper.mapBundleToHashMapGetIntent(response);
     } catch (RemoteException e) {
       e.printStackTrace();
       throw new ServiceConnectionException(e.getMessage());
@@ -102,6 +111,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   }
 
   @Override public boolean isReady() {
-    return service != null;
+    return isServiceReady;
   }
+
 }

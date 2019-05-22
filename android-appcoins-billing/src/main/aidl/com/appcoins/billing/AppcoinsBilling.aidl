@@ -37,7 +37,7 @@ interface AppcoinsBilling {
         *        and "subs" for subscriptions)
         * @return RESULT_OK(0) on success and appropriate response code on failures.
         */
-       int isBillingSupported(int apiVersion, String packageName, String type);
+        int isBillingSupported(int apiVersion, String packageName, String type);
 
        /**
         * Provides details of a list of SKUs

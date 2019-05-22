@@ -6,11 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-import com.appcoins.sdk.android_appcoins_billing.AppcoinsBillingClient;
-import com.appcoins.sdk.android_appcoins_billing.CatapultAppcoinsBilling;
-import com.appcoins.sdk.android_appcoins_billing.helpers.CatapultBillingAppCoinsFactory;
-import com.appcoins.sdk.android_appcoins_billing.types.SkuType;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
+import com.appcoins.sdk.billing.AppcoinsBillingClient;
 import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.ConsumeResponseListener;
 import com.appcoins.sdk.billing.Purchase;
@@ -18,28 +15,27 @@ import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.SkuDetailsResponseListener;
-import io.reactivex.disposables.CompositeDisposable;
+import com.appcoins.sdk.billing.helpers.CatapultBillingAppCoinsFactory;
+import com.appcoins.sdk.billing.types.SkuType;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
 
   private AppcoinsBillingClient cab;
-  private CompositeDisposable compositeDisposable;
   private String token = null;
   private AppCoinsBillingStateListener listener;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    compositeDisposable = new CompositeDisposable();
-    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this.getApplicationContext(),
+    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(getApplicationContext(),
         BuildConfig.IAB_KEY);
 
     final Activity activity = this;
     listener = new AppCoinsBillingStateListener() {
       @Override public void onBillingSetupFinished(int responseCode) {
-        Log.d("Message: ", "Connected-" + responseCode + "");
+        Log.d("Is Billing Setup Finished: ", "Connected-" + responseCode + "");
       }
 
       @Override public void onBillingServiceDisconnected() {
@@ -50,7 +46,6 @@ public class MainActivity extends Activity {
   }
 
   @Override protected void onDestroy() {
-    compositeDisposable.dispose();
     super.onDestroy();
   }
 
@@ -73,24 +68,40 @@ public class MainActivity extends Activity {
   public void onBuyGasButtonClicked(View arg0) {
     BillingFlowParams billingFlowParams =
         new BillingFlowParams("gas", SkuType.inapp.toString(), 10001, null, null, null);
-    int launchBillingFlowResponse = cab.launchBillingFlow(this, billingFlowParams);
-    Log.d("BillingFlowResponse: ", launchBillingFlowResponse + "");
+
+   Activity act = this;
+    Thread t = new Thread(new Runnable() {
+      @Override public void run() {
+        int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
+        Log.d("BillingFlowResponse: ", launchBillingFlowResponse + "");
+      }
+    });
+  t.start();
+
+
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {
-    PurchasesResult pr = cab.queryPurchases(SkuType.inapp.toString());
-    if (pr.getPurchases()
-        .size() > 0) {
-      for (Purchase p : pr.getPurchases()) {
-        Log.d("Purchase result token: ", p.getToken());
-        Log.d("Purchase result sku: ", p.getSku());
+
+    Thread t = new Thread(new Runnable() {
+      @Override public void run() {
+        PurchasesResult pr = cab.queryPurchases(SkuType.inapp.toString());
+        if (pr.getPurchases()
+            .size() > 0) {
+          for (Purchase p : pr.getPurchases()) {
+            Log.d("Purchase result token: ", p.getToken());
+            Log.d("Purchase result sku: ", p.getSku());
+          }
+          token = pr.getPurchases()
+              .get(0)
+              .getToken();
+        } else {
+          Log.d("Message:", "No Available Purchases");
+        }
       }
-      token = pr.getPurchases()
-          .get(0)
-          .getToken();
-    } else {
-      Log.d("Message:", "No Available Purchases");
-    }
+    });
+    t.start();
+
   }
 
   public void onCreateChannelButtonClicked(View view) {
@@ -102,29 +113,45 @@ public class MainActivity extends Activity {
 
     skuDetailsParams.setMoreItemSkus(al);
 
-    cab.querySkuDetailsAsync(skuDetailsParams, new SkuDetailsResponseListener() {
-      @Override
-      public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
-        Log.d("responseCode: ", responseCode + "");
-        for (SkuDetails sd : skuDetailsList) {
-          Log.d("SkuDetails: ", sd.getSku() + "");
-        }
+    Thread t = new Thread(new Runnable() {
+      @Override public void run() {
+        cab.querySkuDetailsAsync(skuDetailsParams, new SkuDetailsResponseListener() {
+          @Override
+          public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
+            Log.d("responseCode: ", responseCode + "");
+            for (SkuDetails sd : skuDetailsList) {
+              Log.d("SkuDetails: ", sd.getSku() + "");
+            }
+          }
+        });
       }
     });
+
+    t.start();;
+
   }
 
   public void makePaymentButtonClicked(View view) {
-    if (token != null) {
-      cab.consumeAsync(token, new ConsumeResponseListener() {
-        @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
-          Log.d("consume response: ",
-              responseCode + " " + "Consumed purchase with token: " + purchaseToken);
-          token = null;
-        }
-      });
-    } else {
-      Log.d("Message:", "No purchase tokens available");
-    }
+
+    Thread t = new Thread(new Runnable() {
+      @Override public void run() {
+
+        if (token != null) {
+        cab.consumeAsync(token, new ConsumeResponseListener() {
+          @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
+            Log.d("consume response: ",
+                responseCode + " " + "Consumed purchase with token: " + purchaseToken);
+            token = null;
+          }
+        });
+      } else {
+        Log.d("Message:", "No purchase tokens available");
+      }
+      }
+    });
+
+    t.start();
+
   }
 
   public void onCloseChannelButtonClicked(View view) {

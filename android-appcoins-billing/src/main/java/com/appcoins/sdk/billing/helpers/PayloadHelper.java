@@ -1,7 +1,6 @@
-package com.appcoins.sdk.android_appcoins_billing.helpers;
+package com.appcoins.sdk.billing.helpers;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import com.appcoins.billing.AppcoinsBilling;
 
 /**
@@ -30,8 +29,8 @@ public class PayloadHelper {
    *
    * @return The final developers payload to be sent
    */
-  public static String buildIntentPayload(@Nullable String orderReference,
-      @Nullable String developerPayload, String origin) {
+  public static String buildIntentPayload( String orderReference,
+      String developerPayload, String origin) {
     Uri.Builder builder = new Uri.Builder();
     builder.scheme(SCHEME)
         .authority("appcoins.io");
@@ -61,7 +60,7 @@ public class PayloadHelper {
     return uri.getQueryParameter(PAYLOAD_PARAMETER);
   }
 
-  @Nullable private static Uri checkRequirements(String uriString) {
+  private static Uri checkRequirements(String uriString) {
     if (uriString == null) {
       return null;
     }

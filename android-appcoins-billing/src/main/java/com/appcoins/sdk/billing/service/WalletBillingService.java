@@ -1,16 +1,18 @@
-package com.appcoins.sdk.android_appcoins_billing.service;
+package com.appcoins.sdk.billing.service;
 
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import com.appcoins.billing.AppcoinsBilling;
+import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
+import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 
 public class WalletBillingService implements AppcoinsBilling {
 
   private AppcoinsBilling service;
 
   public WalletBillingService(IBinder service) {
-    this.service = AppcoinsBilling.Stub.asInterface(service);
+    this.service = AppcoinsBillingStubHelper.Stub.asInterface(service);
   }
 
   @Override

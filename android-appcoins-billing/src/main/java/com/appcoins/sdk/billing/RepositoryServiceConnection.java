@@ -1,4 +1,4 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.billing;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,7 +7,9 @@ import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.util.Log;
-import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
+import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import java.util.List;
 
 public class RepositoryServiceConnection implements ServiceConnection, RepositoryConnection {
@@ -15,6 +17,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
   private final Context context;
   private final ConnectionLifeCycle connectionLifeCycle;
   private AppCoinsBillingStateListener listener;
+  private boolean hasWalletInstalled;
 
   public RepositoryServiceConnection(Context context, ConnectionLifeCycle connectionLifeCycle) {
     this.context = context;
@@ -41,20 +44,27 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
   }
 
   @Override public void startConnection(final AppCoinsBillingStateListener listener) {
+    this.listener = listener;
+
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
 
-    this.listener = listener;
 
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
     if (intentServices != null && !intentServices.isEmpty()) {
+      hasWalletInstalled = true;
       context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+    } else {
+      hasWalletInstalled = false;
+      onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
     }
   }
 
   @Override public void endConnection() {
-    context.unbindService(this);
+    if (hasWalletInstalled) {
+      context.unbindService(this);
+    }
     connectionLifeCycle.onDisconnect(listener);
   }
 }

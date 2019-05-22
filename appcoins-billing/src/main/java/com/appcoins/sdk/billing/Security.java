@@ -34,12 +34,19 @@ public class Security {
    * @param signedData the signed JSON string (signed, not encrypted)
    * @param decodedSignature the Signature for the data, signed with the private key
    */
-  public static boolean verifyPurchase(byte[] base64DecodedPublicKey, String signedData, byte[] decodedSignature) {
-    if (signedData.isEmpty() || base64DecodedPublicKey.length <= 0 || decodedSignature.length <= 0) {
+  public static boolean verifyPurchase(byte[] base64DecodedPublicKey, String signedData,
+      byte[] decodedSignature) {
+    if (signedData.isEmpty()
+        || base64DecodedPublicKey.length <= 0
+        || decodedSignature.length <= 0) {
       return false;
     }
 
     PublicKey key = Security.generatePublicKey(base64DecodedPublicKey);
+
+    if (key == null) {
+      return false;
+    }
 
     return Security.verify(key, signedData, decodedSignature);
   }
@@ -52,17 +59,18 @@ public class Security {
    *
    * @throws IllegalArgumentException if decodedPublicKey is invalid
    */
-  public static PublicKey generatePublicKey(byte[] base64DecodedPublicKey) throws RuntimeException {
+  public static PublicKey generatePublicKey(byte[] base64DecodedPublicKey) {
     try {
 
       KeyFactory keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
 
       return keyFactory.generatePublic(new X509EncodedKeySpec(base64DecodedPublicKey));
     } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
+      return null;
     } catch (InvalidKeySpecException e) {
-      // Log.e(TAG, "Invalid key specification.");
-      throw new IllegalArgumentException(e);
+      e.printStackTrace();
+      return null;
     }
   }
 

@@ -1,12 +1,11 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.billing;
 
 import android.app.Activity;
-import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
-import com.appcoins.sdk.billing.BillingFlowParams;
-import com.appcoins.sdk.billing.ConsumeResponseListener;
-import com.appcoins.sdk.billing.PurchasesResult;
-import com.appcoins.sdk.billing.SkuDetailsParams;
-import com.appcoins.sdk.billing.SkuDetailsResponseListener;
+import android.os.Bundle;
+import android.util.Log;
+import com.appcoins.sdk.billing.helpers.Utils;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
+import java.util.ArrayList;
 
 public interface AppcoinsBillingClient {
   PurchasesResult queryPurchases(String skuType);

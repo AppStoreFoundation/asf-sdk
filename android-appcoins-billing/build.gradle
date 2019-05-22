@@ -1,75 +1,136 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
 
 android {
-    compileSdkVersion COMPILE_SDK_VERSION
-    buildToolsVersion '28.0.3'
+  compileSdkVersion COMPILE_SDK_VERSION
+  buildToolsVersion '28.0.3'
 
-    flavorDimensions "iab"
+  defaultConfig {
+    minSdkVersion MIN_SDK_VERSION
+    targetSdkVersion TARGET_SDK_VERSION
+    versionCode 11
+    versionName "1.3.4"
+    multiDexEnabled true
+  }
 
-    defaultConfig {
-        minSdkVersion MIN_SDK_VERSION
-        targetSdkVersion TARGET_SDK_VERSION
-        versionCode 11
-        versionName "1.3.4"
-        multiDexEnabled true
+  signingConfigs {
+    release {
+      storeFile = file(project.APPCOINS_WALLET_STORE_FILE)
+      storePassword = project.APPCOINS_WALLET_STORE_PASSWORD
+      keyAlias = project.APPCOINS_WALLET_KEY_ALIAS
+      keyPassword = project.APPCOINS_WALLET_KEY_PASSWORD
     }
+  }
 
-    signingConfigs {
-        release {
-            storeFile = file(project.APPCOINS_WALLET_STORE_FILE)
-            storePassword = project.APPCOINS_WALLET_STORE_PASSWORD
-            keyAlias = project.APPCOINS_WALLET_KEY_ALIAS
-            keyPassword = project.APPCOINS_WALLET_KEY_PASSWORD
-        }
+  buildTypes {
+    debug {
+      minifyEnabled false
+      buildConfigField "String", "IAB_BIND_ACTION",
+          "\"" + project.APPCOINS_DEV_IAB_BIND_ACTION + "\""
+      buildConfigField "String", "IAB_BIND_PACKAGE",
+          "\"" + project.APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
+      buildConfigField "String", "IAB_WALLET_ADDR",
+          "\"" + project.APPCOINS_DEV_IAB_WALLET_ADDR + "\""
+      buildConfigField "String", "IAB_KEY",
+          "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
+      buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
+          project.BDS_WALLET_PACKAGE_NAME_DEV
+      buildConfigField 'String', 'HOST_WS',
+          "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+      manifestPlaceholders.iabPermission = "${project.APPCOINS_IAB_PERMISSION}"
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      buildConfigField "String", "IAB_KEY",
+          "\"" + project.APPCOINS_IAB_KEY + "\""
+      buildConfigField "String", "IAB_BIND_ACTION",
+          "\"" + project.APPCOINS_IAB_BIND_ACTION + "\""
+      buildConfigField "String", "IAB_BIND_PACKAGE",
+          "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
+      buildConfigField "String", "IAB_WALLET_ADDR",
+          "\"" + project.APPCOINS_IAB_WALLET_ADDR + "\""
+      buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
+          project.BDS_WALLET_PACKAGE_NAME
+      buildConfigField 'String', 'HOST_WS',
+          "\"" +project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+      minifyEnabled false
+      manifestPlaceholders.iabPermission = "${project.APPCOINS_IAB_PERMISSION}"
     }
-
-    productFlavors {
-        appcoinsiab {
-            dimension "iab"
-            buildConfigField "String", "IAB_UPDATE_ACTION",
-                    "\"" + project.APPCOINS_IAB_UPDATE_ACTION + "\""
-            libraryVariants.all { variant ->
-                if (variant.buildType.getName().equalsIgnoreCase("debug")) {
-                    buildConfigField "String", "IAB_BIND_ACTION",
-                            "\"" + project.APPCOINS_DEV_IAB_BIND_ACTION + "\""
-                    buildConfigField "String", "IAB_BIND_PACKAGE",
-                            "\"" + project.APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
-                    buildConfigField "String", "IAB_WALLET_ADDR",
-                            "\"" + project.APPCOINS_DEV_IAB_WALLET_ADDR + "\""
-                    buildConfigField "String", "IAB_KEY",
-                            "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
-                    variant.getMergedFlavor().manifestPlaceholders = [iabPermission: project.APPCOINS_IAB_PERMISSION]
-                } else {
-                    buildConfigField "String", "IAB_KEY",
-                            "\"" + project.APPCOINS_IAB_KEY + "\""
-                    buildConfigField "String", "IAB_BIND_ACTION",
-                            "\"" + project.APPCOINS_IAB_BIND_ACTION + "\""
-                    buildConfigField "String", "IAB_BIND_PACKAGE",
-                            "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
-                    buildConfigField "String", "IAB_WALLET_ADDR",
-                            "\"" + project.APPCOINS_IAB_WALLET_ADDR + "\""
-                    variant.getMergedFlavor().manifestPlaceholders = [iabPermission: project.APPCOINS_IAB_PERMISSION]
-                }
-            }
-        }
-    }
+  }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    testImplementation 'junit:junit:4.12'
-    implementation 'com.google.code.gson:gson:2.8.5'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    api project(path: ':appcoins-billing')
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  api project(path: ':appcoins-billing')
 }
+
+//region Publishing
+task sourcesJar(type: Jar) {
+  from android.sourceSets.main.java.srcDirs
+  classifier "sources"
+}
+
+task javadoc(type: Javadoc) {
+  source = android.sourceSets.main.java.srcDirs
+  classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+
+  failOnError = false
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+publishing {
+  publications {
+    MyPublication(MavenPublication) {
+      groupId 'com.blockchainds'
+      artifactId project.name
+      version project.version
+      artifact(sourcesJar)
+      artifact(javadocJar)
+      artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+
+      //The publication doesn't know about our dependencies, so we have to manually add them to the pom
+      pom.withXml {
+        def dependenciesNode = asNode().appendNode('dependencies')
+
+        //Iterate over the api dependencies (we don't want the test ones), adding a <dependency> node for each
+        configurations.api.allDependencies.each {
+          def dependencyNode = dependenciesNode.appendNode('dependency')
+          dependencyNode.appendNode('groupId', it.group)
+          dependencyNode.appendNode('artifactId', it.name)
+          dependencyNode.appendNode('version', it.version)
+        }
+      }
+    }
+  }
+  repositories {
+    maven {
+      url "$buildDir/repo"
+    }
+  }
+}
+
+bintray {
+  user = "${BDS_BINTRAY_USER}"
+  key = "${BDS_BINTRAY_KEY}"
+  publications = ['MyPublication']
+  pkg {
+    repo = 'bds'
+    name = "${project.name}"
+    userOrg = "${BDS_BINTRAY_ORG}"
+    licenses = ['GPL-3.0']
+    vcsUrl = 'https://github.com/Aptoide/bds-sdk/android-appcoins-billing'
+
+    version {
+      name = project.version
+    }
+  }
+}
+//endregion
+

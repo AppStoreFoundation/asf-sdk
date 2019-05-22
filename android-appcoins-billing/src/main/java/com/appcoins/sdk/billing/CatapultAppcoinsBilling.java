@@ -1,21 +1,11 @@
-package com.appcoins.sdk.android_appcoins_billing;
+package com.appcoins.sdk.billing;
 
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.util.Log;
-import com.appcoins.sdk.android_appcoins_billing.helpers.PayloadHelper;
-import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
-import com.appcoins.sdk.billing.Billing;
-import com.appcoins.sdk.billing.BillingFlowParams;
-import com.appcoins.sdk.billing.ConsumeResponseListener;
-import com.appcoins.sdk.billing.ResponseCode;
-import com.appcoins.sdk.billing.LaunchBillingFlowResult;
-import com.appcoins.sdk.billing.PurchasesResult;
-import com.appcoins.sdk.billing.ServiceConnectionException;
-import com.appcoins.sdk.billing.SkuDetailsParams;
-import com.appcoins.sdk.billing.SkuDetailsResponseListener;
+import com.appcoins.sdk.billing.helpers.PayloadHelper;
 
 public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
@@ -53,16 +43,16 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
       LaunchBillingFlowResult launchBillingFlowResult =
           billing.launchBillingFlow(billingFlowParams, payload);
 
-      responseCode = (int)launchBillingFlowResult.getResponseCode();
+      responseCode = (int) launchBillingFlowResult.getResponseCode();
 
-      if(responseCode != ResponseCode.OK.getValue()){
+      if (responseCode != ResponseCode.OK.getValue()
+          || !launchBillingFlowResult.isHasWalletInstalled()) {
         return responseCode;
       }
 
-    PendingIntent pendingIntent = (PendingIntent) launchBillingFlowResult.getBuyIntent();
-    activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
-        billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
-
+      PendingIntent pendingIntent = (PendingIntent) launchBillingFlowResult.getBuyIntent();
+      activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
+          billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
     } catch (NullPointerException e) {
       return ResponseCode.ERROR.getValue();
     } catch (IntentSender.SendIntentException e) {
