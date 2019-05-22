@@ -7,6 +7,7 @@ import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.WSServiceController;
 import java.util.ArrayList;
+import java.util.List;
 
 public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
@@ -16,8 +17,9 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
   @Override
   public Bundle getSkuDetails(int apiVersion, String packageName, String type, Bundle skusBundle) {
-    ArrayList<String> sku = (ArrayList<String>) skusBundle.get(Utils.GET_SKU_DETAILS_ITEM_LIST);
-    String response = WSServiceController.GetSkuDetailsService(BuildConfig.HOST_WS,packageName, sku);
+    List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
+    String response =
+        WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku);
     Bundle responseWs = new Bundle();
     responseWs.putString(Utils.NO_WALLET_SKU_DETAILS, response);
     return responseWs;
