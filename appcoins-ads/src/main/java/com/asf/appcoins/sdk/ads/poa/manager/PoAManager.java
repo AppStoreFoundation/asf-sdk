@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
-import com.asf.appcoins.sdk.ads.R;
 import com.asf.appcoins.sdk.ads.network.AppCoinsClient;
 import com.asf.appcoins.sdk.ads.network.QueryParams;
 import com.asf.appcoins.sdk.ads.network.listeners.CheckConnectivityResponseListener;
@@ -72,6 +71,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   boolean fromBackground = false;
   private Handler handleRetryConnection = new Handler();
   private int connectionRetrys = 0;
+  private boolean isWalletInstalled;
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -98,6 +98,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   public static void init(Context context, PoAServiceConnector connector, int networkId)
       throws PackageManager.NameNotFoundException {
     if (instance == null) {
+      WalletUtils.setContext(context);
       SharedPreferences preferences =
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
       String packageName = context.getPackageName();
@@ -263,19 +264,10 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   @Override public void onBecameForeground(Activity activity) {
-
+    //TODO this has to be changed to if only there is a campaign active you call the popup.
     foreground = true;
-    if (!processing) {
-      if (!preferences.getBoolean(FINISHED_KEY, false)) {
-        if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
-          dialogVisible = true;
-          WalletUtils.promptToInstallWallet(activity, activity,
-              activity.getString(R.string.install_wallet_from_ads), this);
-        } else {
-          handleCampaign();
-        }
-      }
-    }
+    isWalletInstalled = WalletUtils.hasWalletInstalled();
+    handleCampaign();
   }
 
   @Override public void onBecameBackground() {
@@ -283,24 +275,11 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     fromBackground = true;
   }
 
-  private void processCampaign(Campaign campaign) {
-    if (!campaign.hasCampaign()) {
-      Log.d(TAG, "No campaign is available.");
-      stopProcess();
-    } else {
-      // start handshake
-      poaConnector.startHandshake(appContext, network);
-
-      checkPreferencesForPackage();
-
-      Bundle bundle = new Bundle();
-      bundle.putString("packageName", campaign.getPackageName());
-      bundle.putString("campaignId", campaign.getId()
-          .toString());
-      poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
-      this.campaignId = campaign.getId();
-      initiateProofSending();
-    }
+  private void sendMSGRegisterCampaign(String packageName, String id) {
+    Bundle bundle = new Bundle();
+    bundle.putString("packageName", packageName);
+    bundle.putString("campaignId", id);
+    poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
   }
 
   private void initiateProofSending() {
@@ -319,12 +298,10 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
    * If there is connectivity executes GetCampaign
    * If not retry in x mills until regainings Connectivity.
    */
-  @Override public void responseConnectivity(boolean value) {
-    if (value) {
+  @Override public void responseConnectivity(boolean hasConnectivity) {
+    if (hasConnectivity) {
       Log.d("Message:", "Connectivity Available");
-      QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
-      GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
-      appcoinsClient.getCampaign(queryParams, getCampaignResponse);
+      retrieveCampaign();
     } else {
       Log.d("Message:", "Connectivity Not available Available");
       if (connectionRetrys < BuildConfig.ADS_CONNECTION_RETRYS_NUMBER) {
@@ -338,6 +315,19 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     }
   }
 
+  private void retrieveCampaign() {
+    if (WalletUtils.hasWalletInstalled()) {
+      //TODO with new Wallet AIDL and new Objects
+      QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
+      GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
+      appcoinsClient.getCampaignFromWallet(queryParams, getCampaignResponse);
+    } else {
+      QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
+      GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
+      appcoinsClient.getCampaign(queryParams, getCampaignResponse);
+    }
+  }
+
   /*
    * @Param value -> response object from the GetCampaign service.
    * Method that handles the GetCampaignService response.
@@ -346,5 +336,31 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   @Override public void responseGetCampaign(AppCoinsClientResponse appCoinsClientResponse) {
     Campaign campaign = CampaignMapper.mapCampaign(appCoinsClientResponse);
     processCampaign(campaign);
+  }
+
+  private void processCampaign(Campaign campaign) {
+    if (!campaign.hasCampaign()) {
+      Log.d(TAG, "No campaign is available.");
+      stopProcess();
+    } else {
+      // start handshake
+      if (isWalletInstalled) {
+        this.campaignId = campaign.getId();
+        poaConnector.startHandshake(appContext, network);
+        checkPreferencesForPackage();
+        sendMSGRegisterCampaign(campaign.getPackageName(), campaign.getId()
+            .toString());
+        initiateProofSending();
+      } else {
+        if (!processing) {
+          if (!preferences.getBoolean(FINISHED_KEY, false)) {
+            if (!dialogVisible) {
+              dialogVisible = true;
+              WalletUtils.promptToInstallWallet();
+            }
+          }
+        }
+      }
+    }
   }
 }

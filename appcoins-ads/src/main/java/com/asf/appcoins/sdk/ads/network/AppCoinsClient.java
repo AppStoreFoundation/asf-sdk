@@ -1,10 +1,11 @@
 package com.asf.appcoins.sdk.ads.network;
 
-import com.asf.appcoins.sdk.ads.network.responses.ClientResponseHandler;
-import com.asf.appcoins.sdk.ads.network.responses.ConnectivityResponseHandler;
-import com.asf.appcoins.sdk.ads.network.responses.HTTPResponseHandler;
 import com.asf.appcoins.sdk.ads.network.clients.CampaignService;
 import com.asf.appcoins.sdk.ads.network.clients.CheckConnectionCampaignService;
+import com.asf.appcoins.sdk.ads.network.clients.WalletCampaignService;
+import com.asf.appcoins.sdk.ads.network.responses.CampaignResponseHandler;
+import com.asf.appcoins.sdk.ads.network.responses.ClientResponseHandler;
+import com.asf.appcoins.sdk.ads.network.responses.ConnectivityResponseHandler;
 
 public class AppCoinsClient {
 
@@ -22,12 +23,26 @@ public class AppCoinsClient {
   }
 
   public void getCampaign(QueryParams queryParams, ClientResponseHandler clientResponseHandler) {
-    HTTPResponseHandler httpResponseHandler = new HTTPResponseHandler(clientResponseHandler);
+    CampaignResponseHandler CampaignResponseHandler =
+        new CampaignResponseHandler(clientResponseHandler);
     CampaignService appcoinsHTTPClient =
         new CampaignService(packageName, versionCode, serviceUrl, interceptor, queryParams,
-            httpResponseHandler);
+            CampaignResponseHandler);
 
     Thread operation = new Thread(appcoinsHTTPClient);
+    operation.start();
+  }
+
+  public void getCampaignFromWallet(QueryParams queryParams,
+      ClientResponseHandler clientResponseHandler) {
+    CampaignResponseHandler CampaignResponseHandler =
+        new CampaignResponseHandler(clientResponseHandler);
+
+    WalletCampaignService walletCampaignService =
+        new WalletCampaignService(packageName, versionCode, serviceUrl, interceptor, queryParams,
+            CampaignResponseHandler);
+
+    Thread operation = new Thread(walletCampaignService);
     operation.start();
   }
 
