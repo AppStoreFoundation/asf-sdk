@@ -11,10 +11,10 @@ import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
 import com.asf.appcoins.sdk.ads.R;
 import com.asf.appcoins.sdk.ads.network.AppCoinsClient;
-import com.asf.appcoins.sdk.ads.network.responses.AppCoinsClientResponse;
 import com.asf.appcoins.sdk.ads.network.QueryParams;
 import com.asf.appcoins.sdk.ads.network.listeners.CheckConnectivityResponseListener;
 import com.asf.appcoins.sdk.ads.network.listeners.GetCampaignResponseListener;
+import com.asf.appcoins.sdk.ads.network.responses.AppCoinsClientResponse;
 import com.asf.appcoins.sdk.ads.network.responses.ConnectivityResponse;
 import com.asf.appcoins.sdk.ads.network.responses.GetCampaignResponse;
 import com.asf.appcoins.sdk.ads.network.threads.CheckConnectivityRetry;
@@ -138,8 +138,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     bundle.putInt("networkId", network);
 
     poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
-
-    handleCampaign();
   }
 
   /**
@@ -274,10 +272,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
           WalletUtils.promptToInstallWallet(activity, activity,
               activity.getString(R.string.install_wallet_from_ads), this);
         } else {
-          // start handshake
-          poaConnector.startHandshake(appContext, network);
-
-          checkPreferencesForPackage();
+          handleCampaign();
         }
       }
     }
@@ -293,14 +288,17 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       Log.d(TAG, "No campaign is available.");
       stopProcess();
     } else {
+      // start handshake
+      poaConnector.startHandshake(appContext, network);
+
+      checkPreferencesForPackage();
+
       Bundle bundle = new Bundle();
       bundle.putString("packageName", campaign.getPackageName());
       bundle.putString("campaignId", campaign.getId()
           .toString());
       poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
-
       this.campaignId = campaign.getId();
-
       initiateProofSending();
     }
   }
@@ -329,14 +327,12 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       appcoinsClient.getCampaign(queryParams, getCampaignResponse);
     } else {
       Log.d("Message:", "Connectivity Not available Available");
-      if(connectionRetrys < BuildConfig.ADS_CONNECTION_RETRYS_NUMBER){
+      if (connectionRetrys < BuildConfig.ADS_CONNECTION_RETRYS_NUMBER) {
         connectionRetrys++;
-        int delayedTime = connectionRetrys*BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS;
+        int delayedTime = connectionRetrys * BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS;
         CheckConnectivityRetry checkConnectivityRetry = new CheckConnectivityRetry(this);
-        handleRetryConnection.postDelayed(checkConnectivityRetry,
-            delayedTime);
-      }
-      else{
+        handleRetryConnection.postDelayed(checkConnectivityRetry, delayedTime);
+      } else {
         Log.d("Message:", "Connectivity Retry exceeded..");
       }
     }
