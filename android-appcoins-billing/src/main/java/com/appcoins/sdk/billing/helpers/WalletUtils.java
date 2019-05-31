@@ -48,18 +48,18 @@ public class WalletUtils {
     }
     AlertDialog.Builder builder;
     builder = new AlertDialog.Builder(act);
-    builder.setTitle(R.string.wallet_missing);
-    builder.setMessage(act.getString(R.string.install_wallet_from_iab));
-    Log.d("String name: ", act.getString(R.string.install_wallet_from_iab));
+    builder.setTitle("APPC Wallet Missing");
+    builder.setMessage("To complete your purchase, you have to install an AppCoins wallet");
+    Log.d("String name: ", "To complete your purchase, you have to install an AppCoins wallet");
 
-    builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+    builder.setPositiveButton("INSTALL", new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialog, int which) {
         act.startActivity(
             new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + walletPackageName)));
       }
     });
 
-    builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
+    builder.setNegativeButton("SKIP", new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialogInterface, int i) {
         dialogInterface.cancel();
       }
