@@ -316,14 +316,12 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   private void retrieveCampaign() {
-    if (WalletUtils.hasWalletInstalled()) {
-      //TODO with new Wallet AIDL and new Objects
-      QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
-      GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
-      appcoinsClient.getCampaignFromWallet(queryParams, getCampaignResponse);
+    QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
+    GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
+    if (isWalletInstalled) {
+      //appcoinsClient.getCampaignFromWallet(queryParams, getCampaignResponse);
+      appcoinsClient.getCampaign(queryParams, getCampaignResponse);
     } else {
-      QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
-      GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
       appcoinsClient.getCampaign(queryParams, getCampaignResponse);
     }
   }
@@ -343,24 +341,31 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       Log.d(TAG, "No campaign is available.");
       stopProcess();
     } else {
-      // start handshake
       if (isWalletInstalled) {
-        this.campaignId = campaign.getId();
-        poaConnector.startHandshake(appContext, network);
-        checkPreferencesForPackage();
-        sendMSGRegisterCampaign(campaign.getPackageName(), campaign.getId()
-            .toString());
-        initiateProofSending();
-      } else {
-        if (!processing) {
-          if (!preferences.getBoolean(FINISHED_KEY, false)) {
-            if (!dialogVisible) {
-              dialogVisible = true;
-              WalletUtils.promptToInstallWallet();
-            }
-          }
-        }
+        walletIsInstalled(campaign);
+      } else{
+        walletIsNotInstalled();
       }
+    }
+  }
+
+  private void walletIsInstalled(Campaign campaign){
+    this.campaignId = campaign.getId();
+    poaConnector.startHandshake(appContext, network);
+    checkPreferencesForPackage();
+    sendMSGRegisterCampaign(campaign.getPackageName(), campaign.getId()
+        .toString());
+    initiateProofSending();
+  }
+
+  private void walletIsNotInstalled(){
+    if (!processing && !preferences.getBoolean(FINISHED_KEY, false) && !dialogVisible) {
+      dialogVisible = true;
+      spHandler.post(new Runnable() {
+        @Override public void run() {
+          WalletUtils.promptToInstallWallet();
+        }
+      });
     }
   }
 }
