@@ -3,14 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="296dp"
     android:layout_height="288dp"
-    android:layout_gravity="center"
-    android:background="@drawable/dialog_wallet_install_parent_background">
+    android:layout_gravity="center">
 
 
     <ImageView
         android:id="@+id/dialog_wallet_install_image_graphic"
         android:layout_width="match_parent"
-        android:layout_height="144dp"
+        android:layout_height="100dp"
         android:layout_alignParentTop="true"
         android:maxWidth="296dp"
         android:scaleType="centerCrop"
@@ -25,8 +24,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="88dp"
         android:scaleType="centerCrop"
-        android:visibility="invisible"
-        android:src="@drawable/dialog_wallet_install_icon" />
+        android:src="@drawable/dialog_wallet_install_icon"
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/dialog_wallet_install_text_message"
@@ -39,9 +38,9 @@
         android:layout_marginRight="32dp"
         android:gravity="center_horizontal"
         android:maxLines="2"
+        android:text="@string/app_wallet_install_wallet_from_ads"
         android:textColor="#4a4a4a"
-        android:textSize="16sp"
-        android:text="@string/app_wallet_install_wallet_from_ads" />
+        android:textSize="16sp" />
 
     <Button
         android:id="@+id/dialog_wallet_install_button_cancel"
@@ -52,6 +51,7 @@
         android:layout_marginTop="26dp"
         android:layout_marginBottom="16dp"
         android:background="@android:color/transparent"
+        android:foreground="?attr/selectableItemBackground"
         android:text="@string/app_wallet_skip"
         android:textAllCaps="true"
         android:textColor="#8f000000"
@@ -69,5 +69,5 @@
         android:background="@drawable/dialog_wallet_install_download_button_background"
         android:text="@string/app_wallet_install"
         android:textAllCaps="true"
-        android:textColor="#ffffff" />
+        android:textColor="@color/dialog_wallet_install_download_button_text_color" />
 </RelativeLayout>

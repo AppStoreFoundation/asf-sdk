@@ -1,4 +1,4 @@
-package com.appcoins.sdk.billing.wallet;
+package com.asf.appcoins.sdk.billing;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -20,9 +20,9 @@ import com.appcoins.sdk.android.billing.R;
 
 public class DialogWalletInstall extends Dialog {
 
-    private final static String MARKET_URI = "market://details?id=%s";
-    private final static String GOOGLEPLAY_URI = "https://play.google.com/store/apps/details?id=%s";
-    private final static String WALLET_PACKAGE = "com.asfoundation.wallet";
+    private final static String WALLET_PACKAGE = "com.appcoins.wallet";
+    private final static String GOOGLEPLAY_URI = "https://play.google.com/store/apps/details?id=" + WALLET_PACKAGE;
+
 
     private Button dialog_wallet_install_button_cancel;
     private Button dialog_wallet_install_button_download;
@@ -32,30 +32,24 @@ public class DialogWalletInstall extends Dialog {
 
     private boolean hasImage;
 
-    public static DialogWalletInstall with(Context context, boolean hasImage) {
-        return new DialogWalletInstall(context).hasImage(hasImage);
+    public static DialogWalletInstall with(Context context) {
+        return new DialogWalletInstall(context);
     }
 
     public DialogWalletInstall(Context context) {
         super(context);
     }
 
-    public DialogWalletInstall hasImage(boolean hasImage) {
-        this.hasImage = hasImage;
-        return this;
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getWindow().setBackgroundDrawableResource(R.drawable.dialog_wallet_install_parent_background);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.wallet_install_dialog);
-        setCancelable(true);
+        setCancelable(false);
 
         buildTop();
         buildMessage();
@@ -67,6 +61,8 @@ public class DialogWalletInstall extends Dialog {
         dialog_wallet_install_image_icon = findViewById(R.id.dialog_wallet_install_image_icon);
         dialog_wallet_install_image_graphic = findViewById(R.id.dialog_wallet_install_image_graphic);
 
+        hasImage = getContext().getResources().getBoolean(R.bool.dialog_wallet_install_has_image);
+
         if (hasImage) {
             dialog_wallet_install_image_icon.setVisibility(View.INVISIBLE);
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(dp(296), dp(144));
@@ -77,7 +73,7 @@ public class DialogWalletInstall extends Dialog {
         } else {
             dialog_wallet_install_image_icon.setVisibility(View.VISIBLE);
             dialog_wallet_install_image_icon.setImageDrawable(getContext().getDrawable(R.drawable.dialog_wallet_install_icon));
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(dp(296), dp(120));
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(dp(296), dp(100));
             dialog_wallet_install_image_graphic.setLayoutParams(lp);
             dialog_wallet_install_image_graphic.setImageDrawable(getContext().getDrawable(R.drawable.dialog_wallet_install_empty_image));
 
@@ -119,15 +115,12 @@ public class DialogWalletInstall extends Dialog {
     }
 
     private void redirectToStore() {
-        try {
-            getContext().startActivity(buildStoreViewIntent(MARKET_URI));
-        } catch (android.content.ActivityNotFoundException e) {
-            getContext().startActivity(buildStoreViewIntent(GOOGLEPLAY_URI));
-        }
+        //https://developer.android.com/distribute/marketing-tools/linking-to-google-play
+        getContext().startActivity(buildStoreViewIntent(GOOGLEPLAY_URI));
     }
 
     private Intent buildStoreViewIntent(String action) {
-        return new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(action, WALLET_PACKAGE)));
+        return new Intent(Intent.ACTION_VIEW, Uri.parse(action));
     }
 
     private int dp(int px) {
@@ -135,4 +128,6 @@ public class DialogWalletInstall extends Dialog {
         DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
         return Math.round(pixels / (displayMetrics.xdpi / displayMetrics.densityDpi));
     }
+
+
 }
