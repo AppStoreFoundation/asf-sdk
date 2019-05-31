@@ -1,5 +1,6 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
+import android.os.Bundle;
 import com.asf.appcoins.sdk.ads.network.responses.AppCoinsClientResponse;
 import java.math.BigInteger;
 import java.util.regex.Matcher;
@@ -52,6 +53,10 @@ public class CampaignMapper {
     }
 
     return "";
+  }
+
+  public  static Campaign mapCampaignFromBundle(Bundle response){
+    return new Campaign(new BigInteger("0"),"");
   }
 }
 

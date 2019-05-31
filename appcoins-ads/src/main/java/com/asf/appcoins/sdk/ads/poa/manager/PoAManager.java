@@ -20,6 +20,11 @@ import com.asf.appcoins.sdk.ads.network.threads.CheckConnectivityRetry;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignMapper;
+import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementListenner;
+import com.asf.appcoins.sdk.ads.repository.ResponseCode;
+import com.asf.appcoins.sdk.ads.repository.WalletCampaignRepository;
+import com.asf.appcoins.sdk.ads.repository.WalletConnectionThreadGetCampaign;
+import com.asf.appcoins.sdk.ads.repository.WalletServiceConnection;
 import java.math.BigInteger;
 import net.grandcentrix.tray.AppPreferences;
 
@@ -72,6 +77,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private Handler handleRetryConnection = new Handler();
   private int connectionRetrys = 0;
   private boolean isWalletInstalled;
+  private WalletCampaignRepository walletCampaignRepository;
+  private WalletServiceConnection walletServiceConnection;
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -316,12 +323,12 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   private void retrieveCampaign() {
-    QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
-    GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
     if (isWalletInstalled) {
-      //appcoinsClient.getCampaignFromWallet(queryParams, getCampaignResponse);
-      appcoinsClient.getCampaign(queryParams, getCampaignResponse);
+      startWalletConnection();
+      //appcoinsClient.getCampaign(queryParams, getCampaignResponse);
     } else {
+      QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
+      GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
       appcoinsClient.getCampaign(queryParams, getCampaignResponse);
     }
   }
@@ -336,6 +343,11 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     processCampaign(campaign);
   }
 
+  @Override public void responseGetCampaignWallet(Bundle response) {
+    Campaign campaign = CampaignMapper.mapCampaignFromBundle(response);
+    processCampaign(campaign);
+  }
+
   private void processCampaign(Campaign campaign) {
     if (!campaign.hasCampaign()) {
       Log.d(TAG, "No campaign is available.");
@@ -343,13 +355,13 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     } else {
       if (isWalletInstalled) {
         walletIsInstalled(campaign);
-      } else{
+      } else {
         walletIsNotInstalled();
       }
     }
   }
 
-  private void walletIsInstalled(Campaign campaign){
+  private void walletIsInstalled(Campaign campaign) {
     this.campaignId = campaign.getId();
     poaConnector.startHandshake(appContext, network);
     checkPreferencesForPackage();
@@ -358,7 +370,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     initiateProofSending();
   }
 
-  private void walletIsNotInstalled(){
+  private void walletIsNotInstalled() {
     if (!processing && !preferences.getBoolean(FINISHED_KEY, false) && !dialogVisible) {
       dialogVisible = true;
       spHandler.post(new Runnable() {
@@ -367,5 +379,24 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
         }
       });
     }
+  }
+
+  private void startWalletConnection() {
+    walletCampaignRepository = new WalletCampaignRepository();
+    walletServiceConnection = new WalletServiceConnection(appContext, walletCampaignRepository);
+    final PoAManager p = this;
+    walletServiceConnection.startConnection(new AppcoinsAdvertisementListenner() {
+      @Override public void onAdvertisementFinished(int responseCode) {
+        if (responseCode == ResponseCode.OK.getValue()) {
+          WalletConnectionThreadGetCampaign walletConnectionThreadGetCampaign =
+              new WalletConnectionThreadGetCampaign(p, walletCampaignRepository);
+          Thread t = new Thread(walletConnectionThreadGetCampaign);
+          t.start();
+        } else {
+          Log.d(TAG, "No campaign is available.");
+          stopProcess();
+        }
+      }
+    });
   }
 }
