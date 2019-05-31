@@ -35,7 +35,7 @@ public class WalletUtils {
 
     private static void showWalletInstallDialog(final Activity activity, Context context, String message, final DialogVisibleListener dialogVisibleListener) {
         DialogWalletInstall
-                .with(activity, false)
+                .with(activity)
                 .show();
     }
 }

@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.billing;
+package com.appcoins.sdk.billing.wallet;
 
 import android.app.Dialog;
 import android.content.Context;

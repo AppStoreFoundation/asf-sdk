@@ -55,7 +55,7 @@ public class WalletUtils {
          *  2- if so, we need to get  url of this image and then when copy this code to  apk-migrator as Smali,
          *  the correct dialog_wallet_install_graphic needs to be write  */
         DialogWalletInstall
-                .with(act, false)
+                .with(act)
                 .show();
     }
 
