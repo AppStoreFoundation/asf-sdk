@@ -363,9 +363,11 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
   private void walletIsInstalled(Campaign campaign) {
     this.campaignId = campaign.getId();
+    Log.d(TAG,"Start Handshake");
+    Log.d(TAG,"CampaignID:"+campaignId +" PackageName: "+appContext.getPackageName());
     poaConnector.startHandshake(appContext, network);
     checkPreferencesForPackage();
-    sendMSGRegisterCampaign(campaign.getPackageName(), campaign.getId()
+    sendMSGRegisterCampaign(appContext.getPackageName(), campaign.getId()
         .toString());
     initiateProofSending();
   }

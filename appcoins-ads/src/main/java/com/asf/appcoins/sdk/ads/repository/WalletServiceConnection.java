@@ -31,7 +31,8 @@ public class WalletServiceConnection implements ServiceConnection {
 
   public void startConnection(final AppcoinsAdvertisementListenner appcoinsAdvertisementListenner) {
     this.listenner = appcoinsAdvertisementListenner;
-    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
+    Intent serviceIntent = new Intent("com.appcoins.wallet.advertising.action.BIND");
+    //TODO CRIAR UMA CONFIGRAÇÂO para o BINDPACKAGE
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
 
     List<ResolveInfo> intentServices = context.getPackageManager()
