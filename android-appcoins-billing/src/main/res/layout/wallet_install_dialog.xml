@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="296dp"
-    android:layout_height="288dp"
-    android:layout_gravity="center">
+    android:layout_height="288dp">
 
 
     <ImageView
@@ -51,7 +50,6 @@
         android:layout_marginTop="26dp"
         android:layout_marginBottom="16dp"
         android:background="@android:color/transparent"
-        android:foreground="?attr/selectableItemBackground"
         android:text="@string/app_wallet_skip"
         android:textAllCaps="true"
         android:textColor="#8f000000"
