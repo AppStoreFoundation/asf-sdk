@@ -9,13 +9,13 @@ import android.os.IBinder;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import java.util.List;
 
-public class WalletServiceConnection implements ServiceConnection {
+public class AppcoinsAdvertisementConnection implements ServiceConnection {
 
   private final ConnectionLifeCycle connectionLifeCycle;
   private Context context;
   private AppcoinsAdvertisementListenner listenner;
 
-  public WalletServiceConnection(Context context,ConnectionLifeCycle connectionLifeCycle){
+  public AppcoinsAdvertisementConnection(Context context,ConnectionLifeCycle connectionLifeCycle){
     this.context = context;
     this.connectionLifeCycle = connectionLifeCycle;
   }
@@ -31,8 +31,8 @@ public class WalletServiceConnection implements ServiceConnection {
 
   public void startConnection(final AppcoinsAdvertisementListenner appcoinsAdvertisementListenner) {
     this.listenner = appcoinsAdvertisementListenner;
-    Intent serviceIntent = new Intent("com.appcoins.wallet.advertising.action.BIND");
-    //TODO CRIAR UMA CONFIGRAÇÂO para o BINDPACKAGE
+    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
+
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
 
     List<ResolveInfo> intentServices = context.getPackageManager()

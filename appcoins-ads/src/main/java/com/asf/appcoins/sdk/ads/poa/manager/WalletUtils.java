@@ -15,9 +15,15 @@ import java.lang.reflect.Field;
 
 public class WalletUtils {
 
+  private static boolean dialogVisible;
+
   public static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
 
   public static Context context;
+
+  public static boolean isDialogVisible() {
+    return dialogVisible;
+  }
 
   public static void setContext(Context cont) {
     context = cont;
@@ -46,6 +52,8 @@ public class WalletUtils {
     if (act == null) {
       return;
     }
+
+    dialogVisible = true;
     AlertDialog.Builder builder;
     builder = new AlertDialog.Builder(act);
     builder.setTitle(R.string.wallet_missing);
@@ -62,6 +70,7 @@ public class WalletUtils {
     builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialogInterface, int i) {
         dialogInterface.cancel();
+        dialogVisible = false;
       }
     });
 

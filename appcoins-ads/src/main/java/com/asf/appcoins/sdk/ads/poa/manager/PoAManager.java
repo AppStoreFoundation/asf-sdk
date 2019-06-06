@@ -20,11 +20,11 @@ import com.asf.appcoins.sdk.ads.network.threads.CheckConnectivityRetry;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
 import com.asf.appcoins.sdk.ads.poa.campaign.CampaignMapper;
+import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementConnection;
 import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementListenner;
+import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementRepository;
+import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementThreadGetCampaign;
 import com.asf.appcoins.sdk.ads.repository.ResponseCode;
-import com.asf.appcoins.sdk.ads.repository.WalletCampaignRepository;
-import com.asf.appcoins.sdk.ads.repository.WalletConnectionThreadGetCampaign;
-import com.asf.appcoins.sdk.ads.repository.WalletServiceConnection;
 import java.math.BigInteger;
 import net.grandcentrix.tray.AppPreferences;
 
@@ -77,8 +77,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private Handler handleRetryConnection = new Handler();
   private int connectionRetrys = 0;
   private boolean isWalletInstalled;
-  private WalletCampaignRepository walletCampaignRepository;
-  private WalletServiceConnection walletServiceConnection;
+  private AppcoinsAdvertisementRepository appcoinsAdvertisementRepository;
+  private AppcoinsAdvertisementConnection appcoinsAdvertisementConnection;
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -324,9 +324,11 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
   private void retrieveCampaign() {
     if (isWalletInstalled) {
+      Log.d(TAG, "Wallet Installed");
       startWalletConnection();
-      //appcoinsClient.getCampaign(queryParams, getCampaignResponse);
     } else {
+      Log.d(TAG, "No Wallet Installed");
+      Log.d(TAG, "Checking for available campaigns");
       QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
       GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
       appcoinsClient.getCampaign(queryParams, getCampaignResponse);
@@ -363,8 +365,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
   private void walletIsInstalled(Campaign campaign) {
     this.campaignId = campaign.getId();
-    Log.d(TAG,"Start Handshake");
-    Log.d(TAG,"CampaignID:"+campaignId +" PackageName: "+appContext.getPackageName());
+    Log.d(TAG, "Start Handshake");
+    Log.d(TAG, "CampaignID:" + campaignId + " PackageName: " + appContext.getPackageName());
     poaConnector.startHandshake(appContext, network);
     checkPreferencesForPackage();
     sendMSGRegisterCampaign(appContext.getPackageName(), campaign.getId()
@@ -373,8 +375,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   private void walletIsNotInstalled() {
-    if (!processing && !preferences.getBoolean(FINISHED_KEY, false) && !dialogVisible) {
-      dialogVisible = true;
+    Log.d(TAG,"Promping Wallet Install");
+    if(!WalletUtils.isDialogVisible()){
       spHandler.post(new Runnable() {
         @Override public void run() {
           WalletUtils.promptToInstallWallet();
@@ -384,18 +386,20 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   private void startWalletConnection() {
-    walletCampaignRepository = new WalletCampaignRepository();
-    walletServiceConnection = new WalletServiceConnection(appContext, walletCampaignRepository);
+    appcoinsAdvertisementRepository = new AppcoinsAdvertisementRepository();
+    appcoinsAdvertisementConnection =
+        new AppcoinsAdvertisementConnection(appContext, appcoinsAdvertisementRepository);
     final PoAManager p = this;
-    walletServiceConnection.startConnection(new AppcoinsAdvertisementListenner() {
+    appcoinsAdvertisementConnection.startConnection(new AppcoinsAdvertisementListenner() {
       @Override public void onAdvertisementFinished(int responseCode) {
         if (responseCode == ResponseCode.OK.getValue()) {
-          WalletConnectionThreadGetCampaign walletConnectionThreadGetCampaign =
-              new WalletConnectionThreadGetCampaign(p, walletCampaignRepository);
-          Thread t = new Thread(walletConnectionThreadGetCampaign);
+          Log.d(TAG, "Retrieving the Campaign by the Wallet");
+          AppcoinsAdvertisementThreadGetCampaign appcoinsAdvertisementThreadGetCampaign =
+              new AppcoinsAdvertisementThreadGetCampaign(p, appcoinsAdvertisementRepository);
+          Thread t = new Thread(appcoinsAdvertisementThreadGetCampaign);
           t.start();
         } else {
-          Log.d(TAG, "No campaign is available.");
+          Log.d(TAG, "Coudn't connect to the wallet");
           stopProcess();
         }
       }

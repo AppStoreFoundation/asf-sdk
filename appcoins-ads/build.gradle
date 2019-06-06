@@ -34,9 +34,9 @@ android {
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
           project.BDS_WALLET_PACKAGE_NAME_DEV
       buildConfigField "String", "IAB_BIND_ACTION",
-          "\"" + project.APPCOINS_DEV_IAB_BIND_ACTION + "\""
+          "\"" + project.APPCOINS_ADVERTISEMENT_DEV_BIND_ACTION + "\""
       buildConfigField "String", "IAB_BIND_PACKAGE",
-          "\"" + project.APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
+          "\"" + project.APPCOINS_ADVERTISEMENT_DEV_IAB_BIND_PACKAGE + "\""
     }
     release {
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',

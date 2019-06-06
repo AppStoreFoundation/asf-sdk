@@ -57,11 +57,16 @@ public class CampaignMapper {
   }
 
   public static Campaign mapCampaignFromBundle(Bundle response) {
-    int responseCode = response.getInt("RESPONSE_CODE");
-    if (responseCode != ResponseCode.OK.getValue()) {
-      return new Campaign(new BigInteger(response.getString("CAMPAIGN_ID")), "");
+
+    try {
+      int responseCode = response.getInt("RESPONSE_CODE");
+      if (responseCode == ResponseCode.OK.getValue()) {
+        return new Campaign(new BigInteger(response.getString("CAMPAIGN_ID")), "");
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
-    return new Campaign(new BigInteger("0"), "");
+    return new Campaign(new BigInteger("-1"), "");
   }
 }
 

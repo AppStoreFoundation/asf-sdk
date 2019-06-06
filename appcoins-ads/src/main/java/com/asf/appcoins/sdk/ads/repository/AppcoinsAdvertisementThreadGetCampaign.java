@@ -4,20 +4,20 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import com.asf.appcoins.sdk.ads.network.listeners.GetCampaignResponseListener;
 
-public class WalletConnectionThreadGetCampaign implements Runnable {
+public class AppcoinsAdvertisementThreadGetCampaign implements Runnable {
 
   private GetCampaignResponseListener getCampaignResponseListener;
-  private WalletCampaignRepository walletCampaignRepository;
+  private AppcoinsAdvertisementRepository appcoinsAdvertisementRepository;
 
-  public WalletConnectionThreadGetCampaign(GetCampaignResponseListener getCampaignResponseListener,
-      WalletCampaignRepository walletCampaignRepository) {
+  public AppcoinsAdvertisementThreadGetCampaign(GetCampaignResponseListener getCampaignResponseListener,
+      AppcoinsAdvertisementRepository appcoinsAdvertisementRepository) {
     this.getCampaignResponseListener = getCampaignResponseListener;
-    this.walletCampaignRepository = walletCampaignRepository;
+    this.appcoinsAdvertisementRepository = appcoinsAdvertisementRepository;
   }
 
   @Override public void run() {
     try {
-      Bundle response = walletCampaignRepository.getAvailableCampaign();
+      Bundle response = appcoinsAdvertisementRepository.getAvailableCampaign();
       getCampaignResponseListener.responseGetCampaignWallet(response);
     } catch (RemoteException e) {
       e.printStackTrace();

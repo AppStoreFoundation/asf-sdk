@@ -2,7 +2,6 @@ package com.asf.appcoins.sdk.ads.network;
 
 import com.asf.appcoins.sdk.ads.network.clients.CampaignService;
 import com.asf.appcoins.sdk.ads.network.clients.CheckConnectionCampaignService;
-import com.asf.appcoins.sdk.ads.repository.WalletCampaignRepository;
 import com.asf.appcoins.sdk.ads.network.responses.CampaignResponseHandler;
 import com.asf.appcoins.sdk.ads.network.responses.ClientResponseHandler;
 import com.asf.appcoins.sdk.ads.network.responses.ConnectivityResponseHandler;
