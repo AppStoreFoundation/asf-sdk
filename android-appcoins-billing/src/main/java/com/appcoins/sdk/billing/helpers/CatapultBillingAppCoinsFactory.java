@@ -1,6 +1,6 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.content.Context;
+import android.app.Activity;
 import android.util.Base64;
 import com.appcoins.sdk.billing.AppCoinsBilling;
 import com.appcoins.sdk.billing.AppcoinsBillingClient;
@@ -9,7 +9,7 @@ import com.appcoins.sdk.billing.RepositoryServiceConnection;
 
 public class CatapultBillingAppCoinsFactory {
 
-  public static AppcoinsBillingClient BuildAppcoinsBilling(Context context,
+  public static AppcoinsBillingClient BuildAppcoinsBilling(Activity context,
       String base64PublicKey) {
 
     AppCoinsAndroidBillingRepository repository = new AppCoinsAndroidBillingRepository(3,

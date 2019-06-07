@@ -149,6 +149,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
           }
         });
       } catch (Exception e) {
+        e.printStackTrace();
         Bundle response = new Bundle();
         response.putInt(Utils.RESPONSE_CODE, ResponseCode.ERROR.getValue());
         return response;
@@ -156,7 +157,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
       Bundle response = new Bundle();
       response.putString(Utils.HAS_WALLET_INSTALLED, "");
-      response.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
+      response.putInt(Utils.RESPONSE_CODE, ResponseCode.ERROR.getValue());
       return response;
     }
   }
@@ -219,7 +220,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
 
-    final Context context = WalletUtils.context;
+    final Context context = WalletUtils.getActivity();
 
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
