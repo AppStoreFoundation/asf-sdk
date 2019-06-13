@@ -1,6 +1,7 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
 import android.os.Bundle;
+import android.util.Log;
 import com.asf.appcoins.sdk.ads.network.responses.AppCoinsClientResponse;
 import com.asf.appcoins.sdk.ads.repository.ResponseCode;
 import java.math.BigInteger;
@@ -64,8 +65,10 @@ public class CampaignMapper {
         return new Campaign(new BigInteger(response.getString("CAMPAIGN_ID")), "");
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      e.printStackTrace();;
     }
+
+    Log.d(CampaignMapper.class.getName(), "No campaign is available.");
     return new Campaign(new BigInteger("-1"), "");
   }
 }

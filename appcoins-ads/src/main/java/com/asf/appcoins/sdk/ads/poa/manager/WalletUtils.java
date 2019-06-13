@@ -50,6 +50,7 @@ public class WalletUtils {
     }
 
     if (act == null) {
+      Log.d(WalletUtils.class.getName(),"Problem retrieving main Activity");
       return;
     }
 

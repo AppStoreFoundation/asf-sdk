@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.IBinder;
+import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import java.util.List;
 
@@ -31,14 +32,17 @@ public class AppcoinsAdvertisementConnection implements ServiceConnection {
 
   public void startConnection(final AppcoinsAdvertisementListenner appcoinsAdvertisementListenner) {
     this.listenner = appcoinsAdvertisementListenner;
-    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
+    Intent serviceIntent = new Intent(BuildConfig.ADVERTISEMENT_BIND_ACTION);
 
-    serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
+    serviceIntent.setPackage(BuildConfig.BDS_WALLET_PACKAGE_NAME);
 
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
     if (intentServices != null && !intentServices.isEmpty()) {
       context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+    }
+    else{
+      appcoinsAdvertisementListenner.onAdvertisementFinished(ResponseCode.ERROR.getValue());
     }
   }
 }

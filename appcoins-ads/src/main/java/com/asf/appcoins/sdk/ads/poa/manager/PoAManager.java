@@ -356,14 +356,14 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       stopProcess();
     } else {
       if (isWalletInstalled) {
-        walletIsInstalled(campaign);
+        startCampaign(campaign);
       } else {
-        walletIsNotInstalled();
+        promptWalletInstall();
       }
     }
   }
 
-  private void walletIsInstalled(Campaign campaign) {
+  private void startCampaign(Campaign campaign) {
     this.campaignId = campaign.getId();
     Log.d(TAG, "Start Handshake");
     Log.d(TAG, "CampaignID:" + campaignId + " PackageName: " + appContext.getPackageName());
@@ -374,8 +374,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     initiateProofSending();
   }
 
-  private void walletIsNotInstalled() {
-    Log.d(TAG,"Promping Wallet Install");
+  private void promptWalletInstall() {
+    Log.d(TAG,"Prompting Wallet Install");
     if(!WalletUtils.isDialogVisible()){
       spHandler.post(new Runnable() {
         @Override public void run() {

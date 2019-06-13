@@ -22,19 +22,14 @@ public class AppCoinsClient {
   }
 
   public void getCampaign(QueryParams queryParams, ClientResponseHandler clientResponseHandler) {
-    CampaignResponseHandler CampaignResponseHandler =
+    CampaignResponseHandler campaignResponseHandler =
         new CampaignResponseHandler(clientResponseHandler);
     CampaignService appcoinsHTTPClient =
         new CampaignService(packageName, versionCode, serviceUrl, interceptor, queryParams,
-            CampaignResponseHandler);
+            campaignResponseHandler);
 
     Thread operation = new Thread(appcoinsHTTPClient);
     operation.start();
-  }
-
-  public void getCampaignFromWallet(QueryParams queryParams,
-      ClientResponseHandler clientResponseHandler) {
-
   }
 
   public void checkConnectivity(ClientResponseHandler clientResponseHandler) {
