@@ -2,6 +2,9 @@ package com.asf.appcoins.sdk.ads.poa.manager;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -78,6 +81,31 @@ public class WalletUtils {
     builder.setIcon(android.R.drawable.ic_dialog_alert);
     builder.show();
   }
+
+
+  public static void createInstallWalletNotification(){
+
+
+    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + walletPackageName));
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+
+
+    Notification notification = new Notification.Builder(context)
+        .setSmallIcon(R.drawable.ic_stat_name)
+        .setContentTitle("APPC Wallet Missing")
+        .setContentText("To get your reward in AppCoins, you need to install the AppCoins BDS Wallet.")
+        .setAutoCancel(true)
+        .addAction(R.drawable.ic_stat_name,"Install",pendingIntent)
+        .build();
+
+    NotificationManager notificationManager =(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    notificationManager.notify(0,notification);
+
+
+
+  }
+
 
   public static Activity getActivity() throws Exception {
     Class activityThreadClass = Class.forName("android.app.ActivityThread");

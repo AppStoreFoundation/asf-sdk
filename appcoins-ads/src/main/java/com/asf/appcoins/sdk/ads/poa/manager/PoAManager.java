@@ -379,7 +379,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     if(!WalletUtils.isDialogVisible()){
       spHandler.post(new Runnable() {
         @Override public void run() {
-          WalletUtils.promptToInstallWallet();
+          WalletUtils.createInstallWalletNotification();
         }
       });
     }

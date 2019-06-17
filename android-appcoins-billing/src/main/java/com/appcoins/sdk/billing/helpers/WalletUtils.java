@@ -69,6 +69,7 @@ public class WalletUtils {
     builder.show();
   }
 
+
   public static Activity getActivity() throws Exception {
     Class activityThreadClass = Class.forName("android.app.ActivityThread");
     Object activityThread = activityThreadClass.getMethod("currentActivityThread")
