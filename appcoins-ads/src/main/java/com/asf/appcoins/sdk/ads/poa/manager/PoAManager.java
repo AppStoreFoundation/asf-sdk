@@ -79,6 +79,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private boolean isWalletInstalled;
   private AppcoinsAdvertisementRepository appcoinsAdvertisementRepository;
   private AppcoinsAdvertisementConnection appcoinsAdvertisementConnection;
+  private static boolean showPopUpNotification;
+  private static String POA_NOTIFICATION_VALUE = "POA_NOTIFICATION";
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -108,6 +110,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       WalletUtils.setContext(context);
       SharedPreferences preferences =
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
+      showPopUpNotification = preferences.contains(POA_NOTIFICATION_VALUE);
       String packageName = context.getPackageName();
       instance = new PoAManager(preferences, connector, context, networkId,
           createAppCoinsClient(packageName, getVerCode(context, packageName), networkId));
@@ -271,9 +274,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   @Override public void onBecameForeground(Activity activity) {
-    //TODO this has to be changed to if only there is a campaign active you call the popup.
-    foreground = true;
     isWalletInstalled = WalletUtils.hasWalletInstalled();
+    foreground = true;
     handleCampaign();
   }
 
@@ -358,7 +360,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       if (isWalletInstalled) {
         startCampaign(campaign);
       } else {
-        promptWalletInstall();
+        promptWalletNotification();
       }
     }
   }
@@ -374,9 +376,13 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     initiateProofSending();
   }
 
-  private void promptWalletInstall() {
-    Log.d(TAG,"Prompting Wallet Install");
-    if(!WalletUtils.isDialogVisible()){
+  private void promptWalletNotification() {
+    if (!showPopUpNotification) {
+      Log.d(TAG, "Prompting Notification Install");
+      preferences.edit()
+          .putBoolean(POA_NOTIFICATION_VALUE, true)
+          .commit();
+      showPopUpNotification = true;
       spHandler.post(new Runnable() {
         @Override public void run() {
           WalletUtils.createInstallWalletNotification();
