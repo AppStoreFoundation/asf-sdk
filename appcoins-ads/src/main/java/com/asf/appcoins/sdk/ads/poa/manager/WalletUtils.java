@@ -1,6 +1,7 @@
 package com.asf.appcoins.sdk.ads.poa.manager;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 
@@ -49,6 +51,55 @@ public class WalletUtils {
   }
 
   public static void createInstallWalletNotification() {
+
+    NotificationManager notificationManager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+      createNotificationChannels("0", "POA_NOTIFICATION_HEADS_UP", "POA_NOTIFICATION_HEADS_UP",
+          notificationManager,NotificationManager.IMPORTANCE_HIGH);
+
+      createNotificationChannels("1", "POA_NOTIFICATION_NORMAL", "POA_NOTIFICATION_NORMAL",
+          notificationManager,NotificationManager.IMPORTANCE_DEFAULT);
+
+      Intent intent = getNotificationIntent();
+
+      if (intent == null) {
+        Log.d(WalletUtils.class.getName(), "ApplicationInfo not Found.");
+        return;
+      }
+
+      Notification notificationHeadsUp = buildNotification("0", getNotificationIntent(), true);
+      Notification notificationNormal = buildNotification("1", getNotificationIntent(), false);
+
+      notificationManager.notify(1, notificationNormal);
+      notificationManager.notify(0, notificationHeadsUp);
+
+    } else {
+
+      Intent intent = getNotificationIntent();
+
+      if (intent == null) {
+        Log.d(WalletUtils.class.getName(), "ApplicationInfo not Found.");
+        return;
+      }
+
+      Notification notificationHeadsUp = buildNotification("0", intent, true);
+
+      notificationManager.notify(0, notificationHeadsUp);
+    }
+  }
+
+  private static void createNotificationChannels(String id, String name, String description,
+      NotificationManager notificationManager, int priority) {
+    NotificationChannel channelHeadUp =
+        new NotificationChannel(id, name, priority);
+    channelHeadUp.setDescription(description);
+    notificationManager.createNotificationChannel(channelHeadUp);
+  }
+
+  private static Intent getNotificationIntent() {
     Intent intent = null;
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + walletPackageName));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -67,8 +118,7 @@ public class WalletUtils {
       resources = packageManager.getResourcesForApplication(applicationInfo);
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
-      Log.d(WalletUtils.class.getName(), "ApplicationInfo not Found.");
-      return;
+      return null;
     }
 
     int applicationIconResID = applicationInfo.icon;
@@ -78,19 +128,40 @@ public class WalletUtils {
     String packageName = resources.getResourcePackageName(applicationIconResID);
     int identifier = resources.getIdentifier(iconName, typeName, packageName);
 
+    intent.putExtra("identifier", identifier);
+
+    return intent;
+  }
+
+  private static Notification buildNotification(String channelId, Intent intent,
+      boolean useTimeOut) {
+
+    Notification.Builder notBuilder = null;
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      notBuilder = new Notification.Builder(context, channelId);
+    } else {
+      notBuilder = new Notification.Builder(context);
+    }
+
     pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-    Notification notification = new Notification.Builder(context).setSmallIcon(identifier)
-        .setContentTitle("APPC Wallet Missing")
-        .setContentText(
-            "To get your reward in AppCoins, you need to install the AppCoins BDS Wallet.")
-        .setAutoCancel(true)
-        .addAction(identifier, "Install", pendingIntent)
-        .build();
+    notBuilder.setSmallIcon(intent.getExtras()
+        .getInt("identifier"))
+        .setContentTitle("You need the AppCoins Wallet!")
+        .setContentText("To get your reward you need the AppCoins Wallet.");
 
-    NotificationManager notificationManager =
-        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    notBuilder.setFullScreenIntent(pendingIntent, false);
 
-    notificationManager.notify(0, notification);
+    notBuilder.setStyle(new Notification.BigTextStyle().bigText(
+        "To get your reward you need the AppCoins Wallet."));
+
+    if (useTimeOut && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      notBuilder.setTimeoutAfter(3000);
+    }
+
+    Notification notification = notBuilder.build();
+
+    return notification;
   }
 }
