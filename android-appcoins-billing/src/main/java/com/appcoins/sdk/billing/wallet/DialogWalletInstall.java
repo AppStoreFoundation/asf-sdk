@@ -10,7 +10,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewOutlineProvider;
@@ -21,6 +24,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.appcoins.sdk.android.billing.R;
+
+import static android.graphics.Typeface.BOLD;
 
 public class DialogWalletInstall extends Dialog {
 
@@ -95,11 +100,14 @@ public class DialogWalletInstall extends Dialog {
         dialog_wallet_install_text_message = findViewById(R.id.dialog_wallet_install_text_message);
         String dialog_message = getContext().getString(R.string.app_wallet_install_wallet_from_ads);
 
-        Spanned messageStylized = Html.fromHtml(dialog_message);
+        SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialog_message);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            messageStylized = Html.fromHtml(dialog_message, Html.FROM_HTML_MODE_LEGACY);
-        }
+        messageStylized
+                .setSpan(
+                        new StyleSpan(BOLD),
+                        dialog_message.indexOf("AppCoins"),
+                        dialog_message.length(),
+                        Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
         dialog_wallet_install_text_message.setText(messageStylized);
     }

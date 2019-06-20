@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="296dp"
-    android:layout_height="288dp">
+    android:layout_width="match_parent"
+    android:layout_height="288dp"
+    android:layout_gravity="top"
+    android:background="@drawable/dialog_wallet_install_parent_background">
 
 
     <ImageView
         android:id="@+id/dialog_wallet_install_image_graphic"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="144dp"
         android:layout_alignParentTop="true"
         android:maxWidth="296dp"
         android:scaleType="centerCrop"
@@ -33,7 +35,7 @@
         android:layout_below="@+id/dialog_wallet_install_image_icon"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="32dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="32dp"
         android:gravity="center_horizontal"
         android:maxLines="2"
@@ -41,31 +43,47 @@
         android:textColor="#4a4a4a"
         android:textSize="16sp" />
 
-    <Button
-        android:id="@+id/dialog_wallet_install_button_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="36dp"
-        android:layout_below="@+id/dialog_wallet_install_text_message"
-        android:layout_marginLeft="72dp"
-        android:layout_marginTop="26dp"
-        android:layout_marginBottom="16dp"
-        android:background="@android:color/transparent"
-        android:text="@string/app_wallet_skip"
-        android:textAllCaps="true"
-        android:textColor="#8f000000"
-        android:textSize="12sp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="1">
 
-    <Button
-        android:id="@+id/dialog_wallet_install_button_download"
-        android:layout_width="110dp"
-        android:layout_height="36dp"
-        android:layout_below="@+id/dialog_wallet_install_text_message"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="26dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/dialog_wallet_install_download_button_background"
-        android:text="@string/app_wallet_install"
-        android:textAllCaps="true"
-        android:textColor="@color/dialog_wallet_install_download_button_text_color" />
+        <Button
+            android:id="@+id/dialog_wallet_install_button_cancel"
+            android:layout_width="56dp"
+            android:layout_height="36dp"
+            android:layout_below="@+id/dialog_wallet_install_text_message"
+            android:layout_marginTop="26dp"
+            android:layout_marginLeft="56dp"
+            android:layout_marginRight="36dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:text="@string/app_wallet_skip"
+            android:textAllCaps="true"
+            android:layout_weight="0.5"
+            android:textColor="#8f000000"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/dialog_wallet_install_button_download"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_below="@+id/dialog_wallet_install_text_message"
+            android:layout_marginTop="26dp"
+            android:layout_weight="0.5"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/dialog_wallet_install_download_button_background"
+            android:gravity="center"
+            android:text="@string/app_wallet_install"
+            android:textAllCaps="true"
+            android:textColor="@color/dialog_wallet_install_download_button_text_color"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+
 </RelativeLayout>
