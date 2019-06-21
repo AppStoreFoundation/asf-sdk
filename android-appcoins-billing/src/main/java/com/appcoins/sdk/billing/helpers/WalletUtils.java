@@ -66,32 +66,15 @@ public class WalletUtils {
     builder.setMessage(act.getString(R.string.install_wallet_from_iab));
     Log.d("String name: ", act.getString(R.string.install_wallet_from_iab));
 
-    if (hasAptoideInstalled(aptoidePackageName, context.getPackageManager())) {
-      Log.d("AptoideInstallation", "Aptoide is installed on this device");
-
       builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
         @Override public void onClick(DialogInterface dialog, int which) {
           try {
-            appStoreIntent.setPackage(aptoidePackageName);
-            act.startActivity(appStoreIntent);
-          } catch (android.content.ActivityNotFoundException exception) {
-            act.startActivity(new Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://appcoins-wallet.br.aptoide.com/")));
-          }
-        }
-      });
-
-      builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
-        @Override public void onClick(DialogInterface dialogInterface, int i) {
-          dialogInterface.cancel();
-        }
-      });
-    } else {
-      Log.d("AptoideInstallation", "Aptoide is not installed on this device");
-
-      builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
-        @Override public void onClick(DialogInterface dialog, int which) {
-          try {
+            if (hasAptoideInstalled(aptoidePackageName, context.getPackageManager())) {
+              Log.d("AptoideInstallation", "Aptoide is installed on this device");
+              appStoreIntent.setPackage(aptoidePackageName);
+            } else {
+              Log.d("AptoideInstallation", "Aptoide is not installed on this device");
+            }
             act.startActivity(appStoreIntent);
           } catch (android.content.ActivityNotFoundException exception) {
             act.startActivity(new Intent(Intent.ACTION_VIEW,
@@ -105,7 +88,6 @@ public class WalletUtils {
           dialogInterface.cancel();
         }
       });
-    }
 
     builder.setIcon(android.R.drawable.ic_dialog_alert);
     builder.show();
