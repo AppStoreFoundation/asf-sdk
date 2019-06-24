@@ -20,6 +20,10 @@ public class WalletUtils {
 
   public static String aptoidePackageName = BuildConfig.APTOIDE_PACKAGE_NAME;
 
+  private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
+
+  private static String POA_NOTIFICATION_NORMAL = "POA_NOTIFICATION_NORMAL";
+
   public static Context context;
 
   public static PendingIntent pendingIntent;
@@ -55,35 +59,27 @@ public class WalletUtils {
     NotificationManager notificationManager =
         (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+    Intent intent = getNotificationIntent();
+
+    if (intent == null) {
+      Log.d(WalletUtils.class.getName(), "ApplicationInfo not Found.");
+      return;
+    }
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-      createNotificationChannels("0", "POA_NOTIFICATION_HEADS_UP", "POA_NOTIFICATION_HEADS_UP",
-          notificationManager,NotificationManager.IMPORTANCE_HIGH);
+      createNotificationChannels("0", POA_NOTIFICATION_HEADS_UP, POA_NOTIFICATION_HEADS_UP,
+          notificationManager, NotificationManager.IMPORTANCE_HIGH);
 
-      createNotificationChannels("1", "POA_NOTIFICATION_NORMAL", "POA_NOTIFICATION_NORMAL",
-          notificationManager,NotificationManager.IMPORTANCE_DEFAULT);
+      createNotificationChannels("1", POA_NOTIFICATION_NORMAL, POA_NOTIFICATION_NORMAL,
+          notificationManager, NotificationManager.IMPORTANCE_DEFAULT);
 
-      Intent intent = getNotificationIntent();
-
-      if (intent == null) {
-        Log.d(WalletUtils.class.getName(), "ApplicationInfo not Found.");
-        return;
-      }
-
-      Notification notificationHeadsUp = buildNotification("0", getNotificationIntent(), true);
-      Notification notificationNormal = buildNotification("1", getNotificationIntent(), false);
+      Notification notificationHeadsUp = buildNotification("0", intent, true);
+      Notification notificationNormal = buildNotification("1", intent, false);
 
       notificationManager.notify(1, notificationNormal);
       notificationManager.notify(0, notificationHeadsUp);
-
     } else {
-
-      Intent intent = getNotificationIntent();
-
-      if (intent == null) {
-        Log.d(WalletUtils.class.getName(), "ApplicationInfo not Found.");
-        return;
-      }
 
       Notification notificationHeadsUp = buildNotification("0", intent, true);
 
@@ -93,8 +89,7 @@ public class WalletUtils {
 
   private static void createNotificationChannels(String id, String name, String description,
       NotificationManager notificationManager, int priority) {
-    NotificationChannel channelHeadUp =
-        new NotificationChannel(id, name, priority);
+    NotificationChannel channelHeadUp = new NotificationChannel(id, name, priority);
     channelHeadUp.setDescription(description);
     notificationManager.createNotificationChannel(channelHeadUp);
   }
