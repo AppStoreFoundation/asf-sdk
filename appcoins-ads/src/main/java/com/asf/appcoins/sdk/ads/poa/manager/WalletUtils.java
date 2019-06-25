@@ -61,8 +61,8 @@ public class WalletUtils {
 
     Intent intent = getNotificationIntent();
 
-    if (intent == null) {
-      Log.d(WalletUtils.class.getName(), "ApplicationInfo not Found.");
+    if(intent == null){
+      Log.d(WalletUtils.class.getName(),"Not found Application Info");
       return;
     }
 
@@ -146,7 +146,9 @@ public class WalletUtils {
         .setContentTitle("You need the AppCoins Wallet!")
         .setContentText("To get your reward you need the AppCoins Wallet.");
 
-    notBuilder.setFullScreenIntent(pendingIntent, false);
+        notBuilder.setContentIntent(pendingIntent);
+
+        notBuilder.setFullScreenIntent(pendingIntent, true);
 
     notBuilder.setStyle(new Notification.BigTextStyle().bigText(
         "To get your reward you need the AppCoins Wallet."));
