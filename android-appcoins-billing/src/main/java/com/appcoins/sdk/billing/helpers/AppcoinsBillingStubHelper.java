@@ -8,8 +8,10 @@ import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.Toast;
 import com.appcoins.billing.AppcoinsBilling;
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.billing.ResponseCode;
@@ -25,6 +27,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
   private final Object lockThread;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private boolean isServiceBound = false;
+  private boolean isMainThread;
 
   public AppcoinsBillingStubHelper() {
     this.lockThread = new Object();
@@ -46,7 +49,11 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         return ResponseCode.SERVICE_UNAVAILABLE.getValue();
       }
     } else {
-      return ResponseCode.OK.getValue();
+      if (type.equalsIgnoreCase("inapp")) {
+        return ResponseCode.OK.getValue();
+      } else {
+        return ResponseCode.BILLING_UNAVAILABLE.getValue();
+      }
     }
   }
 
@@ -110,11 +117,19 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
   @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
       String developerPayload) {
     if (WalletUtils.hasWalletInstalled()) {
+      isMainThread = Looper.myLooper() == Looper.getMainLooper();
+
       try {
         synchronized (lockThread) {
           if (!isServiceBound) {
             createRepository();
-            lockThread.wait();
+            if (!isMainThread) {
+              lockThread.wait();
+            } else {
+              Bundle response = new Bundle();
+              response.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
+              return response;
+            }
           }
         }
         return serviceAppcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type,
@@ -134,6 +149,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
           }
         });
       } catch (Exception e) {
+        e.printStackTrace();
         Bundle response = new Bundle();
         response.putInt(Utils.RESPONSE_CODE, ResponseCode.ERROR.getValue());
         return response;
@@ -141,7 +157,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
       Bundle response = new Bundle();
       response.putString(Utils.HAS_WALLET_INSTALLED, "");
-      response.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
+      response.putInt(Utils.RESPONSE_CODE, ResponseCode.ERROR.getValue());
       return response;
     }
   }
@@ -204,7 +220,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
 
-    Context context = WalletUtils.context;
+    final Context context = WalletUtils.getActivity();
 
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
@@ -215,6 +231,11 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
             serviceAppcoinsBilling = Stub.asInterface(service);
             lockThread.notify();
             isServiceBound = true;
+            if (isMainThread) {
+              Toast.makeText(context, "Try again, it will work this time =)", Toast.LENGTH_SHORT)
+                  .show();
+            }
+            isMainThread = false;
             Log.d(TAG, "onServiceConnected() called service = [" + serviceAppcoinsBilling + "]");
           }
         }
