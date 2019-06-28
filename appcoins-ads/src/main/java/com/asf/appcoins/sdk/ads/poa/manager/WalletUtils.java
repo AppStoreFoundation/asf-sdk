@@ -61,8 +61,8 @@ public class WalletUtils {
 
     Intent intent = getNotificationIntent();
 
-    if(intent == null){
-      Log.d(WalletUtils.class.getName(),"Not found Application Info");
+    if (intent == null) {
+      Log.d(WalletUtils.class.getName(), "Not found Application Info");
       return;
     }
 
@@ -132,30 +132,26 @@ public class WalletUtils {
       boolean useTimeOut) {
 
     Notification.Builder notBuilder = null;
+    pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       notBuilder = new Notification.Builder(context, channelId);
+      notBuilder.setFullScreenIntent(pendingIntent, true);
+      if (useTimeOut) {
+        notBuilder.setTimeoutAfter(3000);
+      }
     } else {
       notBuilder = new Notification.Builder(context);
+      notBuilder.setPriority(Notification.PRIORITY_MAX);
+      notBuilder.setContentIntent(pendingIntent);
+      notBuilder.setVibrate(new long[0]);
     }
 
-    pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-
+    //Because of the migration process the sdk doesnt the strings in the resources yet.
     notBuilder.setSmallIcon(intent.getExtras()
         .getInt("identifier"))
         .setContentTitle("You need the AppCoins Wallet!")
         .setContentText("To get your reward you need the AppCoins Wallet.");
-
-        notBuilder.setContentIntent(pendingIntent);
-
-        notBuilder.setFullScreenIntent(pendingIntent, true);
-
-    notBuilder.setStyle(new Notification.BigTextStyle().bigText(
-        "To get your reward you need the AppCoins Wallet."));
-
-    if (useTimeOut && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      notBuilder.setTimeoutAfter(3000);
-    }
 
     Notification notification = notBuilder.build();
 
