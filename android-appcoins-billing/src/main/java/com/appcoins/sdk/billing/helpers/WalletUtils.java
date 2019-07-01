@@ -35,9 +35,11 @@ public class WalletUtils {
     }
   }
 
-  public static boolean hasAptoideInstalled(String packageName, PackageManager packageManager) {
+  public static boolean hasAptoideInstalled() {
+
+    PackageManager packageManager = context.getPackageManager();
     try {
-      return packageManager.getApplicationInfo(packageName, 0).enabled;
+      return packageManager.getApplicationInfo(aptoidePackageName, 0).enabled;
     } catch (PackageManager.NameNotFoundException e) {
       return false;
     }
@@ -66,31 +68,39 @@ public class WalletUtils {
     builder.setMessage(act.getString(R.string.install_wallet_from_iab));
     Log.d("String name: ", act.getString(R.string.install_wallet_from_iab));
 
-      builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
-        @Override public void onClick(DialogInterface dialog, int which) {
-          try {
-            if (hasAptoideInstalled(aptoidePackageName, context.getPackageManager())) {
-              Log.d("AptoideInstallation", "Aptoide is installed on this device");
-              appStoreIntent.setPackage(aptoidePackageName);
-            } else {
-              Log.d("AptoideInstallation", "Aptoide is not installed on this device");
-            }
-            act.startActivity(appStoreIntent);
-          } catch (android.content.ActivityNotFoundException exception) {
-            act.startActivity(new Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://play.google.com/store/apps/details?id=" + walletPackageName)));
-          }
-        }
-      });
+    builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+      @Override public void onClick(DialogInterface dialog, int which) {
+        OnInstallClickAction(act, appStoreIntent);
+      }
+    });
 
-      builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
-        @Override public void onClick(DialogInterface dialogInterface, int i) {
-          dialogInterface.cancel();
-        }
-      });
+    builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
+      @Override public void onClick(DialogInterface dialogInterface, int i) {
+        dialogInterface.cancel();
+      }
+    });
 
     builder.setIcon(android.R.drawable.ic_dialog_alert);
     builder.show();
+  }
+
+  private static void OnInstallClickAction(Activity act, Intent appStoreIntent) {
+
+    //Check if the user has aptoide installed and open the aptoide's wallet page
+    if (hasAptoideInstalled()) {
+      Log.d("AptoideInstallation", "Aptoide is installed on this device");
+      appStoreIntent.setPackage(aptoidePackageName);
+    } else {
+      //Open google play's wallet page instead
+      Log.d("AptoideInstallation", "Aptoide is not installed on this device");
+    }
+
+    try {
+      act.startActivity(appStoreIntent);
+    } catch (android.content.ActivityNotFoundException exception) {
+      act.startActivity(new Intent(Intent.ACTION_VIEW,
+          Uri.parse("https://play.google.com/store/apps/details?id=" + walletPackageName)));
+    }
   }
 
   public static Activity getActivity() throws Exception {
