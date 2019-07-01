@@ -8,22 +8,26 @@ import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.Toast;
 import com.appcoins.billing.AppcoinsBilling;
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.billing.ResponseCode;
+import com.appcoins.sdk.billing.SkuDetails;
+import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.WSServiceController;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.ContentValues.TAG;
-
 public class AppcoinsBillingStubHelper implements AppcoinsBilling {
+  private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
 
   private final Object lockThread;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private boolean isServiceBound = false;
+  private boolean isMainThread;
 
   public AppcoinsBillingStubHelper() {
     this.lockThread = new Object();
@@ -45,7 +49,11 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         return ResponseCode.SERVICE_UNAVAILABLE.getValue();
       }
     } else {
-      return ResponseCode.OK.getValue();
+      if (type.equalsIgnoreCase("inapp")) {
+        return ResponseCode.OK.getValue();
+      } else {
+        return ResponseCode.BILLING_UNAVAILABLE.getValue();
+      }
     }
   }
 
@@ -69,20 +77,59 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
       }
     } else {
       List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
-      String response = WSServiceController.getSkuDetailsService(packageName, packageName, sku);
-      responseWs.putString(Utils.NO_WALLET_SKU_DETAILS, response);
+      String response =
+          WSServiceController.getSkuDetailsService("https://api.blockchainds.com", packageName,
+              sku);
+      responseWs.putInt(Utils.RESPONSE_CODE, 0);
+      ArrayList<String> skuDetails = buildResponse(response, type);
+      responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
     }
     return responseWs;
+  }
+
+  private ArrayList<String> buildResponse(String response, String type) {
+    SkuDetailsResult skuDetailsResult = AndroidBillingMapper.mapSkuDetailsFromWS(type, response);
+    ArrayList<String> list = new ArrayList<>();
+    for (SkuDetails skuDetails : skuDetailsResult.getSkuDetailsList()) {
+      list.add(map(skuDetails));
+    }
+    return list;
+  }
+
+  private String map(SkuDetails skuDetails) {
+    return "{\"productId\":\""
+        + skuDetails.getSku()
+        + "\",\"type\" : \""
+        + skuDetails.getType()
+        + "\",\"price\" : "
+        + skuDetails.getPrice()
+        + ",\"price_currency_code\": \""
+        + skuDetails.getPriceCurrencyCode()
+        + "\",\"price_amount_micros\": "
+        + skuDetails.getPriceAmountMicros()
+        + ",\"title\" : \""
+        + skuDetails.getTitle()
+        + "\",\"description\" : \""
+        + skuDetails.getDescription()
+        + "\"}";
   }
 
   @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
       String developerPayload) {
     if (WalletUtils.hasWalletInstalled()) {
+      isMainThread = Looper.myLooper() == Looper.getMainLooper();
+
       try {
         synchronized (lockThread) {
           if (!isServiceBound) {
             createRepository();
-            lockThread.wait();
+            if (!isMainThread) {
+              lockThread.wait();
+            } else {
+              Bundle response = new Bundle();
+              response.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
+              return response;
+            }
           }
         }
         return serviceAppcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type,
@@ -102,6 +149,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
           }
         });
       } catch (Exception e) {
+        e.printStackTrace();
         Bundle response = new Bundle();
         response.putInt(Utils.RESPONSE_CODE, ResponseCode.ERROR.getValue());
         return response;
@@ -109,7 +157,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
       Bundle response = new Bundle();
       response.putString(Utils.HAS_WALLET_INSTALLED, "");
-      response.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
+      response.putInt(Utils.RESPONSE_CODE, ResponseCode.ERROR.getValue());
       return response;
     }
   }
@@ -135,12 +183,9 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     } else {
 
       bundleResponse.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
-      bundleResponse.putStringArrayList(Utils.RESPONSE_INAPP_PURCHASE_DATA_LIST,
-          new ArrayList<String>());
-      bundleResponse.putStringArrayList(Utils.RESPONSE_INAPP_SIGNATURE_LIST,
-          new ArrayList<String>());
-      bundleResponse.putStringArrayList(Utils.RESPONSE_INAPP_PURCHASE_ID_LIST,
-          new ArrayList<String>());
+      bundleResponse.putStringArrayList("INAPP_PURCHASE_ITEM_LIST", new ArrayList<String>());
+      bundleResponse.putStringArrayList("INAPP_PURCHASE_DATA_LIST", new ArrayList<String>());
+      bundleResponse.putStringArrayList("INAPP_DATA_SIGNATURE_LIST", new ArrayList<String>());
     }
 
     return bundleResponse;
@@ -175,7 +220,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
 
-    Context context = WalletUtils.context;
+    final Context context = WalletUtils.getActivity();
 
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
@@ -186,6 +231,11 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
             serviceAppcoinsBilling = Stub.asInterface(service);
             lockThread.notify();
             isServiceBound = true;
+            if (isMainThread) {
+              Toast.makeText(context, "Try again, it will work this time =)", Toast.LENGTH_SHORT)
+                  .show();
+            }
+            isMainThread = false;
             Log.d(TAG, "onServiceConnected() called service = [" + serviceAppcoinsBilling + "]");
           }
         }
