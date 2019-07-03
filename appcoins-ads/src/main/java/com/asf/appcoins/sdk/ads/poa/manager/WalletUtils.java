@@ -18,8 +18,6 @@ public class WalletUtils {
 
   public static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
 
-  public static String aptoidePackageName = BuildConfig.APTOIDE_PACKAGE_NAME;
-
   private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
 
   private static String POA_NOTIFICATION_NORMAL = "POA_NOTIFICATION_NORMAL";
@@ -30,17 +28,6 @@ public class WalletUtils {
 
   public static void setContext(Context cont) {
     context = cont;
-  }
-
-  public static boolean hasAptoideInstalled() {
-    PackageManager packageManager = context.getPackageManager();
-
-    try {
-      packageManager.getPackageInfo(aptoidePackageName, 0);
-      return true;
-    } catch (PackageManager.NameNotFoundException e) {
-      return false;
-    }
   }
 
   public static boolean hasWalletInstalled() {
@@ -98,10 +85,6 @@ public class WalletUtils {
     Intent intent = null;
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + walletPackageName));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-    if (hasAptoideInstalled()) {
-      intent.setPackage(aptoidePackageName);
-    }
 
     PackageManager packageManager = context.getPackageManager();
     ApplicationInfo applicationInfo = null;
