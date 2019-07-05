@@ -61,10 +61,10 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private boolean processing;
   /** The handle to keep the runnable tasks that we be running within a certain period */
   private Handler handler = new Handler();
-  /** The runnnable taks that will be trigger periodically */
-  private Runnable sendProof;
   /** The handle to keep the runnable tasks that we be running within a certain period */
   private Handler spHandler = new Handler();
+  /** The runnnable taks that will be trigger periodically */
+  private Runnable sendProof;
   /** The runnnable taks that will be trigger periodically */
   private Runnable spListener;
   /** integer used to track how many proof were already sent */
@@ -75,7 +75,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private boolean dialogVisible = false;
   boolean fromBackground = false;
   private Handler handleRetryConnection = new Handler();
-  private int connectionRetrys = 0;
+  private int connectionRetries = 0;
   private boolean isWalletInstalled;
   private AppcoinsAdvertisementRepository appcoinsAdvertisementRepository;
   private AppcoinsAdvertisementConnection appcoinsAdvertisementConnection;
@@ -111,6 +111,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       String packageName = context.getPackageName();
       instance = new PoAManager(preferences, connector, context, networkId,
           createAppCoinsClient(packageName, getVerCode(context, packageName), networkId));
+      WalletUtils.setDialogVisibleListener(instance);
     }
   }
 
@@ -311,9 +312,9 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       retrieveCampaign();
     } else {
       Log.d("Message:", "Connectivity Not available Available");
-      if (connectionRetrys < BuildConfig.ADS_CONNECTION_RETRYS_NUMBER) {
-        connectionRetrys++;
-        int delayedTime = connectionRetrys * BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS;
+      if (connectionRetries < BuildConfig.ADS_CONNECTION_RETRYS_NUMBER) {
+        connectionRetries++;
+        int delayedTime = connectionRetries * BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS;
         CheckConnectivityRetry checkConnectivityRetry = new CheckConnectivityRetry(this);
         handleRetryConnection.postDelayed(checkConnectivityRetry, delayedTime);
       } else {
@@ -352,7 +353,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
   private void processCampaign(Campaign campaign) {
     if (!campaign.hasCampaign()) {
-      Log.d(TAG, "No campaign is available.");
       stopProcess();
     } else {
       if (isWalletInstalled) {
@@ -375,10 +375,11 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   private void promptWalletInstall() {
-    Log.d(TAG,"Prompting Wallet Install");
-    if(!WalletUtils.isDialogVisible()){
+    Log.d(TAG, "Prompting Wallet Install");
+    if (!dialogVisible) {
       spHandler.post(new Runnable() {
         @Override public void run() {
+          dialogVisible = true;
           WalletUtils.promptToInstallWallet();
         }
       });

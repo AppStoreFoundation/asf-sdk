@@ -1,5 +1,6 @@
 package com.asf.appcoins.sdk.ads.poa.campaign;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.network.responses.AppCoinsClientResponse;
@@ -21,7 +22,7 @@ public class CampaignMapper {
         return campaign;
       }
     }
-    return new Campaign(new BigInteger("-1"), "");
+    return new Campaign( new BigInteger(Integer.toString(Campaign.INVALID_CAMPAIGN)) , "");
   }
 
   public static String GetBigIntValue(String paramName, String response) {

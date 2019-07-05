@@ -21,8 +21,10 @@ public class WalletUtils {
 
   public static Context context;
 
-  public static boolean isDialogVisible() {
-    return dialogVisible;
+  public static DialogVisibleListener dialogVisibleListener;
+
+  public static void setDialogVisibleListener(DialogVisibleListener dialogVisibleListenerParam){
+    dialogVisibleListener = dialogVisibleListenerParam;
   }
 
   public static void setContext(Context cont) {
@@ -49,11 +51,6 @@ public class WalletUtils {
       return;
     }
 
-    if (act == null) {
-      Log.d(WalletUtils.class.getName(),"Problem retrieving main Activity");
-      return;
-    }
-
     dialogVisible = true;
     AlertDialog.Builder builder;
     builder = new AlertDialog.Builder(act);
@@ -70,8 +67,8 @@ public class WalletUtils {
 
     builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialogInterface, int i) {
-        dialogInterface.cancel();
-        dialogVisible = false;
+        dialogVisibleListener.OnDialogVisibleListener(false);
+        dialogInterface.dismiss();
       }
     });
 
@@ -97,6 +94,6 @@ public class WalletUtils {
         return activity;
       }
     }
-    return null;
+    throw new Exception("Problem retrieving main Activity");
   }
 }
