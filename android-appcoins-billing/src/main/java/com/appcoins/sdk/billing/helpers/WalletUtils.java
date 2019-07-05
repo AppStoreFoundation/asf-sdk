@@ -8,13 +8,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.util.Log;
 import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.sdk.android.billing.R;
 import java.lang.ref.WeakReference;
 
 public class WalletUtils {
 
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
-  public static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
-  public static String aptoidePackageName = BuildConfig.APTOIDE_PACKAGE_NAME;
 
   public static WeakReference<Activity> context;
 
@@ -27,7 +26,7 @@ public class WalletUtils {
         .getPackageManager();
 
     try {
-      packageManager.getPackageInfo(walletPackageName, 0);
+      packageManager.getPackageInfo(BuildConfig.BDS_WALLET_PACKAGE_NAME, 0);
       return true;
     } catch (PackageManager.NameNotFoundException e) {
       return false;
@@ -39,7 +38,7 @@ public class WalletUtils {
     PackageManager packageManager = context.get()
         .getPackageManager();
     try {
-      return packageManager.getApplicationInfo(aptoidePackageName, 0).enabled;
+      return packageManager.getApplicationInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0).enabled;
     } catch (PackageManager.NameNotFoundException e) {
       return false;
     }
@@ -59,48 +58,47 @@ public class WalletUtils {
       return;
     }
 
-    final Intent appStoreIntent =
-        new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + walletPackageName));
+    final String url = "market://details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
+
+    final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 
     AlertDialog.Builder builder;
     builder = new AlertDialog.Builder(act);
-    builder.setTitle("APPC Wallet Missing");
-    builder.setMessage("To complete your purchase, you have to install an AppCoins wallet");
-    Log.d("String name: ", "To complete your purchase, you have to install an AppCoins wallet");
+    builder.setTitle(R.string.wallet_missing);
+    builder.setMessage(R.string.install_wallet_from_iab);
+    Log.d("String name: ", act.getString(R.string.install_wallet_from_iab));
 
-    builder.setPositiveButton("INSTALL", new DialogInterface.OnClickListener() {
+    builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialog, int which) {
-        OnInstallClickAction(act, appStoreIntent);
+        OnInstallClickAction(act, appStoreIntent, url);
       }
     });
 
-    builder.setNegativeButton("SKIP", new DialogInterface.OnClickListener() {
+    builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialogInterface, int i) {
         dialogInterface.cancel();
       }
     });
 
     builder.setIcon(android.R.drawable.ic_dialog_alert);
-    Log.d(TAG, "promptToInstallWallet: builder.show()");
     builder.show();
   }
 
-  private static void OnInstallClickAction(Activity act, Intent appStoreIntent) {
+  private static void OnInstallClickAction(Activity act, Intent appStoreIntent, String url) {
+    String aptoideParameters = "&utm_source=appcoinssdk&app_source=" + context.get()
+        .getPackageName();
 
     //Check if the user has aptoide installed and open the aptoide's wallet page
     if (hasAptoideInstalled()) {
-      Log.d("AptoideInstallation", "Aptoide is installed on this device");
-      appStoreIntent.setPackage(aptoidePackageName);
-    } else {
-      //Open google play's wallet page instead
-      Log.d("AptoideInstallation", "Aptoide is not installed on this device");
+      Log.d(TAG, "Aptoide is installed on this device");
+      appStoreIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
+      url += aptoideParameters;
     }
-
     try {
       act.startActivity(appStoreIntent);
     } catch (android.content.ActivityNotFoundException exception) {
-      act.startActivity(new Intent(Intent.ACTION_VIEW,
-          Uri.parse("https://play.google.com/store/apps/details?id=" + walletPackageName)));
+      act.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(
+          "https://play.google.com/store/apps/details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME)));
     }
   }
 
