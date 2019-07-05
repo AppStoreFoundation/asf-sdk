@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
+import com.asf.appcoins.sdk.ads.R;
 
 public class WalletUtils {
 
@@ -23,6 +24,11 @@ public class WalletUtils {
   private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
 
   private static String POA_NOTIFICATION_NORMAL = "POA_NOTIFICATION_NORMAL";
+
+  private static String URL_INTENT_INSTALL =
+      "market://details?id=com.appcoins.wallet&utm_source=appcoinssdk&app_source=";
+
+  private static String URL_APTOIDE_PARAMETERS = "&utm_source=appcoinssdk&app_source=";
 
   public static Context context;
 
@@ -62,7 +68,6 @@ public class WalletUtils {
     Intent intent = getNotificationIntent();
 
     if (intent == null) {
-      Log.d(WalletUtils.class.getName(), "Not found Application Info");
       return;
     }
 
@@ -95,13 +100,14 @@ public class WalletUtils {
   }
 
   private static Intent getNotificationIntent() {
-    Intent intent = null;
-    intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + walletPackageName));
-    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    String url = URL_INTENT_INSTALL;
 
     if (hasAptoideInstalled()) {
-      intent.setPackage(aptoidePackageName);
+      url += URL_APTOIDE_PARAMETERS + context.getPackageName();
     }
+
+
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
     PackageManager packageManager = context.getPackageManager();
     ApplicationInfo applicationInfo = null;
@@ -113,7 +119,8 @@ public class WalletUtils {
       resources = packageManager.getResourcesForApplication(applicationInfo);
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
-      return null;
+      Log.d(WalletUtils.class.getName(), "Not found Application Info");
+      return intent;
     }
 
     int applicationIconResID = applicationInfo.icon;
@@ -131,30 +138,34 @@ public class WalletUtils {
   private static Notification buildNotification(String channelId, Intent intent,
       boolean useTimeOut) {
 
-    Notification.Builder notBuilder = null;
+    Notification.Builder builder;
     pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      notBuilder = new Notification.Builder(context, channelId);
-      notBuilder.setFullScreenIntent(pendingIntent, true);
+      builder = new Notification.Builder(context, channelId);
+      builder.setFullScreenIntent(pendingIntent, true);
       if (useTimeOut) {
-        notBuilder.setTimeoutAfter(3000);
+        builder.setTimeoutAfter(3000);
       }
     } else {
-      notBuilder = new Notification.Builder(context);
-      notBuilder.setPriority(Notification.PRIORITY_MAX);
-      notBuilder.setContentIntent(pendingIntent);
-      notBuilder.setVibrate(new long[0]);
+      builder = new Notification.Builder(context);
+      builder.setPriority(Notification.PRIORITY_MAX);
+      builder.setContentIntent(pendingIntent);
+      builder.setVibrate(new long[0]);
     }
 
-    //Because of the migration process the sdk doesnt the strings in the resources yet.
-    notBuilder.setSmallIcon(intent.getExtras()
-        .getInt("identifier"))
-        .setContentTitle("You need the AppCoins Wallet!")
-        .setContentText("To get your reward you need the AppCoins Wallet.");
+    try{
+      builder.setSmallIcon(intent.getExtras()
+          .getInt("identifier"))
+          .setContentTitle(context.getString(R.string.poa_wallet_not_installed_notification_title))
+          .setContentText(context.getString(R.string.poa_wallet_not_installed_notification_body));
+    }catch(NullPointerException e){
+      e.printStackTrace();
+    }
 
-    Notification notification = notBuilder.build();
+    Notification notification = builder.build();
 
     return notification;
   }
+
 }

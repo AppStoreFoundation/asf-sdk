@@ -110,7 +110,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       WalletUtils.setContext(context);
       SharedPreferences preferences =
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
-      showPopUpNotification = preferences.contains(POA_NOTIFICATION_VALUE);
+
       String packageName = context.getPackageName();
       instance = new PoAManager(preferences, connector, context, networkId,
           createAppCoinsClient(packageName, getVerCode(context, packageName), networkId));
@@ -220,10 +220,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
           postponeSendProof();
         } else {
           // or stop the process
-          if (campaignId != null && !preferences.contains(FINISHED_KEY)) {
-            preferences.edit()
-                .putBoolean(FINISHED_KEY, true)
-                .apply();
+          if (campaignId != null && !getSharedPreferencesBoolean(FINISHED_KEY)) {
+            setSharedPreferencesBoolean(FINISHED_KEY,true);
             finishProcess();
           }
         }
@@ -377,11 +375,9 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   private void promptWalletNotification() {
-    if (!showPopUpNotification) {
+    if (!getSharedPreferencesBoolean(POA_NOTIFICATION_VALUE)) {
       Log.d(TAG, "Prompting Notification Install");
-      preferences.edit()
-          .putBoolean(POA_NOTIFICATION_VALUE, true)
-          .commit();
+      setSharedPreferencesBoolean(POA_NOTIFICATION_VALUE, true);
       showPopUpNotification = true;
       spHandler.post(new Runnable() {
         @Override public void run() {
@@ -411,4 +407,14 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       }
     });
   }
+
+  private void setSharedPreferencesBoolean(String key, boolean value) {
+    preferences.edit()
+        .putBoolean(key, value)
+        .apply();
+  }
+  private boolean getSharedPreferencesBoolean(String key){
+    return preferences.getBoolean(key, false);
+  }
+
 }

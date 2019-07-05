@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.util.Log;
 import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.sdk.android.billing.R;
 import java.lang.ref.WeakReference;
 
 public class WalletUtils {
@@ -47,8 +48,8 @@ public class WalletUtils {
     }
     AlertDialog.Builder builder;
     builder = new AlertDialog.Builder(act);
-    builder.setTitle("APPC Wallet Missing");
-    builder.setMessage("To complete your purchase, you have to install an AppCoins wallet");
+    builder.setTitle(R.string.wallet_missing);
+    builder.setMessage(act.getString(R.string.install_wallet_from_iab));
     Log.d("String name: ", "To complete your purchase, you have to install an AppCoins wallet");
 
     builder.setPositiveButton("INSTALL", new DialogInterface.OnClickListener() {
@@ -65,7 +66,6 @@ public class WalletUtils {
     });
 
     builder.setIcon(android.R.drawable.ic_dialog_alert);
-    Log.d(TAG, "promptToInstallWallet: builder.show()");
     builder.show();
   }
 
