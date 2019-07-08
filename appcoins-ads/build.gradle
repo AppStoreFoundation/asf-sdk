@@ -33,7 +33,7 @@ android {
     debug {
       minifyEnabled false
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
-          project.BDS_WALLET_PACKAGE_NAME
+          project.BDS_WALLET_PACKAGE_NAME_DEV
       buildConfigField "String", "ADVERTISEMENT_BIND_ACTION",
           "\"" + project.APPCOINS_ADVERTISEMENT_BIND + "\""
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
