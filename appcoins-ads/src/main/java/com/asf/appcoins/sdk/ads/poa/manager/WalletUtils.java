@@ -17,10 +17,6 @@ import com.asf.appcoins.sdk.ads.R;
 
 public class WalletUtils {
 
-  public static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
-
-  public static String aptoidePackageName = BuildConfig.APTOIDE_PACKAGE_NAME;
-
   private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
 
   private static String POA_NOTIFICATION_NORMAL = "POA_NOTIFICATION_NORMAL";
@@ -42,7 +38,7 @@ public class WalletUtils {
     PackageManager packageManager = context.getPackageManager();
 
     try {
-      packageManager.getPackageInfo(aptoidePackageName, 0);
+      packageManager.getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME  , 0);
       return true;
     } catch (PackageManager.NameNotFoundException e) {
       return false;
@@ -53,7 +49,7 @@ public class WalletUtils {
     PackageManager packageManager = context.getPackageManager();
 
     try {
-      packageManager.getPackageInfo(walletPackageName, 0);
+      packageManager.getPackageInfo(BuildConfig.BDS_WALLET_PACKAGE_NAME, 0);
       return true;
     } catch (PackageManager.NameNotFoundException e) {
       return false;
@@ -101,13 +97,20 @@ public class WalletUtils {
 
   private static Intent getNotificationIntent() {
     String url = URL_INTENT_INSTALL;
+    boolean hasAptoide = hasAptoideInstalled();
 
-    if (hasAptoideInstalled()) {
+    if (hasAptoide){
       url += URL_APTOIDE_PARAMETERS + context.getPackageName();
     }
 
-
+    Intent intent = null;
+    intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+    if(hasAptoide){
+      intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
+    }
+
 
     PackageManager packageManager = context.getPackageManager();
     ApplicationInfo applicationInfo = null;
