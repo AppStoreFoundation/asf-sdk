@@ -66,11 +66,11 @@ public class CampaignMapper {
         return new Campaign(new BigInteger(response.getString("CAMPAIGN_ID")), "");
       }
     } catch (Exception e) {
-      e.printStackTrace();;
+      e.printStackTrace();
     }
 
     Log.d(CampaignMapper.class.getName(), "No campaign is available.");
-    return new Campaign(new BigInteger("-1"), "");
+    return new Campaign(new BigInteger(Integer.toString(Campaign.INVALID_CAMPAIGN)), "");
   }
 }
 
