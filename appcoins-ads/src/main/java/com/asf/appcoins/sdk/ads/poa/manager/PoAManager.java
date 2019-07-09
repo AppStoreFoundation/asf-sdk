@@ -221,7 +221,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
         } else {
           // or stop the process
           if (campaignId != null && !getSharedPreferencesBoolean(FINISHED_KEY)) {
-            setSharedPreferencesBoolean(FINISHED_KEY,true);
+            setSharedPreferencesBoolean(FINISHED_KEY, true);
             finishProcess();
           }
         }
@@ -274,6 +274,11 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   @Override public void onBecameForeground(Activity activity) {
     isWalletInstalled = WalletUtils.hasWalletInstalled();
     foreground = true;
+
+    if (isWalletInstalled) {
+      WalletUtils.removeNotificationNormal();
+    }
+
     handleCampaign();
   }
 
@@ -413,8 +418,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
         .putBoolean(key, value)
         .apply();
   }
-  private boolean getSharedPreferencesBoolean(String key){
+
+  private boolean getSharedPreferencesBoolean(String key) {
     return preferences.getBoolean(key, false);
   }
-
 }

@@ -26,9 +26,15 @@ public class WalletUtils {
 
   private static String URL_APTOIDE_PARAMETERS = "&utm_source=appcoinssdk&app_source=";
 
-  public static Context context;
+  private static PendingIntent pendingIntent;
 
-  public static PendingIntent pendingIntent;
+  private static int NORMAL_NOTIFICATION_ID = 1;
+
+  private static NotificationManager notificationManager;
+
+  private static boolean hasPopupNormal;
+
+  public static Context context;
 
   public static void setContext(Context cont) {
     context = cont;
@@ -38,7 +44,7 @@ public class WalletUtils {
     PackageManager packageManager = context.getPackageManager();
 
     try {
-      packageManager.getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME  , 0);
+      packageManager.getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0);
       return true;
     } catch (PackageManager.NameNotFoundException e) {
       return false;
@@ -56,9 +62,16 @@ public class WalletUtils {
     }
   }
 
+  public static void removeNotificationNormal() {
+    if (hasPopupNormal) {
+      notificationManager.cancel(NORMAL_NOTIFICATION_ID);
+      hasPopupNormal = false;
+    }
+  }
+
   public static void createInstallWalletNotification() {
 
-    NotificationManager notificationManager =
+    notificationManager =
         (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
     Intent intent = getNotificationIntent();
@@ -72,19 +85,21 @@ public class WalletUtils {
       createNotificationChannels("0", POA_NOTIFICATION_HEADS_UP, POA_NOTIFICATION_HEADS_UP,
           notificationManager, NotificationManager.IMPORTANCE_HIGH);
 
-      createNotificationChannels("1", POA_NOTIFICATION_NORMAL, POA_NOTIFICATION_NORMAL,
+      createNotificationChannels(Integer.toString(NORMAL_NOTIFICATION_ID), POA_NOTIFICATION_NORMAL, POA_NOTIFICATION_NORMAL,
           notificationManager, NotificationManager.IMPORTANCE_DEFAULT);
 
       Notification notificationHeadsUp = buildNotification("0", intent, true);
       Notification notificationNormal = buildNotification("1", intent, false);
 
+      hasPopupNormal = true;
+
       notificationManager.notify(1, notificationNormal);
       notificationManager.notify(0, notificationHeadsUp);
     } else {
 
-      Notification notificationHeadsUp = buildNotification("0", intent, true);
-
-      notificationManager.notify(0, notificationHeadsUp);
+      Notification notificationHeadsUp = buildNotification(Integer.toString(NORMAL_NOTIFICATION_ID), intent, true);
+      hasPopupNormal = true;
+      notificationManager.notify(NORMAL_NOTIFICATION_ID, notificationHeadsUp);
     }
   }
 
@@ -99,7 +114,7 @@ public class WalletUtils {
     String url = URL_INTENT_INSTALL;
     boolean hasAptoide = hasAptoideInstalled();
 
-    if (hasAptoide){
+    if (hasAptoide) {
       url += URL_APTOIDE_PARAMETERS + context.getPackageName();
     }
 
@@ -107,10 +122,9 @@ public class WalletUtils {
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-    if(hasAptoide){
+    if (hasAptoide) {
       intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
-
 
     PackageManager packageManager = context.getPackageManager();
     ApplicationInfo applicationInfo = null;
@@ -157,12 +171,12 @@ public class WalletUtils {
       builder.setVibrate(new long[0]);
     }
 
-    try{
+    try {
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
           .setContentTitle(context.getString(R.string.poa_wallet_not_installed_notification_title))
           .setContentText(context.getString(R.string.poa_wallet_not_installed_notification_body));
-    }catch(NullPointerException e){
+    } catch (NullPointerException e) {
       e.printStackTrace();
     }
 
@@ -170,5 +184,4 @@ public class WalletUtils {
 
     return notification;
   }
-
 }
