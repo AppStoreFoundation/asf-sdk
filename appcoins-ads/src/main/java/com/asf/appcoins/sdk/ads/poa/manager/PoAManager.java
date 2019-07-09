@@ -272,7 +272,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   @Override public void onBecameForeground(Activity activity) {
-    //TODO this has to be changed to if only there is a campaign active you call the popup.
+    isWalletInstalled = WalletUtils.hasWalletInstalled();
     foreground = true;
 
     if (isWalletInstalled) {
