@@ -61,10 +61,10 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private boolean processing;
   /** The handle to keep the runnable tasks that we be running within a certain period */
   private Handler handler = new Handler();
-  /** The handle to keep the runnable tasks that we be running within a certain period */
-  private Handler spHandler = new Handler();
   /** The runnnable taks that will be trigger periodically */
   private Runnable sendProof;
+  /** The handle to keep the runnable tasks that we be running within a certain period */
+  private Handler spHandler = new Handler();
   /** The runnnable taks that will be trigger periodically */
   private Runnable spListener;
   /** integer used to track how many proof were already sent */
@@ -79,6 +79,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private boolean isWalletInstalled;
   private AppcoinsAdvertisementRepository appcoinsAdvertisementRepository;
   private AppcoinsAdvertisementConnection appcoinsAdvertisementConnection;
+  private static boolean showPopUpNotification;
+  private static String POA_NOTIFICATION_VALUE = "POA_NOTIFICATION";
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -108,10 +110,10 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       WalletUtils.setContext(context);
       SharedPreferences preferences =
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
+
       String packageName = context.getPackageName();
       instance = new PoAManager(preferences, connector, context, networkId,
           createAppCoinsClient(packageName, getVerCode(context, packageName), networkId));
-      WalletUtils.setDialogVisibleListener(instance);
     }
   }
 
@@ -218,10 +220,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
           postponeSendProof();
         } else {
           // or stop the process
-          if (campaignId != null && !preferences.contains(FINISHED_KEY)) {
-            preferences.edit()
-                .putBoolean(FINISHED_KEY, true)
-                .apply();
+          if (campaignId != null && !getSharedPreferencesBoolean(FINISHED_KEY)) {
+            setSharedPreferencesBoolean(FINISHED_KEY, true);
             finishProcess();
           }
         }
@@ -272,8 +272,13 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   }
 
   @Override public void onBecameForeground(Activity activity) {
+    //TODO this has to be changed to if only there is a campaign active you call the popup.
     foreground = true;
-    isWalletInstalled = WalletUtils.hasWalletInstalled();
+
+    if (isWalletInstalled) {
+      WalletUtils.removeNotificationNormal();
+    }
+
     handleCampaign();
   }
 
@@ -357,7 +362,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       if (isWalletInstalled) {
         startCampaign(campaign);
       } else {
-        promptWalletInstall();
+        promptWalletNotification();
       }
     }
   }
@@ -373,13 +378,14 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     initiateProofSending();
   }
 
-  private void promptWalletInstall() {
-    Log.d(TAG, "Prompting Wallet Install");
-    if (!dialogVisible) {
+  private void promptWalletNotification() {
+    if (!getSharedPreferencesBoolean(POA_NOTIFICATION_VALUE)) {
+      Log.d(TAG, "Prompting Notification Install");
+      setSharedPreferencesBoolean(POA_NOTIFICATION_VALUE, true);
+      showPopUpNotification = true;
       spHandler.post(new Runnable() {
         @Override public void run() {
-          dialogVisible = true;
-          WalletUtils.promptToInstallWallet();
+          WalletUtils.createInstallWalletNotification();
         }
       });
     }
@@ -404,5 +410,15 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
         }
       }
     });
+  }
+
+  private void setSharedPreferencesBoolean(String key, boolean value) {
+    preferences.edit()
+        .putBoolean(key, value)
+        .apply();
+  }
+
+  private boolean getSharedPreferencesBoolean(String key) {
+    return preferences.getBoolean(key, false);
   }
 }
