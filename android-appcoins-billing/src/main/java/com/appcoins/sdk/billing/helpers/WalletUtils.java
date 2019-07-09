@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.util.Log;
 import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
 import java.lang.ref.WeakReference;
 
 public class WalletUtils {
