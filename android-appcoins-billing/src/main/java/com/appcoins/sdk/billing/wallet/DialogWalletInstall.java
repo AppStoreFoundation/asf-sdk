@@ -16,6 +16,7 @@ import android.text.Spanned;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.Window;
 import android.widget.Button;
@@ -82,7 +83,7 @@ public class DialogWalletInstall extends Dialog {
 
         if (hasImage) {
             dialog_wallet_install_image_icon.setVisibility(View.INVISIBLE);
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(dp(296), dp(124));
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(124));
             dialog_wallet_install_image_graphic.setLayoutParams(lp);
             dialog_wallet_install_image_graphic.setImageDrawable(getContext().getDrawable(R.drawable.dialog_wallet_install_graphic));
 
@@ -90,7 +91,7 @@ public class DialogWalletInstall extends Dialog {
         } else {
             dialog_wallet_install_image_icon.setVisibility(View.VISIBLE);
             dialog_wallet_install_image_icon.setImageDrawable(getContext().getDrawable(R.drawable.dialog_wallet_install_icon));
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(dp(296), dp(100));
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(100));
             dialog_wallet_install_image_graphic.setLayoutParams(lp);
             dialog_wallet_install_image_graphic.setImageDrawable(getContext().getDrawable(R.drawable.dialog_wallet_install_empty_image));
         }
