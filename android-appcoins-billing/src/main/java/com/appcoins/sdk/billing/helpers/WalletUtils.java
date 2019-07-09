@@ -11,6 +11,8 @@ import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.android.billing.R;
 import java.lang.ref.WeakReference;
 
+import static android.provider.CalendarContract.CalendarCache.URI;
+
 public class WalletUtils {
 
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
@@ -58,7 +60,11 @@ public class WalletUtils {
       return;
     }
 
-    final String url = "market://details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
+    String url = "market://details?id="
+        + BuildConfig.BDS_WALLET_PACKAGE_NAME
+        + "&utm_source=appcoinssdk&app_source="
+        + context.get()
+        .getPackageName();
 
     final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 
@@ -70,7 +76,7 @@ public class WalletUtils {
 
     builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
       @Override public void onClick(DialogInterface dialog, int which) {
-        OnInstallClickAction(act, appStoreIntent, url);
+        OnInstallClickAction(act, appStoreIntent);
       }
     });
 
@@ -84,15 +90,10 @@ public class WalletUtils {
     builder.show();
   }
 
-  private static void OnInstallClickAction(Activity act, Intent appStoreIntent, String url) {
-    String aptoideParameters = "&utm_source=appcoinssdk&app_source=" + context.get()
-        .getPackageName();
-
-    //Check if the user has aptoide installed and open the aptoide's wallet page
+  private static void OnInstallClickAction(Activity act, Intent appStoreIntent) {
     if (hasAptoideInstalled()) {
       Log.d(TAG, "Aptoide is installed on this device");
       appStoreIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
-      url += aptoideParameters;
     }
     try {
       act.startActivity(appStoreIntent);
