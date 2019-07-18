@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 public class Campaign {
 
-  private static final int INVALID_CAMPAIGN = -1;
+  public static final int INVALID_CAMPAIGN = -1;
   private final BigInteger id;
   private final String packageName;
 

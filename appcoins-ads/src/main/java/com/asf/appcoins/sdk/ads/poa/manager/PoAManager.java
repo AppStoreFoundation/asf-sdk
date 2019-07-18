@@ -75,7 +75,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private boolean dialogVisible = false;
   boolean fromBackground = false;
   private Handler handleRetryConnection = new Handler();
-  private int connectionRetrys = 0;
+  private int connectionRetries = 0;
   private boolean isWalletInstalled;
   private AppcoinsAdvertisementRepository appcoinsAdvertisementRepository;
   private AppcoinsAdvertisementConnection appcoinsAdvertisementConnection;
@@ -317,9 +317,9 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
       retrieveCampaign();
     } else {
       Log.d("Message:", "Connectivity Not available Available");
-      if (connectionRetrys < BuildConfig.ADS_CONNECTION_RETRYS_NUMBER) {
-        connectionRetrys++;
-        int delayedTime = connectionRetrys * BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS;
+      if (connectionRetries < BuildConfig.ADS_CONNECTION_RETRYS_NUMBER) {
+        connectionRetries++;
+        int delayedTime = connectionRetries * BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS;
         CheckConnectivityRetry checkConnectivityRetry = new CheckConnectivityRetry(this);
         handleRetryConnection.postDelayed(checkConnectivityRetry, delayedTime);
       } else {
@@ -358,7 +358,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
   private void processCampaign(Campaign campaign) {
     if (!campaign.hasCampaign()) {
-      Log.d(TAG, "No campaign is available.");
       stopProcess();
     } else {
       if (isWalletInstalled) {
