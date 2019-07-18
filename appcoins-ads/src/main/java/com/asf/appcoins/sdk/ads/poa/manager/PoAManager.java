@@ -278,8 +278,9 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     if (isWalletInstalled) {
       WalletUtils.removeNotificationNormal();
     }
-
-    handleCampaign();
+    if (!getSharedPreferencesBoolean(FINISHED_KEY)) {
+      handleCampaign();
+    }
   }
 
   @Override public void onBecameBackground() {
