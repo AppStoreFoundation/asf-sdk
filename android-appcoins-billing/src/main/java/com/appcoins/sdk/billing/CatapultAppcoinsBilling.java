@@ -45,8 +45,7 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
       responseCode = (int) launchBillingFlowResult.getResponseCode();
 
-      if (responseCode != ResponseCode.OK.getValue()
-          || !launchBillingFlowResult.isHasWalletInstalled()) {
+      if (responseCode != ResponseCode.OK.getValue()){
         return responseCode;
       }
 
