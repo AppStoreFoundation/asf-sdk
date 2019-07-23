@@ -276,7 +276,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     foreground = true;
 
     if (isWalletInstalled) {
-      WalletUtils.removeNotificationNormal();
+      WalletUtils.removeNotification();
     }
     if (!getSharedPreferencesBoolean(FINISHED_KEY)) {
       handleCampaign();
