@@ -42,65 +42,45 @@ import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PREFERENCE_WALLET
  */
 
 public class PoAManager implements LifeCycleListener.Listener, CheckConnectivityResponseListener,
-    GetCampaignResponseListener {
+    GetCampaignResponseListener, DialogVisibleListener {
 
   public static final String TAG = PoAManager.class.getName();
-
   private static final String FINISHED_KEY = "finished";
-
   private static final int PREFERENCES_LISTENER_DELAY = 1000;
-
-  private static boolean showPopUpNotification;
-
-  private static String POA_NOTIFICATION_VALUE = "POA_NOTIFICATION";
-
   /** The instance of the manager */
   private static PoAManager instance;
-
   private final SharedPreferences preferences;
-
+  private final AppCoinsClient appcoinsClient;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
   private PoAServiceConnector poaConnector;
-
   /** The application context */
   private Context appContext;
-
-  /** integer used to identify the network to which we are connected */
-  private int network;
-
+  /** integer used to identify the network to wich we are connected */
+  private int network = 0;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
-
   /** The handle to keep the runnable tasks that we be running within a certain period */
   private Handler handler = new Handler();
-
-  /** integer used to track how many proof were already sent */
-  private int proofsSent = 0;
-
-  /** The campaign ID value */
-  private BigInteger campaignId;
-
+  /** The runnnable taks that will be trigger periodically */
+  private Runnable sendProof;
   /** The handle to keep the runnable tasks that we be running within a certain period */
   private Handler spHandler = new Handler();
-
   /** The runnnable taks that will be trigger periodically */
   private Runnable spListener;
-
+  /** integer used to track how many proof were already sent */
+  private int proofsSent = 0;
+  /** The campaign ID value */
+  private BigInteger campaignId;
   private boolean foreground = false;
-
+  private boolean dialogVisible = false;
   boolean fromBackground = false;
-
   private Handler handleRetryConnection = new Handler();
-
   private int connectionRetries = 0;
-
   private boolean isWalletInstalled;
-
-  private final AppCoinsClient appcoinsClient;
-
   private AppcoinsAdvertisementRepository appcoinsAdvertisementRepository;
-
   private AppcoinsAdvertisementConnection appcoinsAdvertisementConnection;
+  private static boolean showPopUpNotification;
+  private static String POA_NOTIFICATION_VALUE = "POA_NOTIFICATION";
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -178,6 +158,14 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
    */
   public void stopProcess() {
     if (processing) {
+      if (sendProof != null) {
+        handler.removeCallbacks(sendProof);
+      }
+
+      if (spListener != null) {
+        spHandler.removeCallbacks(spListener);
+      }
+
       Log.d(TAG, "Stopping process.");
       Bundle bundle = new Bundle();
       bundle.putString("packageName", appContext.getPackageName());
@@ -288,9 +276,8 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     foreground = true;
 
     if (isWalletInstalled) {
-      WalletUtils.removeNotificationNormal();
+      WalletUtils.removeNotification();
     }
-
     if (!getSharedPreferencesBoolean(FINISHED_KEY)) {
       handleCampaign();
     }
@@ -312,6 +299,10 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
       sendProof();
     }
+  }
+
+  @Override public void OnDialogVisibleListener(boolean value) {
+    dialogVisible = value;
   }
 
   /*

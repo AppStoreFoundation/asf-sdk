@@ -19,7 +19,7 @@ public class WalletUtils {
 
   private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
 
-  private static String POA_NOTIFICATION_NORMAL = "POA_NOTIFICATION_NORMAL";
+  private static int POA_NOTIFICATION_ID = 0;
 
   private static String URL_INTENT_INSTALL =
       "market://details?id=com.appcoins.wallet&utm_source=appcoinssdk&app_source=";
@@ -28,11 +28,9 @@ public class WalletUtils {
 
   private static PendingIntent pendingIntent;
 
-  private static int NORMAL_NOTIFICATION_ID = 1;
-
   private static NotificationManager notificationManager;
 
-  private static boolean hasPopupNormal;
+  private static boolean hasPopup;
 
   public static Context context;
 
@@ -62,17 +60,14 @@ public class WalletUtils {
     }
   }
 
-  public static void removeNotificationNormal() {
-    if (hasPopupNormal) {
-      notificationManager.cancel(NORMAL_NOTIFICATION_ID);
-      hasPopupNormal = false;
+  public static void removeNotification() {
+    if (hasPopup) {
+      notificationManager.cancel(POA_NOTIFICATION_ID);
+      hasPopup = false;
     }
   }
 
   public static void createInstallWalletNotification() {
-
-    notificationManager =
-        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
     Intent intent = getNotificationIntent();
 
@@ -80,34 +75,28 @@ public class WalletUtils {
       return;
     }
 
+    notificationManager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    hasPopup = true;
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-      createNotificationChannels("0", POA_NOTIFICATION_HEADS_UP, POA_NOTIFICATION_HEADS_UP,
-          notificationManager, NotificationManager.IMPORTANCE_HIGH);
-
-      createNotificationChannels(Integer.toString(NORMAL_NOTIFICATION_ID), POA_NOTIFICATION_NORMAL, POA_NOTIFICATION_NORMAL,
-          notificationManager, NotificationManager.IMPORTANCE_DEFAULT);
-
-      Notification notificationHeadsUp = buildNotification("0", intent, true);
-      Notification notificationNormal = buildNotification("1", intent, false);
-
-      hasPopupNormal = true;
-
-      notificationManager.notify(1, notificationNormal);
-      notificationManager.notify(0, notificationHeadsUp);
+      NotificationChannel channelHeadUp =
+          new NotificationChannel(Integer.toString(POA_NOTIFICATION_ID), POA_NOTIFICATION_HEADS_UP,
+              NotificationManager.IMPORTANCE_HIGH);
+      channelHeadUp.setImportance(NotificationManager.IMPORTANCE_HIGH);
+      channelHeadUp.setDescription(POA_NOTIFICATION_HEADS_UP);
+      channelHeadUp.setVibrationPattern(new long[0]);
+      channelHeadUp.setShowBadge(true);
+      channelHeadUp.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+      notificationManager.createNotificationChannel(channelHeadUp);
+      notificationManager.notify(0,
+          buildNotification(Integer.toString(POA_NOTIFICATION_ID), intent));
     } else {
-
-      Notification notificationHeadsUp = buildNotification(Integer.toString(NORMAL_NOTIFICATION_ID), intent, true);
-      hasPopupNormal = true;
-      notificationManager.notify(NORMAL_NOTIFICATION_ID, notificationHeadsUp);
+      Notification notificationHeadsUp =
+          buildNotificationOlderVersion(intent);
+      notificationManager.notify(POA_NOTIFICATION_ID, notificationHeadsUp);
     }
-  }
-
-  private static void createNotificationChannels(String id, String name, String description,
-      NotificationManager notificationManager, int priority) {
-    NotificationChannel channelHeadUp = new NotificationChannel(id, name, priority);
-    channelHeadUp.setDescription(description);
-    notificationManager.createNotificationChannel(channelHeadUp);
   }
 
   private static Intent getNotificationIntent() {
@@ -152,24 +141,31 @@ public class WalletUtils {
     return intent;
   }
 
-  private static Notification buildNotification(String channelId, Intent intent,
-      boolean useTimeOut) {
+  private static Notification buildNotification(String channelId, Intent intent) {
+    Notification.Builder builder;
+    pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+    builder = new Notification.Builder(context, channelId);
+    builder.setContentIntent(pendingIntent);
+    try {
+      builder.setSmallIcon(intent.getExtras()
+          .getInt("identifier"))
+          .setContentTitle(context.getString(R.string.poa_wallet_not_installed_notification_title))
+          .setContentText(context.getString(R.string.poa_wallet_not_installed_notification_body));
+    } catch (NullPointerException e) {
+      e.printStackTrace();
+    }
+    return builder.build();
+  }
+
+  private static Notification buildNotificationOlderVersion(Intent intent) {
 
     Notification.Builder builder;
     pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      builder = new Notification.Builder(context, channelId);
-      builder.setFullScreenIntent(pendingIntent, true);
-      if (useTimeOut) {
-        builder.setTimeoutAfter(3000);
-      }
-    } else {
-      builder = new Notification.Builder(context);
-      builder.setPriority(Notification.PRIORITY_MAX);
-      builder.setContentIntent(pendingIntent);
-      builder.setVibrate(new long[0]);
-    }
+    builder = new Notification.Builder(context);
+    builder.setPriority(Notification.PRIORITY_MAX);
+    builder.setContentIntent(pendingIntent);
+    builder.setVibrate(new long[0]);
 
     try {
       builder.setSmallIcon(intent.getExtras()
