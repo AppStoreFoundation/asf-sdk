@@ -37,6 +37,8 @@ android {
           "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
           project.BDS_WALLET_PACKAGE_NAME_DEV
+      buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
+          project.APTOIDE_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
       manifestPlaceholders.iabPermission = "${project.APPCOINS_IAB_PERMISSION}"
