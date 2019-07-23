@@ -1,9 +1,9 @@
 package com.asf.appcoins.sdk.ads.network.responses;
 
-public class HTTPResponseHandler implements GetResponseHandler {
+public class CampaignResponseHandler implements GetResponseHandler {
   private ClientResponseHandler clientResponseHandler;
 
-  public HTTPResponseHandler(ClientResponseHandler clientResponseHandler) {
+  public CampaignResponseHandler(ClientResponseHandler clientResponseHandler) {
     this.clientResponseHandler = clientResponseHandler;
   }
 
