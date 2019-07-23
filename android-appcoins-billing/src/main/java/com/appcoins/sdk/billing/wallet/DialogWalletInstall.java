@@ -28,6 +28,13 @@ import com.appcoins.sdk.android.billing.R;
 
 import static android.graphics.Typeface.BOLD;
 
+/**
+ * Here is important to know in advance if the host app has feature graphic,
+ * 1- this boolean hasImage is needed to change layout dynamically
+ * 2- if so, we need to get  url of this image and then when copy this code to  apk-migrator
+ * as Smali,
+ * the correct dialog_wallet_install_graphic needs to be write
+ */
 public class DialogWalletInstall extends Dialog {
 
     private final static String WALLET_PACKAGE = "com.appcoins.wallet";
