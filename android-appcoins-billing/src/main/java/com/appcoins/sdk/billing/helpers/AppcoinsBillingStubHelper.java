@@ -145,7 +145,6 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
       PendingIntent pendingIntent = PendingIntent.getActivity(WalletUtils.context.get(), 0, intent,
           PendingIntent.FLAG_UPDATE_CURRENT);
       Bundle response = new Bundle();
-      response.putString(Utils.HAS_WALLET_INSTALLED, "");
       response.putParcelable("BUY_INTENT", pendingIntent);
 
       response.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
