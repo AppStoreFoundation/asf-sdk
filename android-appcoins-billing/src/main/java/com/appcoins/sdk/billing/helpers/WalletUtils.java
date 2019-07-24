@@ -1,12 +1,7 @@
 package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.util.Log;
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
 import java.lang.ref.WeakReference;

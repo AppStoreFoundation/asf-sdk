@@ -8,15 +8,11 @@ import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -32,7 +28,6 @@ import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 
 import static android.graphics.Typeface.BOLD;
-import static com.appcoins.sdk.billing.helpers.WalletUtils.context;
 
 /**
  * Here is important to know in advance if the host app has feature graphic,
@@ -56,7 +51,6 @@ public class DialogWalletInstall extends Dialog {
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
       + "&utm_source=appcoinssdk&app_source="
       + getContext().getPackageName();
-  private boolean hasImage;
   private static Context mContext;
 
   public static DialogWalletInstall with(Context context) {
