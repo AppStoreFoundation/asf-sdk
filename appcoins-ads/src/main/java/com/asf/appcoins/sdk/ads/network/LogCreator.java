@@ -88,16 +88,4 @@ public class LogCreator {
 
     return logBuilder.toString();
   }
-
-  private String requestDecodedPath(URL urlConnection) {
-    try {
-      String path = URLDecoder.decode(urlConnection.toString(), "UTF-8");
-      //String query = URLDecoder.decode(urlConnection.toString(), "UTF-8");
-      return path;
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      /* Quality */
-    }
-    return null;
-  }
 }

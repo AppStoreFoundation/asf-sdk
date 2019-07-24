@@ -69,14 +69,14 @@ public class MainActivity extends Activity {
     BillingFlowParams billingFlowParams =
         new BillingFlowParams("gas", SkuType.inapp.toString(), 10001, null, null, null);
 
-   Activity act = this;
+    Activity act = this;
     Thread t = new Thread(new Runnable() {
       @Override public void run() {
         int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
         Log.d("BillingFlowResponse: ", launchBillingFlowResponse + "");
       }
     });
-  t.start();
+    t.start();
 
 
   }
@@ -137,16 +137,16 @@ public class MainActivity extends Activity {
       @Override public void run() {
 
         if (token != null) {
-        cab.consumeAsync(token, new ConsumeResponseListener() {
-          @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
-            Log.d("consume response: ",
-                responseCode + " " + "Consumed purchase with token: " + purchaseToken);
-            token = null;
-          }
-        });
-      } else {
-        Log.d("Message:", "No purchase tokens available");
-      }
+          cab.consumeAsync(token, new ConsumeResponseListener() {
+            @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
+              Log.d("consume response: ",
+                  responseCode + " " + "Consumed purchase with token: " + purchaseToken);
+              token = null;
+            }
+          });
+        } else {
+          Log.d("Message:", "No purchase tokens available");
+        }
       }
     });
 

@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.android.billing.R;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
@@ -33,11 +34,14 @@ import com.appcoins.sdk.billing.helpers.WalletUtils;
 import static android.graphics.Typeface.BOLD;
 import static com.appcoins.sdk.billing.helpers.WalletUtils.context;
 
+/**
+ * Here is important to know in advance if the host app has feature graphic,
+ * 1- this boolean hasImage is needed to change layout dynamically
+ * 2- if so, we need to get  url of this image and then when copy this code to  apk-migrator
+ * as Smali,
+ * the correct dialog_wallet_install_graphic needs to be write
+ */
 public class DialogWalletInstall extends Dialog {
-
-  private final static String WALLET_PACKAGE = "com.appcoins.wallet";
-  private final static String GOOGLEPLAY_URI =
-      "https://play.google.com/store/apps/details?id=" + WALLET_PACKAGE;
 
   private Button dialog_wallet_install_button_cancel;
   private Button dialog_wallet_install_button_download;
@@ -45,6 +49,13 @@ public class DialogWalletInstall extends Dialog {
   private ImageView dialog_wallet_install_image_icon;
   private ImageView dialog_wallet_install_image_graphic;
 
+  private boolean hasImage;
+  private static Context context;
+
+  private final String URL_APTOIDE = "market://details?id="
+      + BuildConfig.BDS_WALLET_PACKAGE_NAME
+      + "&utm_source=appcoinssdk&app_source="
+      + getContext().getPackageName();
   private boolean hasImage;
   private static Context mContext;
 
@@ -146,11 +157,16 @@ public class DialogWalletInstall extends Dialog {
 
   private void redirectToStore() {
     //https://developer.android.com/distribute/marketing-tools/linking-to-google-play
-    getContext().startActivity(buildStoreViewIntent(GOOGLEPLAY_URI));
+    getContext().startActivity(buildStoreViewIntent(URL_APTOIDE));
   }
 
   private Intent buildStoreViewIntent(String action) {
-    return new Intent(Intent.ACTION_VIEW, Uri.parse(action));
+
+    final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(action));
+    if (WalletUtils.hasAptoideInstalled()) {
+      appStoreIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
+    }
+    return appStoreIntent;
   }
 
   private int dp(int px) {

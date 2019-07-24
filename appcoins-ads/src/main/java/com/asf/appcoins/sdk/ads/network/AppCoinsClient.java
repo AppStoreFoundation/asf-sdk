@@ -1,10 +1,10 @@
 package com.asf.appcoins.sdk.ads.network;
 
-import com.asf.appcoins.sdk.ads.network.responses.ClientResponseHandler;
-import com.asf.appcoins.sdk.ads.network.responses.ConnectivityResponseHandler;
-import com.asf.appcoins.sdk.ads.network.responses.HTTPResponseHandler;
 import com.asf.appcoins.sdk.ads.network.clients.CampaignService;
 import com.asf.appcoins.sdk.ads.network.clients.CheckConnectionCampaignService;
+import com.asf.appcoins.sdk.ads.network.responses.CampaignResponseHandler;
+import com.asf.appcoins.sdk.ads.network.responses.ClientResponseHandler;
+import com.asf.appcoins.sdk.ads.network.responses.ConnectivityResponseHandler;
 
 public class AppCoinsClient {
 
@@ -22,10 +22,11 @@ public class AppCoinsClient {
   }
 
   public void getCampaign(QueryParams queryParams, ClientResponseHandler clientResponseHandler) {
-    HTTPResponseHandler httpResponseHandler = new HTTPResponseHandler(clientResponseHandler);
+    CampaignResponseHandler campaignResponseHandler =
+        new CampaignResponseHandler(clientResponseHandler);
     CampaignService appcoinsHTTPClient =
         new CampaignService(packageName, versionCode, serviceUrl, interceptor, queryParams,
-            httpResponseHandler);
+            campaignResponseHandler);
 
     Thread operation = new Thread(appcoinsHTTPClient);
     operation.start();

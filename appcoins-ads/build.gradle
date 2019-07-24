@@ -23,6 +23,7 @@ android {
     buildConfigField 'String', 'DEV_BACKEND_BASE_HOST',
         "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
 
+
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     consumerProguardFiles 'proguard-rules.pro'
@@ -33,10 +34,18 @@ android {
       minifyEnabled false
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
           project.BDS_WALLET_PACKAGE_NAME_DEV
+      buildConfigField "String", "ADVERTISEMENT_BIND_ACTION",
+          "\"" + project.APPCOINS_ADVERTISEMENT_BIND + "\""
+      buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
+          project.APTOIDE_PACKAGE_NAME
     }
     release {
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
           project.BDS_WALLET_PACKAGE_NAME
+      buildConfigField "String", "ADVERTISEMENT_BIND_ACTION",
+          "\"" + project.APPCOINS_ADVERTISEMENT_BIND + "\""
+      buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
+          project.APTOIDE_PACKAGE_NAME
       minifyEnabled false
     }
   }

@@ -1,14 +1,17 @@
 package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.util.Log;
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
 import java.lang.ref.WeakReference;
 
 public class WalletUtils {
-
-  public static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
 
   public static WeakReference<Activity> context;
   public static Activity activity;
@@ -23,8 +26,19 @@ public class WalletUtils {
         .getPackageManager();
 
     try {
-      packageManager.getPackageInfo(walletPackageName, 0);
+      packageManager.getPackageInfo(BuildConfig.BDS_WALLET_PACKAGE_NAME, 0);
       return true;
+    } catch (PackageManager.NameNotFoundException e) {
+      return false;
+    }
+  }
+
+  public static boolean hasAptoideInstalled() {
+
+    PackageManager packageManager = context.get()
+        .getPackageManager();
+    try {
+      return packageManager.getApplicationInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0).enabled;
     } catch (PackageManager.NameNotFoundException e) {
       return false;
     }
@@ -37,11 +51,7 @@ public class WalletUtils {
     if (act == null) {
       return;
     }
-    /** Here is important to know in advance if the host app has feature graphic,
-     *  1- this boolean hasImage is needed to change layout dynamically
-     *  2- if so, we need to get  url of this image and then when copy this code to  apk-migrator
-     *  as Smali,
-     *  the correct dialog_wallet_install_graphic needs to be write  */
+
     DialogWalletInstall.with(activity)
         .show();
   }
