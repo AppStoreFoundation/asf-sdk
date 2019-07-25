@@ -97,7 +97,7 @@ bintray {
         name = "${project.name}"
         userOrg = "${BDS_BINTRAY_ORG}"
         licenses = ['GPL-3.0']
-        vcsUrl = 'https://github.com/Aptoide/bds-sdk/android-appcoins-billing'
+        vcsUrl = 'https://github.com/Aptoide/bds-sdk/appcoins-billing'
 
         version {
             name = project.version
