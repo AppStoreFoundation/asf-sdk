@@ -1,5 +1,6 @@
 package com.appcoins.sdk.billing.wallet;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -26,9 +28,12 @@ import android.widget.TextView;
 
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.android.billing.R;
+import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
+import com.appcoins.sdk.billing.helpers.Utils;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 
 import static android.graphics.Typeface.BOLD;
+import static com.appcoins.sdk.billing.helpers.WalletUtils.context;
 
 /**
  * Here is important to know in advance if the host app has feature graphic,
@@ -44,16 +49,18 @@ public class DialogWalletInstall extends Dialog {
   private TextView dialog_wallet_install_text_message;
   private ImageView dialog_wallet_install_image_icon;
   private ImageView dialog_wallet_install_image_graphic;
+  private int RESULT_USER_CANCELED = 1;
 
   private boolean hasImage;
-  private static Context context;
 
   private final String URL_APTOIDE = "market://details?id="
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
       + "&utm_source=appcoinssdk&app_source="
       + getContext().getPackageName();
+  private static Context mContext;
 
   public static DialogWalletInstall with(Context context) {
+    mContext = context;
     return new DialogWalletInstall(context);
   }
 
@@ -129,6 +136,10 @@ public class DialogWalletInstall extends Dialog {
       @Override public void onClick(View v) {
         redirectToStore();
         DialogWalletInstall.this.dismiss();
+        if (mContext instanceof InstallDialogActivity) {
+          ((Activity) mContext).setResult(RESULT_USER_CANCELED);
+          ((Activity) mContext).finish();
+        }
       }
     });
   }
@@ -138,6 +149,10 @@ public class DialogWalletInstall extends Dialog {
     dialog_wallet_install_button_cancel.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         DialogWalletInstall.this.dismiss();
+        if (mContext instanceof InstallDialogActivity) {
+          ((Activity) mContext).setResult(RESULT_USER_CANCELED);
+          ((Activity) mContext).finish();
+        }
       }
     });
   }

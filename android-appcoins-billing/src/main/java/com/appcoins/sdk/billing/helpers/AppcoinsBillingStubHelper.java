@@ -1,6 +1,6 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -141,23 +141,13 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         return response;
       }
     } else {
-      try {
-        Activity act = WalletUtils.getActivity();
-        act.runOnUiThread(new Runnable() {
-          @Override public void run() {
-            WalletUtils.promptToInstallWallet();
-          }
-        });
-      } catch (Exception e) {
-        e.printStackTrace();
-        Bundle response = new Bundle();
-        response.putInt(Utils.RESPONSE_CODE, ResponseCode.ERROR.getValue());
-        return response;
-      }
-
+      Intent intent = new Intent(WalletUtils.context.get(), InstallDialogActivity.class);
+      PendingIntent pendingIntent = PendingIntent.getActivity(WalletUtils.context.get(), 0, intent,
+          PendingIntent.FLAG_UPDATE_CURRENT);
       Bundle response = new Bundle();
-      response.putString(Utils.HAS_WALLET_INSTALLED, "");
-      response.putInt(Utils.RESPONSE_CODE, ResponseCode.ERROR.getValue());
+      response.putParcelable("BUY_INTENT", pendingIntent);
+
+      response.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
       return response;
     }
   }

@@ -13,13 +13,13 @@ import java.lang.ref.WeakReference;
 
 public class WalletUtils {
 
-  public static String walletPackageName = BuildConfig.BDS_WALLET_PACKAGE_NAME;
-
   public static WeakReference<Activity> context;
+  public static Activity activity;
 
   public static void setContext(Activity cont) {
     context = new WeakReference<>(cont);
   }
+  public static void setDialogActivity(Activity act) { activity = act;}
 
   public static boolean hasWalletInstalled() {
     PackageManager packageManager = context.get()
@@ -52,9 +52,7 @@ public class WalletUtils {
       return;
     }
 
-
-
-    DialogWalletInstall.with(act)
+    DialogWalletInstall.with(activity)
         .show();
   }
 
