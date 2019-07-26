@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.android.billing.R;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
+import com.appcoins.sdk.billing.helpers.Utils;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 
 import static android.graphics.Typeface.BOLD;
@@ -48,15 +49,14 @@ public class DialogWalletInstall extends Dialog {
   private TextView dialog_wallet_install_text_message;
   private ImageView dialog_wallet_install_image_icon;
   private ImageView dialog_wallet_install_image_graphic;
+  private int RESULT_USER_CANCELED = 1;
 
   private boolean hasImage;
-  private static Context context;
 
   private final String URL_APTOIDE = "market://details?id="
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
       + "&utm_source=appcoinssdk&app_source="
       + getContext().getPackageName();
-  private boolean hasImage;
   private static Context mContext;
 
   public static DialogWalletInstall with(Context context) {
@@ -137,6 +137,7 @@ public class DialogWalletInstall extends Dialog {
         redirectToStore();
         DialogWalletInstall.this.dismiss();
         if (mContext instanceof InstallDialogActivity) {
+          ((Activity) mContext).setResult(RESULT_USER_CANCELED);
           ((Activity) mContext).finish();
         }
       }
@@ -149,6 +150,7 @@ public class DialogWalletInstall extends Dialog {
       @Override public void onClick(View v) {
         DialogWalletInstall.this.dismiss();
         if (mContext instanceof InstallDialogActivity) {
+          ((Activity) mContext).setResult(RESULT_USER_CANCELED);
           ((Activity) mContext).finish();
         }
       }
