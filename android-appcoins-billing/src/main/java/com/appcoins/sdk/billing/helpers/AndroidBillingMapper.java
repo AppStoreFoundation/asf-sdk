@@ -131,8 +131,8 @@ public class AndroidBillingMapper {
   public static LaunchBillingFlowResult mapBundleToHashMapGetIntent(Bundle bundle) {
 
     LaunchBillingFlowResult launchBillingFlowResult =
-        new LaunchBillingFlowResult(bundle.get("RESPONSE_CODE"), bundle.getParcelable("BUY_INTENT"),
-            !bundle.containsKey(Utils.HAS_WALLET_INSTALLED));
+        new LaunchBillingFlowResult(bundle.get("RESPONSE_CODE"),
+            bundle.getParcelable("BUY_INTENT"));
 
     return launchBillingFlowResult;
   }

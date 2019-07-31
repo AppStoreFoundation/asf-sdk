@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
   }
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    Log.d("Activity Result: ", "onActivityResult(" + requestCode + "," + resultCode + "," + data);
+    Log.d("Activity Result: ", "onActivityResult(" + requestCode + "," + resultCode + "," + data + ")");
     if (data != null && data.getExtras() != null) {
       Bundle bundle = data.getExtras();
       if (bundle != null) {
