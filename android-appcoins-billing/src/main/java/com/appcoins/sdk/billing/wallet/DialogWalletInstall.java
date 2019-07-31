@@ -44,7 +44,7 @@ public class DialogWalletInstall extends Dialog {
   private ImageView dialog_wallet_install_image_graphic;
 
   private boolean hasImage;
-  private static Context mContext;
+  private static Context contextActivity;
 
   private final String URL_APTOIDE = "market://details?id="
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
@@ -57,7 +57,7 @@ public class DialogWalletInstall extends Dialog {
 
   public DialogWalletInstall(Context context) {
     super(context);
-    mContext = context;
+    contextActivity = context;
   }
 
   @Override protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +79,8 @@ public class DialogWalletInstall extends Dialog {
 
     Drawable icon = null;
     try {
-      icon = mContext.getPackageManager()
-          .getApplicationIcon(mContext.getPackageName());
+      icon = contextActivity.getPackageManager()
+          .getApplicationIcon(contextActivity.getPackageName());
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
