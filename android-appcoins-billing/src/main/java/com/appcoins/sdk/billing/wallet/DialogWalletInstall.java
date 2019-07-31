@@ -3,16 +3,15 @@ package com.appcoins.sdk.billing.wallet;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -23,7 +22,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.android.billing.R;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
@@ -46,7 +44,7 @@ public class DialogWalletInstall extends Dialog {
   private ImageView dialog_wallet_install_image_graphic;
 
   private boolean hasImage;
-  private static Context context;
+  private static Context mContext;
 
   private final String URL_APTOIDE = "market://details?id="
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
@@ -59,6 +57,7 @@ public class DialogWalletInstall extends Dialog {
 
   public DialogWalletInstall(Context context) {
     super(context);
+    mContext = context;
   }
 
   @Override protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +76,28 @@ public class DialogWalletInstall extends Dialog {
   }
 
   private void buildTop() {
+
+    Drawable icon = null;
+    try {
+      icon = mContext.getPackageManager()
+          .getApplicationIcon(mContext.getPackageName());
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
+
     dialog_wallet_install_image_icon = findViewById(R.id.dialog_wallet_install_image_icon);
+
     dialog_wallet_install_image_graphic = findViewById(R.id.dialog_wallet_install_image_graphic);
+
+    dialog_wallet_install_image_graphic.setOutlineProvider(new ViewOutlineProvider() {
+      @Override public void getOutline(View view, Outline outline) {
+        outline.setRoundRect(0, 0, view.getWidth(), (view.getHeight() + dp(12)), dp(12));
+        view.setClipToOutline(true);
+      }
+    });
+
+    hasImage = getContext().getResources()
+        .getBoolean(R.bool.dialog_wallet_install_has_image) && icon != null;
 
     dialog_wallet_install_image_graphic.setOutlineProvider(new ViewOutlineProvider() {
       @Override public void getOutline(View view, Outline outline) {
@@ -99,8 +118,7 @@ public class DialogWalletInstall extends Dialog {
           getContext().getDrawable(R.drawable.dialog_wallet_install_graphic));
     } else {
       dialog_wallet_install_image_icon.setVisibility(View.VISIBLE);
-      dialog_wallet_install_image_icon.setImageDrawable(
-          getContext().getDrawable(R.drawable.dialog_wallet_install_icon));
+      dialog_wallet_install_image_icon.setImageDrawable(icon);
       RelativeLayout.LayoutParams lp =
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(100));
       dialog_wallet_install_image_graphic.setLayoutParams(lp);
@@ -111,7 +129,7 @@ public class DialogWalletInstall extends Dialog {
 
   private void buildMessage() {
     dialog_wallet_install_text_message = findViewById(R.id.dialog_wallet_install_text_message);
-    String dialog_message = getContext().getString(R.string.app_wallet_install_wallet_from_ads);
+    String dialog_message = getContext().getString(R.string.app_wallet_install_wallet_from_iab);
 
     SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialog_message);
 
