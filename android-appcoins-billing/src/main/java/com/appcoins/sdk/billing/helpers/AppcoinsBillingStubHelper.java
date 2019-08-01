@@ -178,7 +178,10 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         } else {
           return ResponseCode.SERVICE_UNAVAILABLE.getValue();
         }
-      } catch (RemoteException | InterruptedException e) {
+      } catch (RemoteException e) {
+        e.printStackTrace();
+        return ResponseCode.SERVICE_UNAVAILABLE.getValue();
+      } catch (InterruptedException e) {
         e.printStackTrace();
         return ResponseCode.SERVICE_UNAVAILABLE.getValue();
       }
@@ -192,10 +195,10 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
     Bundle response = new Bundle();
     if (!isServiceBound) {
-      createRepository();
+      boolean hasRepositoryCreated = createRepository();
       synchronized (lockThread) {
-        if (!isMainThread) {
-          lockThread.wait(5000);
+        if (!isMainThread && hasRepositoryCreated) {
+          lockThread.wait();
           response.putBoolean(IS_BINDED_KEY, true);
           return response;
         }
@@ -211,7 +214,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     return null;
   }
 
-  private void createRepository() {
+  private boolean createRepository() {
 
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
@@ -240,6 +243,9 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
           Log.d(TAG, "onServiceDisconnected() called = [" + name + "]");
         }
       }, Context.BIND_AUTO_CREATE);
+      return true;
+    } else {
+      return false;
     }
   }
 

@@ -15,7 +15,6 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -27,11 +26,9 @@ import android.widget.TextView;
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.android.billing.R;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
-import com.appcoins.sdk.billing.helpers.Utils;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 
 import static android.graphics.Typeface.BOLD;
-import static com.appcoins.sdk.billing.helpers.WalletUtils.context;
 
 /**
  * Here is important to know in advance if the host app has feature graphic,
@@ -85,8 +82,8 @@ public class DialogWalletInstall extends Dialog {
     boolean hasImage;
     Drawable icon = null;
     try {
-      icon = contextActivity.getPackageManager()
-          .getApplicationIcon(contextActivity.getPackageName());
+      icon = mContext.getPackageManager()
+          .getApplicationIcon(mContext.getPackageName());
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
