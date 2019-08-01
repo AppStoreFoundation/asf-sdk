@@ -25,12 +25,10 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
   private static final String IS_BINDED_KEY = "IS_BIND";
 
-
   private final Object lockThread;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private boolean isServiceBound = false;
   private boolean isMainThread;
-  private boolean isConnecting;
 
   public AppcoinsBillingStubHelper() {
     this.lockThread = new Object();
@@ -79,8 +77,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     } else {
       List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
       String response =
-          WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName,
-              sku);
+          WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku);
       responseWs.putInt(Utils.RESPONSE_CODE, 0);
       ArrayList<String> skuDetails = buildResponse(response, type);
       responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
@@ -209,12 +206,12 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
       synchronized (lockThread) {
         if (!isMainThread) {
           lockThread.wait(5000);
-          response.putBoolean(IS_BINDED_KEY,true);
+          response.putBoolean(IS_BINDED_KEY, true);
           return response;
         }
       }
-    }else{
-      response.putBoolean(IS_BINDED_KEY,true);
+    } else {
+      response.putBoolean(IS_BINDED_KEY, true);
     }
     response.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
     return response;

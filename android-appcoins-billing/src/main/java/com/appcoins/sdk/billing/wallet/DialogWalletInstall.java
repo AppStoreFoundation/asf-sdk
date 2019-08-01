@@ -42,8 +42,6 @@ public class DialogWalletInstall extends Dialog {
   private TextView dialog_wallet_install_text_message;
   private ImageView dialog_wallet_install_image_icon;
   private ImageView dialog_wallet_install_image_graphic;
-
-  private boolean hasImage;
   private static Context contextActivity;
 
   private final String URL_APTOIDE = "market://details?id="
@@ -76,7 +74,7 @@ public class DialogWalletInstall extends Dialog {
   }
 
   private void buildTop() {
-
+    boolean hasImage;
     Drawable icon = null;
     try {
       icon = contextActivity.getPackageManager()
@@ -98,16 +96,6 @@ public class DialogWalletInstall extends Dialog {
 
     hasImage = getContext().getResources()
         .getBoolean(R.bool.dialog_wallet_install_has_image) && icon != null;
-
-    dialog_wallet_install_image_graphic.setOutlineProvider(new ViewOutlineProvider() {
-      @Override public void getOutline(View view, Outline outline) {
-        outline.setRoundRect(0, 0, view.getWidth(), (view.getHeight() + dp(12)), dp(12));
-        view.setClipToOutline(true);
-      }
-    });
-
-    hasImage = getContext().getResources()
-        .getBoolean(R.bool.dialog_wallet_install_has_image);
 
     if (hasImage) {
       dialog_wallet_install_image_icon.setVisibility(View.INVISIBLE);
