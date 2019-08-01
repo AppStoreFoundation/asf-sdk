@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.android.billing.R;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
+import com.appcoins.sdk.billing.helpers.Utils;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 
 import static android.graphics.Typeface.BOLD;
@@ -141,7 +142,13 @@ public class DialogWalletInstall extends Dialog {
         redirectToStore();
         DialogWalletInstall.this.dismiss();
         if (mContext instanceof InstallDialogActivity) {
-          ((Activity) mContext).setResult(RESULT_USER_CANCELED);
+          Bundle response = new Bundle();
+          response.putInt(Utils.RESPONSE_CODE, RESULT_USER_CANCELED);
+
+          Intent intent = new Intent();
+          intent.putExtras(response);
+
+          ((Activity) mContext).setResult(Activity.RESULT_CANCELED, intent);
           ((Activity) mContext).finish();
         }
       }
@@ -154,7 +161,13 @@ public class DialogWalletInstall extends Dialog {
       @Override public void onClick(View v) {
         DialogWalletInstall.this.dismiss();
         if (mContext instanceof InstallDialogActivity) {
-          ((Activity) mContext).setResult(RESULT_USER_CANCELED);
+          Bundle response = new Bundle();
+          response.putInt(Utils.RESPONSE_CODE, RESULT_USER_CANCELED);
+
+          Intent intent = new Intent();
+          intent.putExtras(response);
+
+          ((Activity) mContext).setResult(Activity.RESULT_CANCELED, intent);
           ((Activity) mContext).finish();
         }
       }
