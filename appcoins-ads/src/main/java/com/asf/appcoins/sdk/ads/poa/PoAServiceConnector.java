@@ -2,7 +2,6 @@ package com.asf.appcoins.sdk.ads.poa;
 
 import android.content.Context;
 import android.os.Bundle;
-import com.asf.appcoins.sdk.ads.repository.ConnectToServiceListenner;
 
 /**
  * Created by Joao Raimundo on 28/03/2018.
@@ -62,7 +61,7 @@ public interface PoAServiceConnector {
    *
    * @retun true if the bind was successful, false otherwise.
    */
-  boolean connectToService(Context context, ConnectToServiceListenner connectToServiceListenner);
+  boolean connectToService(Context context);
 
   /**
    * Method to unbind with the service that handles the PoA process.

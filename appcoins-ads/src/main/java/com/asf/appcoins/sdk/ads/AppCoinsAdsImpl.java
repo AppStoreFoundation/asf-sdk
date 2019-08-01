@@ -33,6 +33,7 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   }
 
   @Override public void sendProof() {
+    poaConnector.connectToService(context);
     long timestamp = System.currentTimeMillis();
     Bundle bundle = new Bundle();
     bundle.putString("packageName", context.getPackageName());
@@ -41,6 +42,7 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   }
 
   @Override public void registerCampaign(String campaignId) {
+    poaConnector.connectToService(context);
     Bundle bundle = new Bundle();
     bundle.putString("packageName", context.getPackageName());
     bundle.putString("campaignId", campaignId);
@@ -48,10 +50,12 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   }
 
   @Override public void setNetwork(int networkId) {
+    if (poaConnector.connectToService(context)) {
       Bundle bundle = new Bundle();
       bundle.putString("packageName", context.getPackageName());
       bundle.putInt("networkId", networkId);
       poaConnector.sendMessage(context, MSG_SET_NETWORK, bundle);
+    }
   }
 
   @Override public void init(Application application) throws PackageManager.NameNotFoundException {
