@@ -19,6 +19,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
+import com.asf.appcoins.sdk.ads.repository.ConnectToServiceListenner;
 import java.util.ArrayList;
 import java.util.List;
 import net.grandcentrix.tray.AppPreferences;
@@ -43,6 +44,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   private Messenger clientMessenger = null;
   /** Lists of messages that are pending to be send */
   private ArrayList<Message> pendingMsgsList = new ArrayList<>();
+  private ConnectToServiceListenner connectToServiceListenner;
   /**
    * Class for interacting with the main interface of the service.
    */
@@ -50,9 +52,10 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     @Override public void onServiceConnected(ComponentName className, IBinder service) {
       serviceMessenger = new Messenger(service);
       isBound = true;
-
+      Log.d(PoAServiceConnectorImpl.TAG,"Connected to Service: "+service);
       // send the pending messages that may have been added to the list before the bind was complete
       sendPendingMessages();
+      connectToServiceListenner.OnConnectToServiceListenner();
     }
 
     @Override public void onServiceDisconnected(ComponentName className) {
@@ -109,10 +112,12 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     sendImplicitBroadcast(context, broadcastIntent);
   }
 
-  @Override public boolean connectToService(Context context) {
+  @Override public boolean connectToService(Context context, ConnectToServiceListenner connectToServiceListenner) {
     if (isBound) {
       return true;
     }
+
+    this.connectToServiceListenner  = connectToServiceListenner;
     // Note that this is an implicit Intent that must be defined in the Android Manifest.
     final AppPreferences appPreferences =
         new AppPreferences(context); // this Preference comes for free from the library
@@ -154,7 +159,6 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     synchronized (pendingMsgsList) {
       // validate if the service is bound
       if (!isBound) {
-        connectToService(context);
         pendingMsgsList.add(msg);
       } else {
         if (pendingMsgsList.isEmpty()) {
