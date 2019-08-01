@@ -195,9 +195,9 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
     Bundle response = new Bundle();
     if (!isServiceBound) {
-      boolean hasRepositoryCreated = createRepository();
+      boolean isRepositoryCreated = createRepository();
       synchronized (lockThread) {
-        if (!isMainThread && hasRepositoryCreated) {
+        if (!isMainThread && isRepositoryCreated) {
           lockThread.wait();
           response.putBoolean(IS_BINDED_KEY, true);
           return response;
