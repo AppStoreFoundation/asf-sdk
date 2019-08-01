@@ -23,6 +23,7 @@ import java.util.List;
 
 public class AppcoinsBillingStubHelper implements AppcoinsBilling {
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
+  private static final String IS_BINDED_KEY = "IS_BIND";
 
   private final Object lockThread;
   private static AppcoinsBilling serviceAppcoinsBilling;
@@ -37,13 +38,12 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
     if (WalletUtils.hasWalletInstalled()) {
       try {
-        synchronized (lockThread) {
-          if (!isServiceBound) {
-            createRepository();
-            lockThread.wait();
-          }
+        Bundle response = walletInstalledBehaviour();
+        if (response.containsKey(IS_BINDED_KEY)) {
+          return serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
+        } else {
+          return ResponseCode.OK.getValue();
         }
-        return serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
       } catch (RemoteException | InterruptedException e) {
         e.printStackTrace();
         return ResponseCode.SERVICE_UNAVAILABLE.getValue();
@@ -64,13 +64,12 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     Bundle responseWs = new Bundle();
     if (WalletUtils.hasWalletInstalled()) {
       try {
-        synchronized (lockThread) {
-          if (!isServiceBound) {
-            createRepository();
-            lockThread.wait();
-          }
+        Bundle response = walletInstalledBehaviour();
+        if (response.containsKey(IS_BINDED_KEY)) {
+          return serviceAppcoinsBilling.getSkuDetails(apiVersion, packageName, type, skusBundle);
+        } else {
+          return response;
         }
-        return serviceAppcoinsBilling.getSkuDetails(apiVersion, packageName, type, skusBundle);
       } catch (RemoteException | InterruptedException e) {
         e.printStackTrace();
         responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
@@ -78,8 +77,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     } else {
       List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
       String response =
-          WSServiceController.getSkuDetailsService("https://api.blockchainds.com", packageName,
-              sku);
+          WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku);
       responseWs.putInt(Utils.RESPONSE_CODE, 0);
       ArrayList<String> skuDetails = buildResponse(response, type);
       responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
@@ -117,23 +115,14 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
   @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
       String developerPayload) {
     if (WalletUtils.hasWalletInstalled()) {
-      isMainThread = Looper.myLooper() == Looper.getMainLooper();
-
       try {
-        synchronized (lockThread) {
-          if (!isServiceBound) {
-            createRepository();
-            if (!isMainThread) {
-              lockThread.wait();
-            } else {
-              Bundle response = new Bundle();
-              response.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
-              return response;
-            }
-          }
+        Bundle response = walletInstalledBehaviour();
+        if (response.containsKey(IS_BINDED_KEY)) {
+          return serviceAppcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type,
+              developerPayload);
+        } else {
+          return response;
         }
-        return serviceAppcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type,
-            developerPayload);
       } catch (RemoteException | InterruptedException e) {
         e.printStackTrace();
         Bundle response = new Bundle();
@@ -158,14 +147,12 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     if (WalletUtils.hasWalletInstalled()) {
       try {
 
-        synchronized (lockThread) {
-          if (!isServiceBound) {
-            createRepository();
-            lockThread.wait();
-          }
+        Bundle response = walletInstalledBehaviour();
+        if (response.containsKey(IS_BINDED_KEY)) {
+          return serviceAppcoinsBilling.getPurchases(apiVersion, packageName, type, null);
+        } else {
+          return response;
         }
-
-        return serviceAppcoinsBilling.getPurchases(apiVersion, packageName, type, null);
       } catch (RemoteException | InterruptedException e) {
         e.printStackTrace();
         bundleResponse.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
@@ -185,14 +172,16 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
     if (WalletUtils.hasWalletInstalled()) {
       try {
-        synchronized (lockThread) {
-          if (!isServiceBound) {
-            createRepository();
-            lockThread.wait();
-          }
+        Bundle response = walletInstalledBehaviour();
+        if (response.containsKey(IS_BINDED_KEY)) {
+          return serviceAppcoinsBilling.consumePurchase(apiVersion, packageName, purchaseToken);
+        } else {
+          return ResponseCode.SERVICE_UNAVAILABLE.getValue();
         }
-        return serviceAppcoinsBilling.consumePurchase(apiVersion, packageName, purchaseToken);
-      } catch (RemoteException | InterruptedException e) {
+      } catch (RemoteException e) {
+        e.printStackTrace();
+        return ResponseCode.SERVICE_UNAVAILABLE.getValue();
+      } catch (InterruptedException e) {
         e.printStackTrace();
         return ResponseCode.SERVICE_UNAVAILABLE.getValue();
       }
@@ -201,11 +190,31 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     }
   }
 
+  private synchronized Bundle walletInstalledBehaviour() throws InterruptedException {
+    isMainThread = Looper.myLooper() == Looper.getMainLooper();
+
+    Bundle response = new Bundle();
+    if (!isServiceBound) {
+      boolean isRepositoryCreated = createRepository();
+      synchronized (lockThread) {
+        if (!isMainThread && isRepositoryCreated) {
+          lockThread.wait();
+          response.putBoolean(IS_BINDED_KEY, true);
+          return response;
+        }
+      }
+    } else {
+      response.putBoolean(IS_BINDED_KEY, true);
+    }
+    response.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
+    return response;
+  }
+
   @Override public IBinder asBinder() {
     return null;
   }
 
-  private void createRepository() {
+  private boolean createRepository() {
 
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
@@ -234,6 +243,9 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
           Log.d(TAG, "onServiceDisconnected() called = [" + name + "]");
         }
       }, Context.BIND_AUTO_CREATE);
+      return true;
+    } else {
+      return false;
     }
   }
 
