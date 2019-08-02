@@ -47,8 +47,6 @@ public class DialogWalletInstall extends Dialog {
   private ImageView dialog_wallet_install_image_graphic;
   private int RESULT_USER_CANCELED = 1;
 
-  private boolean hasImage;
-
   private final String URL_APTOIDE = "market://details?id="
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
       + "&utm_source=appcoinssdk&app_source="
