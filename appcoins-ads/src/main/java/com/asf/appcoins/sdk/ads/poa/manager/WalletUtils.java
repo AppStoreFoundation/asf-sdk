@@ -149,6 +149,7 @@ public class WalletUtils {
     try {
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
+          .setAutoCancel(true)
           .setContentTitle(context.getString(R.string.poa_wallet_not_installed_notification_title))
           .setContentText(context.getString(R.string.poa_wallet_not_installed_notification_body));
     } catch (NullPointerException e) {
@@ -170,6 +171,7 @@ public class WalletUtils {
     try {
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
+          .setAutoCancel(true)
           .setContentTitle(context.getString(R.string.poa_wallet_not_installed_notification_title))
           .setContentText(context.getString(R.string.poa_wallet_not_installed_notification_body));
     } catch (NullPointerException e) {

@@ -56,6 +56,8 @@ android {
           "\"" + project.APPCOINS_IAB_WALLET_ADDR + "\""
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
           project.BDS_WALLET_PACKAGE_NAME
+      buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
+          project.APTOIDE_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" +project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
       minifyEnabled false
