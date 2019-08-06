@@ -33,8 +33,8 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
 
   @Override public void onDisconnect(final AppCoinsBillingStateListener listener) {
     service = null;
-    listener.onBillingSetupFinished(ResponseCode.SERVICE_DISCONNECTED.getValue());
     isServiceReady = false;
+    listener.onBillingServiceDisconnected();
   }
 
   @Override public PurchasesResult getPurchases(String skuType) throws ServiceConnectionException {
