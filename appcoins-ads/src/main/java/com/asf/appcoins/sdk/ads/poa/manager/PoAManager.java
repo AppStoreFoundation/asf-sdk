@@ -83,6 +83,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private AppcoinsAdvertisementConnection appcoinsAdvertisementConnection;
   private static boolean showPopUpNotification;
   private static String POA_NOTIFICATION_VALUE = "POA_NOTIFICATION";
+  private boolean firstProof = false;
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -205,6 +206,12 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
         Log.e(TAG, "Proof " + (proofsSent + 1) + " skipped! Came from background!");
       } else {
+        if(!firstProof){
+          Log.e(TAG, "Start proof sending");
+          postponeSendProof();
+          firstProof = true;
+          return;
+        }
         long timestamp = System.currentTimeMillis();
         Bundle bundle = new Bundle();
         bundle.putString("packageName", appContext.getPackageName());
