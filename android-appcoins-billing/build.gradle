@@ -2,26 +2,15 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-
 android {
   compileSdkVersion COMPILE_SDK_VERSION
-  buildToolsVersion '28.0.3'
 
   defaultConfig {
     minSdkVersion MIN_SDK_VERSION
     targetSdkVersion TARGET_SDK_VERSION
-    versionCode 11
-    versionName "1.3.4"
-    multiDexEnabled true
-  }
 
-  signingConfigs {
-    release {
-      storeFile = file(project.APPCOINS_WALLET_STORE_FILE)
-      storePassword = project.APPCOINS_WALLET_STORE_PASSWORD
-      keyAlias = project.APPCOINS_WALLET_KEY_ALIAS
-      keyPassword = project.APPCOINS_WALLET_KEY_PASSWORD
-    }
+    versionCode VERSION_CODE
+    versionName VERSION_NAME
   }
 
   buildTypes {
@@ -31,29 +20,20 @@ android {
           "\"" + project.APPCOINS_DEV_IAB_BIND_ACTION + "\""
       buildConfigField "String", "IAB_BIND_PACKAGE",
           "\"" + project.APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
-      buildConfigField "String", "IAB_WALLET_ADDR",
-          "\"" + project.APPCOINS_DEV_IAB_WALLET_ADDR + "\""
-      buildConfigField "String", "IAB_KEY",
-          "\"" + project.APPCOINS_DEV_IAB_KEY + "\""
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
           project.BDS_WALLET_PACKAGE_NAME_DEV
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
           project.APTOIDE_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
-      manifestPlaceholders.iabPermission = "${project.APPCOINS_IAB_PERMISSION}"
     }
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      buildConfigField "String", "IAB_KEY",
-          "\"" + project.APPCOINS_IAB_KEY + "\""
       buildConfigField "String", "IAB_BIND_ACTION",
-          "\"" + project.APPCOINS_IAB_BIND_ACTION + "\""
+          "\"" + project.APPCOINS_DEV_IAB_BIND_ACTION + "\""
       buildConfigField "String", "IAB_BIND_PACKAGE",
-          "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
-      buildConfigField "String", "IAB_WALLET_ADDR",
-          "\"" + project.APPCOINS_IAB_WALLET_ADDR + "\""
+          "\"" + project.APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
           project.BDS_WALLET_PACKAGE_NAME
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
@@ -61,7 +41,6 @@ android {
       buildConfigField 'String', 'HOST_WS',
           "\"" +project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
       minifyEnabled false
-      manifestPlaceholders.iabPermission = "${project.APPCOINS_IAB_PERMISSION}"
     }
   }
 }
