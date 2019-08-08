@@ -28,7 +28,6 @@ import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementRepository;
 import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementThreadGetCampaign;
 import com.asf.appcoins.sdk.ads.repository.ResponseCode;
 import java.math.BigInteger;
-import net.grandcentrix.tray.AppPreferences;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -185,8 +184,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     processing = false;
     proofsSent = 0;
     campaignId = null;
-    final AppPreferences appPreferences = new AppPreferences(appContext);
-    appPreferences.remove(PREFERENCE_WALLET_PCKG_NAME);
     poaConnector.disconnectFromService(appContext);
   }
 
@@ -261,8 +258,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
    */
   private void checkPreferencesForPackage() {
     if (!processing) {
-      final AppPreferences appPreferences = new AppPreferences(appContext);
-      if (foreground && appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
+      if (foreground) {
         Log.d(TAG, "Starting PoA process");
         startProcess();
       } else {

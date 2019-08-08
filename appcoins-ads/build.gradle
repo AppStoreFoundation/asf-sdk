@@ -61,7 +61,6 @@ dependencies {
   testImplementation lib.mockito_core
 
   androidTestImplementation lib.android_test_runner
-  api lib.tray
   api project(':android-appcoins-billing')
 
 }
