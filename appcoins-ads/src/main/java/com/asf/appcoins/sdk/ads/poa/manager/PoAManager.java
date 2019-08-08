@@ -206,7 +206,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
         Log.e(TAG, "Proof " + (proofsSent + 1) + " skipped! Came from background!");
       } else {
-        if(!firstProof){
+        if (!firstProof) {
           Log.e(TAG, "Start proof sending");
           postponeSendProof();
           firstProof = true;
@@ -429,6 +429,9 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     return preferences.getBoolean(key, false);
   }
 
+  /*
+   * New listenner to be called when connection to WalletPoaService is succefully done.
+   */
   @Override public void isConnected() {
     try {
       poaConnector.registerCampaign(appContext, campaignId.toString());
