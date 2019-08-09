@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+    <string name="app_wallet_install">INSTALL</string>
+    <string name="app_wallet_install_wallet_from_ads">To get your reward in AppCoins, you need to install the AppCoins Wallet.</string>
+    <string name="app_wallet_install_wallet_from_iab">To complete your purchase, you have to install an AppCoins wallet</string>
+    <string name="app_wallet_skip">SKIP</string>
+    <string name="app_wallet_wallet_missing">APPC Wallet missing</string>
+</resources>

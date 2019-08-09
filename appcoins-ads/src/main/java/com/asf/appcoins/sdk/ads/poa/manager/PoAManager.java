@@ -6,34 +6,27 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
-import com.asf.appcoins.sdk.ads.R;
-import com.asf.appcoins.sdk.ads.ip.IpApi;
-import com.asf.appcoins.sdk.ads.ip.IpResponse;
+import com.asf.appcoins.sdk.ads.network.AppCoinsClient;
+import com.asf.appcoins.sdk.ads.network.QueryParams;
+import com.asf.appcoins.sdk.ads.network.listeners.CheckConnectivityResponseListener;
+import com.asf.appcoins.sdk.ads.network.listeners.GetCampaignResponseListener;
+import com.asf.appcoins.sdk.ads.network.responses.AppCoinsClientResponse;
+import com.asf.appcoins.sdk.ads.network.responses.ConnectivityResponse;
+import com.asf.appcoins.sdk.ads.network.responses.GetCampaignResponse;
+import com.asf.appcoins.sdk.ads.network.threads.CheckConnectivityRetry;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
-import com.asf.appcoins.sdk.ads.poa.campaign.BdsCampaignService;
 import com.asf.appcoins.sdk.ads.poa.campaign.Campaign;
-import com.asf.appcoins.sdk.ads.poa.campaign.CampaignRepository;
-import com.asf.appcoins.sdk.ads.poa.campaign.CampaignService;
-import com.asf.appcoins.sdk.core.util.LogInterceptor;
-import com.asf.appcoins.sdk.core.util.wallet.WalletUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
+import com.asf.appcoins.sdk.ads.poa.campaign.CampaignMapper;
+import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementConnection;
+import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementListenner;
+import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementRepository;
+import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementThreadGetCampaign;
+import com.asf.appcoins.sdk.ads.repository.ResponseCode;
 import java.math.BigInteger;
 import net.grandcentrix.tray.AppPreferences;
-import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -48,7 +41,8 @@ import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PREFERENCE_WALLET
  * Created by Joao Raimundo on 06/04/2018.
  */
 
-public class PoAManager implements LifeCycleListener.Listener {
+public class PoAManager implements LifeCycleListener.Listener, CheckConnectivityResponseListener,
+    GetCampaignResponseListener, DialogVisibleListener {
 
   public static final String TAG = PoAManager.class.getName();
   private static final String FINISHED_KEY = "finished";
@@ -56,14 +50,13 @@ public class PoAManager implements LifeCycleListener.Listener {
   /** The instance of the manager */
   private static PoAManager instance;
   private final SharedPreferences preferences;
-  private final CampaignService campaignService;
+  private final AppCoinsClient appcoinsClient;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
   private PoAServiceConnector poaConnector;
   /** The application context */
   private Context appContext;
   /** integer used to identify the network to wich we are connected */
   private int network = 0;
-  private CompositeDisposable compositeDisposable;
   /** boolean indicating if we are already processing a PoA */
   private boolean processing;
   /** The handle to keep the runnable tasks that we be running within a certain period */
@@ -80,14 +73,22 @@ public class PoAManager implements LifeCycleListener.Listener {
   private BigInteger campaignId;
   private boolean foreground = false;
   private boolean dialogVisible = false;
+  boolean fromBackground = false;
+  private Handler handleRetryConnection = new Handler();
+  private int connectionRetries = 0;
+  private boolean isWalletInstalled;
+  private AppcoinsAdvertisementRepository appcoinsAdvertisementRepository;
+  private AppcoinsAdvertisementConnection appcoinsAdvertisementConnection;
+  private static boolean showPopUpNotification;
+  private static String POA_NOTIFICATION_VALUE = "POA_NOTIFICATION";
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
-      int networkId, CampaignService campaignService) {
+      int networkId, AppCoinsClient appcoinsClient) {
     this.preferences = preferences;
     this.poaConnector = connector;
     this.appContext = context;
     this.network = networkId;
-    this.campaignService = campaignService;
+    this.appcoinsClient = appcoinsClient;
   }
 
   /**
@@ -106,41 +107,26 @@ public class PoAManager implements LifeCycleListener.Listener {
   public static void init(Context context, PoAServiceConnector connector, int networkId)
       throws PackageManager.NameNotFoundException {
     if (instance == null) {
+      WalletUtils.setContext(context);
       SharedPreferences preferences =
           context.getSharedPreferences("PoAManager", Context.MODE_PRIVATE);
+
       String packageName = context.getPackageName();
       instance = new PoAManager(preferences, connector, context, networkId,
-          createCampaignService(packageName, getVerCode(context, packageName), networkId));
+          createAppCoinsClient(packageName, getVerCode(context, packageName), networkId));
     }
   }
 
-  @NonNull
-  private static BdsCampaignService createCampaignService(String packageName, int versionCode,
+  private static AppCoinsClient createAppCoinsClient(String packageName, int versionCode,
       int networkId) {
     boolean isDebug = networkId != 1;
-    return new BdsCampaignService(packageName, versionCode,
-        new CampaignRepository(createApi(isDebug)), () -> IpApi.create(isDebug)
-        .getCountry()
-        .map(IpResponse::getCountryCode));
-  }
-
-  private static CampaignRepository.Api createApi(boolean isDebug) {
-    OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new LogInterceptor());
     String url;
     if (isDebug) {
       url = BuildConfig.DEV_BACKEND_BASE_HOST;
     } else {
       url = BuildConfig.PROD_BACKEND_BASE_HOST;
     }
-    OkHttpClient client = builder.build();
-    Retrofit retrofit =
-        new Retrofit.Builder().addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(JacksonConverterFactory.create(new ObjectMapper()))
-            .client(client)
-            .baseUrl(url)
-            .build();
-
-    return retrofit.create(CampaignRepository.Api.class);
+    return new AppCoinsClient(packageName, versionCode, url, new LogInterceptor());
   }
 
   private static int getVerCode(Context context, String packageName)
@@ -163,12 +149,6 @@ public class PoAManager implements LifeCycleListener.Listener {
     bundle.putInt("networkId", network);
 
     poaConnector.sendMessage(appContext, MSG_SET_NETWORK, bundle);
-
-    handleCampaign();
-
-    if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
-      sendProof();
-    }
   }
 
   /**
@@ -213,49 +193,61 @@ public class PoAManager implements LifeCycleListener.Listener {
    * If all proofs were sent, it stops the process.
    */
   private void sendProof() {
-    // Connection to service may already been done, but we still need to make sure that it is
-    // connected. In case no connection is not yet done, the message is stored to be sent as soon as
-    // the connection is done.
-    poaConnector.connectToService(appContext);
-    // send proof
-    long timestamp = System.currentTimeMillis();
-    Bundle bundle = new Bundle();
-    bundle.putString("packageName", appContext.getPackageName());
-    bundle.putLong("timeStamp", timestamp);
-    poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
-    proofsSent++;
-    Log.e(TAG, "Proof " + proofsSent + " sent!");
-    // schedule the next proof sending
-    if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
-      handler.postDelayed(sendProof = this::sendProof,
-          BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
+    if (foreground) {
+      if (fromBackground) {
+        fromBackground = false;
+
+        if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+          postponeSendProof();
+        }
+
+        Log.e(TAG, "Proof " + (proofsSent + 1) + " skipped! Came from background!");
+      } else {
+        // Connection to service may already been done, but we still need to make sure that it is
+        // connected. In case no connection is not yet done, the message is stored to be sent as soon as
+        // the connection is done.
+        poaConnector.connectToService(appContext);
+        // send proof
+        long timestamp = System.currentTimeMillis();
+        Bundle bundle = new Bundle();
+        bundle.putString("packageName", appContext.getPackageName());
+        bundle.putLong("timeStamp", timestamp);
+        poaConnector.sendMessage(appContext, MSG_SEND_PROOF, bundle);
+        proofsSent++;
+        Log.e(TAG, "Proof " + proofsSent + " sent!");
+        // schedule the next proof sending
+        if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+          postponeSendProof();
+        } else {
+          // or stop the process
+          if (campaignId != null && !getSharedPreferencesBoolean(FINISHED_KEY)) {
+            setSharedPreferencesBoolean(FINISHED_KEY, true);
+            finishProcess();
+          }
+        }
+      }
     } else {
-      // or stop the process
-      if (campaignId != null && !preferences.contains(FINISHED_KEY)) {
-        preferences.edit()
-            .putBoolean(FINISHED_KEY, true)
-            .apply();
-        finishProcess();
+      if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+        postponeSendProof();
+
+        Log.e(TAG, "Proof " + (proofsSent + 1) + " skipped! Application is background!");
       }
     }
   }
 
+  private void postponeSendProof() {
+    handler.postDelayed(new Runnable() {
+      @Override public void run() {
+        sendProof();
+      }
+    }, BuildConfig.ADS_POA_PROOFS_INTERVAL_IN_MILIS);
+  }
+
   private void handleCampaign() {
-    compositeDisposable.add(ReactiveNetwork.observeInternetConnectivity()
-        .subscribeOn(Schedulers.io())
-        .filter(hasInternet -> hasInternet)
-        .filter(__ -> this.campaignId == null)
-        .firstOrError()
-        .flatMap(__ -> campaignService.getCampaign())
-        .retryWhen(throwableObservable -> throwableObservable.toObservable()
-            .flatMap(throwable -> {
-              throwable.printStackTrace();
-              return ReactiveNetwork.observeInternetConnectivity();
-            })
-            .flatMap(this::retryIfNetworkAvailable)
-            .toFlowable(BackpressureStrategy.LATEST))
-        .doOnSuccess(this::processCampaign)
-        .subscribe());
+    ConnectivityResponse connectivityResponse = new ConnectivityResponse(this);
+    if (campaignId == null) {
+      appcoinsClient.checkConnectivity(connectivityResponse);
+    }
   }
 
   /**
@@ -270,62 +262,165 @@ public class PoAManager implements LifeCycleListener.Listener {
         Log.d(TAG, "Starting PoA process");
         startProcess();
       } else {
-        spHandler.postDelayed(spListener = this::checkPreferencesForPackage,
-            PREFERENCES_LISTENER_DELAY);
+        spHandler.postDelayed(new Runnable() {
+          @Override public void run() {
+            checkPreferencesForPackage();
+          }
+        }, PREFERENCES_LISTENER_DELAY);
       }
     }
   }
 
-  /**
-   * Return an observable that emits 0 if there is network. Emits empty otherwise.
-   * This is supposed to avoid breaking the chain.
-   */
-  private ObservableSource<? extends Integer> retryIfNetworkAvailable(Boolean hasInternet) {
-    return hasInternet ? Observable.just(0) : Observable.empty();
-  }
-
   @Override public void onBecameForeground(Activity activity) {
-    this.compositeDisposable = new CompositeDisposable();
-
+    isWalletInstalled = WalletUtils.hasWalletInstalled();
     foreground = true;
 
-    if (!preferences.getBoolean(FINISHED_KEY, false)) {
-      if (!WalletUtils.hasWalletInstalled(activity) && !dialogVisible) {
-        Disposable disposable = WalletUtils.promptToInstallWallet(activity,
-            activity.getString(R.string.install_wallet_from_ads))
-            .toCompletable()
-            .doOnSubscribe(disposable1 -> dialogVisible = true)
-            .doOnComplete(() -> dialogVisible = false)
-            .subscribe(() -> {
-            }, Throwable::printStackTrace);
-      } else {
-        // start handshake
-        poaConnector.startHandshake(appContext, network);
+    if(isWalletInstalled){
+      WalletUtils.removeNotification();
+    }
 
-        checkPreferencesForPackage();
-      }
+    if (!getSharedPreferencesBoolean(FINISHED_KEY)) {
+      handleCampaign();
     }
   }
 
   @Override public void onBecameBackground() {
     foreground = false;
+    fromBackground = true;
+  }
 
-    stopProcess();
-    compositeDisposable.dispose();
+  private void sendMSGRegisterCampaign(String packageName, String id) {
+    Bundle bundle = new Bundle();
+    bundle.putString("packageName", packageName);
+    bundle.putString("campaignId", id);
+    poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
+  }
+
+  private void initiateProofSending() {
+    if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
+      sendProof();
+    }
+  }
+
+  @Override public void OnDialogVisibleListener(boolean value) {
+    dialogVisible = value;
+  }
+
+  /*
+   * @Param value -> true if there is connectivity,false otherwise.
+   * Method that the response of the function checkConnectivity.
+   * If there is connectivity executes GetCampaign
+   * If not retry in x mills until regainings Connectivity.
+   */
+  @Override public void responseConnectivity(boolean hasConnectivity) {
+    if (hasConnectivity) {
+      Log.d("Message:", "Connectivity Available");
+      retrieveCampaign();
+    } else {
+      Log.d("Message:", "Connectivity Not available Available");
+      if (connectionRetries < BuildConfig.ADS_CONNECTION_RETRYS_NUMBER) {
+        connectionRetries++;
+        int delayedTime = connectionRetries * BuildConfig.ADS_CONNECTIVITY_RETRY_IN_MILLS;
+        CheckConnectivityRetry checkConnectivityRetry = new CheckConnectivityRetry(this);
+        handleRetryConnection.postDelayed(checkConnectivityRetry, delayedTime);
+      } else {
+        Log.d("Message:", "Connectivity Retry exceeded..");
+      }
+    }
+  }
+
+  private void retrieveCampaign() {
+    if (isWalletInstalled) {
+      Log.d(TAG, "Wallet Installed");
+      startWalletConnection();
+    } else {
+      Log.d(TAG, "No Wallet Installed");
+      Log.d(TAG, "Checking for available campaigns");
+      QueryParams queryParams = new QueryParams("desc", "price", "true", "BDS");
+      GetCampaignResponse getCampaignResponse = new GetCampaignResponse(this);
+      appcoinsClient.getCampaign(queryParams, getCampaignResponse);
+    }
+  }
+
+  /*
+   * @Param value -> response object from the GetCampaign service.
+   * Method that handles the GetCampaignService response.
+   * If not retry in x mills until regainings Connectivity.
+   */
+  @Override public void responseGetCampaign(AppCoinsClientResponse appCoinsClientResponse) {
+    Campaign campaign = CampaignMapper.mapCampaign(appCoinsClientResponse);
+    processCampaign(campaign);
+  }
+
+  @Override public void responseGetCampaignWallet(Bundle response) {
+    Campaign campaign = CampaignMapper.mapCampaignFromBundle(response);
+    processCampaign(campaign);
   }
 
   private void processCampaign(Campaign campaign) {
     if (!campaign.hasCampaign()) {
-      Log.d(TAG, "No campaign is available.");
       stopProcess();
     } else {
-      Bundle bundle = new Bundle();
-      bundle.putString("packageName", campaign.getPackageName());
-      bundle.putString("campaignId", campaign.getId()
-          .toString());
-      poaConnector.sendMessage(appContext, MSG_REGISTER_CAMPAIGN, bundle);
-
-      this.campaignId = campaign.getId();
+      if (isWalletInstalled) {
+        startCampaign(campaign);
+      } else {
+        promptWalletNotification();
+      }
     }
+  }
+
+  private void startCampaign(Campaign campaign) {
+    this.campaignId = campaign.getId();
+    Log.d(TAG, "Start Handshake");
+    Log.d(TAG, "CampaignID:" + campaignId + " PackageName: " + appContext.getPackageName());
+    poaConnector.startHandshake(appContext, network);
+    checkPreferencesForPackage();
+    sendMSGRegisterCampaign(appContext.getPackageName(), campaign.getId()
+        .toString());
+    initiateProofSending();
+  }
+
+  private void promptWalletNotification() {
+    if (!getSharedPreferencesBoolean(POA_NOTIFICATION_VALUE)) {
+      Log.d(TAG, "Prompting Notification Install");
+      setSharedPreferencesBoolean(POA_NOTIFICATION_VALUE, true);
+      showPopUpNotification = true;
+      spHandler.post(new Runnable() {
+        @Override public void run() {
+          WalletUtils.createInstallWalletNotification();
+        }
+      });
+    }
+  }
+
+  private void startWalletConnection() {
+    appcoinsAdvertisementRepository = new AppcoinsAdvertisementRepository();
+    appcoinsAdvertisementConnection =
+        new AppcoinsAdvertisementConnection(appContext, appcoinsAdvertisementRepository);
+    final PoAManager p = this;
+    appcoinsAdvertisementConnection.startConnection(new AppcoinsAdvertisementListenner() {
+      @Override public void onAdvertisementFinished(int responseCode) {
+        if (responseCode == ResponseCode.OK.getValue()) {
+          Log.d(TAG, "Retrieving the Campaign by the Wallet");
+          AppcoinsAdvertisementThreadGetCampaign appcoinsAdvertisementThreadGetCampaign =
+              new AppcoinsAdvertisementThreadGetCampaign(p, appcoinsAdvertisementRepository);
+          Thread t = new Thread(appcoinsAdvertisementThreadGetCampaign);
+          t.start();
+        } else {
+          Log.d(TAG, "Coudn't connect to the wallet");
+          stopProcess();
+        }
+      }
+    });
+  }
+
+  private void setSharedPreferencesBoolean(String key, boolean value) {
+    preferences.edit()
+        .putBoolean(key, value)
+        .apply();
+  }
+
+  private boolean getSharedPreferencesBoolean(String key) {
+    return preferences.getBoolean(key, false);
   }
 }
