@@ -147,7 +147,7 @@ public class DialogWalletInstall extends Dialog {
           intent.putExtras(response);
 
           ((Activity) mContext).setResult(Activity.RESULT_CANCELED, intent);
-          ((Activity) mContext).finish();
+          //((Activity) mContext).finish();
         }
       }
     });

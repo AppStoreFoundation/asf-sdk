@@ -8,12 +8,11 @@ import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 import com.appcoins.billing.AppcoinsBilling;
 import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.sdk.billing.ConnectToWalletBillingService;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
@@ -23,28 +22,19 @@ import java.util.List;
 
 public class AppcoinsBillingStubHelper implements AppcoinsBilling {
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
-  private static final String IS_BINDED_KEY = "IS_BIND";
 
-  private final Object lockThread;
   private static AppcoinsBilling serviceAppcoinsBilling;
-  private boolean isServiceBound = false;
-  private boolean isMainThread;
 
   public AppcoinsBillingStubHelper() {
-    this.lockThread = new Object();
+    WalletUtils.setAppcoinsBillingStubHelper(this);
   }
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
 
     if (WalletUtils.hasWalletInstalled()) {
       try {
-        Bundle response = walletInstalledBehaviour();
-        if (response.containsKey(IS_BINDED_KEY)) {
-          return serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
-        } else {
-          return ResponseCode.OK.getValue();
-        }
-      } catch (RemoteException | InterruptedException e) {
+        return serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
+      } catch (RemoteException e) {
         e.printStackTrace();
         return ResponseCode.SERVICE_UNAVAILABLE.getValue();
       }
@@ -64,13 +54,8 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     Bundle responseWs = new Bundle();
     if (WalletUtils.hasWalletInstalled()) {
       try {
-        Bundle response = walletInstalledBehaviour();
-        if (response.containsKey(IS_BINDED_KEY)) {
-          return serviceAppcoinsBilling.getSkuDetails(apiVersion, packageName, type, skusBundle);
-        } else {
-          return response;
-        }
-      } catch (RemoteException | InterruptedException e) {
+        return serviceAppcoinsBilling.getSkuDetails(apiVersion, packageName, type, skusBundle);
+      } catch (RemoteException e) {
         e.printStackTrace();
         responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
       }
@@ -116,14 +101,9 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
       String developerPayload) {
     if (WalletUtils.hasWalletInstalled()) {
       try {
-        Bundle response = walletInstalledBehaviour();
-        if (response.containsKey(IS_BINDED_KEY)) {
-          return serviceAppcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type,
-              developerPayload);
-        } else {
-          return response;
-        }
-      } catch (RemoteException | InterruptedException e) {
+        return serviceAppcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type,
+            developerPayload);
+      } catch (RemoteException e) {
         e.printStackTrace();
         Bundle response = new Bundle();
         response.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
@@ -146,14 +126,8 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     Bundle bundleResponse = new Bundle();
     if (WalletUtils.hasWalletInstalled()) {
       try {
-
-        Bundle response = walletInstalledBehaviour();
-        if (response.containsKey(IS_BINDED_KEY)) {
-          return serviceAppcoinsBilling.getPurchases(apiVersion, packageName, type, null);
-        } else {
-          return response;
-        }
-      } catch (RemoteException | InterruptedException e) {
+        return serviceAppcoinsBilling.getPurchases(apiVersion, packageName, type, null);
+      } catch (RemoteException e) {
         e.printStackTrace();
         bundleResponse.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
       }
@@ -172,16 +146,8 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
     if (WalletUtils.hasWalletInstalled()) {
       try {
-        Bundle response = walletInstalledBehaviour();
-        if (response.containsKey(IS_BINDED_KEY)) {
-          return serviceAppcoinsBilling.consumePurchase(apiVersion, packageName, purchaseToken);
-        } else {
-          return ResponseCode.SERVICE_UNAVAILABLE.getValue();
-        }
+        return serviceAppcoinsBilling.consumePurchase(apiVersion, packageName, purchaseToken);
       } catch (RemoteException e) {
-        e.printStackTrace();
-        return ResponseCode.SERVICE_UNAVAILABLE.getValue();
-      } catch (InterruptedException e) {
         e.printStackTrace();
         return ResponseCode.SERVICE_UNAVAILABLE.getValue();
       }
@@ -190,31 +156,12 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     }
   }
 
-  private synchronized Bundle walletInstalledBehaviour() throws InterruptedException {
-    isMainThread = Looper.myLooper() == Looper.getMainLooper();
-
-    Bundle response = new Bundle();
-    if (!isServiceBound) {
-      boolean isRepositoryCreated = createRepository();
-      synchronized (lockThread) {
-        if (!isMainThread && isRepositoryCreated) {
-          lockThread.wait();
-          response.putBoolean(IS_BINDED_KEY, true);
-          return response;
-        }
-      }
-    } else {
-      response.putBoolean(IS_BINDED_KEY, true);
-    }
-    response.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
-    return response;
-  }
-
   @Override public IBinder asBinder() {
     return null;
   }
 
-  private boolean createRepository() {
+  public boolean createRepository(
+      final ConnectToWalletBillingService connectToWalletBillingService) {
 
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
@@ -226,17 +173,9 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     if (intentServices != null && !intentServices.isEmpty()) {
       context.bindService(serviceIntent, new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName name, IBinder service) {
-          synchronized (lockThread) {
-            serviceAppcoinsBilling = Stub.asInterface(service);
-            lockThread.notify();
-            isServiceBound = true;
-            if (isMainThread) {
-              Toast.makeText(context, "Try again, it will work this time =)", Toast.LENGTH_SHORT)
-                  .show();
-            }
-            isMainThread = false;
-            Log.d(TAG, "onServiceConnected() called service = [" + serviceAppcoinsBilling + "]");
-          }
+          serviceAppcoinsBilling = Stub.asInterface(service);
+          connectToWalletBillingService.isConnected();
+          Log.d(TAG, "onServiceConnected() called service = [" + serviceAppcoinsBilling + "]");
         }
 
         @Override public void onServiceDisconnected(ComponentName name) {

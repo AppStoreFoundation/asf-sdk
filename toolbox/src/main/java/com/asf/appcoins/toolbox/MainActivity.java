@@ -69,14 +69,10 @@ public class MainActivity extends Activity {
     BillingFlowParams billingFlowParams =
         new BillingFlowParams("gas", SkuType.inapp.toString(), 10001, null, null, null);
 
-    Activity act = this;
-    Thread t = new Thread(new Runnable() {
-      @Override public void run() {
+   Activity act = this;
         int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
         Log.d("BillingFlowResponse: ", launchBillingFlowResponse + "");
-      }
-    });
-    t.start();
+
 
 
   }
