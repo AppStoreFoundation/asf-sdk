@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -20,6 +21,8 @@ public class WalletUtils {
   private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
 
   private static int POA_NOTIFICATION_ID = 0;
+
+  private static int MINIMUM_APTOIDE_VERSION = 9908;
 
   private static String URL_INTENT_INSTALL =
       "market://details?id=com.appcoins.wallet&utm_source=appcoinssdk&app_source=";
@@ -60,6 +63,32 @@ public class WalletUtils {
     }
   }
 
+  public static int getAptoideVersion() {
+
+    final PackageInfo pInfo;
+    int versionCode = 0;
+
+    try {
+      pInfo = context.getPackageManager()
+          .getPackageInfo(com.appcoins.sdk.android.billing.BuildConfig.APTOIDE_PACKAGE_NAME, 0);
+      String versionName = pInfo.versionName;
+
+      //VersionCode is deprecated for api 28
+      if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        versionCode = (int) pInfo.getLongVersionCode();
+      } else {
+        //noinspection deprecation
+        versionCode = pInfo.versionCode;
+      }
+
+      Log.d("AptoideVersion", "Version Code is: " + versionCode);
+      Log.d("AptoideVersion", "Version Name is: " + versionName);
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
+    return versionCode;
+  }
+
   public static void removeNotification() {
     if (hasPopup) {
       notificationManager.cancel(POA_NOTIFICATION_ID);
@@ -93,8 +122,7 @@ public class WalletUtils {
       notificationManager.notify(0,
           buildNotification(Integer.toString(POA_NOTIFICATION_ID), intent));
     } else {
-      Notification notificationHeadsUp =
-          buildNotificationOlderVersion(intent);
+      Notification notificationHeadsUp = buildNotificationOlderVersion(intent);
       notificationManager.notify(POA_NOTIFICATION_ID, notificationHeadsUp);
     }
   }
@@ -111,7 +139,7 @@ public class WalletUtils {
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-    if (hasAptoide) {
+    if (hasAptoide && WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION) {
       intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
 

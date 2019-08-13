@@ -181,7 +181,8 @@ public class DialogWalletInstall extends Dialog {
 
   private Intent buildStoreViewIntent(String action) {
     final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(action));
-    if (WalletUtils.hasAptoideInstalled() && WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION ) {
+    if (WalletUtils.hasAptoideInstalled()
+        && WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION) {
       appStoreIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
     return appStoreIntent;
