@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import com.appcoins.sdk.android.billing.BuildConfig;
 import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
@@ -19,7 +21,10 @@ public class WalletUtils {
   public static void setContext(Activity cont) {
     context = new WeakReference<>(cont);
   }
-  public static void setDialogActivity(Activity act) { activity = act;}
+
+  public static void setDialogActivity(Activity act) {
+    activity = act;
+  }
 
   public static boolean hasWalletInstalled() {
     PackageManager packageManager = context.get()
@@ -31,6 +36,33 @@ public class WalletUtils {
     } catch (PackageManager.NameNotFoundException e) {
       return false;
     }
+  }
+
+  public static int getAptoideVersion() {
+
+    final PackageInfo pInfo;
+    int versionCode = 0;
+
+    try {
+      pInfo = context.get()
+          .getPackageManager()
+          .getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0);
+      String versionName = pInfo.versionName;
+
+      //VersionCode is deprecated for api 28
+      if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        versionCode = (int) pInfo.getLongVersionCode();
+      } else {
+        //noinspection deprecation
+        versionCode = pInfo.versionCode;
+      }
+
+      Log.d("AptoideVersion", "Version Code is: " + versionCode);
+      Log.d("AptoideVersion", "Version Name is: " + versionName);
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
+    return versionCode;
   }
 
   public static boolean hasAptoideInstalled() {
