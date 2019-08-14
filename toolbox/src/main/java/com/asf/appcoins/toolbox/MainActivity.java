@@ -104,7 +104,7 @@ public class MainActivity extends Activity {
 
   }
 
-  public void onCreateChannelButtonClicked(View view) {
+  public void onSkuDetailsButtonClicked(View view) {
     SkuDetailsParams skuDetailsParams = new SkuDetailsParams();
     skuDetailsParams.setItemType(SkuType.inapp.toString());
     ArrayList<String> al = new ArrayList<String>();
