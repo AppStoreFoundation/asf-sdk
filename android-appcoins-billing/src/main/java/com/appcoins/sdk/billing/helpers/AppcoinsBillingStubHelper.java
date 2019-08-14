@@ -20,6 +20,8 @@ import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.WSServiceController;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class AppcoinsBillingStubHelper implements AppcoinsBilling {
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
@@ -99,12 +101,24 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         + skuDetails.getSku()
         + "\",\"type\" : \""
         + skuDetails.getType()
-        + "\",\"price\" : "
+        + "\",\"price\" : \""
         + skuDetails.getPrice()
-        + ",\"price_currency_code\": \""
+        + "\",\"price_currency_code\": \""
         + skuDetails.getPriceCurrencyCode()
         + "\",\"price_amount_micros\": "
         + skuDetails.getPriceAmountMicros()
+        + ",\"appc_price\" : \""
+        + skuDetails.getAppcPrice()
+        + "\",\"appc_price_currency_code\": \""
+        + skuDetails.getAppcPriceCurrencyCode()
+        + "\",\"appc_price_amount_micros\": "
+        + skuDetails.getAppcPriceAmountMicros()
+        + ",\"fiat_price\" : \""
+        + skuDetails.getFiatPrice()
+        + "\",\"fiat_price_currency_code\": \""
+        + skuDetails.getFiatPriceCurrencyCode()
+        + "\",\"fiat_price_amount_micros\": "
+        + skuDetails.getFiatPriceAmountMicros()
         + ",\"title\" : \""
         + skuDetails.getTitle()
         + "\",\"description\" : \""
@@ -258,5 +272,31 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         return AppcoinsBilling.Stub.asInterface(service);
       }
     }
+  }
+
+  private static String getAppcPrice(JSONObject parentObject) throws JSONException {
+    return String.format("%s %s", "APPC", parentObject.getString("appc"));
+  }
+
+  private static long getAppcAmountInMicros(JSONObject parentObject) throws JSONException {
+    long price = parentObject.getLong("appc");
+    return price * 1000000;
+  }
+
+  private static String getFiatPrice(JSONObject parentObject) throws JSONException {
+    String value = parentObject.getString("value");
+    String code = parentObject.getJSONObject("currency")
+        .getString("code");
+    return String.format("%s %s", code, value);
+  }
+
+  private static long getFiatAmountInMicros(JSONObject parentObject) throws JSONException {
+    long price = parentObject.getLong("value");
+    return price * 1000000;
+  }
+
+  private static String getFiatCurrencyCode(JSONObject parentObject) throws JSONException {
+    return parentObject.getJSONObject("currency")
+        .getString("code");
   }
 }

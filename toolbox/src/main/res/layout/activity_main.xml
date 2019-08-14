@@ -31,10 +31,10 @@
       app:layout_constraintTop_toTopOf="@id/buyButton"
       />
   <Button
-      android:id="@+id/createChannelButton"
+      android:id="@+id/sku_details"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:onClick="onCreateChannelButtonClicked"
+      android:onClick="onSkuDetailsButtonClicked"
       android:text="@string/sku_details"
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toBottomOf="@id/upgradeButton"
@@ -47,7 +47,7 @@
       android:onClick="makePaymentButtonClicked"
       android:text="@string/consume"
       app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/createChannelButton"
+      app:layout_constraintTop_toBottomOf="@id/sku_details"
       />
   <Button
       android:id="@+id/closeChannelButton"

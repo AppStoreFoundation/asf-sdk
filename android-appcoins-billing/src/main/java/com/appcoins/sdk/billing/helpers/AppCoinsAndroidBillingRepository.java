@@ -67,12 +67,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
 
     try {
       response = service.getSkuDetails(apiVersion, packageName, skuType, bundle);
-      if (response.containsKey(Utils.NO_WALLET_SKU_DETAILS)) {
-        return AndroidBillingMapper.mapSkuDetailsFromWS(skuType,
-            response.getString(Utils.NO_WALLET_SKU_DETAILS));
-      } else {
-        return AndroidBillingMapper.mapBundleToHashMapSkuDetails(skuType, response);
-      }
+      return AndroidBillingMapper.mapBundleToHashMapSkuDetails(skuType, response);
     } catch (RemoteException e) {
       e.printStackTrace();
       throw new ServiceConnectionException(e.getMessage());
