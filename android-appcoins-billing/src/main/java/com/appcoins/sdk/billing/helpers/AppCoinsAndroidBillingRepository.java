@@ -19,10 +19,12 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   private final String packageName;
   private WalletBillingService service;
   private boolean isServiceReady;
+  private EventLogger eventLogger;
 
   public AppCoinsAndroidBillingRepository(int apiVersion, String packageName) {
     this.apiVersion = apiVersion;
     this.packageName = packageName;
+    this.eventLogger = new EventLogger();
   }
 
   @Override public void onConnect(IBinder service, final AppCoinsBillingStateListener listener) {
@@ -95,6 +97,9 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
       throw new ServiceConnectionException();
     }
     try {
+
+      String valueStr = ""; //TODO how to get the purchase value, why do we need it?
+      eventLogger.LogPurchaseEvent(sku,valueStr,this.packageName);
 
       Bundle response = service.getBuyIntent(apiVersion, packageName, sku, skuType, payload);
 
