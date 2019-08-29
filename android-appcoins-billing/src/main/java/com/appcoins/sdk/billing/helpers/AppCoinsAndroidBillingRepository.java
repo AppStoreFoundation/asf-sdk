@@ -22,12 +22,10 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   private final String packageName;
   private WalletBillingService service;
   private boolean isServiceReady;
-  private EventLogger eventLogger;
 
   public AppCoinsAndroidBillingRepository(int apiVersion, String packageName) {
     this.apiVersion = apiVersion;
     this.packageName = packageName;
-    this.eventLogger = new EventLogger();
   }
 
   @Override public void onConnect(IBinder service, final AppCoinsBillingStateListener listener) {
@@ -100,15 +98,10 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
       throw new ServiceConnectionException();
     }
     try {
-      eventLogger.LogPurchaseEvent(sku, this.packageName);
-
       Bundle response = service.getBuyIntent(apiVersion, packageName, sku, skuType, payload);
 
       return AndroidBillingMapper.mapBundleToHashMapGetIntent(response);
     } catch (RemoteException e) {
-      e.printStackTrace();
-      throw new ServiceConnectionException(e.getMessage());
-    } catch (JSONException e) {
       e.printStackTrace();
       throw new ServiceConnectionException(e.getMessage());
     }
