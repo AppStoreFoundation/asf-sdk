@@ -100,9 +100,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
       throw new ServiceConnectionException();
     }
     try {
-
-      String valueStr = ""; //TODO how to get the purchase value, why do we need it?
-      eventLogger.LogPurchaseEvent(sku,valueStr,this.packageName);
+      eventLogger.LogPurchaseEvent(sku, this.packageName);
 
       Bundle response = service.getBuyIntent(apiVersion, packageName, sku, skuType, payload);
 
@@ -119,5 +117,4 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   @Override public boolean isReady() {
     return isServiceReady;
   }
-
 }
