@@ -12,6 +12,9 @@ import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.service.WalletBillingService;
+
+import org.json.JSONException;
+
 import java.util.List;
 
 class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycle {
@@ -105,6 +108,9 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
 
       return AndroidBillingMapper.mapBundleToHashMapGetIntent(response);
     } catch (RemoteException e) {
+      e.printStackTrace();
+      throw new ServiceConnectionException(e.getMessage());
+    } catch (JSONException e) {
       e.printStackTrace();
       throw new ServiceConnectionException(e.getMessage());
     }

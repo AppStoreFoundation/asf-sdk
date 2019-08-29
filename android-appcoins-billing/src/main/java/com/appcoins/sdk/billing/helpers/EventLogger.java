@@ -2,10 +2,14 @@ package com.appcoins.sdk.billing.helpers;
 
 import com.appcoins.billing.sdk.BuildConfig;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -21,13 +25,13 @@ public class EventLogger {
     private final String SERVICE_PATH = "user/addEvent/action=CLICK/context=BILLING_SDK/name=";
     private final String purchaseEventName = "PURCHASE_INTENT";
 
-    private void LogEvent(String eventName, String data) {
+    private void LogEvent(String eventName, JSONObject jsonObj) {
         String finalURL = BASE_URL + SERVICE_PATH + eventName;
 
-        PostDataToURL(finalURL, data);
+        PostDataToURL(finalURL, jsonObj);
     }
 
-    public void LogPurchaseEvent(String sku, String value, String appPackage) {
+    public void LogPurchaseEvent(String sku, String value, String appPackage) throws JSONException {
         String eventName = purchaseEventName;
 
         int sdkVersionCode = BuildConfig.VERSION_CODE;
@@ -35,15 +39,25 @@ public class EventLogger {
 
         Boolean hasWallet = WalletUtils.hasWalletInstalled();
 
-        String jsonData = "{ \"aptoide_vercode\": " +  sdkVersionCode + ", \"aptoide_package\": \"" + sdkPackageName + "\", \"unity_version\": \"" + ENTITY_NAME + "\", \"data\": { \"purchase\": { \"package_name\":\"" + appPackage + "\", \"sku\":\"" + sku + "\"";
-            if (value != "ERROR" && hasWallet) {
-                jsonData += ", \"value\": " + value;
-            }
-            jsonData += "}, \"wallet_installed\": " + (hasWallet ? "true" : "false") + " } }";
-        LogEvent(eventName,jsonData);
+        JSONObject jsonObj = new JSONObject();
+        jsonObj.put("aptoide_vercode",Integer.toString(sdkVersionCode));
+        jsonObj.put("aptoide_package",sdkPackageName);
+        jsonObj.put("unity_version", "sdk");
+
+        JSONObject purchaseObj = new JSONObject();
+        purchaseObj.put("package_name", appPackage);
+        purchaseObj.put("sku", sku);
+
+        JSONObject dataObj = new JSONObject();
+        dataObj.put("wallet_installed", hasWallet);
+        dataObj.put("purchase", purchaseObj);
+
+        jsonObj.put("data", dataObj);
+
+        LogEvent(eventName, jsonObj);
     }
 
-    private void PostDataToURL(String urlStr, String jsonData) {
+    private void PostDataToURL(String urlStr, JSONObject jsonObj) {
         URL url = null;
         String responseStr = "";
 
@@ -52,31 +66,30 @@ public class EventLogger {
 
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setRequestProperty("Accept", "application/json");
             connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
 
-            //This try will close outputstream automatically once it's done with it
-            try(OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonData.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
+            OutputStream os = connection.getOutputStream();
+            String jsonString = jsonObj.toString();
+            byte[] postData = jsonString.getBytes();
+            os.write(postData);
+            os.close();
 
             connection.connect();
 
-            try(BufferedReader br = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+            int code = connection.getResponseCode();
+            System.out.println(code);
+
+            try(BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))){
                 StringBuilder response = new StringBuilder();
                 String responseLine = null;
                 while ((responseLine = br.readLine()) != null) {
                     response.append(responseLine.trim());
                 }
-                responseStr = response.toString();
-                System.out.println(responseStr);
-            }
-
-            if (connection != null) {
-                connection.disconnect();
+                if (connection != null) {
+                    connection.disconnect();
+                    System.out.println(response.toString());
+                }
             }
         } catch (MalformedURLException e) {
             responseStr = "";
