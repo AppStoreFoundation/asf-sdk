@@ -12,6 +12,9 @@ import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.service.WalletBillingService;
+
+import org.json.JSONException;
+
 import java.util.List;
 
 class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycle {
@@ -95,7 +98,6 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
       throw new ServiceConnectionException();
     }
     try {
-
       Bundle response = service.getBuyIntent(apiVersion, packageName, sku, skuType, payload);
 
       return AndroidBillingMapper.mapBundleToHashMapGetIntent(response);
@@ -108,5 +110,4 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
   @Override public boolean isReady() {
     return isServiceReady;
   }
-
 }

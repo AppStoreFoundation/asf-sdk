@@ -13,7 +13,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 import com.appcoins.billing.AppcoinsBilling;
-import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;

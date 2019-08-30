@@ -7,9 +7,10 @@ import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.util.Log;
-import com.appcoins.sdk.android.billing.BuildConfig;
+
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
-import com.appcoins.sdk.billing.helpers.WalletUtils;
+
 import java.util.List;
 
 public class RepositoryServiceConnection implements ServiceConnection, RepositoryConnection {

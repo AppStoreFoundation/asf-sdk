@@ -2,7 +2,7 @@ package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
 import android.os.Bundle;
-import com.appcoins.sdk.android.billing.R;
+import com.appcoins.billing.sdk.R;
 
 public class InstallDialogActivity extends Activity {
 
