@@ -12,6 +12,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import com.appcoins.billing.AppcoinsBilling;
 import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.ConnectToWalletBillingService;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
@@ -110,6 +111,9 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         return response;
       }
     } else {
+      BuyItemProperties buyItemProperties = new BuyItemProperties(apiVersion,packageName,sku,type,
+          developerPayload);
+      WalletUtils.buyItemProperties = buyItemProperties;
       Intent intent = new Intent(WalletUtils.context.get(), InstallDialogActivity.class);
       PendingIntent pendingIntent = PendingIntent.getActivity(WalletUtils.context.get(), 0, intent,
           PendingIntent.FLAG_UPDATE_CURRENT);
