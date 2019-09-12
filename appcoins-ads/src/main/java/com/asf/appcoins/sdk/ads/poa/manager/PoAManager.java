@@ -203,12 +203,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
         Log.e(TAG, "Proof " + (proofsSent + 1) + " skipped! Came from background!");
       } else {
-        if (!firstProof) {
-          Log.e(TAG, "Start proof sending");
-          postponeSendProof();
-          firstProof = true;
-          return;
-        }
         long timestamp = System.currentTimeMillis();
         Bundle bundle = new Bundle();
         bundle.putString("packageName", appContext.getPackageName());
@@ -298,7 +292,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
   private void initiateProofSending() {
     if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
-      sendProof();
+      postponeSendProof();
     }
   }
 
