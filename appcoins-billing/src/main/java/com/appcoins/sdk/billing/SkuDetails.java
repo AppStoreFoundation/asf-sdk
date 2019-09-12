@@ -91,4 +91,48 @@ public class SkuDetails {
   public String getDescription() {
     return description;
   }
+
+  @Override public String toString() {
+    return "SkuDetails{"
+        + "itemType='"
+        + itemType
+        + '\''
+        + ", sku='"
+        + sku
+        + '\''
+        + ", type='"
+        + type
+        + '\''
+        + ", price='"
+        + price
+        + '\''
+        + ", priceCurrencyCode='"
+        + priceCurrencyCode
+        + '\''
+        + ", priceAmountMicros="
+        + priceAmountMicros
+        + ", appcPrice='"
+        + appcPrice
+        + '\''
+        + ", appcPriceCurrencyCode='"
+        + appcPriceCurrencyCode
+        + '\''
+        + ", appcPriceAmountMicros="
+        + appcPriceAmountMicros
+        + ", fiatPrice='"
+        + fiatPrice
+        + '\''
+        + ", fiatPriceCurrencyCode='"
+        + fiatPriceCurrencyCode
+        + '\''
+        + ", fiatPriceAmountMicros="
+        + fiatPriceAmountMicros
+        + ", title='"
+        + title
+        + '\''
+        + ", description='"
+        + description
+        + '\''
+        + '}';
+  }
 }

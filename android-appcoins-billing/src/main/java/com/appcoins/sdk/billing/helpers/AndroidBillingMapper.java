@@ -199,7 +199,7 @@ public class AndroidBillingMapper {
   }
 
   private static String getAppcPrice(JSONObject parentObject) throws JSONException {
-    return String.format("%s %s", APPC, parentObject.getString("appc"));
+    return String.format("%s %s", parentObject.getString("appc"), APPC);
   }
 
   private static long getAppcAmountInMicros(JSONObject parentObject) throws JSONException {
@@ -210,7 +210,7 @@ public class AndroidBillingMapper {
   private static String getFiatPrice(JSONObject parentObject) throws JSONException {
     String value = parentObject.getString("value");
     String code = parentObject.getJSONObject("currency")
-        .getString("code");
+        .getString("symbol");
     return String.format("%s %s", code, value);
   }
 
