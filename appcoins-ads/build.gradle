@@ -22,7 +22,8 @@ android {
         "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST + "\""
     buildConfigField 'String', 'DEV_BACKEND_BASE_HOST',
         "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
-
+    buildConfigField 'String', 'APPCOINS_POA_SERVICE_NAME',
+        "\"" + project.APPCOINS_POA_SERVICE_NAME + "\""
 
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -60,7 +61,6 @@ dependencies {
   testImplementation lib.mockito_core
 
   androidTestImplementation lib.android_test_runner
-  api lib.tray
   api project(':android-appcoins-billing')
 
 }

@@ -14,12 +14,6 @@ public interface AppCoinsAds {
   int NETWORK_ROPSTEN = 3;
 
   /**
-   * Method that starts the handshake that will find the service/wallet that can handle the PoA
-   * process.
-   */
-  void handshake();
-
-  /**
    * Method that send a proof the wallet that is listening to our PoA process.
    */
   void sendProof();
