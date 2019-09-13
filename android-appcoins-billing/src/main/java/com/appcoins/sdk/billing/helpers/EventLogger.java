@@ -1,37 +1,33 @@
 package com.appcoins.sdk.billing.helpers;
 
 import com.appcoins.billing.sdk.BuildConfig;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-
 import javax.net.ssl.HttpsURLConnection;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class EventLogger {
+public class EventLogger implements Runnable {
 
   public static String ENTITY_NAME = "SDK";
 
   private final String BASE_URL = "https://ws75.aptoide.com/api/7/";
   private final String SERVICE_PATH = "user/addEvent/action=CLICK/context=BILLING_SDK/name=";
   private final String purchaseEventName = "PURCHASE_INTENT";
+  private String sku;
+  private String appPackage;
 
-  private void LogEvent(String eventName, JSONObject jsonObj) {
-    String finalURL = BASE_URL + SERVICE_PATH + eventName;
-
-    PostDataToURL(finalURL, jsonObj);
+  public EventLogger(String sku, String appPackage) {
+    this.sku = sku;
+    this.appPackage = appPackage;
   }
 
-  public void LogPurchaseEvent(String sku, String appPackage) throws JSONException {
+  public void LogPurchaseEvent() throws JSONException {
     String eventName = purchaseEventName;
 
     int sdkVersionCode = BuildConfig.VERSION_CODE;
@@ -54,7 +50,9 @@ public class EventLogger {
 
     jsonObj.put("data", dataObj);
 
-    LogEvent(eventName, jsonObj);
+    String finalURL = BASE_URL + SERVICE_PATH + eventName;
+
+    PostDataToURL(finalURL, jsonObj);
   }
 
   private void PostDataToURL(String urlStr, JSONObject jsonObj) {
@@ -92,7 +90,6 @@ public class EventLogger {
         System.out.println(response.toString());
       }
       br.close();
-
     } catch (MalformedURLException e) {
       responseStr = "";
       e.printStackTrace();
@@ -101,6 +98,14 @@ public class EventLogger {
       e.printStackTrace();
     } catch (IOException e) {
       responseStr = "";
+      e.printStackTrace();
+    }
+  }
+
+  @Override public void run() {
+    try {
+      LogPurchaseEvent();
+    } catch (JSONException e) {
       e.printStackTrace();
     }
   }

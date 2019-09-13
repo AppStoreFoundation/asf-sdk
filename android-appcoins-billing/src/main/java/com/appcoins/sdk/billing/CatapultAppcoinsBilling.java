@@ -7,18 +7,15 @@ import android.content.IntentSender;
 import android.util.Log;
 import com.appcoins.sdk.billing.helpers.EventLogger;
 import com.appcoins.sdk.billing.helpers.PayloadHelper;
-import org.json.JSONException;
 
 public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
   private final Billing billing;
   private final RepositoryConnection connection;
-  private final EventLogger eventLogger;
 
-  public CatapultAppcoinsBilling(Billing billing, RepositoryConnection connection, EventLogger eventLogger) {
+  public CatapultAppcoinsBilling(Billing billing, RepositoryConnection connection) {
     this.billing = billing;
     this.connection = connection;
-    this.eventLogger = eventLogger;
   }
 
   @Override public PurchasesResult queryPurchases(String skuType) {
@@ -44,14 +41,17 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
       Log.d("Message: ", payload);
 
-      this.eventLogger.LogPurchaseEvent(billingFlowParams.getSku(), activity.getApplicationContext()
-          .getPackageName());
+      Thread t = new Thread(new EventLogger(billingFlowParams.getSku(),
+          activity.getApplicationContext()
+              .getPackageName()));
+      t.start();
+
       LaunchBillingFlowResult launchBillingFlowResult =
           billing.launchBillingFlow(billingFlowParams, payload);
 
       responseCode = (int) launchBillingFlowResult.getResponseCode();
 
-      if (responseCode != ResponseCode.OK.getValue()){
+      if (responseCode != ResponseCode.OK.getValue()) {
         return responseCode;
       }
 
@@ -64,8 +64,6 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
       return ResponseCode.ERROR.getValue();
     } catch (ServiceConnectionException e) {
       return ResponseCode.SERVICE_UNAVAILABLE.getValue();
-    } catch (JSONException e) {
-      return ResponseCode.ERROR.getValue();
     }
     return ResponseCode.OK.getValue();
   }
