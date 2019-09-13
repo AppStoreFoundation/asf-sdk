@@ -82,7 +82,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private AppcoinsAdvertisementConnection appcoinsAdvertisementConnection;
   private static boolean showPopUpNotification;
   private static String POA_NOTIFICATION_VALUE = "POA_NOTIFICATION";
-  private boolean firstProof = false;
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
