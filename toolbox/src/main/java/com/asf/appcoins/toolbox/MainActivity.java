@@ -22,6 +22,7 @@ import java.util.List;
 
 public class MainActivity extends Activity {
 
+  private static final String TAG = MainActivity.class.getSimpleName();
   private AppcoinsBillingClient cab;
   private String token = null;
   private AppCoinsBillingStateListener listener;
@@ -35,11 +36,11 @@ public class MainActivity extends Activity {
     final Activity activity = this;
     listener = new AppCoinsBillingStateListener() {
       @Override public void onBillingSetupFinished(int responseCode) {
-        Log.d("Is Billing Setup Finished: ", "Connected-" + responseCode + "");
+        Log.d(TAG, "Is Billing Setup Finished:  Connected-" + responseCode + "");
       }
 
       @Override public void onBillingServiceDisconnected() {
-        Log.d("Message: ", "Disconnected");
+        Log.d(TAG, "Message: Disconnected");
       }
     };
     cab.startConnection(listener);
@@ -50,15 +51,15 @@ public class MainActivity extends Activity {
   }
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    Log.d("Activity Result: ", "onActivityResult(" + requestCode + "," + resultCode + "," + data + ")");
+    Log.d(TAG, "Activity Result: onActivityResult(" + requestCode + "," + resultCode + "," + data + ")");
     if (data != null && data.getExtras() != null) {
       Bundle bundle = data.getExtras();
       if (bundle != null) {
         for (String key : bundle.keySet()) {
           Object value = bundle.get(key);
           if (value != null) {
-            Log.d("Message Key", key);
-            Log.d("Message value", value.toString());
+            Log.d(TAG, "Message Key" + key);
+            Log.d(TAG, "Message value" + value.toString());
           }
         }
       }
@@ -73,7 +74,7 @@ public class MainActivity extends Activity {
     Thread t = new Thread(new Runnable() {
       @Override public void run() {
         int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
-        Log.d("BillingFlowResponse: ", launchBillingFlowResponse + "");
+        Log.d(TAG, "BillingFlowResponse: " + launchBillingFlowResponse );
       }
     });
     t.start();
@@ -89,14 +90,14 @@ public class MainActivity extends Activity {
         if (pr.getPurchases()
             .size() > 0) {
           for (Purchase p : pr.getPurchases()) {
-            Log.d("Purchase result token: ", p.getToken());
-            Log.d("Purchase result sku: ", p.getSku());
+            Log.d(TAG, "Purchase result token: " + p.getToken());
+            Log.d(TAG, "Purchase result sku: " + p.getSku());
           }
           token = pr.getPurchases()
               .get(0)
               .getToken();
         } else {
-          Log.d("Message:", "No Available Purchases");
+          Log.d(TAG, "Message: No Available Purchases");
         }
       }
     });
@@ -118,9 +119,9 @@ public class MainActivity extends Activity {
         cab.querySkuDetailsAsync(skuDetailsParams, new SkuDetailsResponseListener() {
           @Override
           public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
-            Log.d("responseCode: ", responseCode + "");
+            Log.d(TAG, "responseCode: " + responseCode + "");
             for (SkuDetails sd : skuDetailsList) {
-              Log.d("SkuDetails: ", sd.getSku() + "");
+              Log.d(TAG, sd.toString());
             }
           }
         });
@@ -139,13 +140,13 @@ public class MainActivity extends Activity {
         if (token != null) {
           cab.consumeAsync(token, new ConsumeResponseListener() {
             @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
-              Log.d("consume response: ",
+              Log.d(TAG, "consume response: " +
                   responseCode + " " + "Consumed purchase with token: " + purchaseToken);
               token = null;
             }
           });
         } else {
-          Log.d("Message:", "No purchase tokens available");
+          Log.d(TAG, "Message: No purchase tokens available");
         }
       }
     });
