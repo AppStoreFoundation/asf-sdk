@@ -41,10 +41,10 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
       Log.d("Message: ", payload);
 
-      Thread t = new Thread(new EventLogger(billingFlowParams.getSku(),
+      Thread eventLoggerThread = new Thread(new EventLogger(billingFlowParams.getSku(),
           activity.getApplicationContext()
               .getPackageName()));
-      t.start();
+      eventLoggerThread.start();
 
       LaunchBillingFlowResult launchBillingFlowResult =
           billing.launchBillingFlow(billingFlowParams, payload);
