@@ -22,6 +22,6 @@ public class CatapultBillingAppCoinsFactory {
     byte[] base64DecodedPublicKey = Base64.decode(base64PublicKey, Base64.DEFAULT);
 
     return new CatapultAppcoinsBilling(new AppCoinsBilling(repository, base64DecodedPublicKey),
-        connection, new EventLogger());
+        connection);
   }
 }
