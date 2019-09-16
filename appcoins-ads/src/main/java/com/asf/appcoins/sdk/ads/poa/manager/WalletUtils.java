@@ -24,6 +24,8 @@ public class WalletUtils {
 
   private static int MINIMUM_APTOIDE_VERSION = 9908;
 
+  private static int UNINSTALLED_APTOIDE_VERSIONCODE = 0;
+
   private static String URL_INTENT_INSTALL =
       "market://details?id=com.appcoins.wallet&utm_source=appcoinssdk&app_source=";
 
@@ -41,16 +43,6 @@ public class WalletUtils {
     context = cont;
   }
 
-  public static boolean hasAptoideInstalled() {
-    PackageManager packageManager = context.getPackageManager();
-
-    try {
-      packageManager.getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0);
-      return true;
-    } catch (PackageManager.NameNotFoundException e) {
-      return false;
-    }
-  }
 
   public static boolean hasWalletInstalled() {
     PackageManager packageManager = context.getPackageManager();
@@ -80,9 +72,6 @@ public class WalletUtils {
         //noinspection deprecation
         versionCode = pInfo.versionCode;
       }
-
-      Log.d("AptoideVersion", "Version Code is: " + versionCode);
-      Log.d("AptoideVersion", "Version Name is: " + versionName);
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
@@ -129,9 +118,9 @@ public class WalletUtils {
 
   private static Intent getNotificationIntent() {
     String url = URL_INTENT_INSTALL;
-    boolean hasAptoide = hasAptoideInstalled();
 
-    if (hasAptoide) {
+
+    if (WalletUtils.getAptoideVersion() != UNINSTALLED_APTOIDE_VERSIONCODE) {
       url += URL_APTOIDE_PARAMETERS + context.getPackageName();
     }
 
@@ -139,7 +128,7 @@ public class WalletUtils {
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-    if (hasAptoide && WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION) {
+    if (WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION) {
       intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
 

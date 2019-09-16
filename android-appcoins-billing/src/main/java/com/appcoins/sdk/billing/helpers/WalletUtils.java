@@ -56,24 +56,10 @@ public class WalletUtils {
         //noinspection deprecation
         versionCode = pInfo.versionCode;
       }
-
-      Log.d("AptoideVersion", "Version Code is: " + versionCode);
-      Log.d("AptoideVersion", "Version Name is: " + versionName);
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
     return versionCode;
-  }
-
-  public static boolean hasAptoideInstalled() {
-
-    PackageManager packageManager = context.get()
-        .getPackageManager();
-    try {
-      return packageManager.getApplicationInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0).enabled;
-    } catch (PackageManager.NameNotFoundException e) {
-      return false;
-    }
   }
 
   public static void promptToInstallWallet() {
