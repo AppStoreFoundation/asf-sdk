@@ -185,7 +185,6 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
   }
 
   @Override public int consumePurchase(int apiVersion, String packageName, String purchaseToken) {
-
     if (WalletUtils.hasWalletInstalled()) {
       try {
         Bundle response = walletInstalledBehaviour();

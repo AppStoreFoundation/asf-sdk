@@ -1,15 +1,14 @@
 package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.util.Log;
+import android.content.pm.ResolveInfo;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class WalletUtils {
 
@@ -19,7 +18,10 @@ public class WalletUtils {
   public static void setContext(Activity cont) {
     context = new WeakReference<>(cont);
   }
-  public static void setDialogActivity(Activity act) { activity = act;}
+
+  public static void setDialogActivity(Activity act) {
+    activity = act;
+  }
 
   public static boolean hasWalletInstalled() {
     PackageManager packageManager = context.get()
@@ -58,5 +60,22 @@ public class WalletUtils {
 
   public static Activity getActivity() {
     return context.get();
+  }
+
+  private boolean hasWalletAptoideService() {
+    Intent serviceIntent = new Intent(BuildConfig.APTOIDE_SERVICE_BILLING_DEV);
+    serviceIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME_DEV);
+
+    final Context context = WalletUtils.getActivity();
+
+    List<ResolveInfo> intentServices = context.getPackageManager()
+        .queryIntentServices(serviceIntent, 0);
+    for (ResolveInfo intentService : intentServices) {
+      if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME_DEV)
+          || intentService.resolvePackageName.equals(BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

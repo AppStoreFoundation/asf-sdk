@@ -26,6 +26,10 @@ android {
           project.APTOIDE_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+      buildConfigField 'String', 'APTOIDE_SERVICE_BILLING_DEV',
+          "\"" + project.APTOIDE_SERVICE_BILLING_DEV + "\""
+      buildConfigField 'String', 'APTOIDE_PACKAGE_NAME_DEV',
+          "\"" + project.APTOIDE_PACKAGE_NAME_DEV + "\""
     }
     release {
       minifyEnabled false
@@ -40,6 +44,8 @@ android {
           project.APTOIDE_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" +project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+      buildConfigField 'String', 'APTOIDE_SERVICE_BILLING',
+          "\"" + project.APTOIDE_SERVICE_BILLING + "\""
       minifyEnabled false
     }
   }
