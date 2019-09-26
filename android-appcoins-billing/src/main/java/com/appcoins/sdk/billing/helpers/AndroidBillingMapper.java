@@ -225,11 +225,7 @@ public class AndroidBillingMapper {
           str.append("\\f");
           break;
         default:
-          if (c <= 0x1F) {
-            str.append(String.format("\\u%04x", (int) c));
-          } else {
             str.append(c);
-          }
           break;
       }
     }
