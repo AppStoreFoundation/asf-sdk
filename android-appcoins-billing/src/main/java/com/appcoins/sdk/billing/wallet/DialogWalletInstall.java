@@ -40,6 +40,14 @@ import static android.graphics.Typeface.BOLD;
  */
 public class DialogWalletInstall extends Dialog {
 
+  private static String DIALOG_WALLET_INSTALL_IMAGE_ICON = "dialog_wallet_install_image_icon";
+  private static String DIALOG_WALLET_INSTALL_IMAGE_GRAPHIC = "dialog_wallet_install_image_graphic";
+  private static String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
+  private static String DIALOG_WALLET_INSTALL_EMPTY_IMAGE = "dialog_wallet_install_empty_image";
+  private static String DIALOG_WALLET_INSTALL_TEXT_MESSAGE = "dialog_wallet_install_text_message";
+  private static String DIALOG_WALLET_INSTALL_BUTTON_DOWNLOAD = "dialog_wallet_install_button_download";
+  private static String DIALOG_WALLET_INSTALL_BUTTON_CANCEL= "dialog_wallet_install_button_cancel";
+
   private Button dialog_wallet_install_button_cancel;
   private Button dialog_wallet_install_button_download;
   private TextView dialog_wallet_install_text_message;
@@ -89,10 +97,10 @@ public class DialogWalletInstall extends Dialog {
     }
 
     dialog_wallet_install_image_icon = findViewById(contextApp.getResources()
-        .getIdentifier("dialog_wallet_install_image_icon", "id", contextApp.getPackageName()));
+        .getIdentifier(DIALOG_WALLET_INSTALL_IMAGE_ICON, "id", contextApp.getPackageName()));
 
     dialog_wallet_install_image_graphic = findViewById(contextApp.getResources()
-        .getIdentifier("dialog_wallet_install_image_graphic", "id", contextApp.getPackageName()));
+        .getIdentifier(DIALOG_WALLET_INSTALL_IMAGE_GRAPHIC, "id", contextApp.getPackageName()));
 
     dialog_wallet_install_image_graphic.setOutlineProvider(new ViewOutlineProvider() {
       @Override public void getOutline(View view, Outline outline) {
@@ -101,17 +109,16 @@ public class DialogWalletInstall extends Dialog {
       }
     });
 
-    //dialog_wallet_install_has_image
     hasImage = getContext().getResources()
         .getBoolean(R.bool.dialog_wallet_install_has_image) && icon != null;
 
-    if (!hasImage) {
+    if (hasImage) {
       dialog_wallet_install_image_icon.setVisibility(View.INVISIBLE);
       RelativeLayout.LayoutParams lp =
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(124));
       dialog_wallet_install_image_graphic.setLayoutParams(lp);
       int resourceId = contextApp.getResources()
-          .getIdentifier("dialog_wallet_install_graphic", "drawable", contextApp.getPackageName());
+          .getIdentifier(DIALOG_WALLET_INSTALL_GRAPHIC, "drawable", contextApp.getPackageName());
       dialog_wallet_install_image_graphic.setImageDrawable(contextApp.getResources()
           .getDrawable(resourceId));
     } else {
@@ -121,16 +128,16 @@ public class DialogWalletInstall extends Dialog {
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(100));
       dialog_wallet_install_image_graphic.setLayoutParams(lp);
       int resourceId = contextApp.getResources()
-          .getIdentifier("dialog_wallet_install_empty_image", "drawable", contextApp.getPackageName());
+          .getIdentifier(DIALOG_WALLET_INSTALL_EMPTY_IMAGE, "drawable",
+              contextApp.getPackageName());
       dialog_wallet_install_image_graphic.setImageDrawable(contextApp.getResources()
           .getDrawable(resourceId));
     }
   }
 
   private void buildMessage() {
-    //R.id.dialog_wallet_install_text_message
     dialog_wallet_install_text_message = findViewById(contextApp.getResources()
-        .getIdentifier("dialog_wallet_install_text_message", "id", contextApp.getPackageName()));
+        .getIdentifier(DIALOG_WALLET_INSTALL_TEXT_MESSAGE, "id", contextApp.getPackageName()));
 
     String dialog_message = getContext().getString(R.string.app_wallet_install_wallet_from_iab);
 
@@ -143,9 +150,8 @@ public class DialogWalletInstall extends Dialog {
   }
 
   private void buildDownloadButton() {
-    //R.id.dialog_wallet_install_button_download
     dialog_wallet_install_button_download = findViewById(contextApp.getResources()
-        .getIdentifier("dialog_wallet_install_button_download", "id", contextApp.getPackageName()));
+        .getIdentifier(DIALOG_WALLET_INSTALL_BUTTON_DOWNLOAD, "id", contextApp.getPackageName()));
     dialog_wallet_install_button_download.setOnClickListener(new View.OnClickListener() {
 
       @Override public void onClick(View v) {
@@ -166,9 +172,8 @@ public class DialogWalletInstall extends Dialog {
   }
 
   private void buildCancelButton() {
-    //dialog_wallet_install_button_download
     dialog_wallet_install_button_cancel = findViewById(contextApp.getResources()
-        .getIdentifier("dialog_wallet_install_button_download", "id", contextApp.getPackageName()));
+        .getIdentifier(DIALOG_WALLET_INSTALL_BUTTON_CANCEL, "id", contextApp.getPackageName()));
     dialog_wallet_install_button_cancel.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         DialogWalletInstall.this.dismiss();
@@ -187,7 +192,6 @@ public class DialogWalletInstall extends Dialog {
   }
 
   private void redirectToStore() {
-    //https://developer.android.com/distribute/marketing-tools/linking-to-google-play
     getContext().startActivity(buildStoreViewIntent(URL_APTOIDE));
   }
 
