@@ -23,15 +23,6 @@ android {
   lintOptions {
     warning 'InvalidPackage'
   }
-
-  buildTypes {
-    debug {
-      project.ext.buildType = "debug"
-    }
-    release {
-      project.ext.buildType = "release"
-    }
-  }
 }
 
 dependencies {

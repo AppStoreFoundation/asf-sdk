@@ -15,12 +15,11 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    libraryVariants.all { variant ->
-        project.ext.buildType = variant.buildType.name // sets the current build type
-    }
-
     buildTypes {
         debug {
+            minifyEnabled false
+        }
+        release {
             minifyEnabled false
         }
     }
