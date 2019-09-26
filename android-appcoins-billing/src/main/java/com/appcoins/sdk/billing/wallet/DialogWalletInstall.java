@@ -101,24 +101,29 @@ public class DialogWalletInstall extends Dialog {
       }
     });
 
+    //dialog_wallet_install_has_image
     hasImage = getContext().getResources()
         .getBoolean(R.bool.dialog_wallet_install_has_image) && icon != null;
 
-    if (hasImage) {
+    if (!hasImage) {
       dialog_wallet_install_image_icon.setVisibility(View.INVISIBLE);
       RelativeLayout.LayoutParams lp =
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(124));
       dialog_wallet_install_image_graphic.setLayoutParams(lp);
-      dialog_wallet_install_image_graphic.setImageDrawable(
-          getContext().getDrawable(R.drawable.dialog_wallet_install_graphic));
+      int resourceId = contextApp.getResources()
+          .getIdentifier("dialog_wallet_install_graphic", "drawable", contextApp.getPackageName());
+      dialog_wallet_install_image_graphic.setImageDrawable(contextApp.getResources()
+          .getDrawable(resourceId));
     } else {
       dialog_wallet_install_image_icon.setVisibility(View.VISIBLE);
       dialog_wallet_install_image_icon.setImageDrawable(icon);
       RelativeLayout.LayoutParams lp =
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(100));
       dialog_wallet_install_image_graphic.setLayoutParams(lp);
-      dialog_wallet_install_image_graphic.setImageDrawable(
-          getContext().getDrawable(R.drawable.dialog_wallet_install_empty_image));
+      int resourceId = contextApp.getResources()
+          .getIdentifier("dialog_wallet_install_empty_image", "drawable", contextApp.getPackageName());
+      dialog_wallet_install_image_graphic.setImageDrawable(contextApp.getResources()
+          .getDrawable(resourceId));
     }
   }
 
