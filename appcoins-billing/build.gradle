@@ -15,11 +15,12 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+    libraryVariants.all { variant ->
+        project.ext.buildType = variant.buildType.name // sets the current build type
+    }
+
     buildTypes {
         debug {
-            minifyEnabled false
-        }
-        release {
             minifyEnabled false
         }
     }
@@ -65,7 +66,7 @@ publishing {
             version project.version
             artifact(sourcesJar)
             artifact(javadocJar)
-            artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+            artifact("$buildDir/outputs/aar/${project.name}-${System.getenv('BUILD_TYPE_NAME')}.aar")
 
             //The publication doesn't know about our dependencies, so we have to manually add them to the pom
             pom.withXml {
