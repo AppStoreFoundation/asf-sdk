@@ -46,14 +46,19 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
   @Override public void startConnection(final AppCoinsBillingStateListener listener) {
     this.listener = listener;
     String packageName = WalletUtils.getBillingServicePackageName();
-    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
-    serviceIntent.setPackage(packageName);
+    if (packageName != null) {
+      Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
+      serviceIntent.setPackage(packageName);
 
-    List<ResolveInfo> intentServices = context.getPackageManager()
-        .queryIntentServices(serviceIntent, 0);
-    if (intentServices != null && !intentServices.isEmpty()) {
-      hasWalletInstalled = true;
-      context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+      List<ResolveInfo> intentServices = context.getPackageManager()
+          .queryIntentServices(serviceIntent, 0);
+      if (intentServices != null && !intentServices.isEmpty()) {
+        hasWalletInstalled = true;
+        context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+      } else {
+        hasWalletInstalled = false;
+        onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
+      }
     } else {
       hasWalletInstalled = false;
       onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
