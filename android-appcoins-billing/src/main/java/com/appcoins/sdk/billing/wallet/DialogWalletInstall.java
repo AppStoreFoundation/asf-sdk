@@ -76,8 +76,6 @@ public class DialogWalletInstall extends Dialog {
 
     requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-    setContentView(contextApp.getResources()
-        .getIdentifier("wallet_install_dialog", "layout", contextApp.getPackageName()));
     setContentView(appContext.getResources()
         .getIdentifier("wallet_install_dialog", "layout", appContext.getPackageName()));
     setCancelable(false);
