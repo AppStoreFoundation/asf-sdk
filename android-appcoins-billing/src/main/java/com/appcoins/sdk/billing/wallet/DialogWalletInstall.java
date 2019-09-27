@@ -40,6 +40,14 @@ import static android.graphics.Typeface.BOLD;
  */
 public class DialogWalletInstall extends Dialog {
 
+  private static String DIALOG_WALLET_INSTALL_IMAGE_ICON = "dialog_wallet_install_image_icon";
+  private static String DIALOG_WALLET_INSTALL_IMAGE_GRAPHIC = "dialog_wallet_install_image_graphic";
+  private static String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
+  private static String DIALOG_WALLET_INSTALL_EMPTY_IMAGE = "dialog_wallet_install_empty_image";
+  private static String DIALOG_WALLET_INSTALL_TEXT_MESSAGE = "dialog_wallet_install_text_message";
+  private static String DIALOG_WALLET_INSTALL_BUTTON_DOWNLOAD = "dialog_wallet_install_button_download";
+  private static String DIALOG_WALLET_INSTALL_BUTTON_CANCEL= "dialog_wallet_install_button_cancel";
+
   private Button dialog_wallet_install_button_cancel;
   private Button dialog_wallet_install_button_download;
   private TextView dialog_wallet_install_text_message;
@@ -51,10 +59,10 @@ public class DialogWalletInstall extends Dialog {
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
       + "&utm_source=appcoinssdk&app_source="
       + getContext().getPackageName();
-  private static Context mContext;
+  private static Context appContext;
 
   public static DialogWalletInstall with(Context context) {
-    mContext = context;
+    appContext = context;
     return new DialogWalletInstall(context);
   }
 
@@ -68,7 +76,8 @@ public class DialogWalletInstall extends Dialog {
 
     requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-    setContentView(R.layout.wallet_install_dialog);
+    setContentView(appContext.getResources()
+        .getIdentifier("wallet_install_dialog", "layout", appContext.getPackageName()));
     setCancelable(false);
 
     buildTop();
@@ -81,15 +90,17 @@ public class DialogWalletInstall extends Dialog {
     boolean hasImage;
     Drawable icon = null;
     try {
-      icon = mContext.getPackageManager()
-          .getApplicationIcon(mContext.getPackageName());
+      icon = appContext.getPackageManager()
+          .getApplicationIcon(appContext.getPackageName());
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
 
-    dialog_wallet_install_image_icon = findViewById(R.id.dialog_wallet_install_image_icon);
+    dialog_wallet_install_image_icon = findViewById(appContext.getResources()
+        .getIdentifier(DIALOG_WALLET_INSTALL_IMAGE_ICON, "id", appContext.getPackageName()));
 
-    dialog_wallet_install_image_graphic = findViewById(R.id.dialog_wallet_install_image_graphic);
+    dialog_wallet_install_image_graphic = findViewById(appContext.getResources()
+        .getIdentifier(DIALOG_WALLET_INSTALL_IMAGE_GRAPHIC, "id", appContext.getPackageName()));
 
     dialog_wallet_install_image_graphic.setOutlineProvider(new ViewOutlineProvider() {
       @Override public void getOutline(View view, Outline outline) {
@@ -106,21 +117,28 @@ public class DialogWalletInstall extends Dialog {
       RelativeLayout.LayoutParams lp =
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(124));
       dialog_wallet_install_image_graphic.setLayoutParams(lp);
-      dialog_wallet_install_image_graphic.setImageDrawable(
-          getContext().getDrawable(R.drawable.dialog_wallet_install_graphic));
+      int resourceId = appContext.getResources()
+          .getIdentifier(DIALOG_WALLET_INSTALL_GRAPHIC, "drawable", appContext.getPackageName());
+      dialog_wallet_install_image_graphic.setImageDrawable(appContext.getResources()
+          .getDrawable(resourceId));
     } else {
       dialog_wallet_install_image_icon.setVisibility(View.VISIBLE);
       dialog_wallet_install_image_icon.setImageDrawable(icon);
       RelativeLayout.LayoutParams lp =
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(100));
       dialog_wallet_install_image_graphic.setLayoutParams(lp);
-      dialog_wallet_install_image_graphic.setImageDrawable(
-          getContext().getDrawable(R.drawable.dialog_wallet_install_empty_image));
+      int resourceId = appContext.getResources()
+          .getIdentifier(DIALOG_WALLET_INSTALL_EMPTY_IMAGE, "drawable",
+              appContext.getPackageName());
+      dialog_wallet_install_image_graphic.setImageDrawable(appContext.getResources()
+          .getDrawable(resourceId));
     }
   }
 
   private void buildMessage() {
-    dialog_wallet_install_text_message = findViewById(R.id.dialog_wallet_install_text_message);
+    dialog_wallet_install_text_message = findViewById(appContext.getResources()
+        .getIdentifier(DIALOG_WALLET_INSTALL_TEXT_MESSAGE, "id", appContext.getPackageName()));
+
     String dialog_message = getContext().getString(R.string.app_wallet_install_wallet_from_iab);
 
     SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialog_message);
@@ -132,48 +150,48 @@ public class DialogWalletInstall extends Dialog {
   }
 
   private void buildDownloadButton() {
-    dialog_wallet_install_button_download =
-        findViewById(R.id.dialog_wallet_install_button_download);
+    dialog_wallet_install_button_download = findViewById(appContext.getResources()
+        .getIdentifier(DIALOG_WALLET_INSTALL_BUTTON_DOWNLOAD, "id", appContext.getPackageName()));
     dialog_wallet_install_button_download.setOnClickListener(new View.OnClickListener() {
 
       @Override public void onClick(View v) {
         redirectToStore();
         DialogWalletInstall.this.dismiss();
-        if (mContext instanceof InstallDialogActivity) {
+        if (appContext instanceof InstallDialogActivity) {
           Bundle response = new Bundle();
           response.putInt(Utils.RESPONSE_CODE, RESULT_USER_CANCELED);
 
           Intent intent = new Intent();
           intent.putExtras(response);
 
-          ((Activity) mContext).setResult(Activity.RESULT_CANCELED, intent);
-          ((Activity) mContext).finish();
+          ((Activity) appContext).setResult(Activity.RESULT_CANCELED, intent);
+          ((Activity) appContext).finish();
         }
       }
     });
   }
 
   private void buildCancelButton() {
-    dialog_wallet_install_button_cancel = findViewById(R.id.dialog_wallet_install_button_cancel);
+    dialog_wallet_install_button_cancel = findViewById(appContext.getResources()
+        .getIdentifier(DIALOG_WALLET_INSTALL_BUTTON_CANCEL, "id", appContext.getPackageName()));
     dialog_wallet_install_button_cancel.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         DialogWalletInstall.this.dismiss();
-        if (mContext instanceof InstallDialogActivity) {
+        if (appContext instanceof InstallDialogActivity) {
           Bundle response = new Bundle();
           response.putInt(Utils.RESPONSE_CODE, RESULT_USER_CANCELED);
 
           Intent intent = new Intent();
           intent.putExtras(response);
 
-          ((Activity) mContext).setResult(Activity.RESULT_CANCELED, intent);
-          ((Activity) mContext).finish();
+          ((Activity) appContext).setResult(Activity.RESULT_CANCELED, intent);
+          ((Activity) appContext).finish();
         }
       }
     });
   }
 
   private void redirectToStore() {
-    //https://developer.android.com/distribute/marketing-tools/linking-to-google-play
     getContext().startActivity(buildStoreViewIntent(URL_APTOIDE));
   }
 
