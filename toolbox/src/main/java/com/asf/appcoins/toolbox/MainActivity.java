@@ -30,10 +30,8 @@ public class MainActivity extends Activity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this,
-        BuildConfig.IAB_KEY);
+    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this, BuildConfig.IAB_KEY);
 
-    final Activity activity = this;
     listener = new AppCoinsBillingStateListener() {
       @Override public void onBillingSetupFinished(int responseCode) {
         Log.d(TAG, "Is Billing Setup Finished:  Connected-" + responseCode + "");
@@ -51,7 +49,8 @@ public class MainActivity extends Activity {
   }
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    Log.d(TAG, "Activity Result: onActivityResult(" + requestCode + "," + resultCode + "," + data + ")");
+    Log.d(TAG,
+        "Activity Result: onActivityResult(" + requestCode + "," + resultCode + "," + data + ")");
     if (data != null && data.getExtras() != null) {
       Bundle bundle = data.getExtras();
       if (bundle != null) {
@@ -74,12 +73,10 @@ public class MainActivity extends Activity {
     Thread t = new Thread(new Runnable() {
       @Override public void run() {
         int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
-        Log.d(TAG, "BillingFlowResponse: " + launchBillingFlowResponse );
+        Log.d(TAG, "BillingFlowResponse: " + launchBillingFlowResponse);
       }
     });
     t.start();
-
-
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {
@@ -102,17 +99,16 @@ public class MainActivity extends Activity {
       }
     });
     t.start();
-
   }
 
   public void onSkuDetailsButtonClicked(View view) {
     SkuDetailsParams skuDetailsParams = new SkuDetailsParams();
     skuDetailsParams.setItemType(SkuType.inapp.toString());
-    ArrayList<String> al = new ArrayList<String>();
+    ArrayList<String> skusList = new ArrayList<String>();
 
-    al.add("gas");
+    skusList.add("gas");
 
-    skuDetailsParams.setMoreItemSkus(al);
+    skuDetailsParams.setMoreItemSkus(skusList);
 
     Thread t = new Thread(new Runnable() {
       @Override public void run() {
@@ -128,8 +124,7 @@ public class MainActivity extends Activity {
       }
     });
 
-    t.start();;
-
+    t.start();
   }
 
   public void makePaymentButtonClicked(View view) {
@@ -140,8 +135,11 @@ public class MainActivity extends Activity {
         if (token != null) {
           cab.consumeAsync(token, new ConsumeResponseListener() {
             @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
-              Log.d(TAG, "consume response: " +
-                  responseCode + " " + "Consumed purchase with token: " + purchaseToken);
+              Log.d(TAG, "consume response: "
+                  + responseCode
+                  + " "
+                  + "Consumed purchase with token: "
+                  + purchaseToken);
               token = null;
             }
           });
@@ -152,7 +150,6 @@ public class MainActivity extends Activity {
     });
 
     t.start();
-
   }
 
   public void onCloseChannelButtonClicked(View view) {

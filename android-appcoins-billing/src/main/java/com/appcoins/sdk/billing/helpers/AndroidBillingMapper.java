@@ -244,9 +244,9 @@ public class AndroidBillingMapper {
 
   private static String getFiatPrice(JSONObject parentObject) throws JSONException {
     String value = parentObject.getString("value");
-    String code = parentObject.getJSONObject("currency")
+    String symbol = parentObject.getJSONObject("currency")
         .getString("symbol");
-    return String.format("%s %s", code, value);
+    return String.format("%s %s", symbol, value);
   }
 
   private static long getFiatAmountInMicros(JSONObject parentObject) throws JSONException {
