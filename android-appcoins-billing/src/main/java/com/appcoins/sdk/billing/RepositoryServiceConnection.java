@@ -47,21 +47,28 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     this.listener = listener;
     String packageName = WalletUtils.getBillingServicePackageName();
     if (packageName != null) {
-      Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
-      serviceIntent.setPackage(packageName);
-
-      List<ResolveInfo> intentServices = context.getPackageManager()
-          .queryIntentServices(serviceIntent, 0);
-      if (intentServices != null && !intentServices.isEmpty()) {
-        hasWalletInstalled = true;
-        context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
-      } else {
-        hasWalletInstalled = false;
-        onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
-      }
+      walletIsInstalled(packageName);
     } else {
-      hasWalletInstalled = false;
-      onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
+      walletIsNotInstalled();
+    }
+  }
+
+  private void walletIsNotInstalled() {
+    hasWalletInstalled = false;
+    onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
+  }
+
+  private void walletIsInstalled(String packageName) {
+    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
+    serviceIntent.setPackage(packageName);
+
+    List<ResolveInfo> intentServices = context.getPackageManager()
+        .queryIntentServices(serviceIntent, 0);
+    if (intentServices != null && !intentServices.isEmpty()) {
+      hasWalletInstalled = true;
+      context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+    } else {
+      walletIsNotInstalled();
     }
   }
 
