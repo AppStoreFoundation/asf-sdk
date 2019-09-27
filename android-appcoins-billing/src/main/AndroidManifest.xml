@@ -2,6 +2,7 @@
     package="com.appcoins.billing.sdk">
 
   <uses-permission android:name="com.appcoins.BILLING"/>
+  <uses-permission android:name="com.appcoins.BILLING"/>
   <application>
     <activity android:name="com.appcoins.sdk.billing.helpers.InstallDialogActivity"/>
   </application>

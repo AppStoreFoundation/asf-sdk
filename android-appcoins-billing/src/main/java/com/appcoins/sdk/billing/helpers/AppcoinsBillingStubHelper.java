@@ -130,7 +130,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
   @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
       String developerPayload) {
-    if (WalletUtils.hasWalletInstalled()) {
+     if (WalletUtils.hasWalletInstalled()) {
       try {
         Bundle response = walletInstalledBehaviour();
         if (response.containsKey(IS_BINDED_KEY)) {

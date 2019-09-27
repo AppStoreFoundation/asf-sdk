@@ -7,10 +7,9 @@ import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
-
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import java.util.List;
 
 public class RepositoryServiceConnection implements ServiceConnection, RepositoryConnection {
@@ -46,10 +45,9 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
 
   @Override public void startConnection(final AppCoinsBillingStateListener listener) {
     this.listener = listener;
-
+    String packageName = WalletUtils.getBillingServicePackageName();
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
-    serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
-
+    serviceIntent.setPackage(packageName);
 
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);

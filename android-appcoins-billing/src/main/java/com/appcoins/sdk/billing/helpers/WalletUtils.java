@@ -62,9 +62,9 @@ public class WalletUtils {
     return context.get();
   }
 
-  private boolean hasWalletAptoideService() {
-    Intent serviceIntent = new Intent(BuildConfig.APTOIDE_SERVICE_BILLING_DEV);
-    serviceIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME_DEV);
+  public static String getBillingServicePackageName() {
+    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
+    //serviceIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME_DEV);
 
     final Context context = WalletUtils.getActivity();
 
@@ -73,9 +73,9 @@ public class WalletUtils {
     for (ResolveInfo intentService : intentServices) {
       if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME_DEV)
           || intentService.resolvePackageName.equals(BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
-        return true;
+        return intentService.serviceInfo.packageName ;
       }
     }
-    return false;
+    return null;
   }
 }
