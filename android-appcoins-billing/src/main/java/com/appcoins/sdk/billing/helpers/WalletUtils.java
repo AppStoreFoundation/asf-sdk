@@ -24,15 +24,19 @@ public class WalletUtils {
   }
 
   public static boolean hasWalletInstalled() {
-    PackageManager packageManager = context.get()
-        .getPackageManager();
+    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
 
-    try {
-      packageManager.getPackageInfo(BuildConfig.BDS_WALLET_PACKAGE_NAME, 0);
-      return true;
-    } catch (PackageManager.NameNotFoundException e) {
-      return false;
+    final Context context = WalletUtils.getActivity();
+
+    List<ResolveInfo> intentServices = context.getPackageManager()
+        .queryIntentServices(serviceIntent, 0);
+    for (ResolveInfo intentService : intentServices) {
+      if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME_DEV)
+          || intentService.resolvePackageName.equals(BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
+        return true;
+      }
     }
+    return false;
   }
 
   public static boolean hasAptoideInstalled() {
@@ -64,7 +68,6 @@ public class WalletUtils {
 
   public static String getBillingServicePackageName() {
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
-    //serviceIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME_DEV);
 
     final Context context = WalletUtils.getActivity();
 
@@ -73,7 +76,7 @@ public class WalletUtils {
     for (ResolveInfo intentService : intentServices) {
       if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME_DEV)
           || intentService.resolvePackageName.equals(BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
-        return intentService.serviceInfo.packageName ;
+        return intentService.serviceInfo.packageName;
       }
     }
     return null;
