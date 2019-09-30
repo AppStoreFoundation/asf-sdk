@@ -113,7 +113,7 @@ public class DialogWalletInstall extends Dialog {
 
     hasImage = getContext().getResources()
         .getBoolean(appContext.getResources()
-            .getIdentifier(DIALOG_WALLET_INSTALL_HAS_IMAGE, "id",
+            .getIdentifier(DIALOG_WALLET_INSTALL_HAS_IMAGE, "bool",
                 appContext.getPackageName())) && icon != null;
 
     if (hasImage) {
@@ -144,7 +144,7 @@ public class DialogWalletInstall extends Dialog {
         .getIdentifier(DIALOG_WALLET_INSTALL_TEXT_MESSAGE, "id", appContext.getPackageName()));
 
     String dialog_message = getContext().getString(appContext.getResources()
-        .getIdentifier(APP_WALLET_INSTALL_WALLET_FROM_IAB, "id", appContext.getPackageName()));
+        .getIdentifier(APP_WALLET_INSTALL_WALLET_FROM_IAB, "string", appContext.getPackageName()));
 
     SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialog_message);
 

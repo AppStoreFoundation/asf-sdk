@@ -151,8 +151,8 @@ public class WalletUtils {
     builder.setContentIntent(pendingIntent);
     try {
       Resources resources = context.getResources();
-      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE,"id",context.getPackageName());
-      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY,"id",context.getPackageName());
+      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE,"string",context.getPackageName());
+      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY,"string",context.getPackageName());
 
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
@@ -177,8 +177,8 @@ public class WalletUtils {
 
     try {
       Resources resources = context.getResources();
-      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE,"id",context.getPackageName());
-      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY,"id",context.getPackageName());
+      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE,"string",context.getPackageName());
+      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY,"string",context.getPackageName());
 
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
