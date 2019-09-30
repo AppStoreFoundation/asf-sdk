@@ -32,6 +32,9 @@ public class WalletUtils {
 
   private static boolean hasPopup;
 
+  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE = "poa_wallet_not_installed_notification_title";
+  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY = "poa_wallet_not_installed_notification_body";
+
   public static Context context;
 
   public static void setContext(Context cont) {
@@ -147,11 +150,15 @@ public class WalletUtils {
     builder = new Notification.Builder(context, channelId);
     builder.setContentIntent(pendingIntent);
     try {
+      Resources resources = context.getResources();
+      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE,"id",context.getPackageName());
+      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY,"id",context.getPackageName());
+
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
           .setAutoCancel(true)
-          .setContentTitle(context.getString(R.string.poa_wallet_not_installed_notification_title))
-          .setContentText(context.getString(R.string.poa_wallet_not_installed_notification_body));
+          .setContentTitle(context.getString(titleId))
+          .setContentText(context.getString(bodyId));
     } catch (NullPointerException e) {
       e.printStackTrace();
     }
@@ -169,11 +176,15 @@ public class WalletUtils {
     builder.setVibrate(new long[0]);
 
     try {
+      Resources resources = context.getResources();
+      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE,"id",context.getPackageName());
+      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY,"id",context.getPackageName());
+
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
           .setAutoCancel(true)
-          .setContentTitle(context.getString(R.string.poa_wallet_not_installed_notification_title))
-          .setContentText(context.getString(R.string.poa_wallet_not_installed_notification_body));
+          .setContentTitle(context.getString(titleId))
+          .setContentText(context.getString(bodyId));
     } catch (NullPointerException e) {
       e.printStackTrace();
     }
