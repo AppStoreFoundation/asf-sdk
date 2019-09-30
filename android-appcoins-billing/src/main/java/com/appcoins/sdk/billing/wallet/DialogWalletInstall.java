@@ -47,6 +47,8 @@ public class DialogWalletInstall extends Dialog {
   private static String DIALOG_WALLET_INSTALL_TEXT_MESSAGE = "dialog_wallet_install_text_message";
   private static String DIALOG_WALLET_INSTALL_BUTTON_DOWNLOAD = "dialog_wallet_install_button_download";
   private static String DIALOG_WALLET_INSTALL_BUTTON_CANCEL= "dialog_wallet_install_button_cancel";
+  private static String APP_WALLET_INSTALL_WALLET_FROM_IAB = "app_wallet_install_wallet_from_iab";
+  private static String DIALOG_WALLET_INSTALL_HAS_IMAGE = "dialog_wallet_install_has_image";
 
   private Button dialog_wallet_install_button_cancel;
   private Button dialog_wallet_install_button_download;
@@ -110,7 +112,9 @@ public class DialogWalletInstall extends Dialog {
     });
 
     hasImage = getContext().getResources()
-        .getBoolean(R.bool.dialog_wallet_install_has_image) && icon != null;
+        .getBoolean(appContext.getResources()
+            .getIdentifier(DIALOG_WALLET_INSTALL_HAS_IMAGE, "bool",
+                appContext.getPackageName())) && icon != null;
 
     if (hasImage) {
       dialog_wallet_install_image_icon.setVisibility(View.INVISIBLE);
@@ -139,7 +143,8 @@ public class DialogWalletInstall extends Dialog {
     dialog_wallet_install_text_message = findViewById(appContext.getResources()
         .getIdentifier(DIALOG_WALLET_INSTALL_TEXT_MESSAGE, "id", appContext.getPackageName()));
 
-    String dialog_message = getContext().getString(R.string.app_wallet_install_wallet_from_iab);
+    String dialog_message = getContext().getString(appContext.getResources()
+        .getIdentifier(APP_WALLET_INSTALL_WALLET_FROM_IAB, "string", appContext.getPackageName()));
 
     SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialog_message);
 
