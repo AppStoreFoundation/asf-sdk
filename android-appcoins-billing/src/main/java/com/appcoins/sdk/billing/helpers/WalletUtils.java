@@ -32,7 +32,7 @@ public class WalletUtils {
         .queryIntentServices(serviceIntent, 0);
     for (ResolveInfo intentService : intentServices) {
       if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME_DEV)
-          || intentService.resolvePackageName.equals(BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
+          || intentService.serviceInfo.packageName.equals(BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
         return true;
       }
     }
@@ -75,7 +75,7 @@ public class WalletUtils {
         .queryIntentServices(serviceIntent, 0);
     for (ResolveInfo intentService : intentServices) {
       if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME_DEV)
-          || intentService.resolvePackageName.equals(BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
+          || intentService.serviceInfo.packageName.equals(BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
         return intentService.serviceInfo.packageName;
       }
     }
