@@ -8,12 +8,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.R;
+import java.util.List;
 
 public class WalletUtils {
 
@@ -34,6 +36,8 @@ public class WalletUtils {
 
   public static Context context;
 
+  public static String billingPackageName;
+
   public static void setContext(Context cont) {
     context = cont;
   }
@@ -50,14 +54,24 @@ public class WalletUtils {
   }
 
   public static boolean hasWalletInstalled() {
-    PackageManager packageManager = context.getPackageManager();
+    Intent serviceIntent = new Intent(com.appcoins.billing.sdk.BuildConfig.IAB_BIND_ACTION);
 
-    try {
-      packageManager.getPackageInfo(BuildConfig.BDS_WALLET_PACKAGE_NAME, 0);
-      return true;
-    } catch (PackageManager.NameNotFoundException e) {
-      return false;
+    final Context context = com.appcoins.sdk.billing.helpers.WalletUtils.getActivity();
+
+    List<ResolveInfo> intentServices = context.getPackageManager()
+        .queryIntentServices(serviceIntent, 0);
+    for (ResolveInfo intentService : intentServices) {
+      if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME)
+          || intentService.serviceInfo.packageName.equals(com.appcoins.billing.sdk.BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
+        billingPackageName = intentService.serviceInfo.packageName;
+        return true;
+      }
     }
+    return false;
+  }
+
+  public static String getBillingServicePackageName() {
+    return billingPackageName;
   }
 
   public static void removeNotification() {

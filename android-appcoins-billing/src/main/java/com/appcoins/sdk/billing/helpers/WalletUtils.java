@@ -14,6 +14,7 @@ public class WalletUtils {
 
   public static WeakReference<Activity> context;
   public static Activity activity;
+  public static String billingPackageName;
 
   public static void setContext(Activity cont) {
     context = new WeakReference<>(cont);
@@ -31,8 +32,9 @@ public class WalletUtils {
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
     for (ResolveInfo intentService : intentServices) {
-      if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME_DEV)
+      if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME)
           || intentService.serviceInfo.packageName.equals(BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
+        billingPackageName = intentService.serviceInfo.packageName;
         return true;
       }
     }
@@ -67,18 +69,6 @@ public class WalletUtils {
   }
 
   public static String getBillingServicePackageName() {
-    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
-
-    final Context context = WalletUtils.getActivity();
-
-    List<ResolveInfo> intentServices = context.getPackageManager()
-        .queryIntentServices(serviceIntent, 0);
-    for (ResolveInfo intentService : intentServices) {
-      if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME_DEV)
-          || intentService.serviceInfo.packageName.equals(BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
-        return intentService.serviceInfo.packageName;
-      }
-    }
-    return null;
+    return billingPackageName;
   }
 }
