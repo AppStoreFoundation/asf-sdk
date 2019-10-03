@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.util.Log;
+import com.appcoins.sdk.billing.helpers.EventLogger;
 import com.appcoins.sdk.billing.helpers.PayloadHelper;
 
 public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
@@ -40,12 +41,17 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
       Log.d("Message: ", payload);
 
+      Thread eventLoggerThread = new Thread(new EventLogger(billingFlowParams.getSku(),
+          activity.getApplicationContext()
+              .getPackageName()));
+      eventLoggerThread.start();
+
       LaunchBillingFlowResult launchBillingFlowResult =
           billing.launchBillingFlow(billingFlowParams, payload);
 
       responseCode = (int) launchBillingFlowResult.getResponseCode();
 
-      if (responseCode != ResponseCode.OK.getValue()){
+      if (responseCode != ResponseCode.OK.getValue()) {
         return responseCode;
       }
 

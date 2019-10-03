@@ -13,15 +13,13 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 import com.appcoins.billing.AppcoinsBilling;
-import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.WSServiceController;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class AppcoinsBillingStubHelper implements AppcoinsBilling {
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
@@ -52,7 +50,11 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
       }
     } else {
       if (type.equalsIgnoreCase("inapp")) {
-        return ResponseCode.OK.getValue();
+        if (apiVersion == 3) {
+          return ResponseCode.OK.getValue();
+        } else {
+          return ResponseCode.BILLING_UNAVAILABLE.getValue();
+        }
       } else {
         return ResponseCode.BILLING_UNAVAILABLE.getValue();
       }
@@ -272,31 +274,5 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         return AppcoinsBilling.Stub.asInterface(service);
       }
     }
-  }
-
-  private static String getAppcPrice(JSONObject parentObject) throws JSONException {
-    return String.format("%s %s", "APPC", parentObject.getString("appc"));
-  }
-
-  private static long getAppcAmountInMicros(JSONObject parentObject) throws JSONException {
-    long price = parentObject.getLong("appc");
-    return price * 1000000;
-  }
-
-  private static String getFiatPrice(JSONObject parentObject) throws JSONException {
-    String value = parentObject.getString("value");
-    String code = parentObject.getJSONObject("currency")
-        .getString("code");
-    return String.format("%s %s", code, value);
-  }
-
-  private static long getFiatAmountInMicros(JSONObject parentObject) throws JSONException {
-    long price = parentObject.getLong("value");
-    return price * 1000000;
-  }
-
-  private static String getFiatCurrencyCode(JSONObject parentObject) throws JSONException {
-    return parentObject.getJSONObject("currency")
-        .getString("code");
   }
 }
