@@ -54,20 +54,35 @@ public class WalletUtils {
   }
 
   public static boolean hasWalletInstalled() {
-    Intent serviceIntent = new Intent(com.appcoins.billing.sdk.BuildConfig.IAB_BIND_ACTION);
-
-    final Context context = com.appcoins.sdk.billing.helpers.WalletUtils.getActivity();
+    Intent serviceIntent = new Intent(BuildConfig.ADVERTISEMENT_BIND_ACTION);
 
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
-    for (ResolveInfo intentService : intentServices) {
-      if (intentService.serviceInfo.packageName.equals(BuildConfig.APTOIDE_PACKAGE_NAME)
-          || intentService.serviceInfo.packageName.equals(com.appcoins.billing.sdk.BuildConfig.BDS_WALLET_PACKAGE_NAME)) {
-        billingPackageName = intentService.serviceInfo.packageName;
+
+    if (intentServices.size() > 0) {
+      String[] packageNameArray = new String[intentServices.size()];
+      int index = 0;
+      for (ResolveInfo intentService : intentServices) {
+        packageNameArray[index++] = intentService.serviceInfo.packageName;
+      }
+      billingPackageName = chooseServiceToBind(packageNameArray);
+      if (billingPackageName != null) {
         return true;
       }
     }
     return false;
+  }
+
+  public static String chooseServiceToBind(String[] packageNameServices) {
+    String[] packagesOrded = BuildConfig.SERVICE_BIND_LIST.split(",");
+    for (String packageService : packageNameServices) {
+      for (int i = 0; i < packagesOrded.length; i++) {
+        if(packageService.equals(packagesOrded[i])){
+          return packageService;
+        }
+      }
+    }
+    return null;
   }
 
   public static String getBillingServicePackageName() {

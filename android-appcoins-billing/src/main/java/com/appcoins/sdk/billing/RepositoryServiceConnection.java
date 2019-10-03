@@ -45,8 +45,8 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
 
   @Override public void startConnection(final AppCoinsBillingStateListener listener) {
     this.listener = listener;
-    String packageName = WalletUtils.getBillingServicePackageName();
-    if (packageName != null) {
+    if (WalletUtils.hasWalletInstalled()) {
+      String packageName = WalletUtils.getBillingServicePackageName();
       walletIsInstalled(packageName);
     } else {
       walletIsNotInstalled();

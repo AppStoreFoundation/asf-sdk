@@ -116,7 +116,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
   public void startWalletPoaService(Context context) {
     Intent serviceIntent = new Intent();
-    serviceIntent.setComponent(new ComponentName(BuildConfig.BDS_WALLET_PACKAGE_NAME,
+    serviceIntent.setComponent(new ComponentName(WalletUtils.getBillingServicePackageName(),
         BuildConfig.APPCOINS_POA_SERVICE_NAME));
     serviceIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
     serviceIntent.putExtra(PARAM_APP_SERVICE_NAME, SDKPoAService.class.getName());
