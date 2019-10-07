@@ -179,9 +179,9 @@ public class AndroidBillingMapper {
 
           String type = skuType;
 
-          String title = obj.getString("label");
+          String title = escapeString(obj.getString("label"));
 
-          String description = obj.getString("description");
+          String description = escapeString(obj.getString("description"));
 
           SkuDetails skuDetails =
               new SkuDetails(skuType, sku, type, price, priceAmountMicros, priceCurrencyCode,
@@ -198,6 +198,41 @@ public class AndroidBillingMapper {
     return new SkuDetailsResult(arrayList, ResponseCode.OK.getValue());
   }
 
+  private static String escapeString(String value) {
+    StringBuilder str = new StringBuilder();
+
+    for (int i = 0, length = value.length(); i < length; i++) {
+      char c = value.charAt(i);
+      switch (c) {
+        case '"':
+        case '\\':
+        case '/':
+          str.append('\\').append(c);
+          break;
+        case '\t':
+          str.append("\\t");
+          break;
+        case '\b':
+          str.append("\\b");
+          break;
+        case '\n':
+          str.append("\\n");
+          break;
+        case '\r':
+          str.append("\\r");
+          break;
+        case '\f':
+          str.append("\\f");
+          break;
+        default:
+            str.append(c);
+          break;
+      }
+    }
+    return str.toString();
+  }
+
+
   private static String getAppcPrice(JSONObject parentObject) throws JSONException {
     return String.format("%s %s", parentObject.getString("appc"), APPC);
   }
@@ -209,9 +244,9 @@ public class AndroidBillingMapper {
 
   private static String getFiatPrice(JSONObject parentObject) throws JSONException {
     String value = parentObject.getString("value");
-    String code = parentObject.getJSONObject("currency")
+    String symbol = parentObject.getJSONObject("currency")
         .getString("symbol");
-    return String.format("%s %s", code, value);
+    return String.format("%s %s", symbol, value);
   }
 
   private static long getFiatAmountInMicros(JSONObject parentObject) throws JSONException {
