@@ -231,8 +231,11 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
   private boolean createRepository() {
 
+    String packageName = WalletUtils.getBillingServicePackageName();
+
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
+    serviceIntent.setPackage(packageName);
 
     final Context context = WalletUtils.getActivity();
 
