@@ -1,7 +1,6 @@
 package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -27,7 +26,8 @@ public class WalletUtils {
   public static boolean hasWalletInstalled() {
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
 
-    List<ResolveInfo> intentServices = context.get().getPackageManager()
+    List<ResolveInfo> intentServices = context.get()
+        .getPackageManager()
         .queryIntentServices(serviceIntent, 0);
 
     if (intentServices.size() > 0) {
@@ -37,18 +37,15 @@ public class WalletUtils {
         packageNameArray[index++] = intentService.serviceInfo.packageName;
       }
       billingPackageName = chooseServiceToBind(packageNameArray);
-      if (billingPackageName != null) {
-        return true;
-      }
     }
-    return false;
+    return billingPackageName != null;
   }
 
-  public static String chooseServiceToBind(String[] packageNameServices) {
+  private static String chooseServiceToBind(String[] packageNameServices) {
     String[] packagesOrded = BuildConfig.SERVICE_BIND_LIST.split(",");
     for (String packageService : packageNameServices) {
       for (int i = 0; i < packagesOrded.length; i++) {
-        if(packageService.equals(packagesOrded[i])){
+        if (packageService.equals(packagesOrded[i])) {
           return packageService;
         }
       }

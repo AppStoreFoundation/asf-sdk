@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
-import com.asf.appcoins.sdk.ads.R;
 import java.util.List;
 
 public class WalletUtils {
@@ -34,8 +33,10 @@ public class WalletUtils {
 
   private static boolean hasPopup;
 
-  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE = "poa_wallet_not_installed_notification_title";
-  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY = "poa_wallet_not_installed_notification_body";
+  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE =
+      "poa_wallet_not_installed_notification_title";
+  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY =
+      "poa_wallet_not_installed_notification_body";
 
   public static Context context;
 
@@ -69,18 +70,15 @@ public class WalletUtils {
         packageNameArray[index++] = intentService.serviceInfo.packageName;
       }
       billingPackageName = chooseServiceToBind(packageNameArray);
-      if (billingPackageName != null) {
-        return true;
-      }
     }
-    return false;
+    return billingPackageName != null;
   }
 
-  public static String chooseServiceToBind(String[] packageNameServices) {
+  private static String chooseServiceToBind(String[] packageNameServices) {
     String[] packagesOrded = BuildConfig.SERVICE_BIND_LIST.split(",");
     for (String packageService : packageNameServices) {
       for (int i = 0; i < packagesOrded.length; i++) {
-        if(packageService.equals(packagesOrded[i])){
+        if (packageService.equals(packagesOrded[i])) {
           return packageService;
         }
       }
@@ -125,8 +123,7 @@ public class WalletUtils {
       notificationManager.notify(0,
           buildNotification(Integer.toString(POA_NOTIFICATION_ID), intent));
     } else {
-      Notification notificationHeadsUp =
-          buildNotificationOlderVersion(intent);
+      Notification notificationHeadsUp = buildNotificationOlderVersion(intent);
       notificationManager.notify(POA_NOTIFICATION_ID, notificationHeadsUp);
     }
   }
@@ -180,8 +177,10 @@ public class WalletUtils {
     builder.setContentIntent(pendingIntent);
     try {
       Resources resources = context.getResources();
-      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE,"string",context.getPackageName());
-      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY,"string",context.getPackageName());
+      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE, "string",
+          context.getPackageName());
+      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY, "string",
+          context.getPackageName());
 
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
@@ -206,8 +205,10 @@ public class WalletUtils {
 
     try {
       Resources resources = context.getResources();
-      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE,"string",context.getPackageName());
-      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY,"string",context.getPackageName());
+      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE, "string",
+          context.getPackageName());
+      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY, "string",
+          context.getPackageName());
 
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))

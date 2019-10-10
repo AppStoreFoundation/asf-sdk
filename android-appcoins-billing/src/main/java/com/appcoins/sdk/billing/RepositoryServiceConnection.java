@@ -47,18 +47,18 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     this.listener = listener;
     if (WalletUtils.hasWalletInstalled()) {
       String packageName = WalletUtils.getBillingServicePackageName();
-      walletIsInstalled(packageName);
+      walletInstalledBehaviour(packageName);
     } else {
-      walletIsNotInstalled();
+      walletNotInstalledBehaviour();
     }
   }
 
-  private void walletIsNotInstalled() {
+  private void walletNotInstalledBehaviour() {
     hasWalletInstalled = false;
     onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
   }
 
-  private void walletIsInstalled(String packageName) {
+  private void walletInstalledBehaviour(String packageName) {
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(packageName);
 
@@ -68,7 +68,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
       hasWalletInstalled = true;
       context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
     } else {
-      walletIsNotInstalled();
+      walletNotInstalledBehaviour();
     }
   }
 
