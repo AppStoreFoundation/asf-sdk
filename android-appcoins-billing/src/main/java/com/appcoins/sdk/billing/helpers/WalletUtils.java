@@ -30,7 +30,7 @@ public class WalletUtils {
         .getPackageManager()
         .queryIntentServices(serviceIntent, 0);
 
-    if (intentServices.size() > 0) {
+    if (intentServices.size() > 0 && intentServices != null) {
       String[] packageNameArray = new String[intentServices.size()];
       int index = 0;
       for (ResolveInfo intentService : intentServices) {
