@@ -54,7 +54,6 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
   }
 
   private void walletNotInstalledBehaviour() {
-    hasWalletInstalled = false;
     onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
   }
 
