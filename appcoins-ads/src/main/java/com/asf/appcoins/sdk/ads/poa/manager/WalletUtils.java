@@ -24,7 +24,7 @@ public class WalletUtils {
 
   private static int MINIMUM_APTOIDE_VERSION = 9908;
 
-  private static int UNINSTALLED_APTOIDE_VERSIONCODE = 0;
+  private static int DEFAULT_APTOIDE_VERSION_CODE = 0;
 
   private static String URL_INTENT_INSTALL =
       "market://details?id=com.appcoins.wallet&utm_source=appcoinssdk&app_source=";
@@ -43,7 +43,6 @@ public class WalletUtils {
     context = cont;
   }
 
-
   public static boolean hasWalletInstalled() {
     PackageManager packageManager = context.getPackageManager();
 
@@ -58,24 +57,23 @@ public class WalletUtils {
   public static int getAptoideVersion() {
 
     final PackageInfo pInfo;
-    int versionCode = 0;
+    int DEFAULT_APTOIDE_VERSION_CODE = 0;
 
     try {
       pInfo = context.getPackageManager()
-          .getPackageInfo(com.appcoins.sdk.android.billing.BuildConfig.APTOIDE_PACKAGE_NAME, 0);
-      String versionName = pInfo.versionName;
+          .getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0);
 
       //VersionCode is deprecated for api 28
       if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        versionCode = (int) pInfo.getLongVersionCode();
+        DEFAULT_APTOIDE_VERSION_CODE = (int) pInfo.getLongVersionCode();
       } else {
         //noinspection deprecation
-        versionCode = pInfo.versionCode;
+        DEFAULT_APTOIDE_VERSION_CODE = pInfo.versionCode;
       }
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
-    return versionCode;
+    return DEFAULT_APTOIDE_VERSION_CODE;
   }
 
   public static void removeNotification() {
@@ -119,8 +117,7 @@ public class WalletUtils {
   private static Intent getNotificationIntent() {
     String url = URL_INTENT_INSTALL;
 
-
-    if (WalletUtils.getAptoideVersion() != UNINSTALLED_APTOIDE_VERSIONCODE) {
+    if (WalletUtils.getAptoideVersion() != DEFAULT_APTOIDE_VERSION_CODE) {
       url += URL_APTOIDE_PARAMETERS + context.getPackageName();
     }
 

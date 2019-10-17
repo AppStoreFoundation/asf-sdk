@@ -41,25 +41,24 @@ public class WalletUtils {
   public static int getAptoideVersion() {
 
     final PackageInfo pInfo;
-    int versionCode = 0;
+    int DEFAULT_APTOIDE_VERSION_CODE = 0;
 
     try {
       pInfo = context.get()
           .getPackageManager()
           .getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0);
-      String versionName = pInfo.versionName;
 
       //VersionCode is deprecated for api 28
       if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        versionCode = (int) pInfo.getLongVersionCode();
+        DEFAULT_APTOIDE_VERSION_CODE = (int) pInfo.getLongVersionCode();
       } else {
         //noinspection deprecation
-        versionCode = pInfo.versionCode;
+        DEFAULT_APTOIDE_VERSION_CODE = pInfo.versionCode;
       }
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
-    return versionCode;
+    return DEFAULT_APTOIDE_VERSION_CODE;
   }
 
   public static void promptToInstallWallet() {
