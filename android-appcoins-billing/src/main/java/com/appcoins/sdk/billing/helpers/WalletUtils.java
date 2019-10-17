@@ -7,6 +7,7 @@ import android.content.pm.ResolveInfo;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WalletUtils {
@@ -24,6 +25,8 @@ public class WalletUtils {
   }
 
   public static boolean hasWalletInstalled() {
+
+    ArrayList intentServicesResponse = new ArrayList();
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
 
     List<ResolveInfo> intentServices = context.get()
@@ -31,23 +34,19 @@ public class WalletUtils {
         .queryIntentServices(serviceIntent, 0);
 
     if (intentServices.size() > 0 && intentServices != null) {
-      String[] packageNameArray = new String[intentServices.size()];
-      int index = 0;
       for (ResolveInfo intentService : intentServices) {
-        packageNameArray[index++] = intentService.serviceInfo.packageName;
+        intentServicesResponse.add(intentService.serviceInfo.packageName);
       }
-      billingPackageName = chooseServiceToBind(packageNameArray);
+      billingPackageName = chooseServiceToBind(intentServicesResponse);
     }
     return billingPackageName != null;
   }
 
-  private static String chooseServiceToBind(String[] packageNameServices) {
+  private static String chooseServiceToBind(ArrayList packageNameServices) {
     String[] packagesOrded = BuildConfig.SERVICE_BIND_LIST.split(",");
-    for (String packageService : packageNameServices) {
-      for (int i = 0; i < packagesOrded.length; i++) {
-        if (packageService.equals(packagesOrded[i])) {
-          return packageService;
-        }
+    for (int i = 0; i < packagesOrded.length; i++) {
+      if (packageNameServices.contains(packagesOrded[i])) {
+        return packagesOrded[i];
       }
     }
     return null;
