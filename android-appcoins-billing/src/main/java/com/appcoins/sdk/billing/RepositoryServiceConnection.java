@@ -4,14 +4,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
-
-import java.util.List;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 
 public class RepositoryServiceConnection implements ServiceConnection, RepositoryConnection {
   private static final String TAG = RepositoryServiceConnection.class.getSimpleName();
@@ -46,20 +43,24 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
 
   @Override public void startConnection(final AppCoinsBillingStateListener listener) {
     this.listener = listener;
-
-    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
-    serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
-
-
-    List<ResolveInfo> intentServices = context.getPackageManager()
-        .queryIntentServices(serviceIntent, 0);
-    if (intentServices != null && !intentServices.isEmpty()) {
+    if (WalletUtils.hasWalletInstalled()) {
       hasWalletInstalled = true;
-      context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+      String packageName = WalletUtils.getBillingServicePackageName();
+      walletInstalledBehaviour(packageName);
     } else {
       hasWalletInstalled = false;
-      onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
+      walletNotInstalledBehaviour();
     }
+  }
+
+  private void walletNotInstalledBehaviour() {
+    onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
+  }
+
+  private void walletInstalledBehaviour(String packageName) {
+    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
+    serviceIntent.setPackage(packageName);
+    context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
   }
 
   @Override public void endConnection() {

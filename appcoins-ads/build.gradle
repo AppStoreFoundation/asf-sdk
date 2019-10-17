@@ -39,6 +39,13 @@ android {
           "\"" + project.APPCOINS_ADVERTISEMENT_BIND + "\""
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
           project.APTOIDE_PACKAGE_NAME
+      buildConfigField 'String', 'SERVICE_BIND_LIST',
+          "\"" + project.APTOIDE_PACKAGE_NAME.replace('\"', '') +
+              "," +
+              project.BDS_WALLET_PACKAGE_NAME_DEV.replace('\"', '') +
+              "," +
+              project.CAFE_BAZAR_PACKAGE_NAME.replace('\"', '') +
+              "\""
     }
     release {
       minifyEnabled false
@@ -48,6 +55,14 @@ android {
           "\"" + project.APPCOINS_ADVERTISEMENT_BIND + "\""
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
           project.APTOIDE_PACKAGE_NAME
+      buildConfigField 'String', 'SERVICE_BIND_LIST',
+          "\"" + project.APTOIDE_PACKAGE_NAME.replace('\"', '') +
+              "," +
+              project.BDS_WALLET_PACKAGE_NAME.replace('\"', '') +
+              "," +
+              project.CAFE_BAZAR_PACKAGE_NAME.replace('\"', '') +
+              "\""
+      minifyEnabled false
     }
   }
 
@@ -62,7 +77,6 @@ dependencies {
 
   androidTestImplementation lib.android_test_runner
   api project(':android-appcoins-billing')
-
 }
 
 //region Publishing

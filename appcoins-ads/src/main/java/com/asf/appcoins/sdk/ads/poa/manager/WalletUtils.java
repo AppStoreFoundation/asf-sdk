@@ -8,12 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
-import com.asf.appcoins.sdk.ads.R;
+import java.util.List;
+import java.util.ArrayList;
+
 
 public class WalletUtils {
 
@@ -32,10 +35,14 @@ public class WalletUtils {
 
   private static boolean hasPopup;
 
-  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE = "poa_wallet_not_installed_notification_title";
-  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY = "poa_wallet_not_installed_notification_body";
+  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE =
+      "poa_wallet_not_installed_notification_title";
+  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY =
+      "poa_wallet_not_installed_notification_body";
 
   public static Context context;
+
+  public static String billingPackageName;
 
   public static void setContext(Context cont) {
     context = cont;
@@ -53,14 +60,34 @@ public class WalletUtils {
   }
 
   public static boolean hasWalletInstalled() {
-    PackageManager packageManager = context.getPackageManager();
+    ArrayList <String> intentServicesResponse = new ArrayList<String>();
+    Intent serviceIntent = new Intent(BuildConfig.ADVERTISEMENT_BIND_ACTION);
 
-    try {
-      packageManager.getPackageInfo(BuildConfig.BDS_WALLET_PACKAGE_NAME, 0);
-      return true;
-    } catch (PackageManager.NameNotFoundException e) {
-      return false;
+    List<ResolveInfo> intentServices = context
+        .getPackageManager()
+        .queryIntentServices(serviceIntent, 0);
+
+    if (intentServices.size() > 0 && intentServices != null) {
+      for (ResolveInfo intentService : intentServices) {
+        intentServicesResponse.add(intentService.serviceInfo.packageName);
+      }
+      billingPackageName = chooseServiceToBind(intentServicesResponse);
     }
+    return billingPackageName != null;
+  }
+
+  private static String chooseServiceToBind(ArrayList packageNameServices) {
+    String[] packagesOrded = BuildConfig.SERVICE_BIND_LIST.split(",");
+    for (int i = 0; i < packagesOrded.length; i++) {
+      if (packageNameServices.contains(packagesOrded[i])) {
+        return packagesOrded[i];
+      }
+    }
+    return null;
+  }
+
+  public static String getBillingServicePackageName() {
+    return billingPackageName;
   }
 
   public static void removeNotification() {
@@ -96,8 +123,7 @@ public class WalletUtils {
       notificationManager.notify(0,
           buildNotification(Integer.toString(POA_NOTIFICATION_ID), intent));
     } else {
-      Notification notificationHeadsUp =
-          buildNotificationOlderVersion(intent);
+      Notification notificationHeadsUp = buildNotificationOlderVersion(intent);
       notificationManager.notify(POA_NOTIFICATION_ID, notificationHeadsUp);
     }
   }
@@ -151,8 +177,10 @@ public class WalletUtils {
     builder.setContentIntent(pendingIntent);
     try {
       Resources resources = context.getResources();
-      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE,"string",context.getPackageName());
-      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY,"string",context.getPackageName());
+      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE, "string",
+          context.getPackageName());
+      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY, "string",
+          context.getPackageName());
 
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
@@ -177,8 +205,10 @@ public class WalletUtils {
 
     try {
       Resources resources = context.getResources();
-      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE,"string",context.getPackageName());
-      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY,"string",context.getPackageName());
+      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE, "string",
+          context.getPackageName());
+      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY, "string",
+          context.getPackageName());
 
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
