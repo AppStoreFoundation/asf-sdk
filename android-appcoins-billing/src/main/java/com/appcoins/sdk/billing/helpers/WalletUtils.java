@@ -15,6 +15,8 @@ import java.lang.ref.WeakReference;
 
 public class WalletUtils {
 
+  public static final int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
+
   public static WeakReference<Activity> context;
   public static Activity activity;
 
@@ -41,7 +43,7 @@ public class WalletUtils {
   public static int getAptoideVersion() {
 
     final PackageInfo pInfo;
-    int DEFAULT_APTOIDE_VERSION_CODE = 0;
+    int versionCode = UNINSTALLED_APTOIDE_VERSION_CODE;
 
     try {
       pInfo = context.get()
@@ -50,15 +52,15 @@ public class WalletUtils {
 
       //VersionCode is deprecated for api 28
       if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        DEFAULT_APTOIDE_VERSION_CODE = (int) pInfo.getLongVersionCode();
+        versionCode = (int) pInfo.getLongVersionCode();
       } else {
         //noinspection deprecation
-        DEFAULT_APTOIDE_VERSION_CODE = pInfo.versionCode;
+        versionCode = pInfo.versionCode;
       }
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
-    return DEFAULT_APTOIDE_VERSION_CODE;
+    return versionCode;
   }
 
   public static void promptToInstallWallet() {
