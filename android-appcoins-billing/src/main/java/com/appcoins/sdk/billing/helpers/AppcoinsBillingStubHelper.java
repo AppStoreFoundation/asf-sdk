@@ -13,7 +13,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 import com.appcoins.billing.AppcoinsBilling;
-import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
@@ -50,7 +50,11 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
       }
     } else {
       if (type.equalsIgnoreCase("inapp")) {
-        return ResponseCode.OK.getValue();
+        if (apiVersion == 3) {
+          return ResponseCode.OK.getValue();
+        } else {
+          return ResponseCode.BILLING_UNAVAILABLE.getValue();
+        }
       } else {
         return ResponseCode.BILLING_UNAVAILABLE.getValue();
       }
@@ -99,12 +103,24 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         + skuDetails.getSku()
         + "\",\"type\" : \""
         + skuDetails.getType()
-        + "\",\"price\" : "
+        + "\",\"price\" : \""
         + skuDetails.getPrice()
-        + ",\"price_currency_code\": \""
+        + "\",\"price_currency_code\": \""
         + skuDetails.getPriceCurrencyCode()
         + "\",\"price_amount_micros\": "
         + skuDetails.getPriceAmountMicros()
+        + ",\"appc_price\" : \""
+        + skuDetails.getAppcPrice()
+        + "\",\"appc_price_currency_code\": \""
+        + skuDetails.getAppcPriceCurrencyCode()
+        + "\",\"appc_price_amount_micros\": "
+        + skuDetails.getAppcPriceAmountMicros()
+        + ",\"fiat_price\" : \""
+        + skuDetails.getFiatPrice()
+        + "\",\"fiat_price_currency_code\": \""
+        + skuDetails.getFiatPriceCurrencyCode()
+        + "\",\"fiat_price_amount_micros\": "
+        + skuDetails.getFiatPriceAmountMicros()
         + ",\"title\" : \""
         + skuDetails.getTitle()
         + "\",\"description\" : \""
@@ -114,7 +130,7 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
   @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
       String developerPayload) {
-    if (WalletUtils.hasWalletInstalled()) {
+     if (WalletUtils.hasWalletInstalled()) {
       try {
         Bundle response = walletInstalledBehaviour();
         if (response.containsKey(IS_BINDED_KEY)) {
@@ -169,7 +185,6 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
   }
 
   @Override public int consumePurchase(int apiVersion, String packageName, String purchaseToken) {
-
     if (WalletUtils.hasWalletInstalled()) {
       try {
         Bundle response = walletInstalledBehaviour();
@@ -216,8 +231,11 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
 
   private boolean createRepository() {
 
+    String packageName = WalletUtils.getBillingServicePackageName();
+
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
+    serviceIntent.setPackage(packageName);
 
     final Context context = WalletUtils.getActivity();
 

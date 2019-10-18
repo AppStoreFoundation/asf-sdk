@@ -1,17 +1,18 @@
 package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
-import com.appcoins.sdk.android.billing.BuildConfig;
+import android.content.pm.ResolveInfo;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WalletUtils {
 
@@ -19,6 +20,7 @@ public class WalletUtils {
 
   public static WeakReference<Activity> context;
   public static Activity activity;
+  public static String billingPackageName;
 
   public static void setContext(Activity cont) {
     context = new WeakReference<>(cont);
@@ -29,15 +31,31 @@ public class WalletUtils {
   }
 
   public static boolean hasWalletInstalled() {
-    PackageManager packageManager = context.get()
-        .getPackageManager();
 
-    try {
-      packageManager.getPackageInfo(BuildConfig.BDS_WALLET_PACKAGE_NAME, 0);
-      return true;
-    } catch (PackageManager.NameNotFoundException e) {
-      return false;
+    ArrayList intentServicesResponse = new ArrayList();
+    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
+
+    List<ResolveInfo> intentServices = context.get()
+        .getPackageManager()
+        .queryIntentServices(serviceIntent, 0);
+
+    if (intentServices.size() > 0 && intentServices != null) {
+      for (ResolveInfo intentService : intentServices) {
+        intentServicesResponse.add(intentService.serviceInfo.packageName);
+      }
+      billingPackageName = chooseServiceToBind(intentServicesResponse);
     }
+    return billingPackageName != null;
+  }
+
+  private static String chooseServiceToBind(ArrayList packageNameServices) {
+    String[] packagesOrded = BuildConfig.SERVICE_BIND_LIST.split(",");
+    for (int i = 0; i < packagesOrded.length; i++) {
+      if (packageNameServices.contains(packagesOrded[i])) {
+        return packagesOrded[i];
+      }
+    }
+    return null;
   }
 
   public static int getAptoideVersion() {
@@ -77,5 +95,9 @@ public class WalletUtils {
 
   public static Activity getActivity() {
     return context.get();
+  }
+
+  public static String getBillingServicePackageName() {
+    return billingPackageName;
   }
 }

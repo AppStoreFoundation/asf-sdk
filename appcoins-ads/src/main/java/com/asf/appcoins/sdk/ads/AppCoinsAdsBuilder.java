@@ -24,9 +24,6 @@ public final class AppCoinsAdsBuilder {
   }
 
   public AppCoinsAds createAdvertisementSdk(Context context) {
-    if (this.poaConnector == null) {
-      this.poaConnector = new PoAServiceConnectorImpl(null);
-    }
 
     if (country == null) {
       country = context.getResources()
@@ -38,6 +35,10 @@ public final class AppCoinsAdsBuilder {
       networkId = NETWORK_ROPSTEN;
     } else {
       networkId = NETWORK_MAIN;
+    }
+
+    if (this.poaConnector == null) {
+      this.poaConnector = new PoAServiceConnectorImpl(null,networkId);
     }
 
     return new AppCoinsAdsImpl(poaConnector, networkId);
