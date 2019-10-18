@@ -15,6 +15,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -56,6 +57,7 @@ public class DialogWalletInstall extends Dialog {
   private ImageView dialog_wallet_install_image_icon;
   private ImageView dialog_wallet_install_image_graphic;
   private int RESULT_USER_CANCELED = 1;
+  private int MINIMUM_APTOIDE_VERSION = 9908;
 
   private final String URL_APTOIDE = "market://details?id="
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
@@ -201,9 +203,8 @@ public class DialogWalletInstall extends Dialog {
   }
 
   private Intent buildStoreViewIntent(String action) {
-
     final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(action));
-    if (WalletUtils.hasAptoideInstalled()) {
+    if (WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION) {
       appStoreIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
     return appStoreIntent;

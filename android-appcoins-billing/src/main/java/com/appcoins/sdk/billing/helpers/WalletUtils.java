@@ -2,7 +2,11 @@ package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.util.Log;
 import android.content.pm.ResolveInfo;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
@@ -11,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WalletUtils {
+
+  public static final int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
 
   public static WeakReference<Activity> context;
   public static Activity activity;
@@ -52,15 +58,27 @@ public class WalletUtils {
     return null;
   }
 
-  public static boolean hasAptoideInstalled() {
+  public static int getAptoideVersion() {
 
-    PackageManager packageManager = context.get()
-        .getPackageManager();
+    final PackageInfo pInfo;
+    int versionCode = UNINSTALLED_APTOIDE_VERSION_CODE;
+
     try {
-      return packageManager.getApplicationInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0).enabled;
+      pInfo = context.get()
+          .getPackageManager()
+          .getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0);
+
+      //VersionCode is deprecated for api 28
+      if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        versionCode = (int) pInfo.getLongVersionCode();
+      } else {
+        //noinspection deprecation
+        versionCode = pInfo.versionCode;
+      }
     } catch (PackageManager.NameNotFoundException e) {
-      return false;
+      e.printStackTrace();
     }
+    return versionCode;
   }
 
   public static void promptToInstallWallet() {
