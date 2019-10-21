@@ -38,7 +38,7 @@ android {
       buildConfigField "String", "ADVERTISEMENT_BIND_ACTION",
           "\"" + project.APPCOINS_ADVERTISEMENT_BIND + "\""
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
-          project.APTOIDE_PACKAGE_NAME
+          project.APTOIDE_PACKAGE_NAME_DEV
       buildConfigField 'String', 'SERVICE_BIND_LIST',
           "\"" + project.APTOIDE_PACKAGE_NAME.replace('\"', '') +
               "," +
