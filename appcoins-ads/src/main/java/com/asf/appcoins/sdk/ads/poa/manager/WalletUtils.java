@@ -7,19 +7,27 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
-import com.asf.appcoins.sdk.ads.R;
+import java.util.List;
+import java.util.ArrayList;
+
 
 public class WalletUtils {
 
   private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
 
   private static int POA_NOTIFICATION_ID = 0;
+
+  private static int MINIMUM_APTOIDE_VERSION = 9908;
+
+  private static int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
 
   private static String URL_INTENT_INSTALL =
       "market://details?id=com.appcoins.wallet&utm_source=appcoinssdk&app_source=";
@@ -32,32 +40,70 @@ public class WalletUtils {
 
   private static boolean hasPopup;
 
+  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE =
+      "poa_wallet_not_installed_notification_title";
+  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY =
+      "poa_wallet_not_installed_notification_body";
+
   public static Context context;
+
+  public static String billingPackageName;
 
   public static void setContext(Context cont) {
     context = cont;
   }
 
-  public static boolean hasAptoideInstalled() {
-    PackageManager packageManager = context.getPackageManager();
+  public static boolean hasWalletInstalled() {
+    ArrayList <String> intentServicesResponse = new ArrayList<String>();
+    Intent serviceIntent = new Intent(BuildConfig.ADVERTISEMENT_BIND_ACTION);
 
-    try {
-      packageManager.getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0);
-      return true;
-    } catch (PackageManager.NameNotFoundException e) {
-      return false;
+    List<ResolveInfo> intentServices = context
+        .getPackageManager()
+        .queryIntentServices(serviceIntent, 0);
+
+    if (intentServices.size() > 0 && intentServices != null) {
+      for (ResolveInfo intentService : intentServices) {
+        intentServicesResponse.add(intentService.serviceInfo.packageName);
+      }
+      billingPackageName = chooseServiceToBind(intentServicesResponse);
     }
+    return billingPackageName != null;
   }
 
-  public static boolean hasWalletInstalled() {
-    PackageManager packageManager = context.getPackageManager();
+  private static String chooseServiceToBind(ArrayList packageNameServices) {
+    String[] packagesOrded = BuildConfig.SERVICE_BIND_LIST.split(",");
+    for (int i = 0; i < packagesOrded.length; i++) {
+      if (packageNameServices.contains(packagesOrded[i])) {
+        return packagesOrded[i];
+      }
+    }
+    return null;
+  }
+
+  public static String getBillingServicePackageName() {
+    return billingPackageName;
+  }
+
+  public static int getAptoideVersion() {
+
+    final PackageInfo pInfo;
+    int versionCode = UNINSTALLED_APTOIDE_VERSION_CODE;
 
     try {
-      packageManager.getPackageInfo(BuildConfig.BDS_WALLET_PACKAGE_NAME, 0);
-      return true;
+      pInfo = context.getPackageManager()
+          .getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0);
+
+      //VersionCode is deprecated for api 28
+      if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        versionCode = (int) pInfo.getLongVersionCode();
+      } else {
+        //noinspection deprecation
+        versionCode = pInfo.versionCode;
+      }
     } catch (PackageManager.NameNotFoundException e) {
-      return false;
+      e.printStackTrace();
     }
+    return versionCode;
   }
 
   public static void removeNotification() {
@@ -93,17 +139,15 @@ public class WalletUtils {
       notificationManager.notify(0,
           buildNotification(Integer.toString(POA_NOTIFICATION_ID), intent));
     } else {
-      Notification notificationHeadsUp =
-          buildNotificationOlderVersion(intent);
+      Notification notificationHeadsUp = buildNotificationOlderVersion(intent);
       notificationManager.notify(POA_NOTIFICATION_ID, notificationHeadsUp);
     }
   }
 
   private static Intent getNotificationIntent() {
     String url = URL_INTENT_INSTALL;
-    boolean hasAptoide = hasAptoideInstalled();
 
-    if (hasAptoide) {
+    if (WalletUtils.getAptoideVersion() != UNINSTALLED_APTOIDE_VERSION_CODE) {
       url += URL_APTOIDE_PARAMETERS + context.getPackageName();
     }
 
@@ -111,7 +155,7 @@ public class WalletUtils {
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-    if (hasAptoide) {
+    if (WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION) {
       intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
 
@@ -147,11 +191,17 @@ public class WalletUtils {
     builder = new Notification.Builder(context, channelId);
     builder.setContentIntent(pendingIntent);
     try {
+      Resources resources = context.getResources();
+      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE, "string",
+          context.getPackageName());
+      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY, "string",
+          context.getPackageName());
+
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
           .setAutoCancel(true)
-          .setContentTitle(context.getString(R.string.poa_wallet_not_installed_notification_title))
-          .setContentText(context.getString(R.string.poa_wallet_not_installed_notification_body));
+          .setContentTitle(context.getString(titleId))
+          .setContentText(context.getString(bodyId));
     } catch (NullPointerException e) {
       e.printStackTrace();
     }
@@ -169,11 +219,17 @@ public class WalletUtils {
     builder.setVibrate(new long[0]);
 
     try {
+      Resources resources = context.getResources();
+      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE, "string",
+          context.getPackageName());
+      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY, "string",
+          context.getPackageName());
+
       builder.setSmallIcon(intent.getExtras()
           .getInt("identifier"))
           .setAutoCancel(true)
-          .setContentTitle(context.getString(R.string.poa_wallet_not_installed_notification_title))
-          .setContentText(context.getString(R.string.poa_wallet_not_installed_notification_body));
+          .setContentTitle(context.getString(titleId))
+          .setContentText(context.getString(bodyId));
     } catch (NullPointerException e) {
       e.printStackTrace();
     }

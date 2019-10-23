@@ -43,5 +43,4 @@ ver.jackson = "2.9.5"
 // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
 ver.retrofit2 = "2.4.0"
 
-ver.tray = "0.12.0"
 ver.reactivenetwork_rx2 = "0.12.3"

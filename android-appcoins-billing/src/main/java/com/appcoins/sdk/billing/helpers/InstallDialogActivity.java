@@ -6,16 +6,17 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.util.Log;
-import com.appcoins.sdk.android.billing.R;
 import com.appcoins.sdk.billing.ConnectToWalletBillingService;
 
 public class InstallDialogActivity extends Activity {
 
+  public static String INSTALL_DIALOG_ACTIVITY =  "install_dialog_activity";
   private int RESULT_USER_CANCELED = 1;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.install_dialog_activity);
+    setContentView(this.getResources()
+       .getIdentifier(INSTALL_DIALOG_ACTIVITY, "layout", this.getPackageName()));
     WalletUtils.setDialogActivity(this);
     WalletUtils.promptToInstallWallet();
   }

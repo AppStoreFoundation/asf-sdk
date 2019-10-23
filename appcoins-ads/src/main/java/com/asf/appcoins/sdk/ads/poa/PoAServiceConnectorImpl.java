@@ -8,8 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -17,11 +16,13 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.text.TextUtils;
 import android.util.Log;
+import com.asf.appcoins.sdk.ads.BuildConfig;
+import com.asf.appcoins.sdk.ads.WalletPoAServiceListenner;
+import com.asf.appcoins.sdk.ads.poa.manager.WalletUtils;
 import java.util.ArrayList;
-import java.util.List;
-import net.grandcentrix.tray.AppPreferences;
+
+import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 
 public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
@@ -43,6 +44,9 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   private Messenger clientMessenger = null;
   /** Lists of messages that are pending to be send */
   private ArrayList<Message> pendingMsgsList = new ArrayList<>();
+  private WalletPoAServiceListenner walletPoAServiceListenner;
+  private int networkId;
+
   /**
    * Class for interacting with the main interface of the service.
    */
@@ -50,7 +54,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     @Override public void onServiceConnected(ComponentName className, IBinder service) {
       serviceMessenger = new Messenger(service);
       isBound = true;
-
+      walletPoAServiceListenner.isConnected();
       // send the pending messages that may have been added to the list before the bind was complete
       sendPendingMessages();
     }
@@ -66,73 +70,63 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
   /**
    * The constructor for the connector implementation.
    */
-  public PoAServiceConnectorImpl(ArrayList<MessageListener> listeners) {
+  public PoAServiceConnectorImpl(ArrayList<MessageListener> listeners, int networkId) {
     handlerThread = new HandlerThread("HandlerThread");
     handlerThread.start();
     handler = new IncomingHandler(handlerThread, listeners);
     clientMessenger = new Messenger(handler);
+    this.networkId = networkId;
   }
 
-  /**
-   * Method to send implicit broadcast of the given intent. This method will check which packages
-   * are ready to receive the broadcasts for the given intent and then send a explicit broadcast.
-   *
-   * @param context The application context
-   * @param intent The intent to broadcast
-   */
-  private static void sendImplicitBroadcast(Context context, Intent intent) {
-    PackageManager pm = context.getPackageManager();
-    List<ResolveInfo> matches = pm.queryBroadcastReceivers(intent, 0);
+  @Override public void registerCampaign(Context context, String campaignId)
+      throws RemoteException {
+    Bundle bundle = new Bundle();
+    bundle.putString("packageName", context.getPackageName());
+    bundle.putString("campaignId", campaignId);
 
-    for (ResolveInfo resolveInfo : matches) {
-      Intent explicit = new Intent(intent);
-      ComponentName cn = new ComponentName(resolveInfo.activityInfo.applicationInfo.packageName,
-          resolveInfo.activityInfo.name);
-
-      explicit.setComponent(cn);
-      context.sendBroadcast(explicit);
-    }
+    Message msg = Message.obtain(null, MSG_REGISTER_CAMPAIGN, 0, 0);
+    msg.setData(bundle);
+    msg.replyTo = clientMessenger;
+    serviceMessenger.send(msg);
   }
 
-  @Override public void startHandshake(Context context, int networkId) {
-    Log.d(TAG, "Start handshake...");
+  @Override public boolean connectToService(Context context,
+      WalletPoAServiceListenner walletPoAServiceListenner) {
 
-    // send broadcast intent to start the handshake
-    Intent broadcastIntent = new Intent(ACTION_START_HANDSHAKE);
-    broadcastIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
-    broadcastIntent.putExtra(PARAM_APP_SERVICE_NAME, SDKPoAService.class.getName());
-    broadcastIntent.putExtra(PARAM_NETWORK_ID, networkId);
-    // We need to start the handshake with the implicit broadcast, instead of a generic one due to a
-    // 'ban' on the implicit broadcast when targeting Android 8.0 sdk (targetSdkVersion). Meaning
-    // that only explicit broadcast will work. For that reason we search for the packages that can
-    // listen to the intent that we intend to send and sent an explicit broadcast for it.
-    sendImplicitBroadcast(context, broadcastIntent);
-  }
-
-  @Override public boolean connectToService(Context context) {
-    if (isBound) {
-      return true;
-    }
-    // Note that this is an implicit Intent that must be defined in the Android Manifest.
-    final AppPreferences appPreferences =
-        new AppPreferences(context); // this Preference comes for free from the library
-    final String packageName = appPreferences.getString(PREFERENCE_WALLET_PCKG_NAME, null);
+    this.walletPoAServiceListenner = walletPoAServiceListenner;
+    startWalletPoaService(context);
 
     boolean result = false;
-    if (!TextUtils.isEmpty(packageName)) {
-      Intent i = new Intent(ACTION_BIND);
-      i.setPackage(packageName);
+    Intent i = new Intent(ACTION_BIND);
+    i.setPackage(WalletUtils.getBillingServicePackageName());
 
-      result = context.getApplicationContext()
-          .bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+    result = context.getApplicationContext()
+        .bindService(i, mConnection, Context.BIND_AUTO_CREATE);
 
-      if (!result) {
-        context.getApplicationContext()
-            .unbindService(mConnection);
-      }
+    if (!result) {
+      context.getApplicationContext()
+          .unbindService(mConnection);
     }
-
     return result;
+  }
+
+  @Override public boolean isConnectionReady() {
+    return isBound;
+  }
+
+  public void startWalletPoaService(Context context) {
+    Intent serviceIntent = new Intent();
+    serviceIntent.setComponent(new ComponentName(WalletUtils.getBillingServicePackageName(),
+        BuildConfig.APPCOINS_POA_SERVICE_NAME));
+    serviceIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
+    serviceIntent.putExtra(PARAM_APP_SERVICE_NAME, SDKPoAService.class.getName());
+    serviceIntent.putExtra(PARAM_NETWORK_ID, networkId);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      context.startForegroundService(serviceIntent);
+    } else {
+      context.startService(serviceIntent);
+    }
   }
 
   @Override public void disconnectFromService(Context context) {
@@ -154,7 +148,6 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     synchronized (pendingMsgsList) {
       // validate if the service is bound
       if (!isBound) {
-        connectToService(context);
         pendingMsgsList.add(msg);
       } else {
         if (pendingMsgsList.isEmpty()) {

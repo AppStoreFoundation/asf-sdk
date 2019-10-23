@@ -6,9 +6,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.RemoteException;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.LifeCycleListener;
+import com.asf.appcoins.sdk.ads.WalletPoAServiceListenner;
 import com.asf.appcoins.sdk.ads.network.AppCoinsClient;
 import com.asf.appcoins.sdk.ads.network.QueryParams;
 import com.asf.appcoins.sdk.ads.network.listeners.CheckConnectivityResponseListener;
@@ -26,7 +28,6 @@ import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementRepository;
 import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementThreadGetCampaign;
 import com.asf.appcoins.sdk.ads.repository.ResponseCode;
 import java.math.BigInteger;
-import net.grandcentrix.tray.AppPreferences;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
@@ -42,7 +43,7 @@ import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PREFERENCE_WALLET
  */
 
 public class PoAManager implements LifeCycleListener.Listener, CheckConnectivityResponseListener,
-    GetCampaignResponseListener, DialogVisibleListener {
+    GetCampaignResponseListener, DialogVisibleListener, WalletPoAServiceListenner {
 
   public static final String TAG = PoAManager.class.getName();
   private static final String FINISHED_KEY = "finished";
@@ -182,8 +183,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     processing = false;
     proofsSent = 0;
     campaignId = null;
-    final AppPreferences appPreferences = new AppPreferences(appContext);
-    appPreferences.remove(PREFERENCE_WALLET_PCKG_NAME);
     poaConnector.disconnectFromService(appContext);
   }
 
@@ -203,11 +202,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
         Log.e(TAG, "Proof " + (proofsSent + 1) + " skipped! Came from background!");
       } else {
-        // Connection to service may already been done, but we still need to make sure that it is
-        // connected. In case no connection is not yet done, the message is stored to be sent as soon as
-        // the connection is done.
-        poaConnector.connectToService(appContext);
-        // send proof
         long timestamp = System.currentTimeMillis();
         Bundle bundle = new Bundle();
         bundle.putString("packageName", appContext.getPackageName());
@@ -257,8 +251,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
    */
   private void checkPreferencesForPackage() {
     if (!processing) {
-      final AppPreferences appPreferences = new AppPreferences(appContext);
-      if (foreground && appPreferences.contains(PREFERENCE_WALLET_PCKG_NAME)) {
+      if (foreground) {
         Log.d(TAG, "Starting PoA process");
         startProcess();
       } else {
@@ -275,7 +268,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     isWalletInstalled = WalletUtils.hasWalletInstalled();
     foreground = true;
 
-    if(isWalletInstalled){
+    if (isWalletInstalled) {
       WalletUtils.removeNotification();
     }
 
@@ -298,7 +291,7 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
   private void initiateProofSending() {
     if (proofsSent < BuildConfig.ADS_POA_NUMBER_OF_PROOFS) {
-      sendProof();
+      postponeSendProof();
     }
   }
 
@@ -371,13 +364,14 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
   private void startCampaign(Campaign campaign) {
     this.campaignId = campaign.getId();
-    Log.d(TAG, "Start Handshake");
     Log.d(TAG, "CampaignID:" + campaignId + " PackageName: " + appContext.getPackageName());
-    poaConnector.startHandshake(appContext, network);
-    checkPreferencesForPackage();
-    sendMSGRegisterCampaign(appContext.getPackageName(), campaign.getId()
-        .toString());
-    initiateProofSending();
+    if (poaConnector.isConnectionReady()) {
+      isConnected();
+    } else {
+      if (!poaConnector.connectToService(appContext, this)) {
+        Log.d(TAG, "No Service to be Binded");
+      }
+    }
   }
 
   private void promptWalletNotification() {
@@ -422,5 +416,19 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
 
   private boolean getSharedPreferencesBoolean(String key) {
     return preferences.getBoolean(key, false);
+  }
+
+  /*
+   * New listenner to be called when connection to WalletPoaService is succefully done.
+   */
+  @Override public void isConnected() {
+    try {
+      poaConnector.registerCampaign(appContext, campaignId.toString());
+      checkPreferencesForPackage();
+      sendMSGRegisterCampaign(appContext.getPackageName(), campaignId.toString());
+      initiateProofSending();
+    } catch (RemoteException e) {
+      e.printStackTrace();
+    }
   }
 }

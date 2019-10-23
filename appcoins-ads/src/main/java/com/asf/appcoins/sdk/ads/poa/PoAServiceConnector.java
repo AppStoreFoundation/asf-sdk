@@ -2,6 +2,8 @@ package com.asf.appcoins.sdk.ads.poa;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.RemoteException;
+import com.asf.appcoins.sdk.ads.WalletPoAServiceListenner;
 
 /**
  * Created by Joao Raimundo on 28/03/2018.
@@ -45,15 +47,6 @@ public interface PoAServiceConnector {
   String PARAM_NETWORK_ID = "PARAM_NETWORK_ID";
 
   /**
-   * Method that starts the handshake process, that obtains the wallet that is listening to our
-   * broadcast and that manages the PoA process.
-   *
-   * @param context The context where this connector is being used.
-   * @param networkId The id of the network in use.
-   */
-  void startHandshake(Context context, int networkId);
-
-  /**
    * Method to bind to the service on the received package name and listening to the for the given
    * action of the intent filter.
    *
@@ -61,7 +54,7 @@ public interface PoAServiceConnector {
    *
    * @retun true if the bind was successful, false otherwise.
    */
-  boolean connectToService(Context context);
+  boolean connectToService(Context context, WalletPoAServiceListenner walletPoAServiceListenner);
 
   /**
    * Method to unbind with the service that handles the PoA process.
@@ -79,4 +72,10 @@ public interface PoAServiceConnector {
    * @param content The package name where the service is located.
    */
   void sendMessage(Context context, int messageType, Bundle content);
+
+  void registerCampaign(Context context, String campaignId) throws RemoteException;
+
+  boolean isConnectionReady();
+
+
 }
