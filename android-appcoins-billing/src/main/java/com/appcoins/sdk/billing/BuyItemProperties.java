@@ -1,6 +1,8 @@
 package com.appcoins.sdk.billing;
 
-public class BuyItemProperties {
+import java.io.Serializable;
+
+public class BuyItemProperties implements Serializable {
 
   private int apiVersion;
   private String packageName;

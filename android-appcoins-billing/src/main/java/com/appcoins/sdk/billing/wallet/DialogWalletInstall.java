@@ -15,7 +15,6 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -25,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
-import com.appcoins.billing.sdk.R;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
 import com.appcoins.sdk.billing.helpers.Utils;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
@@ -46,8 +44,9 @@ public class DialogWalletInstall extends Dialog {
   private static String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
   private static String DIALOG_WALLET_INSTALL_EMPTY_IMAGE = "dialog_wallet_install_empty_image";
   private static String DIALOG_WALLET_INSTALL_TEXT_MESSAGE = "dialog_wallet_install_text_message";
-  private static String DIALOG_WALLET_INSTALL_BUTTON_DOWNLOAD = "dialog_wallet_install_button_download";
-  private static String DIALOG_WALLET_INSTALL_BUTTON_CANCEL= "dialog_wallet_install_button_cancel";
+  private static String DIALOG_WALLET_INSTALL_BUTTON_DOWNLOAD =
+      "dialog_wallet_install_button_download";
+  private static String DIALOG_WALLET_INSTALL_BUTTON_CANCEL = "dialog_wallet_install_button_cancel";
   private static String APP_WALLET_INSTALL_WALLET_FROM_IAB = "app_wallet_install_wallet_from_iab";
   private static String DIALOG_WALLET_INSTALL_HAS_IMAGE = "dialog_wallet_install_has_image";
 
@@ -115,8 +114,8 @@ public class DialogWalletInstall extends Dialog {
 
     hasImage = getContext().getResources()
         .getBoolean(appContext.getResources()
-            .getIdentifier(DIALOG_WALLET_INSTALL_HAS_IMAGE, "bool",
-                appContext.getPackageName())) && icon != null;
+            .getIdentifier(DIALOG_WALLET_INSTALL_HAS_IMAGE, "bool", appContext.getPackageName()))
+        && icon != null;
 
     if (hasImage) {
       dialog_wallet_install_image_icon.setVisibility(View.INVISIBLE);
@@ -164,18 +163,6 @@ public class DialogWalletInstall extends Dialog {
       @Override public void onClick(View v) {
         redirectToStore();
         DialogWalletInstall.this.dismiss();
-        if (appContext instanceof InstallDialogActivity) {
-          Bundle response = new Bundle();
-          response.putInt(Utils.RESPONSE_CODE, RESULT_USER_CANCELED);
-
-          Intent intent = new Intent();
-          intent.putExtras(response);
-
-          ((Activity) appContext).setResult(Activity.RESULT_CANCELED, intent);
-          ((Activity) appContext).finish();
-          ((Activity) appContext).setResult(Activity.RESULT_CANCELED, intent);
-          //((Activity) mContext).finish();
-        }
       }
     });
   }
@@ -199,6 +186,7 @@ public class DialogWalletInstall extends Dialog {
       }
     });
   }
+
 
   private void redirectToStore() {
     getContext().startActivity(buildStoreViewIntent(URL_APTOIDE));

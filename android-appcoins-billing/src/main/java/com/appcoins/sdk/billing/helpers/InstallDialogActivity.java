@@ -5,18 +5,26 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import com.appcoins.billing.sdk.R;
+import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.ConnectToWalletBillingService;
 
 public class InstallDialogActivity extends Activity {
 
-  public static String INSTALL_DIALOG_ACTIVITY =  "install_dialog_activity";
-  private int RESULT_USER_CANCELED = 1;
+  public final static String INSTALL_DIALOG_ACTIVITY = "install_dialog_activity";
+  public final static String KEY_BUY_INTENT = "BUY_INTENT";
+  public final static int REQUEST_CODE = 10001;
+  public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
+  public BuyItemProperties buyItemProperties;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
+    appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
+    buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
+        AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
     super.onCreate(savedInstanceState);
     setContentView(this.getResources()
-       .getIdentifier(INSTALL_DIALOG_ACTIVITY, "layout", this.getPackageName()));
+        .getIdentifier(INSTALL_DIALOG_ACTIVITY, "layout", this.getPackageName()));
     WalletUtils.setDialogActivity(this);
     WalletUtils.promptToInstallWallet();
   }
@@ -24,46 +32,34 @@ public class InstallDialogActivity extends Activity {
   @Override protected void onResume() {
     super.onResume();
     if (WalletUtils.hasWalletInstalled()) {
-      WalletUtils.appcoinsBillingStubHelper.createRepository(new ConnectToWalletBillingService() {
+      appcoinsBillingStubHelper.createRepository(new ConnectToWalletBillingService() {
         @Override public void isConnected() {
-          Bundle intent =WalletUtils.appcoinsBillingStubHelper.getBuyIntent(WalletUtils.buyItemProperties.getApiVersion(),WalletUtils.buyItemProperties.getPackageName()
-          ,WalletUtils.buyItemProperties.getSku(),WalletUtils.buyItemProperties.getType(),WalletUtils.buyItemProperties.getDeveloperPayload());
-
-          PendingIntent pendingIntent = (PendingIntent) intent.getParcelable("BUY_INTENT");
-          try {
-            startIntentSenderForResult(pendingIntent.getIntentSender(),
-                10001, new Intent(), 0, 0, 0);
-          } catch (IntentSender.SendIntentException e) {
-            e.printStackTrace();
-          }
+          makeTheStoredPurchase();
         }
       });
     }
   }
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    Log.d("Activity Result: ", "onActivityResult(" + requestCode + "," + resultCode + "," + data + ")");
-    if (data != null && data.getExtras() != null) {
-      Bundle bundle = data.getExtras();
-      if (bundle != null) {
-        for (String key : bundle.keySet()) {
-          Object value = bundle.get(key);
-          if (value != null) {
-            Log.d("Message Key", key);
-            Log.d("Message value", value.toString());
-          }
-        }
-      }
-      finishActivity();
+    finishActivity(resultCode, data);
+  }
+
+  public void makeTheStoredPurchase() {
+    Bundle intent = appcoinsBillingStubHelper.getBuyIntent(buyItemProperties.getApiVersion(),
+        buyItemProperties.getPackageName(), buyItemProperties.getSku(), buyItemProperties.getType(),
+        buyItemProperties.getDeveloperPayload());
+
+    PendingIntent pendingIntent = intent.getParcelable(KEY_BUY_INTENT);
+    try {
+      startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE, new Intent(), 0, 0,
+          0);
+    } catch (IntentSender.SendIntentException e) {
+      e.printStackTrace();
     }
   }
 
-  public void finishActivity() {
-    Bundle response = new Bundle();
-    response.putInt(Utils.RESPONSE_CODE, RESULT_USER_CANCELED);
-    Intent intent = new Intent();
-    intent.putExtras(response);
-    this.setResult(Activity.RESULT_CANCELED, intent);
+  private void finishActivity(int resultCode, Intent data) {
+    this.setResult(resultCode, data);
     this.finish();
   }
 }

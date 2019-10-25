@@ -4,13 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
-import android.util.Log;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import com.appcoins.billing.sdk.BuildConfig;
-import com.appcoins.sdk.android.billing.BuildConfig;
-import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -23,8 +19,6 @@ public class WalletUtils {
   public static WeakReference<Activity> context;
   public static Activity activity;
   public static String billingPackageName;
-  public static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
-  public static BuyItemProperties buyItemProperties;
 
   public static void setContext(Activity cont) {
     context = new WeakReference<>(cont);
@@ -32,10 +26,6 @@ public class WalletUtils {
 
   public static void setDialogActivity(Activity act) {
     activity = act;
-  }
-
-  public static void setAppcoinsBillingStubHelper(AppcoinsBillingStubHelper helper) {
-    appcoinsBillingStubHelper = helper;
   }
 
   public static boolean hasWalletInstalled() {

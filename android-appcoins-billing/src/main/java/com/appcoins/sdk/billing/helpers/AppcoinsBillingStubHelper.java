@@ -11,24 +11,28 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import com.appcoins.billing.AppcoinsBilling;
-import com.appcoins.sdk.android.billing.BuildConfig;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.ConnectToWalletBillingService;
-import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.WSServiceController;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AppcoinsBillingStubHelper implements AppcoinsBilling {
+public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
 
   private static AppcoinsBilling serviceAppcoinsBilling;
 
-  public AppcoinsBillingStubHelper() {
-    WalletUtils.setAppcoinsBillingStubHelper(this);
+  public final static String APPCOINS_BILLING_STUB_HELPER_INSTANCE = "appcoins_billing_stub_helper";
+  public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
+  private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
+
+  private AppcoinsBillingStubHelper() {
+    this.appcoinsBillingStubHelper = this;
   }
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
@@ -80,44 +84,14 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     SkuDetailsResult skuDetailsResult = AndroidBillingMapper.mapSkuDetailsFromWS(type, response);
     ArrayList<String> list = new ArrayList<>();
     for (SkuDetails skuDetails : skuDetailsResult.getSkuDetailsList()) {
-      list.add(map(skuDetails));
+      list.add(AndroidBillingMapper.mapSkuDetailsResponse(skuDetails));
     }
     return list;
   }
 
-  private String map(SkuDetails skuDetails) {
-    return "{\"productId\":\""
-        + skuDetails.getSku()
-        + "\",\"type\" : \""
-        + skuDetails.getType()
-        + "\",\"price\" : \""
-        + skuDetails.getPrice()
-        + "\",\"price_currency_code\": \""
-        + skuDetails.getPriceCurrencyCode()
-        + "\",\"price_amount_micros\": "
-        + skuDetails.getPriceAmountMicros()
-        + ",\"appc_price\" : \""
-        + skuDetails.getAppcPrice()
-        + "\",\"appc_price_currency_code\": \""
-        + skuDetails.getAppcPriceCurrencyCode()
-        + "\",\"appc_price_amount_micros\": "
-        + skuDetails.getAppcPriceAmountMicros()
-        + ",\"fiat_price\" : \""
-        + skuDetails.getFiatPrice()
-        + "\",\"fiat_price_currency_code\": \""
-        + skuDetails.getFiatPriceCurrencyCode()
-        + "\",\"fiat_price_amount_micros\": "
-        + skuDetails.getFiatPriceAmountMicros()
-        + ",\"title\" : \""
-        + skuDetails.getTitle()
-        + "\",\"description\" : \""
-        + skuDetails.getDescription()
-        + "\"}";
-  }
-
   @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
       String developerPayload) {
-     if (WalletUtils.hasWalletInstalled()) {
+    if (WalletUtils.hasWalletInstalled()) {
       try {
         return serviceAppcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type,
             developerPayload);
@@ -128,10 +102,13 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
         return response;
       }
     } else {
-      BuyItemProperties buyItemProperties = new BuyItemProperties(apiVersion,packageName,sku,type,
-          developerPayload);
-      WalletUtils.buyItemProperties = buyItemProperties;
+      BuyItemProperties buyItemProperties =
+          new BuyItemProperties(apiVersion, packageName, sku, type, developerPayload);
+
       Intent intent = new Intent(WalletUtils.context.get(), InstallDialogActivity.class);
+      intent.putExtra(APPCOINS_BILLING_STUB_HELPER_INSTANCE, this);
+      intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
+
       PendingIntent pendingIntent = PendingIntent.getActivity(WalletUtils.context.get(), 0, intent,
           PendingIntent.FLAG_UPDATE_CURRENT);
       Bundle response = new Bundle();
@@ -180,6 +157,10 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     return null;
   }
 
+  public void setServiceAppcoinsBillingConnection(){
+
+  }
+
   public boolean createRepository(
       final ConnectToWalletBillingService connectToWalletBillingService) {
 
@@ -211,11 +192,18 @@ public class AppcoinsBillingStubHelper implements AppcoinsBilling {
     }
   }
 
+  public static AppcoinsBillingStubHelper getInstance() {
+    if (appcoinsBillingStubHelper == null) {
+      appcoinsBillingStubHelper = new AppcoinsBillingStubHelper();
+    }
+    return appcoinsBillingStubHelper;
+  }
+
   public static abstract class Stub {
 
     public static AppcoinsBilling asInterface(IBinder service) {
       if (!WalletUtils.hasWalletInstalled()) {
-        return new AppcoinsBillingStubHelper();
+        return AppcoinsBillingStubHelper.getInstance();
       } else {
         return AppcoinsBilling.Stub.asInterface(service);
       }
