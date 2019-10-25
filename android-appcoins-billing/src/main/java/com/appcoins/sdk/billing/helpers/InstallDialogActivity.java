@@ -17,6 +17,8 @@ public class InstallDialogActivity extends Activity {
   public final static int REQUEST_CODE = 10001;
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
+  private View walletCreationCard;
+  private View walletCreationText;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
@@ -27,11 +29,19 @@ public class InstallDialogActivity extends Activity {
         .getIdentifier(INSTALL_DIALOG_ACTIVITY, "layout", this.getPackageName()));
     WalletUtils.setDialogActivity(this);
     WalletUtils.promptToInstallWallet();
+    setContentView(R.layout.activity_iab_wallet_creation);
+    walletCreationCard = findViewById(R.id.create_wallet_card);
+    walletCreationText = findViewById(R.id.create_wallet_text);
+    walletCreationCard.setVisibility(View.INVISIBLE);
+    walletCreationText.setVisibility(View.INVISIBLE);
   }
 
   @Override protected void onResume() {
     super.onResume();
     if (WalletUtils.hasWalletInstalled()) {
+      walletCreationCard.setVisibility(View.VISIBLE);
+      walletCreationText.setVisibility(View.VISIBLE);
+
       appcoinsBillingStubHelper.createRepository(new ConnectToWalletBillingService() {
         @Override public void isConnected() {
           makeTheStoredPurchase();
@@ -51,6 +61,9 @@ public class InstallDialogActivity extends Activity {
 
     PendingIntent pendingIntent = intent.getParcelable(KEY_BUY_INTENT);
     try {
+      walletCreationCard.setVisibility(View.INVISIBLE);
+      walletCreationText.setVisibility(View.INVISIBLE);
+
       startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE, new Intent(), 0, 0,
           0);
     } catch (IntentSender.SendIntentException e) {
