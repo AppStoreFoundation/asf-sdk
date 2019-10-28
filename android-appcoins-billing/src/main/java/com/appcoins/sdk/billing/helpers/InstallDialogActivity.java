@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import com.appcoins.billing.sdk.R;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.ConnectToWalletBillingService;
@@ -18,9 +19,10 @@ public class InstallDialogActivity extends Activity {
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
   private View walletCreationCard;
-  private View walletCreationText;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
+    getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
@@ -29,18 +31,15 @@ public class InstallDialogActivity extends Activity {
         .getIdentifier(INSTALL_DIALOG_ACTIVITY, "layout", this.getPackageName()));
     WalletUtils.setDialogActivity(this);
     WalletUtils.promptToInstallWallet();
-    setContentView(R.layout.activity_iab_wallet_creation);
+    setContentView(R.layout.loading_dialog_install);
     walletCreationCard = findViewById(R.id.create_wallet_card);
-    walletCreationText = findViewById(R.id.create_wallet_text);
     walletCreationCard.setVisibility(View.INVISIBLE);
-    walletCreationText.setVisibility(View.INVISIBLE);
   }
 
   @Override protected void onResume() {
     super.onResume();
     if (WalletUtils.hasWalletInstalled()) {
       walletCreationCard.setVisibility(View.VISIBLE);
-      walletCreationText.setVisibility(View.VISIBLE);
 
       appcoinsBillingStubHelper.createRepository(new ConnectToWalletBillingService() {
         @Override public void isConnected() {
@@ -62,7 +61,6 @@ public class InstallDialogActivity extends Activity {
     PendingIntent pendingIntent = intent.getParcelable(KEY_BUY_INTENT);
     try {
       walletCreationCard.setVisibility(View.INVISIBLE);
-      walletCreationText.setVisibility(View.INVISIBLE);
 
       startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE, new Intent(), 0, 0,
           0);
