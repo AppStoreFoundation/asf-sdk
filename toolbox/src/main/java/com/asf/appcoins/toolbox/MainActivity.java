@@ -57,8 +57,8 @@ public class MainActivity extends Activity {
         for (String key : bundle.keySet()) {
           Object value = bundle.get(key);
           if (value != null) {
-            Log.d(TAG, "Message Key" + key);
-            Log.d(TAG, "Message value" + value.toString());
+            Log.d(TAG, "Message Key: " + key);
+            Log.d(TAG, "Message value: " + value.toString());
           }
         }
       }

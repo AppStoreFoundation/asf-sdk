@@ -19,6 +19,7 @@ public class WalletUtils {
   public static WeakReference<Activity> context;
   public static Activity activity;
   public static String billingPackageName;
+  private static DialogWalletInstall dialogWalletInstall;
 
   public static void setContext(Activity cont) {
     context = new WeakReference<>(cont);
@@ -87,8 +88,12 @@ public class WalletUtils {
       return;
     }
 
-    DialogWalletInstall.with(activity)
-        .show();
+    dialogWalletInstall = DialogWalletInstall.with(activity);
+    dialogWalletInstall.show();
+  }
+
+  public static void dismissDialogWalletInstall(){
+    dialogWalletInstall.dismiss();
   }
 
   public static Activity getActivity() {

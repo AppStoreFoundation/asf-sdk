@@ -157,10 +157,6 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     return null;
   }
 
-  public void setServiceAppcoinsBillingConnection(){
-
-  }
-
   public boolean createRepository(
       final ConnectToWalletBillingService connectToWalletBillingService) {
 

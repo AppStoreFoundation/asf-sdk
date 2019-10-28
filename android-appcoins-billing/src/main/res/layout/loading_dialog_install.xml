@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/create_wallet_card"
+    android:id="@+id/loading_dialog_install"
     android:layout_width="296dp"
     android:layout_height="254dp"
     android:layout_gravity="center"

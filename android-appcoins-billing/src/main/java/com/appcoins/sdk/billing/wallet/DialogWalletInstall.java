@@ -162,7 +162,6 @@ public class DialogWalletInstall extends Dialog {
 
       @Override public void onClick(View v) {
         redirectToStore();
-        DialogWalletInstall.this.dismiss();
       }
     });
   }
