@@ -30,7 +30,7 @@ public class WalletUtils {
   private static int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
 
   private static String URL_INTENT_INSTALL =
-      "market://details?id=com.appcoins.wallet&utm_source=appcoinssdk&app_source=";
+      "market://details?id="+BuildConfig.BDS_WALLET_PACKAGE_NAME+"&utm_source=appcoinssdk&app_source=";
 
   private static String URL_APTOIDE_PARAMETERS = "&utm_source=appcoinssdk&app_source=";
 
@@ -146,8 +146,8 @@ public class WalletUtils {
 
   private static Intent getNotificationIntent() {
     String url = URL_INTENT_INSTALL;
-
-    if (WalletUtils.getAptoideVersion() != UNINSTALLED_APTOIDE_VERSION_CODE) {
+    int verCode = WalletUtils.getAptoideVersion();
+    if ( verCode != UNINSTALLED_APTOIDE_VERSION_CODE) {
       url += URL_APTOIDE_PARAMETERS + context.getPackageName();
     }
 
@@ -155,7 +155,7 @@ public class WalletUtils {
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-    if (WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION) {
+    if (verCode >= MINIMUM_APTOIDE_VERSION) {
       intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
 
