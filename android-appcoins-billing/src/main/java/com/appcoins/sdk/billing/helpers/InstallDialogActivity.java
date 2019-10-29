@@ -7,7 +7,7 @@ import android.content.IntentSender;
 import android.os.Bundle;
 import android.view.View;
 import com.appcoins.sdk.billing.BuyItemProperties;
-import com.appcoins.sdk.billing.ConnectToWalletBillingService;
+import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
 
 public class InstallDialogActivity extends Activity {
 
@@ -30,26 +30,28 @@ public class InstallDialogActivity extends Activity {
 
     WalletUtils.setDialogActivity(this);
     WalletUtils.promptToInstallWallet();
-
-    this.
-        setContentView(this.getResources()
-            .getIdentifier(LOADING_DIALOG_CARD, "layout", this.getPackageName()));
-    loadingDialogInstall = this.findViewById(this.getResources()
-        .getIdentifier(LOADING_DIALOG_CARD, "id", this.getPackageName()));
-    loadingDialogInstall.setVisibility(View.INVISIBLE);
   }
 
   @Override protected void onResume() {
     super.onResume();
     if (WalletUtils.hasWalletInstalled()) {
+      showLoadingDialog();
       loadingDialogInstall.setVisibility(View.VISIBLE);
       WalletUtils.dismissDialogWalletInstall();
-      appcoinsBillingStubHelper.createRepository(new ConnectToWalletBillingService() {
-        @Override public void isConnected() {
+      appcoinsBillingStubHelper.createRepository(new StartPurchaseAfterBindListener() {
+        @Override public void startPurchaseAfterBind() {
           makeTheStoredPurchase();
         }
       });
     }
+  }
+
+  private void showLoadingDialog() {
+    this.setContentView(this.getResources()
+        .getIdentifier(LOADING_DIALOG_CARD, "layout", this.getPackageName()));
+    loadingDialogInstall = this.findViewById(this.getResources()
+        .getIdentifier(LOADING_DIALOG_CARD, "id", this.getPackageName()));
+    loadingDialogInstall.setVisibility(View.VISIBLE);
   }
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {

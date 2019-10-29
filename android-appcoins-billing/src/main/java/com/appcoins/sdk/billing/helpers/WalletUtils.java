@@ -38,7 +38,7 @@ public class WalletUtils {
         .getPackageManager()
         .queryIntentServices(serviceIntent, 0);
 
-    if (intentServices.size() > 0 && intentServices != null) {
+    if (intentServices != null && intentServices.size() > 0) {
       for (ResolveInfo intentService : intentServices) {
         intentServicesResponse.add(intentService.serviceInfo.packageName);
       }
@@ -80,7 +80,7 @@ public class WalletUtils {
     return versionCode;
   }
 
-  public static void promptToInstallWallet() {
+  static void promptToInstallWallet() {
     final Activity act;
     act = context.get();
 
@@ -92,7 +92,7 @@ public class WalletUtils {
     dialogWalletInstall.show();
   }
 
-  public static void dismissDialogWalletInstall(){
+  static void dismissDialogWalletInstall(){
     dialogWalletInstall.dismiss();
   }
 
