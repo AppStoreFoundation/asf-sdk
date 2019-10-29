@@ -64,11 +64,8 @@ public class DialogWalletInstall extends Dialog {
       + getContext().getPackageName();
   private static Context appContext;
 
-  private static String packageName;
-
   public static DialogWalletInstall with(Context context) {
     appContext = context;
-    packageName = appContext.getPackageName();
     return new DialogWalletInstall(context);
   }
 
@@ -79,25 +76,26 @@ public class DialogWalletInstall extends Dialog {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    String packageName = appContext.getPackageName();
     Window window = getWindow();
 
     if (window != null) {
       window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-      requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-      setContentView(appContext.getResources()
-          .getIdentifier(DIALOG_INSTALL_DIALOG, "layout", packageName));
-      setCancelable(false);
-
-      buildTop();
-      buildMessage();
-      buildCancelButton();
-      buildDownloadButton();
     }
+
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+    setContentView(appContext.getResources()
+        .getIdentifier(DIALOG_INSTALL_DIALOG, "layout", packageName));
+    setCancelable(false);
+
+    buildTop(packageName);
+    buildMessage(packageName);
+    buildCancelButton(packageName);
+    buildDownloadButton(packageName);
   }
 
-  private void buildTop() {
+  private void buildTop(String packageName) {
     boolean hasImage;
     Drawable icon = null;
     try {
@@ -146,7 +144,7 @@ public class DialogWalletInstall extends Dialog {
     }
   }
 
-  private void buildMessage() {
+  private void buildMessage(String packageName) {
     dialog_wallet_install_text_message = findViewById(appContext.getResources()
         .getIdentifier(DIALOG_WALLET_INSTALL_TEXT_MESSAGE, "id", packageName));
 
@@ -161,7 +159,7 @@ public class DialogWalletInstall extends Dialog {
     dialog_wallet_install_text_message.setText(messageStylized);
   }
 
-  private void buildDownloadButton() {
+  private void buildDownloadButton(String packageName) {
     dialog_wallet_install_button_download = findViewById(appContext.getResources()
         .getIdentifier(DIALOG_WALLET_INSTALL_BUTTON_DOWNLOAD, "id", packageName));
     dialog_wallet_install_button_download.setOnClickListener(new View.OnClickListener() {
@@ -172,7 +170,7 @@ public class DialogWalletInstall extends Dialog {
     });
   }
 
-  private void buildCancelButton() {
+  private void buildCancelButton(String packageName) {
     dialog_wallet_install_button_cancel = findViewById(appContext.getResources()
         .getIdentifier(DIALOG_WALLET_INSTALL_BUTTON_CANCEL, "id", packageName));
     dialog_wallet_install_button_cancel.setOnClickListener(new View.OnClickListener() {
