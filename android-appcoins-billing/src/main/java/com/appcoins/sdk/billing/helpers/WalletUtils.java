@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
-import android.util.Log;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
 import java.lang.ref.WeakReference;
@@ -21,6 +19,7 @@ public class WalletUtils {
   public static WeakReference<Activity> context;
   public static Activity activity;
   public static String billingPackageName;
+  private static DialogWalletInstall dialogWalletInstall;
 
   public static void setContext(Activity cont) {
     context = new WeakReference<>(cont);
@@ -39,7 +38,7 @@ public class WalletUtils {
         .getPackageManager()
         .queryIntentServices(serviceIntent, 0);
 
-    if (intentServices.size() > 0 && intentServices != null) {
+    if (intentServices != null && intentServices.size() > 0) {
       for (ResolveInfo intentService : intentServices) {
         intentServicesResponse.add(intentService.serviceInfo.packageName);
       }
@@ -81,7 +80,7 @@ public class WalletUtils {
     return versionCode;
   }
 
-  public static void promptToInstallWallet() {
+  static void promptToInstallWallet() {
     final Activity act;
     act = context.get();
 
@@ -89,8 +88,12 @@ public class WalletUtils {
       return;
     }
 
-    DialogWalletInstall.with(activity)
-        .show();
+    dialogWalletInstall = DialogWalletInstall.with(activity);
+    dialogWalletInstall.show();
+  }
+
+  static void dismissDialogWalletInstall(){
+    dialogWalletInstall.dismiss();
   }
 
   public static Activity getActivity() {

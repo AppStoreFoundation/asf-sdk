@@ -258,4 +258,34 @@ public class AndroidBillingMapper {
     return parentObject.getJSONObject("currency")
         .getString("code");
   }
+
+  public static String mapSkuDetailsResponse(SkuDetails skuDetails) {
+    return "{\"productId\":\""
+        + skuDetails.getSku()
+        + "\",\"type\" : \""
+        + skuDetails.getType()
+        + "\",\"price\" : \""
+        + skuDetails.getPrice()
+        + "\",\"price_currency_code\": \""
+        + skuDetails.getPriceCurrencyCode()
+        + "\",\"price_amount_micros\": "
+        + skuDetails.getPriceAmountMicros()
+        + ",\"appc_price\" : \""
+        + skuDetails.getAppcPrice()
+        + "\",\"appc_price_currency_code\": \""
+        + skuDetails.getAppcPriceCurrencyCode()
+        + "\",\"appc_price_amount_micros\": "
+        + skuDetails.getAppcPriceAmountMicros()
+        + ",\"fiat_price\" : \""
+        + skuDetails.getFiatPrice()
+        + "\",\"fiat_price_currency_code\": \""
+        + skuDetails.getFiatPriceCurrencyCode()
+        + "\",\"fiat_price_amount_micros\": "
+        + skuDetails.getFiatPriceAmountMicros()
+        + ",\"title\" : \""
+        + skuDetails.getTitle()
+        + "\",\"description\" : \""
+        + skuDetails.getDescription()
+        + "\"}";
+  }
 }
