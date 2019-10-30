@@ -15,6 +15,7 @@ public class InstallDialogActivity extends Activity {
   public final static String INSTALL_DIALOG_ACTIVITY = "install_dialog_activity";
   public final static String LOADING_DIALOG_CARD = "loading_dialog_install";
   public final static int REQUEST_CODE = 10001;
+  public final static int ERROR_RESULT_CODE = 6;
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
   private View loadingDialogInstall;
@@ -69,7 +70,7 @@ public class InstallDialogActivity extends Activity {
       startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE, new Intent(), 0, 0,
           0);
     } catch (IntentSender.SendIntentException e) {
-      e.printStackTrace();
+      finishActivity(ERROR_RESULT_CODE, new Intent());
     }
   }
 
