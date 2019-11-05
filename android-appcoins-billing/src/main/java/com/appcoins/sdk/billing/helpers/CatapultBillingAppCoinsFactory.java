@@ -5,13 +5,13 @@ import android.util.Base64;
 import com.appcoins.sdk.billing.AppCoinsBilling;
 import com.appcoins.sdk.billing.AppcoinsBillingClient;
 import com.appcoins.sdk.billing.CatapultAppcoinsBilling;
-import com.appcoins.sdk.billing.PurchaseFinishedListener;
+import com.appcoins.sdk.billing.PurchasesUpdatedListener;
 import com.appcoins.sdk.billing.RepositoryServiceConnection;
 
 public class CatapultBillingAppCoinsFactory {
 
   public static AppcoinsBillingClient BuildAppcoinsBilling(Activity context, String base64PublicKey,
-      PurchaseFinishedListener purchaseFinishedListener) {
+      PurchasesUpdatedListener purchaseFinishedListener) {
 
     AppCoinsAndroidBillingRepository repository = new AppCoinsAndroidBillingRepository(3,
         context.getApplicationContext()

@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.util.Base64;
 import android.util.Log;
 import com.appcoins.sdk.billing.helpers.Utils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.json.JSONObject;
 
 public class ApplicationUtils {
@@ -13,22 +16,15 @@ public class ApplicationUtils {
   private static final String RESPONSE_INAPP_SIGNATURE = "INAPP_DATA_SIGNATURE";
   private static final String RESPONSE_INAPP_PURCHASE_ID = "INAPP_PURCHASE_ID";
 
-  // IAB Helper error codes
-  private static final int IABHELPER_VERIFICATION_FAILED = -1003;
-  private static final int IABHELPER_USER_CANCELLED = -1005;
-  private static final int IABHELPER_UNKNOWN_PURCHASE_RESPONSE = -1006;
-  private static final int IABHELPER_UNKNOWN_ERROR = -1008;
-  private static final int IABHELPER_BAD_RESPONSE = -1002;
-
   private final static String TAG = ApplicationUtils.class.getSimpleName();
 
   public static boolean handleActivityResult(Billing billing, int resultCode, Intent data,
-      PurchaseFinishedListener purchaseFinishedListener) {
+      PurchasesUpdatedListener purchaseFinishedListener) {
 
     if (data == null) {
       logError("Null data in IAB activity result.");
-      purchaseFinishedListener.onPurchaseFinished(IABHELPER_UNKNOWN_ERROR,
-          "Null data in IAB result", null, null);
+      purchaseFinishedListener.onPurchasesUpdated(ResponseCode.ERROR.getValue(),
+          Collections.<Purchase>emptyList());
       return false;
     }
 
@@ -46,8 +42,8 @@ public class ApplicationUtils {
         logError("BUG: either purchaseData or dataSignature is null.");
         logDebug("Extras: " + data.getExtras()
             .toString());
-        purchaseFinishedListener.onPurchaseFinished(IABHELPER_UNKNOWN_ERROR,
-            "IAB returned null purchaseData or dataSignature", null, null);
+        purchaseFinishedListener.onPurchasesUpdated(ResponseCode.ERROR.getValue(),
+            Collections.<Purchase>emptyList());
 
         return false;
       }
@@ -56,48 +52,48 @@ public class ApplicationUtils {
         JSONObject purchaseDataJSON = null;
         try {
           purchaseDataJSON = new JSONObject(purchaseData);
-          purchaseFinishedListener.onPurchaseFinished(responseCode,
-              "Purchase signature successfully verified.", getTokenFromJSON(purchaseDataJSON),
-              getSkuFromJSON(purchaseDataJSON));
+          Purchase purchase =
+              new Purchase(getObjectFromJson(purchaseDataJSON, "orderId"), "inapp", purchaseData,
+                  Base64.decode(dataSignature, Base64.DEFAULT),
+                  Long.parseLong(getObjectFromJson(purchaseDataJSON, "purchaseTime")),
+                  Integer.decode(getObjectFromJson(purchaseDataJSON, "purchaseState")),
+                  getObjectFromJson(purchaseDataJSON, "developerPayload"),
+                  getObjectFromJson(purchaseDataJSON, "purchaseToken"),
+                  getObjectFromJson(purchaseDataJSON, "packageName"),
+                  getObjectFromJson(purchaseDataJSON, "productId"),
+                  Boolean.parseBoolean(getObjectFromJson(purchaseDataJSON, "isAutoRenewing")));
+          List<Purchase> purchases = new ArrayList<>();
+          purchases.add(purchase);
+          purchaseFinishedListener.onPurchasesUpdated(responseCode, purchases);
         } catch (Exception e) {
           e.printStackTrace();
-          purchaseFinishedListener.onPurchaseFinished(IABHELPER_BAD_RESPONSE,
-              "Failed to parse purchase data.", null, null);
+          purchaseFinishedListener.onPurchasesUpdated(ResponseCode.ERROR.getValue(),
+              Collections.<Purchase>emptyList());
+          logError("Failed to parse purchase data.");
           return false;
         }
         return true;
       } else {
-        purchaseFinishedListener.onPurchaseFinished(IABHELPER_VERIFICATION_FAILED,
-            "Signature verification failed for sku:", null, null);
+        logError("Signature verification failed for sku:");
+        purchaseFinishedListener.onPurchasesUpdated(ResponseCode.ERROR.getValue(),
+            Collections.<Purchase>emptyList());
         return false;
       }
     } else if (resultCode == Activity.RESULT_OK) {
       // result code was OK, but in-app billing response was not OK.
       logDebug("Result code was OK but in-app billing response was not OK: " + getResponseDesc(
           responseCode));
-      purchaseFinishedListener.onPurchaseFinished(resultCode,
-          "Result code was OK but in-app billing response was not OK: " + getResponseDesc(
-              responseCode), null, null);
+      purchaseFinishedListener.onPurchasesUpdated(responseCode, Collections.<Purchase>emptyList());
     } else if (resultCode == Activity.RESULT_CANCELED) {
 
       logDebug("Purchase canceled - Response: " + getResponseDesc(responseCode));
-      purchaseFinishedListener.onPurchaseFinished(IABHELPER_USER_CANCELLED,
-          "Purchase canceled - Response: " + getResponseDesc(responseCode), null, null);
+      purchaseFinishedListener.onPurchasesUpdated(ResponseCode.USER_CANCELED.getValue(),
+          Collections.<Purchase>emptyList());
     } else {
       logError("Purchase failed. Result code: " + resultCode + ". Response: " + getResponseDesc(
           responseCode));
-      purchaseFinishedListener.onPurchaseFinished(IABHELPER_UNKNOWN_PURCHASE_RESPONSE,
-          "Purchase canceled - Response: " + getResponseDesc(responseCode), null, null);
-    }
-    return true;
-  }
-
-  private static boolean verifySignature(String signature, String purchaseData,
-      String dataSignature) {
-    if (!Security.verifyPurchase(Base64.decode(signature, Base64.DEFAULT), purchaseData,
-        Base64.decode(dataSignature, Base64.DEFAULT))) {
-      logError("Purchase signature verification FAILED");
-      return false;
+      purchaseFinishedListener.onPurchasesUpdated(ResponseCode.ERROR.getValue(),
+          Collections.<Purchase>emptyList());
     }
     return true;
   }
@@ -129,12 +125,8 @@ public class ApplicationUtils {
     Log.e(TAG, "In-app billing error: " + msg);
   }
 
-  private static String getTokenFromJSON(JSONObject data) {
-    return data.optString("purchaseToken");
-  }
-
-  private static String getSkuFromJSON(JSONObject data) {
-    return data.optString("productId");
+  private static String getObjectFromJson(JSONObject data, String objectId) {
+    return data.optString(objectId);
   }
 
   private static String getResponseDesc(int code) {

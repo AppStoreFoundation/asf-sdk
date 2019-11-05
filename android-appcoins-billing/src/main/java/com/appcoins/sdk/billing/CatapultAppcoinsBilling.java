@@ -13,10 +13,10 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
   private final Billing billing;
   private final RepositoryConnection connection;
-  private final PurchaseFinishedListener purchaseFinishedListener;
+  private final PurchasesUpdatedListener purchaseFinishedListener;
 
   public CatapultAppcoinsBilling(Billing billing, RepositoryConnection connection,
-      PurchaseFinishedListener purchaseFinishedListener) {
+      PurchasesUpdatedListener purchaseFinishedListener) {
     this.billing = billing;
     this.connection = connection;
     this.purchaseFinishedListener = purchaseFinishedListener;

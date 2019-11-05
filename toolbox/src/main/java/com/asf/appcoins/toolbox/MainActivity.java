@@ -11,8 +11,9 @@ import com.appcoins.sdk.billing.AppcoinsBillingClient;
 import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.ConsumeResponseListener;
 import com.appcoins.sdk.billing.Purchase;
-import com.appcoins.sdk.billing.PurchaseFinishedListener;
 import com.appcoins.sdk.billing.PurchasesResult;
+import com.appcoins.sdk.billing.PurchasesUpdatedListener;
+import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.SkuDetailsResponseListener;
@@ -31,11 +32,11 @@ public class MainActivity extends Activity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    PurchaseFinishedListener purchaseFinishedListener = (responseCode, message, token1, sku) -> {
-      if (responseCode == 0) {
-        token = token1;
-      } else {
-        Log.e(TAG, "onActivityResult: " + message);
+    PurchasesUpdatedListener purchaseFinishedListener = (responseCode, purchases) -> {
+      if (responseCode== ResponseCode.OK.getValue()) {
+        for (Purchase purchase : purchases) {
+          token = purchase.getToken();
+        }
       }
     };
     cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this, BuildConfig.IAB_KEY,
@@ -77,7 +78,7 @@ public class MainActivity extends Activity {
 
   public void onBuyGasButtonClicked(View arg0) {
     BillingFlowParams billingFlowParams =
-        new BillingFlowParams("gas", SkuType.inapp.toString(), null, null, null);
+        new BillingFlowParams("gas", SkuType.inapp.toString(), null, "cenas", null);
 
     Activity act = this;
     Thread t = new Thread(new Runnable() {
