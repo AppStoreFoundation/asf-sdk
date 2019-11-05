@@ -25,7 +25,7 @@ public class AppCoinsBilling implements Billing {
         String purchaseData = purchase.getOriginalJson();
         byte[] decodeSignature = purchase.getSignature();
 
-        if (!Security.verifyPurchase(base64DecodedPublicKey, purchaseData, decodeSignature)) {
+        if (!verifyPurchase(purchaseData, decodeSignature)) {
           invalidPurchase.add(purchase);
           return new PurchasesResult(Collections.emptyList(), ResponseCode.ERROR.getValue());
         }
@@ -40,6 +40,10 @@ public class AppCoinsBilling implements Billing {
       return new PurchasesResult(Collections.emptyList(),
           ResponseCode.SERVICE_UNAVAILABLE.getValue());
     }
+  }
+
+  public boolean verifyPurchase(String purchaseData, byte[] decodeSignature) {
+    return Security.verifyPurchase(base64DecodedPublicKey, purchaseData, decodeSignature);
   }
 
   @Override public void querySkuDetailsAsync(SkuDetailsParams skuDetailsParams,

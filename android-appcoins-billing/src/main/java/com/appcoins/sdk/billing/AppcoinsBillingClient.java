@@ -1,11 +1,7 @@
 package com.appcoins.sdk.billing;
 
 import android.app.Activity;
-import android.os.Bundle;
-import android.util.Log;
-import com.appcoins.sdk.billing.helpers.Utils;
-import com.appcoins.sdk.billing.helpers.WalletUtils;
-import java.util.ArrayList;
+import android.content.Intent;
 
 public interface AppcoinsBillingClient {
   PurchasesResult queryPurchases(String skuType);
@@ -22,4 +18,7 @@ public interface AppcoinsBillingClient {
   void endConnection();
 
   boolean isReady();
+
+  boolean onActivityResult(int requestCode, int resultCode, Intent data,
+      PurchaseFinishedListener listener);
 }

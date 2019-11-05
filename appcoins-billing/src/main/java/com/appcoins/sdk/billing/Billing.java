@@ -13,5 +13,7 @@ public interface Billing {
       throws ServiceConnectionException;
 
   boolean isReady();
+
+  boolean verifyPurchase(String purchaseData, byte[] decodeSignature);
 }
 

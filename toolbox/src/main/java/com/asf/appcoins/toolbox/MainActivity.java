@@ -11,6 +11,7 @@ import com.appcoins.sdk.billing.AppcoinsBillingClient;
 import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.ConsumeResponseListener;
 import com.appcoins.sdk.billing.Purchase;
+import com.appcoins.sdk.billing.PurchaseFinishedListener;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
@@ -51,6 +52,14 @@ public class MainActivity extends Activity {
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     Log.d(TAG,
         "Activity Result: onActivityResult(" + requestCode + "," + resultCode + "," + data + ")");
+    PurchaseFinishedListener purchaseFinishedListener = (responseCode, message, token1, sku) -> {
+      if (responseCode == 0) {
+        token = token1;
+      } else {
+        Log.e(TAG, "onActivityResult: " + message);
+      }
+    };
+    cab.onActivityResult(requestCode, resultCode, data, purchaseFinishedListener);
     if (data != null && data.getExtras() != null) {
       Bundle bundle = data.getExtras();
       if (bundle != null) {
@@ -67,7 +76,7 @@ public class MainActivity extends Activity {
 
   public void onBuyGasButtonClicked(View arg0) {
     BillingFlowParams billingFlowParams =
-        new BillingFlowParams("gas", SkuType.inapp.toString(), 10001, null, null, null);
+        new BillingFlowParams("gas", SkuType.inapp.toString(), null, null, null);
 
     Activity act = this;
     Thread t = new Thread(new Runnable() {
