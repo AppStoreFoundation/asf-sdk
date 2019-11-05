@@ -1,6 +1,7 @@
 package com.asf.appcoins.toolbox;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +22,7 @@ import com.appcoins.sdk.billing.helpers.CatapultBillingAppCoinsFactory;
 import com.appcoins.sdk.billing.types.SkuType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends Activity {
 
@@ -33,10 +35,17 @@ public class MainActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     PurchasesUpdatedListener purchaseFinishedListener = (responseCode, purchases) -> {
-      if (responseCode== ResponseCode.OK.getValue()) {
+      if (responseCode == ResponseCode.OK.getValue()) {
         for (Purchase purchase : purchases) {
           token = purchase.getToken();
         }
+      } else {
+        new AlertDialog.Builder(this).setMessage(
+            String.format(Locale.ENGLISH, "response code: %d -> %s", responseCode,
+                ResponseCode.values()[responseCode].name()))
+            .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+            .create()
+            .show();
       }
     };
     cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this, BuildConfig.IAB_KEY,
