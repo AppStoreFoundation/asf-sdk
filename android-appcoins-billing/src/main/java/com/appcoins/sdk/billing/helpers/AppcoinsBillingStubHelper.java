@@ -107,14 +107,14 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       BuyItemProperties buyItemProperties =
           new BuyItemProperties(apiVersion, packageName, sku, type, developerPayload);
 
-      Activity activity = WalletUtils.context.get();
+      Context context = WalletUtils.getContext();
 
-      Intent intent = new Intent(activity, InstallDialogActivity.class);
+      Intent intent = new Intent(context, InstallDialogActivity.class);
       intent.putExtra(APPCOINS_BILLING_STUB_HELPER_INSTANCE, this);
       intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
 
       PendingIntent pendingIntent =
-          PendingIntent.getActivity(activity, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+          PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
       Bundle response = new Bundle();
       response.putParcelable("BUY_INTENT", pendingIntent);
 
@@ -169,7 +169,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
     serviceIntent.setPackage(packageName);
 
-    final Context context = WalletUtils.getActivity();
+    final Context context = WalletUtils.getContext();
 
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);

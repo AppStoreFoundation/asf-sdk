@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
+import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
 
 public class InstallDialogActivity extends Activity {
 
@@ -19,6 +20,7 @@ public class InstallDialogActivity extends Activity {
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
   private View loadingDialogInstall;
+  private DialogWalletInstall dialog;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -28,9 +30,8 @@ public class InstallDialogActivity extends Activity {
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
-
-    WalletUtils.setDialogActivity(this);
-    WalletUtils.promptToInstallWallet();
+    dialog = DialogWalletInstall.with(this);
+    dialog.show();
   }
 
   @Override protected void onResume() {
@@ -38,7 +39,7 @@ public class InstallDialogActivity extends Activity {
     if (WalletUtils.hasWalletInstalled()) {
       showLoadingDialog();
       loadingDialogInstall.setVisibility(View.VISIBLE);
-      WalletUtils.dismissDialogWalletInstall();
+      dialog.dismiss();
       appcoinsBillingStubHelper.createRepository(new StartPurchaseAfterBindListener() {
         @Override public void startPurchaseAfterBind() {
           makeTheStoredPurchase();
