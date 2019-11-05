@@ -31,7 +31,15 @@ public class MainActivity extends Activity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this, BuildConfig.IAB_KEY);
+    PurchaseFinishedListener purchaseFinishedListener = (responseCode, message, token1, sku) -> {
+      if (responseCode == 0) {
+        token = token1;
+      } else {
+        Log.e(TAG, "onActivityResult: " + message);
+      }
+    };
+    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this, BuildConfig.IAB_KEY,
+        purchaseFinishedListener);
 
     listener = new AppCoinsBillingStateListener() {
       @Override public void onBillingSetupFinished(int responseCode) {
@@ -52,14 +60,7 @@ public class MainActivity extends Activity {
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     Log.d(TAG,
         "Activity Result: onActivityResult(" + requestCode + "," + resultCode + "," + data + ")");
-    PurchaseFinishedListener purchaseFinishedListener = (responseCode, message, token1, sku) -> {
-      if (responseCode == 0) {
-        token = token1;
-      } else {
-        Log.e(TAG, "onActivityResult: " + message);
-      }
-    };
-    cab.onActivityResult(requestCode, resultCode, data, purchaseFinishedListener);
+    cab.onActivityResult(requestCode, resultCode, data);
     if (data != null && data.getExtras() != null) {
       Bundle bundle = data.getExtras();
       if (bundle != null) {

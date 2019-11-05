@@ -13,10 +13,13 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
   private final Billing billing;
   private final RepositoryConnection connection;
+  private final PurchaseFinishedListener purchaseFinishedListener;
 
-  public CatapultAppcoinsBilling(Billing billing, RepositoryConnection connection) {
+  public CatapultAppcoinsBilling(Billing billing, RepositoryConnection connection,
+      PurchaseFinishedListener purchaseFinishedListener) {
     this.billing = billing;
     this.connection = connection;
+    this.purchaseFinishedListener = purchaseFinishedListener;
   }
 
   @Override public PurchasesResult queryPurchases(String skuType) {
@@ -85,10 +88,9 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
     return billing.isReady();
   }
 
-  @Override public boolean onActivityResult(int requestCode, int resultCode, Intent data,
-      PurchaseFinishedListener listener) {
+  @Override public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == REQUEST_CODE) {
-      ApplicationUtils.handleActivityResult(billing, resultCode, data, listener);
+      ApplicationUtils.handleActivityResult(billing, resultCode, data, purchaseFinishedListener);
       return true;
     }
     return false;

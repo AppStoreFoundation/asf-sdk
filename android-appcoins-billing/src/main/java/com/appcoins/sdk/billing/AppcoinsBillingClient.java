@@ -19,6 +19,5 @@ public interface AppcoinsBillingClient {
 
   boolean isReady();
 
-  boolean onActivityResult(int requestCode, int resultCode, Intent data,
-      PurchaseFinishedListener listener);
+  boolean onActivityResult(int requestCode, int resultCode, Intent data);
 }
