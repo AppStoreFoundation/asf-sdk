@@ -10,6 +10,7 @@ import android.graphics.Outline;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -45,8 +46,9 @@ public class DialogWalletInstall extends Dialog {
   private static String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
   private static String DIALOG_WALLET_INSTALL_EMPTY_IMAGE = "dialog_wallet_install_empty_image";
   private static String DIALOG_WALLET_INSTALL_TEXT_MESSAGE = "dialog_wallet_install_text_message";
-  private static String DIALOG_WALLET_INSTALL_BUTTON_DOWNLOAD = "dialog_wallet_install_button_download";
-  private static String DIALOG_WALLET_INSTALL_BUTTON_CANCEL= "dialog_wallet_install_button_cancel";
+  private static String DIALOG_WALLET_INSTALL_BUTTON_DOWNLOAD =
+      "dialog_wallet_install_button_download";
+  private static String DIALOG_WALLET_INSTALL_BUTTON_CANCEL = "dialog_wallet_install_button_cancel";
   private static String APP_WALLET_INSTALL_WALLET_FROM_IAB = "app_wallet_install_wallet_from_iab";
   private static String DIALOG_WALLET_INSTALL_HAS_IMAGE = "dialog_wallet_install_has_image";
 
@@ -104,17 +106,19 @@ public class DialogWalletInstall extends Dialog {
     dialog_wallet_install_image_graphic = findViewById(appContext.getResources()
         .getIdentifier(DIALOG_WALLET_INSTALL_IMAGE_GRAPHIC, "id", appContext.getPackageName()));
 
-    dialog_wallet_install_image_graphic.setOutlineProvider(new ViewOutlineProvider() {
-      @Override public void getOutline(View view, Outline outline) {
-        outline.setRoundRect(0, 0, view.getWidth(), (view.getHeight() + dp(12)), dp(12));
-        view.setClipToOutline(true);
-      }
-    });
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      dialog_wallet_install_image_graphic.setOutlineProvider(new ViewOutlineProvider() {
+        @Override public void getOutline(View view, Outline outline) {
+          outline.setRoundRect(0, 0, view.getWidth(), (view.getHeight() + dp(12)), dp(12));
+          view.setClipToOutline(true);
+        }
+      });
+    }
 
     hasImage = getContext().getResources()
         .getBoolean(appContext.getResources()
-            .getIdentifier(DIALOG_WALLET_INSTALL_HAS_IMAGE, "bool",
-                appContext.getPackageName())) && icon != null;
+            .getIdentifier(DIALOG_WALLET_INSTALL_HAS_IMAGE, "bool", appContext.getPackageName()))
+        && icon != null;
 
     if (hasImage) {
       dialog_wallet_install_image_icon.setVisibility(View.INVISIBLE);
