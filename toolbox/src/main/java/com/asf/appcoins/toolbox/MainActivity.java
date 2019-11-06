@@ -1,6 +1,7 @@
 package com.asf.appcoins.toolbox;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,8 @@ import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.ConsumeResponseListener;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
+import com.appcoins.sdk.billing.PurchasesUpdatedListener;
+import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.SkuDetailsResponseListener;
@@ -19,6 +22,7 @@ import com.appcoins.sdk.billing.helpers.CatapultBillingAppCoinsFactory;
 import com.appcoins.sdk.billing.types.SkuType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends Activity {
 
@@ -30,7 +34,22 @@ public class MainActivity extends Activity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this, BuildConfig.IAB_KEY);
+    PurchasesUpdatedListener purchaseFinishedListener = (responseCode, purchases) -> {
+      if (responseCode == ResponseCode.OK.getValue()) {
+        for (Purchase purchase : purchases) {
+          token = purchase.getToken();
+        }
+      } else {
+        new AlertDialog.Builder(this).setMessage(
+            String.format(Locale.ENGLISH, "response code: %d -> %s", responseCode,
+                ResponseCode.values()[responseCode].name()))
+            .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+            .create()
+            .show();
+      }
+    };
+    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this, BuildConfig.IAB_KEY,
+        purchaseFinishedListener);
 
     listener = new AppCoinsBillingStateListener() {
       @Override public void onBillingSetupFinished(int responseCode) {
@@ -51,6 +70,7 @@ public class MainActivity extends Activity {
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     Log.d(TAG,
         "Activity Result: onActivityResult(" + requestCode + "," + resultCode + "," + data + ")");
+    cab.onActivityResult(requestCode, resultCode, data);
     if (data != null && data.getExtras() != null) {
       Bundle bundle = data.getExtras();
       if (bundle != null) {
@@ -67,7 +87,7 @@ public class MainActivity extends Activity {
 
   public void onBuyGasButtonClicked(View arg0) {
     BillingFlowParams billingFlowParams =
-        new BillingFlowParams("gas", SkuType.inapp.toString(), 10001, null, null, null);
+        new BillingFlowParams("gas", SkuType.inapp.toString(), null, null, null);
 
     Activity act = this;
     Thread t = new Thread(new Runnable() {

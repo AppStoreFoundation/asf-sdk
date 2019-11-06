@@ -9,13 +9,17 @@ import com.appcoins.sdk.billing.helpers.EventLogger;
 import com.appcoins.sdk.billing.helpers.PayloadHelper;
 
 public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
+  private static final int REQUEST_CODE = 51;
 
   private final Billing billing;
   private final RepositoryConnection connection;
+  private final PurchasesUpdatedListener purchaseFinishedListener;
 
-  public CatapultAppcoinsBilling(Billing billing, RepositoryConnection connection) {
+  public CatapultAppcoinsBilling(Billing billing, RepositoryConnection connection,
+      PurchasesUpdatedListener purchaseFinishedListener) {
     this.billing = billing;
     this.connection = connection;
+    this.purchaseFinishedListener = purchaseFinishedListener;
   }
 
   @Override public PurchasesResult queryPurchases(String skuType) {
@@ -56,8 +60,8 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
       }
 
       PendingIntent pendingIntent = (PendingIntent) launchBillingFlowResult.getBuyIntent();
-      activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
-          billingFlowParams.getRequestCode(), new Intent(), 0, 0, 0);
+      activity.startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE,
+          new Intent(), 0, 0, 0);
     } catch (NullPointerException e) {
       return ResponseCode.ERROR.getValue();
     } catch (IntentSender.SendIntentException e) {
@@ -82,6 +86,14 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
 
   @Override public boolean isReady() {
     return billing.isReady();
+  }
+
+  @Override public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == REQUEST_CODE) {
+      ApplicationUtils.handleActivityResult(billing, resultCode, data, purchaseFinishedListener);
+      return true;
+    }
+    return false;
   }
 }
 
