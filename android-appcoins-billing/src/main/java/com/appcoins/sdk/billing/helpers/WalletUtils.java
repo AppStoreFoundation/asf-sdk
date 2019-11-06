@@ -1,14 +1,13 @@
 package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
 import com.appcoins.billing.sdk.BuildConfig;
-import com.appcoins.sdk.billing.wallet.DialogWalletInstall;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,17 +15,11 @@ public class WalletUtils {
 
   public static final int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
 
-  public static WeakReference<Activity> context;
-  public static Activity activity;
+  public static Context context;
   public static String billingPackageName;
-  private static DialogWalletInstall dialogWalletInstall;
 
-  public static void setContext(Activity cont) {
-    context = new WeakReference<>(cont);
-  }
-
-  public static void setDialogActivity(Activity act) {
-    activity = act;
+  public static void setContext(Context context) {
+    WalletUtils.context = context.getApplicationContext();
   }
 
   public static boolean hasWalletInstalled() {
@@ -34,7 +27,7 @@ public class WalletUtils {
     ArrayList intentServicesResponse = new ArrayList();
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
 
-    List<ResolveInfo> intentServices = context.get()
+    List<ResolveInfo> intentServices = context
         .getPackageManager()
         .queryIntentServices(serviceIntent, 0);
 
@@ -63,7 +56,7 @@ public class WalletUtils {
     int versionCode = UNINSTALLED_APTOIDE_VERSION_CODE;
 
     try {
-      pInfo = context.get()
+      pInfo = context
           .getPackageManager()
           .getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0);
 
@@ -80,24 +73,8 @@ public class WalletUtils {
     return versionCode;
   }
 
-  static void promptToInstallWallet() {
-    final Activity act;
-    act = context.get();
-
-    if (act == null) {
-      return;
-    }
-
-    dialogWalletInstall = DialogWalletInstall.with(activity);
-    dialogWalletInstall.show();
-  }
-
-  static void dismissDialogWalletInstall(){
-    dialogWalletInstall.dismiss();
-  }
-
-  public static Activity getActivity() {
-    return context.get();
+  public static Context getContext() {
+    return context;
   }
 
   public static String getBillingServicePackageName() {
