@@ -1,2 +1,2 @@
 For BDS SDK Documentation read:
-   [SDK Rewards integration](https://github.com/Aptoide/bds-sdk/wiki)
+   [SDK Rewards integration](https://docs.catappult.io/docs/native-user-acquisition)

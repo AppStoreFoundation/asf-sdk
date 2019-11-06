@@ -10,6 +10,7 @@ import android.graphics.Outline;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -111,12 +112,14 @@ public class DialogWalletInstall extends Dialog {
     dialog_wallet_install_image_graphic = findViewById(appContext.getResources()
         .getIdentifier(DIALOG_WALLET_INSTALL_IMAGE_GRAPHIC, "id", packageName));
 
-    dialog_wallet_install_image_graphic.setOutlineProvider(new ViewOutlineProvider() {
-      @Override public void getOutline(View view, Outline outline) {
-        outline.setRoundRect(0, 0, view.getWidth(), (view.getHeight() + dp(12)), dp(12));
-        view.setClipToOutline(true);
-      }
-    });
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      dialog_wallet_install_image_graphic.setOutlineProvider(new ViewOutlineProvider() {
+        @Override public void getOutline(View view, Outline outline) {
+          outline.setRoundRect(0, 0, view.getWidth(), (view.getHeight() + dp(12)), dp(12));
+          view.setClipToOutline(true);
+        }
+      });
+    }
 
     hasImage = getContext().getResources()
         .getBoolean(appContext.getResources()
