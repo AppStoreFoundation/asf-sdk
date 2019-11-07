@@ -19,6 +19,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.WalletPoAServiceListenner;
+import com.asf.appcoins.sdk.ads.poa.manager.WalletUtils;
 import java.util.ArrayList;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
@@ -97,7 +98,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
     boolean result = false;
     Intent i = new Intent(ACTION_BIND);
-    i.setPackage(BuildConfig.BDS_WALLET_PACKAGE_NAME);
+    i.setPackage(WalletUtils.getBillingServicePackageName());
 
     result = context.getApplicationContext()
         .bindService(i, mConnection, Context.BIND_AUTO_CREATE);
@@ -115,7 +116,7 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
 
   public void startWalletPoaService(Context context) {
     Intent serviceIntent = new Intent();
-    serviceIntent.setComponent(new ComponentName(BuildConfig.BDS_WALLET_PACKAGE_NAME,
+    serviceIntent.setComponent(new ComponentName(WalletUtils.getBillingServicePackageName(),
         BuildConfig.APPCOINS_POA_SERVICE_NAME));
     serviceIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
     serviceIntent.putExtra(PARAM_APP_SERVICE_NAME, SDKPoAService.class.getName());
