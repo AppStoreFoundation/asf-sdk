@@ -68,11 +68,21 @@ public class InstallDialogActivity extends Activity {
     PendingIntent pendingIntent = intent.getParcelable(KEY_BUY_INTENT);
     try {
       loadingDialogInstall.setVisibility(View.INVISIBLE);
-      startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE, new Intent(), 0, 0,
-          0);
+      if (pendingIntent != null) {
+        startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE, new Intent(), 0,
+            0, 0);
+      } else {
+        finishActivityWithError();
+      }
     } catch (IntentSender.SendIntentException e) {
-      finishActivity(ERROR_RESULT_CODE, new Intent());
+      finishActivityWithError();
     }
+  }
+
+  private void finishActivityWithError() {
+    Intent response = new Intent();
+    response.putExtra("RESPONSE_CODE", ERROR_RESULT_CODE);
+    finishActivity(ERROR_RESULT_CODE, response);
   }
 
   private void finishActivity(int resultCode, Intent data) {
