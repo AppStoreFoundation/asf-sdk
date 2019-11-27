@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -23,12 +22,17 @@ public class WalletUtils {
   }
 
   public static boolean hasWalletInstalled() {
+    if (billingPackageName == null) {
+      getPackageToBind();
+    }
+    return billingPackageName != null;
+  }
 
+  private static void getPackageToBind() {
     ArrayList intentServicesResponse = new ArrayList();
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
 
-    List<ResolveInfo> intentServices = context
-        .getPackageManager()
+    List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
 
     if (intentServices != null && intentServices.size() > 0) {
@@ -37,7 +41,6 @@ public class WalletUtils {
       }
       billingPackageName = chooseServiceToBind(intentServicesResponse);
     }
-    return billingPackageName != null;
   }
 
   private static String chooseServiceToBind(ArrayList packageNameServices) {
@@ -56,8 +59,7 @@ public class WalletUtils {
     int versionCode = UNINSTALLED_APTOIDE_VERSION_CODE;
 
     try {
-      pInfo = context
-          .getPackageManager()
+      pInfo = context.getPackageManager()
           .getPackageInfo(BuildConfig.APTOIDE_PACKAGE_NAME, 0);
 
       //VersionCode is deprecated for api 28
@@ -78,6 +80,9 @@ public class WalletUtils {
   }
 
   public static String getBillingServicePackageName() {
+    if (billingPackageName == null) {
+      getPackageToBind();
+    }
     return billingPackageName;
   }
 }
