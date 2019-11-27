@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -15,9 +16,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
-import java.util.List;
 import java.util.ArrayList;
-
+import java.util.List;
 
 public class WalletUtils {
 
@@ -29,8 +29,9 @@ public class WalletUtils {
 
   private static int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
 
-  private static String URL_INTENT_INSTALL =
-      "market://details?id="+BuildConfig.BDS_WALLET_PACKAGE_NAME+"&utm_source=appcoinssdk&app_source=";
+  private static String URL_INTENT_INSTALL = "market://details?id="
+      + BuildConfig.BDS_WALLET_PACKAGE_NAME
+      + "&utm_source=appcoinssdk&app_source=";
 
   private static String URL_APTOIDE_PARAMETERS = "&utm_source=appcoinssdk&app_source=";
 
@@ -45,6 +46,9 @@ public class WalletUtils {
   private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY =
       "poa_wallet_not_installed_notification_body";
 
+  private static final String URL_BROWSER = "https://play.google.com/store/apps/details?id="
+      + com.appcoins.billing.sdk.BuildConfig.BDS_WALLET_PACKAGE_NAME;
+
   public static Context context;
 
   public static String billingPackageName;
@@ -54,20 +58,25 @@ public class WalletUtils {
   }
 
   public static boolean hasWalletInstalled() {
-    ArrayList <String> intentServicesResponse = new ArrayList<String>();
-    Intent serviceIntent = new Intent(BuildConfig.ADVERTISEMENT_BIND_ACTION);
+    if (billingPackageName == null) {
+      getPackageToBind();
+    }
+    return billingPackageName != null;
+  }
 
-    List<ResolveInfo> intentServices = context
-        .getPackageManager()
+  private static void getPackageToBind() {
+    ArrayList intentServicesResponse = new ArrayList();
+    Intent serviceIntent = new Intent(com.appcoins.billing.sdk.BuildConfig.IAB_BIND_ACTION);
+
+    List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
 
-    if (intentServices.size() > 0 && intentServices != null) {
+    if (intentServices != null && intentServices.size() > 0) {
       for (ResolveInfo intentService : intentServices) {
         intentServicesResponse.add(intentService.serviceInfo.packageName);
       }
       billingPackageName = chooseServiceToBind(intentServicesResponse);
     }
-    return billingPackageName != null;
   }
 
   private static String chooseServiceToBind(ArrayList packageNameServices) {
@@ -81,6 +90,9 @@ public class WalletUtils {
   }
 
   public static String getBillingServicePackageName() {
+    if (billingPackageName == null) {
+      getPackageToBind();
+    }
     return billingPackageName;
   }
 
@@ -106,6 +118,11 @@ public class WalletUtils {
     return versionCode;
   }
 
+  private static boolean resolveActivityInfoForIntent(Intent intent) {
+    ActivityInfo activityInfo = intent.resolveActivityInfo(context.getPackageManager(), 0);
+    return activityInfo == null;
+  }
+
   public static void removeNotification() {
     if (hasPopup) {
       notificationManager.cancel(POA_NOTIFICATION_ID);
@@ -115,7 +132,14 @@ public class WalletUtils {
 
   public static void createInstallWalletNotification() {
 
-    Intent intent = getNotificationIntent();
+    Intent intent = getNotificationIntentForStore();
+
+    if (resolveActivityInfoForIntent(intent)) {
+      intent = getNotificationIntentForBrowser();
+      if (resolveActivityInfoForIntent(intent)) {
+        intent = null;
+      }
+    }
 
     if (intent == null) {
       return;
@@ -144,14 +168,22 @@ public class WalletUtils {
     }
   }
 
-  private static Intent getNotificationIntent() {
+  private static Intent getNotificationIntentForBrowser() {
+    Intent intent;
+    intent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_BROWSER));
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    return buildNotification(intent);
+  }
+
+  private static Intent getNotificationIntentForStore() {
+
     String url = URL_INTENT_INSTALL;
     int verCode = WalletUtils.getAptoideVersion();
-    if ( verCode != UNINSTALLED_APTOIDE_VERSION_CODE) {
+    if (verCode != UNINSTALLED_APTOIDE_VERSION_CODE) {
       url += URL_APTOIDE_PARAMETERS + context.getPackageName();
     }
 
-    Intent intent = null;
+    Intent intent;
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -159,6 +191,10 @@ public class WalletUtils {
       intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
 
+    return buildNotification(intent);
+  }
+
+  private static Intent buildNotification(Intent intent) {
     PackageManager packageManager = context.getPackageManager();
     ApplicationInfo applicationInfo = null;
     Resources resources = null;

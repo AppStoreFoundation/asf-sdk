@@ -2,8 +2,10 @@ package com.appcoins.sdk.billing.wallet;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Outline;
@@ -63,6 +65,10 @@ public class DialogWalletInstall extends Dialog {
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
       + "&utm_source=appcoinssdk&app_source="
       + getContext().getPackageName();
+
+  private final String URL_BROWSER =
+      "https://play.google.com/store/apps/details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
+
   private static Context appContext;
 
   public static DialogWalletInstall with(Context context) {
@@ -168,7 +174,15 @@ public class DialogWalletInstall extends Dialog {
     dialog_wallet_install_button_download.setOnClickListener(new View.OnClickListener() {
 
       @Override public void onClick(View v) {
-        redirectToStore();
+        Intent storeIntent = buildStoreViewIntent();
+        if (resolveActivityInfoForIntent(storeIntent)) {
+          getContext().startActivity(storeIntent);
+        } else {
+          Intent browserIntent = buildBrowserIntent();
+          if (resolveActivityInfoForIntent(browserIntent)) {
+            getContext().startActivity(browserIntent);
+          }
+        }
       }
     });
   }
@@ -193,12 +207,18 @@ public class DialogWalletInstall extends Dialog {
     });
   }
 
-  private void redirectToStore() {
-    getContext().startActivity(buildStoreViewIntent(URL_APTOIDE));
+  private boolean resolveActivityInfoForIntent(Intent intent) {
+      ActivityInfo activityInfo = intent.resolveActivityInfo(getContext().getPackageManager(), 0);
+    return activityInfo != null;
   }
 
-  private Intent buildStoreViewIntent(String action) {
-    final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(action));
+  private Intent buildBrowserIntent() {
+    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_BROWSER));
+    return browserIntent;
+  }
+
+  private Intent buildStoreViewIntent() {
+    final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_APTOIDE));
     if (WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION) {
       appStoreIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
