@@ -120,7 +120,7 @@ public class WalletUtils {
 
   private static boolean resolveActivityInfoForIntent(Intent intent) {
     ActivityInfo activityInfo = intent.resolveActivityInfo(context.getPackageManager(), 0);
-    return activityInfo != null;
+    return activityInfo == null;
   }
 
   public static void removeNotification() {
@@ -134,9 +134,9 @@ public class WalletUtils {
 
     Intent intent = getNotificationIntentForStore();
 
-    if (!resolveActivityInfoForIntent(intent)) {
+    if (resolveActivityInfoForIntent(intent)) {
       intent = getNotificationIntentForBrowser();
-      if (!resolveActivityInfoForIntent(intent)) {
+      if (resolveActivityInfoForIntent(intent)) {
         intent = null;
       }
     }
@@ -169,7 +169,7 @@ public class WalletUtils {
   }
 
   private static Intent getNotificationIntentForBrowser() {
-    Intent intent = null;
+    Intent intent;
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_BROWSER));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
     return buildNotification(intent);
@@ -183,7 +183,7 @@ public class WalletUtils {
       url += URL_APTOIDE_PARAMETERS + context.getPackageName();
     }
 
-    Intent intent = null;
+    Intent intent;
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
