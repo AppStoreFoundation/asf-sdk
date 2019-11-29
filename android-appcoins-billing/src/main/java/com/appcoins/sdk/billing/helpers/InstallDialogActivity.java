@@ -4,12 +4,13 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
 import android.util.TypedValue;
@@ -20,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
-import com.appcoins.billing.sdk.R;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
 
@@ -32,6 +32,12 @@ public class InstallDialogActivity extends Activity {
   public final static int ERROR_RESULT_CODE = 6;
   private final static int MINIMUM_APTOIDE_VERSION = 9908;
   private final static int RESULT_USER_CANCELED = 1;
+  private static String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
+  private static String DIALOG_WALLET_INSTALL_EMPTY_IMAGE = "dialog_wallet_install_empty_image";
+  private static Boolean hasImage = false;
+  private static String installButtonColor = "#ffffbb33";
+  private static String installButtonTextColor = "#ffffffff";
+
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
   private String URL_APTOIDE;
@@ -142,6 +148,8 @@ public class InstallDialogActivity extends Activity {
     Button skipButton = buildSkipButton(installButton, skipButtonText);
     backgroundLayout.addView(skipButton);
 
+    showAppRelatedImagery(appIcon, appBanner);
+
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
             RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -189,18 +197,17 @@ public class InstallDialogActivity extends Activity {
   }
 
   private Button buildInstallButton(CardView cardLayout, String installButtonText) {
-    int installButtonColor = Color.parseColor("#ffffbb33");
     Button installButton = new Button(this);
     installButton.setText(installButtonText);
     installButton.setTextSize(12);
-    installButton.setTextColor(Color.WHITE);
+    installButton.setTextColor(Color.parseColor(installButtonTextColor));
     installButton.setId(6);
     installButton.setGravity(Gravity.CENTER);
     installButton.setIncludeFontPadding(false);
     installButton.setPadding(0, 0, 0, 0);
 
     GradientDrawable installButtonDrawable = new GradientDrawable();
-    installButtonDrawable.setColor(installButtonColor);
+    installButtonDrawable.setColor(Color.parseColor(installButtonColor));
     installButtonDrawable.setCornerRadius(dpToPx(16));
     installButton.setBackground(installButtonDrawable);
 
@@ -239,18 +246,10 @@ public class InstallDialogActivity extends Activity {
   private ImageView buildAppIcon(CardView cardLayout) {
     ImageView appIcon = new ImageView(this);
     appIcon.setId(4);
-
-    GradientDrawable appIconDrawable = new GradientDrawable();
-    appIconDrawable.setColor(Color.WHITE);
-    appIconDrawable.setCornerRadius(dpToPx(6));
-    appIcon.setBackground(appIconDrawable);
-
     ViewCompat.setElevation(appIcon, 30);
     appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-    appIcon.setImageDrawable(
-        ContextCompat.getDrawable(this, R.drawable.dialog_wallet_install_icon));
     RelativeLayout.LayoutParams appIconParams =
-        new RelativeLayout.LayoutParams(dpToPx(56), dpToPx(56));
+        new RelativeLayout.LayoutParams(dpToPx(60), dpToPx(60));
     appIconParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
     appIconParams.addRule(RelativeLayout.ALIGN_TOP, cardLayout.getId());
     appIconParams.setMargins(0, dpToPx(88), 0, 0);
@@ -262,8 +261,6 @@ public class InstallDialogActivity extends Activity {
     ImageView appBanner = new ImageView(this);
     appBanner.setId(3);
     appBanner.setScaleType(ImageView.ScaleType.CENTER_CROP);
-    appBanner.setImageDrawable(
-        ContextCompat.getDrawable(this, R.drawable.dialog_wallet_install_graphic));
     RelativeLayout.LayoutParams appBannerParams =
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dpToPx(120));
     appBannerParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
@@ -302,5 +299,31 @@ public class InstallDialogActivity extends Activity {
       appStoreIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
     return appStoreIntent;
+  }
+
+  private void showAppRelatedImagery(ImageView appIcon, ImageView appBanner) {
+    String packageName = getPackageName();
+    Drawable icon = null;
+    try {
+      icon = this.getPackageManager()
+          .getApplicationIcon(packageName);
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
+
+    if (hasImage) {
+      appIcon.setVisibility(View.INVISIBLE);
+      int resourceId = this.getResources()
+          .getIdentifier(DIALOG_WALLET_INSTALL_GRAPHIC, "raw", packageName);
+      appBanner.setImageDrawable(this.getResources()
+          .getDrawable(resourceId));
+    } else {
+      appIcon.setVisibility(View.VISIBLE);
+      appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+      appIcon.setImageDrawable(icon);
+      int resourceId = this.getResources()
+          .getIdentifier(DIALOG_WALLET_INSTALL_EMPTY_IMAGE, "raw", packageName);
+      appBanner.setBackgroundResource(resourceId);
+    }
   }
 }
