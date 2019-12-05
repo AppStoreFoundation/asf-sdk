@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -13,6 +14,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -23,6 +28,9 @@ import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
+import java.util.Locale;
+
+import static android.graphics.Typeface.BOLD;
 
 public class InstallDialogActivity extends Activity {
 
@@ -32,6 +40,10 @@ public class InstallDialogActivity extends Activity {
   public final static int ERROR_RESULT_CODE = 6;
   private final static int MINIMUM_APTOIDE_VERSION = 9908;
   private final static int RESULT_USER_CANCELED = 1;
+  private static String dialogInstallationBody;
+  private static String installButtonText;
+  private static String skipButtonText;
+  private static String dialogHighlightString;
   private static String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
   private static String DIALOG_WALLET_INSTALL_EMPTY_IMAGE = "dialog_wallet_install_empty_image";
   private static Boolean hasImage = false;
@@ -54,7 +66,9 @@ public class InstallDialogActivity extends Activity {
         + "&utm_source=appcoinssdk&app_source="
         + this.getPackageName();
 
-    showInstallationDialog();
+    RelativeLayout installationDialog = setupInstallationDialog();
+
+    showInstallationDialog(installationDialog);
   }
 
   @Override protected void onResume() {
@@ -122,24 +136,21 @@ public class InstallDialogActivity extends Activity {
     this.finish();
   }
 
-  private void showInstallationDialog() {
-    String dialogInstallationBody =
-        "To get your reward in AppCoins, you need to install the AppCoins Wallet.";
-    String installButtonText = "INSTALL";
-    String skipButtonText = "SKIP";
+  private RelativeLayout setupInstallationDialog() {
+    int layoutOrientation = getLayoutOrientation();
 
     RelativeLayout backgroundLayout = buildBackground();
 
-    CardView cardLayout = buildCardView();
+    CardView cardLayout = buildCardView(layoutOrientation);
     backgroundLayout.addView(cardLayout);
 
     ImageView appBanner = buildAppBanner();
     cardLayout.addView(appBanner);
 
-    ImageView appIcon = buildAppIcon(cardLayout);
+    ImageView appIcon = buildAppIcon(layoutOrientation, cardLayout);
     backgroundLayout.addView(appIcon);
 
-    TextView dialogBody = buildDialogBody(appIcon, dialogInstallationBody);
+    TextView dialogBody = buildDialogBody(layoutOrientation, appIcon);
     backgroundLayout.addView(dialogBody);
 
     Button installButton = buildInstallButton(cardLayout, installButtonText);
@@ -150,10 +161,15 @@ public class InstallDialogActivity extends Activity {
 
     showAppRelatedImagery(appIcon, appBanner);
 
+    return backgroundLayout;
+  }
+
+  private void showInstallationDialog(RelativeLayout dialogLayout) {
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
             RelativeLayout.LayoutParams.MATCH_PARENT);
-    setContentView(backgroundLayout, layoutParams);
+
+    setContentView(dialogLayout, layoutParams);
   }
 
   private RelativeLayout buildBackground() {
@@ -171,7 +187,7 @@ public class InstallDialogActivity extends Activity {
     skipButton.setTextSize(12);
     skipButton.setTextColor(skipButtonColor);
     skipButton.setId(7);
-    skipButton.setGravity(Gravity.CENTER);
+    skipButton.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
     skipButton.setBackgroundColor(Color.TRANSPARENT);
     skipButton.setIncludeFontPadding(false);
     skipButton.setClickable(true);
@@ -225,34 +241,90 @@ public class InstallDialogActivity extends Activity {
     return installButton;
   }
 
-  private TextView buildDialogBody(ImageView appIcon, String dialogInstallationBody) {
+  private TextView buildDialogBody(int layoutOrientation, ImageView appIcon) {
+    setupTranslations();
     int dialogBodyColor = Color.parseColor("#4a4a4a");
     TextView dialogBody = new TextView(this);
     dialogBody.setId(5);
     dialogBody.setMaxLines(2);
-    dialogBody.setText(dialogInstallationBody);
     dialogBody.setTextColor(dialogBodyColor);
     dialogBody.setTextSize(16);
     dialogBody.setGravity(Gravity.CENTER_HORIZONTAL);
+    int dialogBodyWidth = RelativeLayout.LayoutParams.MATCH_PARENT;
+    int textMarginTop = dpToPx(20);
+    if (layoutOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+      dialogBodyWidth = dpToPx(384);
+      textMarginTop = dpToPx(10);
+    }
     RelativeLayout.LayoutParams bodyParams =
-        new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT);
+        new RelativeLayout.LayoutParams(dialogBodyWidth, RelativeLayout.LayoutParams.WRAP_CONTENT);
     bodyParams.addRule(RelativeLayout.BELOW, appIcon.getId());
-    bodyParams.setMargins(dpToPx(32), dpToPx(20), dpToPx(32), 0);
+    bodyParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+    bodyParams.setMargins(dpToPx(32), textMarginTop, dpToPx(32), 0);
     dialogBody.setLayoutParams(bodyParams);
+    formatDialogBody(dialogBody);
     return dialogBody;
   }
 
-  private ImageView buildAppIcon(CardView cardLayout) {
+  private void formatDialogBody(TextView dialogBody) {
+    SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialogInstallationBody);
+    messageStylized.setSpan(new StyleSpan(BOLD),
+        dialogInstallationBody.indexOf(dialogHighlightString),
+        dialogInstallationBody.indexOf("AppCoins") + dialogHighlightString.length(),
+        Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+    dialogBody.setText(messageStylized);
+  }
+
+  private void setupTranslations() {
+    switch (Locale.getDefault()
+        .getCountry()) {
+      case "por":
+        dialogInstallationBody = "Para completar a venda, você deve instalar AppCoins wallet";
+        installButtonText = "INSTALAR";
+        skipButtonText = "PULAR";
+        dialogHighlightString = "AppCoins wallet";
+        break;
+      case "spa":
+        dialogInstallationBody = "Para completar la venta, debe instalar AppCoins wallet";
+        installButtonText = "INSTALACIÓN";
+        skipButtonText = "OMITIR";
+        dialogHighlightString = "AppCoins wallet";
+        break;
+      case "deu":
+        dialogInstallationBody =
+            "Um den Verkauf abzuschließen, müssen Sie die AppCoins-Geldbörse installieren";
+        installButtonText = "INSTALLIEREN";
+        skipButtonText = "ÜBERSPRINGEN";
+        dialogHighlightString = "AppCoins-Geldbörse";
+        break;
+      default:
+        dialogInstallationBody =
+            "To complete your purchase, you have to install an AppCoins wallet";
+        installButtonText = "INSTALL";
+        skipButtonText = "SKIP";
+        dialogHighlightString = "AppCoins wallet";
+    }
+    Log.d("tag123", "Country: " + Locale.getDefault()
+        .getCountry()
+        .toLowerCase());
+  }
+
+  private ImageView buildAppIcon(int layoutOrientation, CardView cardView) {
     ImageView appIcon = new ImageView(this);
     appIcon.setId(4);
     ViewCompat.setElevation(appIcon, 30);
     appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    int appIconMarginTop = dpToPx(85);
+    int appIconSize = dpToPx(66);
+    if (layoutOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+      appIconMarginTop = dpToPx(80);
+      appIconSize = dpToPx(80);
+    }
     RelativeLayout.LayoutParams appIconParams =
-        new RelativeLayout.LayoutParams(dpToPx(60), dpToPx(60));
+        new RelativeLayout.LayoutParams(appIconSize, appIconSize);
     appIconParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-    appIconParams.addRule(RelativeLayout.ALIGN_TOP, cardLayout.getId());
-    appIconParams.setMargins(0, dpToPx(88), 0, 0);
+    appIconParams.addRule(RelativeLayout.ALIGN_TOP, cardView.getId());
+    appIconParams.setMargins(0, appIconMarginTop, 0, 0);
     appIcon.setLayoutParams(appIconParams);
     return appIcon;
   }
@@ -268,7 +340,7 @@ public class InstallDialogActivity extends Activity {
     return appBanner;
   }
 
-  private CardView buildCardView() {
+  private CardView buildCardView(int layoutOrientation) {
     CardView cardLayout = new CardView(this);
     cardLayout.setClipToPadding(false);
     cardLayout.setId(2);
@@ -276,9 +348,13 @@ public class InstallDialogActivity extends Activity {
     ViewCompat.setElevation(cardLayout, 0);
     cardLayout.setCardBackgroundColor(Color.WHITE);
     int cardLayoutMargins = dpToPx(12);
+    int cardWidth = RelativeLayout.LayoutParams.MATCH_PARENT;
+    if (layoutOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+      cardWidth = dpToPx(384);
+    }
     RelativeLayout.LayoutParams cardLayoutParams =
-        new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dpToPx(288));
-    cardLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+        new RelativeLayout.LayoutParams(cardWidth, dpToPx(288));
+    cardLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
     cardLayoutParams.setMargins(cardLayoutMargins, 0, cardLayoutMargins, 0);
     cardLayout.setLayoutParams(cardLayoutParams);
     return cardLayout;
@@ -325,5 +401,9 @@ public class InstallDialogActivity extends Activity {
           .getIdentifier(DIALOG_WALLET_INSTALL_EMPTY_IMAGE, "raw", packageName);
       appBanner.setBackgroundResource(resourceId);
     }
+  }
+
+  private int getLayoutOrientation() {
+    return getResources().getConfiguration().orientation;
   }
 }
