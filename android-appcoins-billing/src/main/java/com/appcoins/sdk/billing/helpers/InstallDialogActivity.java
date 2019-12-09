@@ -17,7 +17,6 @@ import android.support.v7.widget.CardView;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -38,6 +37,7 @@ public class InstallDialogActivity extends Activity {
   public final static String LOADING_DIALOG_CARD = "loading_dialog_install";
   public final static int REQUEST_CODE = 10001;
   public final static int ERROR_RESULT_CODE = 6;
+  private final static String TRANSLATIONS = "translations";
   private final static int MINIMUM_APTOIDE_VERSION = 9908;
   private final static int RESULT_USER_CANCELED = 1;
   private static String dialogInstallationBody;
@@ -54,6 +54,7 @@ public class InstallDialogActivity extends Activity {
   public BuyItemProperties buyItemProperties;
   private String URL_APTOIDE;
   private View loadingDialogInstall;
+  private TranslationsModel translationsModel;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -65,6 +66,10 @@ public class InstallDialogActivity extends Activity {
         + BuildConfig.BDS_WALLET_PACKAGE_NAME
         + "&utm_source=appcoinssdk&app_source="
         + this.getPackageName();
+
+    if (savedInstanceState != null) {
+      translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
+    }
 
     RelativeLayout installationDialog = setupInstallationDialog();
 
@@ -82,6 +87,11 @@ public class InstallDialogActivity extends Activity {
         }
       });
     }
+  }
+
+  @Override protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putSerializable(TRANSLATIONS, translationsModel);
   }
 
   @Override public void onBackPressed() {
@@ -262,51 +272,38 @@ public class InstallDialogActivity extends Activity {
     bodyParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
     bodyParams.setMargins(dpToPx(32), textMarginTop, dpToPx(32), 0);
     dialogBody.setLayoutParams(bodyParams);
-    formatDialogBody(dialogBody);
+    dialogBody.setText(setHighlightDialogBody());
     return dialogBody;
   }
 
-  private void formatDialogBody(TextView dialogBody) {
-    SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialogInstallationBody);
-    messageStylized.setSpan(new StyleSpan(BOLD),
-        dialogInstallationBody.indexOf(dialogHighlightString),
-        dialogInstallationBody.indexOf("AppCoins") + dialogHighlightString.length(),
+  private SpannableStringBuilder setHighlightDialogBody() {
+    String dialogBody = String.format(dialogInstallationBody, dialogHighlightString);
+    SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialogBody);
+    messageStylized.setSpan(new StyleSpan(BOLD), dialogBody.indexOf(dialogHighlightString),
+        dialogBody.indexOf(dialogHighlightString) + dialogHighlightString.length(),
         Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-    dialogBody.setText(messageStylized);
+    return messageStylized;
   }
 
   private void setupTranslations() {
-    switch (Locale.getDefault()
-        .getCountry()) {
-      case "por":
-        dialogInstallationBody = "Para completar a venda, você deve instalar AppCoins wallet";
-        installButtonText = "INSTALAR";
-        skipButtonText = "PULAR";
-        dialogHighlightString = "AppCoins wallet";
-        break;
-      case "spa":
-        dialogInstallationBody = "Para completar la venta, debe instalar AppCoins wallet";
-        installButtonText = "INSTALACIÓN";
-        skipButtonText = "OMITIR";
-        dialogHighlightString = "AppCoins wallet";
-        break;
-      case "deu":
-        dialogInstallationBody =
-            "Um den Verkauf abzuschließen, müssen Sie die AppCoins-Geldbörse installieren";
-        installButtonText = "INSTALLIEREN";
-        skipButtonText = "ÜBERSPRINGEN";
-        dialogHighlightString = "AppCoins-Geldbörse";
-        break;
-      default:
-        dialogInstallationBody =
-            "To complete your purchase, you have to install an AppCoins wallet";
-        installButtonText = "INSTALL";
-        skipButtonText = "SKIP";
-        dialogHighlightString = "AppCoins wallet";
+    Locale locale = Locale.getDefault();
+    if (translationsModel == null || !translationsModel.getLanguageCode()
+        .equalsIgnoreCase(locale.getLanguage()) || !translationsModel.getCountryCode()
+        .equalsIgnoreCase(locale.getCountry())) {
+      TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
+      translationsModel =
+          translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
+      setInstallationDialogText();
+    } else {
+      setInstallationDialogText();
     }
-    Log.d("tag123", "Country: " + Locale.getDefault()
-        .getCountry()
-        .toLowerCase());
+  }
+
+  private void setInstallationDialogText() {
+    dialogInstallationBody = translationsModel.getIabInstallationDialogString();
+    installButtonText = translationsModel.getInstallationButtonString();
+    skipButtonText = translationsModel.getSkipButtonString();
+    dialogHighlightString = translationsModel.getDialogStringHighlight();
   }
 
   private ImageView buildAppIcon(int layoutOrientation, CardView cardView) {
