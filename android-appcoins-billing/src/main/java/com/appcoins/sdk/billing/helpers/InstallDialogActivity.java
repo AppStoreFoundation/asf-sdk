@@ -390,14 +390,14 @@ public class InstallDialogActivity extends Activity {
 
     if (hasImage) {
       appIcon.setVisibility(View.INVISIBLE);
-      appBannerDrawable = fetchAppBannerDrawable(
-          "appcoins_wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_GRAPHIC + ".png");
+      appBannerDrawable = fetchAppGraphicDrawable(
+          "appcoins-wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_GRAPHIC + ".png");
     } else {
       appIcon.setVisibility(View.VISIBLE);
       appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
       appIcon.setImageDrawable(icon);
-      appBannerDrawable = fetchAppBannerDrawable(
-          "appcoins_wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_EMPTY_IMAGE + ".png");
+      appBannerDrawable = fetchAppGraphicDrawable(
+          "appcoins-wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_EMPTY_IMAGE + ".png");
     }
     appBanner.setImageDrawable(appBannerDrawable);
   }
@@ -405,7 +405,7 @@ public class InstallDialogActivity extends Activity {
   private boolean isAppBannerAvailable() {
     boolean hasImage;
     try {
-      hasImage = Arrays.asList(getAssets().list("appcoins_wallet/resources"))
+      hasImage = Arrays.asList(getAssets().list("appcoins-wallet/resources"))
           .contains(DIALOG_WALLET_INSTALL_GRAPHIC + ".png");
     } catch (IOException e) {
       e.printStackTrace();
@@ -414,7 +414,7 @@ public class InstallDialogActivity extends Activity {
     return hasImage;
   }
 
-  private Drawable fetchAppBannerDrawable(String path) {
+  private Drawable fetchAppGraphicDrawable(String path) {
     InputStream inputStream = null;
     try {
       inputStream = this.getResources()

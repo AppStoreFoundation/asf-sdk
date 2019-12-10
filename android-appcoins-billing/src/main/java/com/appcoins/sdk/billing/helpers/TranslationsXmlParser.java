@@ -28,9 +28,9 @@ public class TranslationsXmlParser {
     TranslationsModel translationsModel = new TranslationsModel(language, country);
     if (language.equalsIgnoreCase(country)) {
       translationXmlPath =
-          "appcoins_wallet/resources/translations/values-" + language + "/external_strings.xml";
+          "appcoins-wallet/resources/translations/values-" + language + "/external_strings.xml";
     } else {
-      translationXmlPath = "appcoins_wallet/resources/translations/values-"
+      translationXmlPath = "appcoins-wallet/resources/translations/values-"
           + language
           + "-r"
           + country.toUpperCase()
