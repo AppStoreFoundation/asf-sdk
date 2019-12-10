@@ -27,6 +27,9 @@ import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Locale;
 
 import static android.graphics.Typeface.BOLD;
@@ -40,16 +43,15 @@ public class InstallDialogActivity extends Activity {
   private final static String TRANSLATIONS = "translations";
   private final static int MINIMUM_APTOIDE_VERSION = 9908;
   private final static int RESULT_USER_CANCELED = 1;
+  private static final String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
+  private static final String DIALOG_WALLET_INSTALL_EMPTY_IMAGE =
+      "dialog_wallet_install_empty_image";
+  private static final String installButtonColor = "#ffffbb33";
+  private static final String installButtonTextColor = "#ffffffff";
   private static String dialogInstallationBody;
   private static String installButtonText;
   private static String skipButtonText;
   private static String dialogHighlightString;
-  private static String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
-  private static String DIALOG_WALLET_INSTALL_EMPTY_IMAGE = "dialog_wallet_install_empty_image";
-  private static Boolean hasImage = false;
-  private static String installButtonColor = "#ffffbb33";
-  private static String installButtonTextColor = "#ffffffff";
-
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
   private String URL_APTOIDE;
@@ -383,21 +385,45 @@ public class InstallDialogActivity extends Activity {
     } catch (PackageManager.NameNotFoundException e) {
       e.printStackTrace();
     }
+    boolean hasImage = isAppBannerAvailable();
+    Drawable appBannerDrawable;
 
     if (hasImage) {
       appIcon.setVisibility(View.INVISIBLE);
-      int resourceId = this.getResources()
-          .getIdentifier(DIALOG_WALLET_INSTALL_GRAPHIC, "raw", packageName);
-      appBanner.setImageDrawable(this.getResources()
-          .getDrawable(resourceId));
+      appBannerDrawable = fetchAppBannerDrawable(
+          "appcoins_wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_GRAPHIC + ".png");
     } else {
       appIcon.setVisibility(View.VISIBLE);
       appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
       appIcon.setImageDrawable(icon);
-      int resourceId = this.getResources()
-          .getIdentifier(DIALOG_WALLET_INSTALL_EMPTY_IMAGE, "raw", packageName);
-      appBanner.setBackgroundResource(resourceId);
+      appBannerDrawable = fetchAppBannerDrawable(
+          "appcoins_wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_EMPTY_IMAGE + ".png");
     }
+    appBanner.setImageDrawable(appBannerDrawable);
+  }
+
+  private boolean isAppBannerAvailable() {
+    boolean hasImage;
+    try {
+      hasImage = Arrays.asList(getAssets().list("appcoins_wallet/resources"))
+          .contains(DIALOG_WALLET_INSTALL_GRAPHIC + ".png");
+    } catch (IOException e) {
+      e.printStackTrace();
+      hasImage = false;
+    }
+    return hasImage;
+  }
+
+  private Drawable fetchAppBannerDrawable(String path) {
+    InputStream inputStream = null;
+    try {
+      inputStream = this.getResources()
+          .getAssets()
+          .open(path);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return Drawable.createFromStream(inputStream, null);
   }
 
   private int getLayoutOrientation() {

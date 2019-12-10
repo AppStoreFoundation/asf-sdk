@@ -27,10 +27,14 @@ public class TranslationsXmlParser {
     String translationXmlPath;
     TranslationsModel translationsModel = new TranslationsModel(language, country);
     if (language.equalsIgnoreCase(country)) {
-      translationXmlPath = "values-" + language + "/external_strings.xml";
-    } else {
       translationXmlPath =
-          "values-" + language + "-r" + country.toUpperCase() + "/external_strings.xml";
+          "appcoins_wallet/resources/translations/values-" + language + "/external_strings.xml";
+    } else {
+      translationXmlPath = "appcoins_wallet/resources/translations/values-"
+          + language
+          + "-r"
+          + country.toUpperCase()
+          + "/external_strings.xml";
     }
     try {
       InputStream inputStream = context.getAssets()
@@ -50,6 +54,7 @@ public class TranslationsXmlParser {
         eventType = parser.next();
       }
       translationsModel.mapStrings(xmlContent);
+      inputStream.close();
     } catch (XmlPullParserException e) {
       translationsModel.mapStrings(setDefaultValues());
       e.printStackTrace();
@@ -57,6 +62,7 @@ public class TranslationsXmlParser {
       translationsModel.mapStrings(setDefaultValues());
       e.printStackTrace();
     }
+
     return translationsModel;
   }
 
