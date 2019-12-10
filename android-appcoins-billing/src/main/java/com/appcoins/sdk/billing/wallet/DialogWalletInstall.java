@@ -1,9 +1,10 @@
 package com.appcoins.sdk.billing.wallet;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -52,6 +53,8 @@ public class DialogWalletInstall extends Dialog {
   private static String DIALOG_WALLET_INSTALL_BUTTON_CANCEL = "dialog_wallet_install_button_cancel";
   private static String APP_WALLET_INSTALL_WALLET_FROM_IAB = "app_wallet_install_wallet_from_iab";
   private static String DIALOG_WALLET_INSTALL_HAS_IMAGE = "dialog_wallet_install_has_image";
+  private static String DIALOG_NO_STORE_OR_BROWSER = "app_wallet_no_store_or_browser";
+  private static String APP_WALLET_SKIP = "app_wallet_skip";
 
   private Button dialog_wallet_install_button_cancel;
   private Button dialog_wallet_install_button_download;
@@ -181,6 +184,8 @@ public class DialogWalletInstall extends Dialog {
           Intent browserIntent = buildBrowserIntent();
           if (resolveActivityInfoForIntent(browserIntent)) {
             getContext().startActivity(browserIntent);
+          } else {
+            buildAlertNoBrowserAndStores();
           }
         }
       }
@@ -208,7 +213,7 @@ public class DialogWalletInstall extends Dialog {
   }
 
   private boolean resolveActivityInfoForIntent(Intent intent) {
-      ActivityInfo activityInfo = intent.resolveActivityInfo(getContext().getPackageManager(), 0);
+    ActivityInfo activityInfo = intent.resolveActivityInfo(getContext().getPackageManager(), 0);
     return activityInfo != null;
   }
 
@@ -231,5 +236,29 @@ public class DialogWalletInstall extends Dialog {
     DisplayMetrics displayMetrics = getContext().getResources()
         .getDisplayMetrics();
     return Math.round(pixels / (displayMetrics.xdpi / displayMetrics.densityDpi));
+  }
+
+  private void buildAlertNoBrowserAndStores() {
+    AlertDialog.Builder alert = new AlertDialog.Builder(appContext);
+    String value = appContext.getResources()
+        .getString(appContext.getResources()
+            .getIdentifier(DIALOG_NO_STORE_OR_BROWSER, "string", appContext.getPackageName()));
+    String dismissValue = appContext.getResources()
+        .getString(appContext.getResources()
+            .getIdentifier(APP_WALLET_SKIP, "string", appContext.getPackageName()));
+    alert.setMessage(value);
+    alert.setCancelable(true);
+    alert.setPositiveButton(dismissValue, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        Bundle response = new Bundle();
+        response.putInt(Utils.RESPONSE_CODE, RESULT_USER_CANCELED);
+        Intent intent = new Intent();
+        intent.putExtras(response);
+        ((Activity) appContext).setResult(Activity.RESULT_CANCELED, intent);
+        ((Activity) appContext).finish();
+      }
+    });
+    AlertDialog alertDialog = alert.create();
+    alertDialog.show();
   }
 }

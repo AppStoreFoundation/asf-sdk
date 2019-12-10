@@ -5,4 +5,5 @@
     <string name="app_wallet_install_wallet_from_iab">To complete your purchase, you have to install an AppCoins wallet</string>
     <string name="app_wallet_skip">SKIP</string>
     <string name="app_wallet_wallet_missing">APPC Wallet missing</string>
+    <string name="app_wallet_no_store_or_browser">You need to install Aptoide to get AppCoins Wallet</string>
 </resources>
