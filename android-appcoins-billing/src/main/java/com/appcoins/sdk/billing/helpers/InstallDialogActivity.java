@@ -44,8 +44,8 @@ public class InstallDialogActivity extends Activity {
   private static final String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
   private static final String DIALOG_WALLET_INSTALL_EMPTY_IMAGE =
       "dialog_wallet_install_empty_image";
-  private static final String installButtonColor = "#ffffbb33";
-  private static final String installButtonTextColor = "#ffffffff";
+  private static String installButtonColor = "#ffffbb33";
+  private static String installButtonTextColor = "#ffffffff";
   private static String dialogInstallationBody;
   private static String installButtonText;
   private static String skipButtonText;
