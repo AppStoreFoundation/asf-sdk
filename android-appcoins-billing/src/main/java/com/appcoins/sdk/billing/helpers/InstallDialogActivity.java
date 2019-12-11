@@ -151,7 +151,7 @@ public class InstallDialogActivity extends Activity {
 
     RelativeLayout backgroundLayout = buildBackground();
 
-    RelativeLayout dialogLayout = buildCardView(layoutOrientation);
+    RelativeLayout dialogLayout = buildDialogLayout(layoutOrientation);
     backgroundLayout.addView(dialogLayout);
 
     ImageView appBanner = buildAppBanner();
@@ -169,7 +169,7 @@ public class InstallDialogActivity extends Activity {
     Button skipButton = buildSkipButton(installButton, skipButtonText);
     backgroundLayout.addView(skipButton);
 
-    showAppRelatedImagery(appIcon, appBanner);
+    showAppRelatedImagery(appIcon, appBanner, dialogBody);
 
     return backgroundLayout;
   }
@@ -336,19 +336,12 @@ public class InstallDialogActivity extends Activity {
     return appBanner;
   }
 
-  private RelativeLayout buildCardView(int layoutOrientation) {
+  private RelativeLayout buildDialogLayout(int layoutOrientation) {
     RelativeLayout dialogLayout = new RelativeLayout(this);
     dialogLayout.setClipToPadding(false);
     dialogLayout.setId(2);
 
-    GradientDrawable shape = new GradientDrawable();
-    shape.setShape(GradientDrawable.RECTANGLE);
-    shape.setColor(Color.WHITE);
-    shape.setStroke(3, Color.WHITE);
-
-    shape.setCornerRadius(dpToPx(15));
-
-    dialogLayout.setBackground(shape);
+    dialogLayout.setBackgroundColor(Color.WHITE);
 
     int dialogLayoutMargins = dpToPx(12);
     int cardWidth = RelativeLayout.LayoutParams.MATCH_PARENT;
@@ -380,9 +373,11 @@ public class InstallDialogActivity extends Activity {
     return appStoreIntent;
   }
 
-  private void showAppRelatedImagery(ImageView appIcon, ImageView appBanner) {
+  private void showAppRelatedImagery(ImageView appIcon, ImageView appBanner,
+      TextView dialogLayout) {
     String packageName = getPackageName();
     Drawable icon = null;
+
     try {
       icon = this.getPackageManager()
           .getApplicationIcon(packageName);
@@ -396,6 +391,10 @@ public class InstallDialogActivity extends Activity {
       appIcon.setVisibility(View.INVISIBLE);
       appBannerDrawable = fetchAppGraphicDrawable(
           "appcoins-wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_GRAPHIC + ".png");
+      RelativeLayout.LayoutParams dialogParams =
+          (RelativeLayout.LayoutParams) dialogLayout.getLayoutParams();
+      int textMarginTop = dpToPx(5);
+      dialogParams.setMargins(dpToPx(32), textMarginTop, dpToPx(32), 0);
     } else {
       appIcon.setVisibility(View.VISIBLE);
       appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -413,7 +412,7 @@ public class InstallDialogActivity extends Activity {
   private boolean isAppBannerAvailable() {
     boolean hasImage;
     try {
-      hasImage = Arrays.asList(getAssets().list("appcoins-wallet/resources"))
+      hasImage = Arrays.asList(getAssets().list("appcoins-wallet/resources/app-banner"))
           .contains(DIALOG_WALLET_INSTALL_GRAPHIC + ".png");
     } catch (IOException e) {
       e.printStackTrace();
