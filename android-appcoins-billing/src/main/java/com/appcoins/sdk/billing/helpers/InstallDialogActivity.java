@@ -12,8 +12,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.CardView;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
@@ -153,19 +151,19 @@ public class InstallDialogActivity extends Activity {
 
     RelativeLayout backgroundLayout = buildBackground();
 
-    CardView cardLayout = buildCardView(layoutOrientation);
-    backgroundLayout.addView(cardLayout);
+    RelativeLayout dialogLayout = buildCardView(layoutOrientation);
+    backgroundLayout.addView(dialogLayout);
 
     ImageView appBanner = buildAppBanner();
-    cardLayout.addView(appBanner);
+    dialogLayout.addView(appBanner);
 
-    ImageView appIcon = buildAppIcon(layoutOrientation, cardLayout);
+    ImageView appIcon = buildAppIcon(layoutOrientation, dialogLayout);
     backgroundLayout.addView(appIcon);
 
     TextView dialogBody = buildDialogBody(layoutOrientation, appIcon);
     backgroundLayout.addView(dialogBody);
 
-    Button installButton = buildInstallButton(cardLayout, installButtonText);
+    Button installButton = buildInstallButton(dialogLayout, installButtonText);
     backgroundLayout.addView(installButton);
 
     Button skipButton = buildSkipButton(installButton, skipButtonText);
@@ -224,7 +222,7 @@ public class InstallDialogActivity extends Activity {
     return skipButton;
   }
 
-  private Button buildInstallButton(CardView cardLayout, String installButtonText) {
+  private Button buildInstallButton(RelativeLayout dialogLayout, String installButtonText) {
     Button installButton = new Button(this);
     installButton.setText(installButtonText);
     installButton.setTextSize(12);
@@ -241,8 +239,8 @@ public class InstallDialogActivity extends Activity {
 
     RelativeLayout.LayoutParams installButtonParams =
         new RelativeLayout.LayoutParams(dpToPx(110), dpToPx(36));
-    installButtonParams.addRule(RelativeLayout.ALIGN_BOTTOM, cardLayout.getId());
-    installButtonParams.addRule(RelativeLayout.ALIGN_RIGHT, cardLayout.getId());
+    installButtonParams.addRule(RelativeLayout.ALIGN_BOTTOM, dialogLayout.getId());
+    installButtonParams.addRule(RelativeLayout.ALIGN_RIGHT, dialogLayout.getId());
     installButtonParams.setMargins(0, 0, dpToPx(20), dpToPx(16));
     installButton.setLayoutParams(installButtonParams);
     installButton.setOnClickListener(new View.OnClickListener() {
@@ -308,10 +306,9 @@ public class InstallDialogActivity extends Activity {
     dialogHighlightString = translationsModel.getDialogStringHighlight();
   }
 
-  private ImageView buildAppIcon(int layoutOrientation, CardView cardView) {
+  private ImageView buildAppIcon(int layoutOrientation, RelativeLayout cardView) {
     ImageView appIcon = new ImageView(this);
     appIcon.setId(4);
-    ViewCompat.setElevation(appIcon, 30);
     appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
     int appIconMarginTop = dpToPx(85);
     int appIconSize = dpToPx(66);
@@ -339,24 +336,31 @@ public class InstallDialogActivity extends Activity {
     return appBanner;
   }
 
-  private CardView buildCardView(int layoutOrientation) {
-    CardView cardLayout = new CardView(this);
-    cardLayout.setClipToPadding(false);
-    cardLayout.setId(2);
-    cardLayout.setRadius(dpToPx(12));
-    ViewCompat.setElevation(cardLayout, 0);
-    cardLayout.setCardBackgroundColor(Color.WHITE);
-    int cardLayoutMargins = dpToPx(12);
+  private RelativeLayout buildCardView(int layoutOrientation) {
+    RelativeLayout dialogLayout = new RelativeLayout(this);
+    dialogLayout.setClipToPadding(false);
+    dialogLayout.setId(2);
+
+    GradientDrawable shape = new GradientDrawable();
+    shape.setShape(GradientDrawable.RECTANGLE);
+    shape.setColor(Color.WHITE);
+    shape.setStroke(3, Color.WHITE);
+
+    shape.setCornerRadius(dpToPx(15));
+
+    dialogLayout.setBackground(shape);
+
+    int dialogLayoutMargins = dpToPx(12);
     int cardWidth = RelativeLayout.LayoutParams.MATCH_PARENT;
     if (layoutOrientation == Configuration.ORIENTATION_LANDSCAPE) {
       cardWidth = dpToPx(384);
     }
-    RelativeLayout.LayoutParams cardLayoutParams =
+    RelativeLayout.LayoutParams dialogLayoutParams =
         new RelativeLayout.LayoutParams(cardWidth, dpToPx(288));
-    cardLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-    cardLayoutParams.setMargins(cardLayoutMargins, 0, cardLayoutMargins, 0);
-    cardLayout.setLayoutParams(cardLayoutParams);
-    return cardLayout;
+    dialogLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+    dialogLayoutParams.setMargins(dialogLayoutMargins, 0, dialogLayoutMargins, 0);
+    dialogLayout.setLayoutParams(dialogLayoutParams);
+    return dialogLayout;
   }
 
   private int dpToPx(int dp) {
@@ -399,6 +403,10 @@ public class InstallDialogActivity extends Activity {
       appBannerDrawable = fetchAppGraphicDrawable(
           "appcoins-wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_EMPTY_IMAGE + ".png");
     }
+    GradientDrawable shape = new GradientDrawable();
+    shape.setShape(GradientDrawable.RECTANGLE);
+    shape.setColor(Color.WHITE);
+    shape.setStroke(0, Color.WHITE);
     appBanner.setImageDrawable(appBannerDrawable);
   }
 
