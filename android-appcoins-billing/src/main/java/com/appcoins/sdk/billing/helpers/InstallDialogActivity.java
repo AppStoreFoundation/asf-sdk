@@ -306,7 +306,7 @@ public class InstallDialogActivity extends Activity {
     dialogHighlightString = translationsModel.getDialogStringHighlight();
   }
 
-  private ImageView buildAppIcon(int layoutOrientation, RelativeLayout cardView) {
+  private ImageView buildAppIcon(int layoutOrientation, RelativeLayout dialogLayout) {
     ImageView appIcon = new ImageView(this);
     appIcon.setId(4);
     appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -319,7 +319,7 @@ public class InstallDialogActivity extends Activity {
     RelativeLayout.LayoutParams appIconParams =
         new RelativeLayout.LayoutParams(appIconSize, appIconSize);
     appIconParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-    appIconParams.addRule(RelativeLayout.ALIGN_TOP, cardView.getId());
+    appIconParams.addRule(RelativeLayout.ALIGN_TOP, dialogLayout.getId());
     appIconParams.setMargins(0, appIconMarginTop, 0, 0);
     appIcon.setLayoutParams(appIconParams);
     return appIcon;
