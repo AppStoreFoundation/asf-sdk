@@ -402,10 +402,6 @@ public class InstallDialogActivity extends Activity {
       appBannerDrawable = fetchAppGraphicDrawable(
           "appcoins-wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_EMPTY_IMAGE + ".png");
     }
-    GradientDrawable shape = new GradientDrawable();
-    shape.setShape(GradientDrawable.RECTANGLE);
-    shape.setColor(Color.WHITE);
-    shape.setStroke(0, Color.WHITE);
     appBanner.setImageDrawable(appBannerDrawable);
   }
 
