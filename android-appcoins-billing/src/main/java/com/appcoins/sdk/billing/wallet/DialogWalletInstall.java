@@ -53,8 +53,10 @@ public class DialogWalletInstall extends Dialog {
   private static String DIALOG_WALLET_INSTALL_BUTTON_CANCEL = "dialog_wallet_install_button_cancel";
   private static String APP_WALLET_INSTALL_WALLET_FROM_IAB = "app_wallet_install_wallet_from_iab";
   private static String DIALOG_WALLET_INSTALL_HAS_IMAGE = "dialog_wallet_install_has_image";
-  private static String DIALOG_NO_STORE_OR_BROWSER = "app_wallet_no_store_or_browser";
-  private static String APP_WALLET_SKIP = "app_wallet_skip";
+  private static String IAP_WALLET_AND_APPSTORE_NOT_INSTALLED_POPUP_BODY =
+      "iap_wallet_and_appstore_not_installed_popup_body";
+  private static String IAP_WALLET_AND_APPSTORE_NOT_INSTALLED_POPUP_BUTTON =
+      "iap_wallet_and_appstore_not_installed_popup_button";
 
   private Button dialog_wallet_install_button_cancel;
   private Button dialog_wallet_install_button_download;
@@ -242,10 +244,12 @@ public class DialogWalletInstall extends Dialog {
     AlertDialog.Builder alert = new AlertDialog.Builder(appContext);
     String value = appContext.getResources()
         .getString(appContext.getResources()
-            .getIdentifier(DIALOG_NO_STORE_OR_BROWSER, "string", appContext.getPackageName()));
+            .getIdentifier(IAP_WALLET_AND_APPSTORE_NOT_INSTALLED_POPUP_BODY, "string",
+                appContext.getPackageName()));
     String dismissValue = appContext.getResources()
         .getString(appContext.getResources()
-            .getIdentifier(APP_WALLET_SKIP, "string", appContext.getPackageName()));
+            .getIdentifier(IAP_WALLET_AND_APPSTORE_NOT_INSTALLED_POPUP_BUTTON, "string",
+                appContext.getPackageName()));
     alert.setMessage(value);
     alert.setCancelable(true);
     alert.setPositiveButton(dismissValue, new DialogInterface.OnClickListener() {
