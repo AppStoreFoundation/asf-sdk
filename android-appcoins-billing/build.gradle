@@ -25,7 +25,7 @@ android {
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
           project.APTOIDE_PACKAGE_NAME_DEV
       buildConfigField 'String', 'HOST_WS',
-          "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+          "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
       buildConfigField 'String', 'SERVICE_BIND_LIST',
           "\"" + project.APTOIDE_PACKAGE_NAME_DEV.replace('\"', '') +
               "," +

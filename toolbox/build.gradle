@@ -4,7 +4,7 @@ android {
   compileSdkVersion COMPILE_SDK_VERSION
 
   defaultConfig {
-    applicationId "com.appcoins.toolbox"
+    applicationId "com.playkot.ageofmagic"
 
     minSdkVersion MIN_SDK_VERSION
     targetSdkVersion TARGET_SDK_VERSION

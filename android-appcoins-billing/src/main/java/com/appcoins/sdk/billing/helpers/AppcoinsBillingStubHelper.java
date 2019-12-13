@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,10 +13,10 @@ import android.util.Log;
 import com.appcoins.billing.AppcoinsBilling;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
-import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
+import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.WSServiceController;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,6 +31,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       "appcoins_billing_stub_helper";
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
+  private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
 
   private AppcoinsBillingStubHelper() {
     this.appcoinsBillingStubHelper = this;
@@ -73,17 +73,43 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       }
     } else {
       List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
-      String response =
-          WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku);
+
+      ArrayList skuSendList = new ArrayList();
+      int indexSkuSend = 0;
+      int remainNumberSkuToSend = sku.size() - 1;
+      ArrayList<SkuDetailsResult> skuDetailsResultList = new ArrayList<>();
+
+      for (String nameSku : sku) {
+        if (indexSkuSend == MAX_SKUS_SEND_WS || indexSkuSend == remainNumberSkuToSend) {
+          indexSkuSend++;
+          skuSendList.add(nameSku);
+          String response =
+              WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku);
+          responseWs.putInt(Utils.RESPONSE_CODE, 0);
+          skuDetailsResultList.add(AndroidBillingMapper.mapSkuDetailsFromWS("inapp", response));
+          skuDetailsResultList.clear();
+          remainNumberSkuToSend -= indexSkuSend;
+          indexSkuSend = 0;
+        } else {
+          indexSkuSend++;
+          skuSendList.add(nameSku);
+        }
+      }
+
+      ArrayList<SkuDetails> finalList = new ArrayList<>();
+      for (SkuDetailsResult skuDetails : skuDetailsResultList) {
+        finalList.addAll(skuDetails.getSkuDetailsList());
+      }
+
+      SkuDetailsResult skuDetailsResult = new SkuDetailsResult(finalList, 0);
       responseWs.putInt(Utils.RESPONSE_CODE, 0);
-      ArrayList<String> skuDetails = buildResponse(response, type);
+      ArrayList<String> skuDetails = buildResponse(skuDetailsResult);
       responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
     }
     return responseWs;
   }
 
-  private ArrayList<String> buildResponse(String response, String type) {
-    SkuDetailsResult skuDetailsResult = AndroidBillingMapper.mapSkuDetailsFromWS(type, response);
+  private ArrayList<String> buildResponse(SkuDetailsResult skuDetailsResult) {
     ArrayList<String> list = new ArrayList<>();
     for (SkuDetails skuDetails : skuDetailsResult.getSkuDetailsList()) {
       list.add(AndroidBillingMapper.mapSkuDetailsResponse(skuDetails));
@@ -161,7 +187,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     return null;
   }
 
-  boolean createRepository(final StartPurchaseAfterBindListener startPurchaseAfterConnectionListenner) {
+  boolean createRepository(
+      final StartPurchaseAfterBindListener startPurchaseAfterConnectionListenner) {
 
     String packageName = WalletUtils.getBillingServicePackageName();
 
