@@ -145,8 +145,8 @@ public class AndroidBillingMapper {
     return launchBillingFlowResult;
   }
 
-  public static SkuDetailsResult mapSkuDetailsFromWS(String skuType, String skuDetailsresponse) {
-    ArrayList<SkuDetails> arrayList = new ArrayList<SkuDetails>();
+  public static ArrayList<SkuDetails> mapSkuDetailsFromWS(String skuType, String skuDetailsresponse) {
+    ArrayList<SkuDetails> skuDetailsList = new ArrayList<SkuDetails>();
 
     if (skuDetailsresponse != "") {
       try {
@@ -188,14 +188,14 @@ public class AndroidBillingMapper {
                   appcPrice, appcPriceAmountMicros, appcPriceCurrencyCode, fiatPrice,
                   fiatPriceAmountMicros, fiatPriceCurrencyCode, title, description);
 
-          arrayList.add(skuDetails);
+          skuDetailsList.add(skuDetails);
         }
       } catch (JSONException e) {
         e.printStackTrace();
       }
     }
 
-    return new SkuDetailsResult(arrayList, ResponseCode.OK.getValue());
+    return skuDetailsList;
   }
 
   private static String escapeString(String value) {

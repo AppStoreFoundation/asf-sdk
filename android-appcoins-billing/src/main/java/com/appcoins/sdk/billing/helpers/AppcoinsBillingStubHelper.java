@@ -73,40 +73,30 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       }
     } else {
       List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
-
-      ArrayList skuSendList = new ArrayList();
-      int indexSkuSend = 0;
-      int remainNumberSkuToSend = sku.size() - 1;
-      ArrayList<SkuDetailsResult> skuDetailsResultList = new ArrayList<>();
-
-      for (String nameSku : sku) {
-        if (indexSkuSend == MAX_SKUS_SEND_WS || indexSkuSend == remainNumberSkuToSend) {
-          indexSkuSend++;
-          skuSendList.add(nameSku);
-          String response =
-              WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku);
-          responseWs.putInt(Utils.RESPONSE_CODE, 0);
-          skuDetailsResultList.add(AndroidBillingMapper.mapSkuDetailsFromWS("inapp", response));
-          skuDetailsResultList.clear();
-          remainNumberSkuToSend -= indexSkuSend;
-          indexSkuSend = 0;
-        } else {
-          indexSkuSend++;
-          skuSendList.add(nameSku);
-        }
-      }
-
-      ArrayList<SkuDetails> finalList = new ArrayList<>();
-      for (SkuDetailsResult skuDetails : skuDetailsResultList) {
-        finalList.addAll(skuDetails.getSkuDetailsList());
-      }
-
-      SkuDetailsResult skuDetailsResult = new SkuDetailsResult(finalList, 0);
+      ArrayList<SkuDetails> skuDetailsList = getSkuDetailsFromService(sku, packageName, type);
+      SkuDetailsResult skuDetailsResult = new SkuDetailsResult(skuDetailsList, 0);
       responseWs.putInt(Utils.RESPONSE_CODE, 0);
       ArrayList<String> skuDetails = buildResponse(skuDetailsResult);
       responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
     }
     return responseWs;
+  }
+
+  private ArrayList<SkuDetails> getSkuDetailsFromService(List<String> sku, String packageName,
+      String type) {
+    ArrayList skuSendList = new ArrayList();
+    ArrayList<SkuDetails> skuDetailsList = new ArrayList<>();
+
+    for (int i = 1; i <= sku.size(); i++) {
+      skuSendList.add(sku.get(i - 1));
+      if (i % MAX_SKUS_SEND_WS == 0 || i == sku.size()) {
+        String response =
+            WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuSendList);
+        skuDetailsList.addAll(AndroidBillingMapper.mapSkuDetailsFromWS(type, response));
+        skuSendList.clear();
+      }
+    }
+    return skuDetailsList;
   }
 
   private ArrayList<String> buildResponse(SkuDetailsResult skuDetailsResult) {
