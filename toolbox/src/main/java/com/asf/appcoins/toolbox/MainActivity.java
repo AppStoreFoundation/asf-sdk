@@ -129,22 +129,15 @@ public class MainActivity extends Activity {
     skusList.add("gas");
 
     skuDetailsParams.setMoreItemSkus(skusList);
-
-    Thread t = new Thread(new Runnable() {
-      @Override public void run() {
-        cab.querySkuDetailsAsync(skuDetailsParams, new SkuDetailsResponseListener() {
-          @Override
-          public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
-            Log.d(TAG, "responseCode: " + responseCode + "");
-            for (SkuDetails sd : skuDetailsList) {
-              Log.d(TAG, sd.toString());
-            }
-          }
-        });
+    cab.querySkuDetailsAsync(skuDetailsParams, new SkuDetailsResponseListener() {
+      @Override
+      public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
+        Log.d(TAG, "responseCode: " + responseCode + "");
+        for (SkuDetails sd : skuDetailsList) {
+          Log.d(TAG, sd.toString());
+        }
       }
     });
-
-    t.start();
   }
 
   public void makePaymentButtonClicked(View view) {

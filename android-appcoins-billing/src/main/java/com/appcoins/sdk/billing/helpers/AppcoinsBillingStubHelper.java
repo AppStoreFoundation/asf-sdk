@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,15 +8,16 @@ import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 import com.appcoins.billing.AppcoinsBilling;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
-import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
+import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.WSServiceController;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   public Bundle getSkuDetails(final int apiVersion, final String packageName, final String type,
       final Bundle skusBundle) {
 
-    Bundle responseWs = new Bundle();
+    final Bundle responseWs = new Bundle();
     if (WalletUtils.hasWalletInstalled()) {
       try {
         return serviceAppcoinsBilling.getSkuDetails(apiVersion, packageName, type, skusBundle);
@@ -72,14 +72,34 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
       }
     } else {
-      List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
-      String response =
-          WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku);
-      responseWs.putInt(Utils.RESPONSE_CODE, 0);
-      ArrayList<String> skuDetails = buildResponse(response, type);
-      responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
+      Log.d("NO WALLET INSTALLED,","AQUIII");
+      if (Looper.myLooper() == Looper.getMainLooper()) {
+        Thread t = new Thread(new Runnable() {
+          @Override public void run() {
+            getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+          }
+        });
+        t.start();
+        try {
+          t.join();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      } else {
+        getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+      }
     }
     return responseWs;
+  }
+
+  private void getSkuDetailsFromService(String packageName, String type, Bundle skusBundle,
+      Bundle responseWs) {
+    List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
+    String response =
+        WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku);
+    responseWs.putInt(Utils.RESPONSE_CODE, 0);
+    ArrayList<String> skuDetails = buildResponse(response, type);
+    responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
   }
 
   private ArrayList<String> buildResponse(String response, String type) {
@@ -161,7 +181,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     return null;
   }
 
-  boolean createRepository(final StartPurchaseAfterBindListener startPurchaseAfterConnectionListenner) {
+  boolean createRepository(
+      final StartPurchaseAfterBindListener startPurchaseAfterConnectionListenner) {
 
     String packageName = WalletUtils.getBillingServicePackageName();
 
