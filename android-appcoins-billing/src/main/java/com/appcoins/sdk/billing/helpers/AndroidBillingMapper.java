@@ -145,12 +145,12 @@ public class AndroidBillingMapper {
     return launchBillingFlowResult;
   }
 
-  public static ArrayList<SkuDetails> mapSkuDetailsFromWS(String skuType, String skuDetailsresponse) {
+  public static ArrayList<SkuDetails> mapSkuDetailsFromWS(String skuType, String skuDetailsResponse) {
     ArrayList<SkuDetails> skuDetailsList = new ArrayList<SkuDetails>();
 
-    if (skuDetailsresponse != "") {
+    if (!skuDetailsResponse.equals("")) {
       try {
-        JSONObject jsonElement = new JSONObject(skuDetailsresponse);
+        JSONObject jsonElement = new JSONObject(skuDetailsResponse);
         JSONArray items = jsonElement.getJSONArray("items");
         for (int i = 0; i < items.length(); i++) {
           JSONObject obj = items.getJSONObject(i);

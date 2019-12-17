@@ -84,7 +84,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
 
   private ArrayList<SkuDetails> getSkuDetailsFromService(List<String> sku, String packageName,
       String type) {
-    ArrayList skuSendList = new ArrayList();
+    List <String> skuSendList = new ArrayList<>();
     ArrayList<SkuDetails> skuDetailsList = new ArrayList<>();
 
     for (int i = 1; i <= sku.size(); i++) {

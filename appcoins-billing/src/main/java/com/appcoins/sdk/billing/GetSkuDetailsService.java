@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing;
 
-import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,17 +7,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class GetSkuDetailsService {
 
   private final static String URL_PATH = "/inapp/8.20180518/packages/packageName/products?names=";
-  private static final String APPC = "APPC";
-
   private final String serviceUrl;
   private String packageName;
   private List<String> sku;
@@ -32,10 +25,9 @@ public class GetSkuDetailsService {
 
   public String getSkuDetailsForPackageName() {
     String response = "";
-    URL url = null;
+    URL url;
     try {
       String urlBuilt =buildURL(packageName, sku);
-      Log.d("URL BUILT:",urlBuilt);
       url = new URL(urlBuilt);
 
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
