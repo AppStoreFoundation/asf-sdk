@@ -33,8 +33,11 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
 
+  public Object lockObject;
+
   private AppcoinsBillingStubHelper() {
     this.appcoinsBillingStubHelper = this;
+    this.lockObject = new Object();
   }
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
@@ -72,34 +75,40 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
       }
     } else {
-      Log.d("NO WALLET INSTALLED,","AQUIII");
       if (Looper.myLooper() == Looper.getMainLooper()) {
         Thread t = new Thread(new Runnable() {
           @Override public void run() {
-            getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+            getSkuDetailsFromService(packageName, type, skusBundle, responseWs, lockObject);
           }
         });
         t.start();
         try {
-          t.join();
+          synchronized (lockObject) {
+            lockObject.wait();
+          }
         } catch (InterruptedException e) {
           e.printStackTrace();
+          responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
         }
       } else {
-        getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+        getSkuDetailsFromService(packageName, type, skusBundle, responseWs, lockObject);
       }
     }
     return responseWs;
   }
 
   private void getSkuDetailsFromService(String packageName, String type, Bundle skusBundle,
-      Bundle responseWs) {
+      Bundle responseWs, Object lockObject) {
+
     List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
     String response =
         WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku);
     responseWs.putInt(Utils.RESPONSE_CODE, 0);
     ArrayList<String> skuDetails = buildResponse(response, type);
     responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
+    synchronized (lockObject) {
+      lockObject.notify();
+    }
   }
 
   private ArrayList<String> buildResponse(String response, String type) {

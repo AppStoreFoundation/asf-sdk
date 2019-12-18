@@ -10,18 +10,15 @@ import android.widget.Toast;
 import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.AppcoinsBillingClient;
 import com.appcoins.sdk.billing.BillingFlowParams;
-import com.appcoins.sdk.billing.ConsumeResponseListener;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.PurchasesUpdatedListener;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
-import com.appcoins.sdk.billing.SkuDetailsResponseListener;
 import com.appcoins.sdk.billing.helpers.CatapultBillingAppCoinsFactory;
 import com.appcoins.sdk.billing.types.SkuType;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends Activity {
@@ -90,11 +87,9 @@ public class MainActivity extends Activity {
         new BillingFlowParams("gas", SkuType.inapp.toString(), null, null, null);
 
     Activity act = this;
-    Thread t = new Thread(new Runnable() {
-      @Override public void run() {
-        int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
-        Log.d(TAG, "BillingFlowResponse: " + launchBillingFlowResponse);
-      }
+    Thread t = new Thread(() -> {
+      int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
+      Log.d(TAG, "BillingFlowResponse: " + launchBillingFlowResponse);
     });
     t.start();
   }
@@ -129,36 +124,31 @@ public class MainActivity extends Activity {
     skusList.add("gas");
 
     skuDetailsParams.setMoreItemSkus(skusList);
-    cab.querySkuDetailsAsync(skuDetailsParams, new SkuDetailsResponseListener() {
-      @Override
-      public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
-        Log.d(TAG, "responseCode: " + responseCode + "");
-        for (SkuDetails sd : skuDetailsList) {
-          Log.d(TAG, sd.toString());
-        }
-      }
-    });
+    Thread t = new Thread(
+        () -> cab.querySkuDetailsAsync(skuDetailsParams, (responseCode, skuDetailsList) -> {
+          Log.d(TAG, "responseCode: " + responseCode + "");
+          for (SkuDetails sd : skuDetailsList) {
+            Log.d(TAG, sd.toString());
+          }
+        }));
+    t.start();
   }
 
   public void makePaymentButtonClicked(View view) {
 
-    Thread t = new Thread(new Runnable() {
-      @Override public void run() {
+    Thread t = new Thread(() -> {
 
-        if (token != null) {
-          cab.consumeAsync(token, new ConsumeResponseListener() {
-            @Override public void onConsumeResponse(int responseCode, String purchaseToken) {
-              Log.d(TAG, "consume response: "
-                  + responseCode
-                  + " "
-                  + "Consumed purchase with token: "
-                  + purchaseToken);
-              token = null;
-            }
-          });
-        } else {
-          Log.d(TAG, "Message: No purchase tokens available");
-        }
+      if (token != null) {
+        cab.consumeAsync(token, (responseCode, purchaseToken) -> {
+          Log.d(TAG, "consume response: "
+              + responseCode
+              + " "
+              + "Consumed purchase with token: "
+              + purchaseToken);
+          token = null;
+        });
+      } else {
+        Log.d(TAG, "Message: No purchase tokens available");
       }
     });
 
