@@ -16,9 +16,11 @@ import com.appcoins.sdk.billing.PurchasesUpdatedListener;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
+import com.appcoins.sdk.billing.SkuDetailsResponseListener;
 import com.appcoins.sdk.billing.helpers.CatapultBillingAppCoinsFactory;
 import com.appcoins.sdk.billing.types.SkuType;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends Activity {
@@ -96,21 +98,19 @@ public class MainActivity extends Activity {
 
   public void onUpgradeAppButtonClicked(View arg0) {
 
-    Thread t = new Thread(new Runnable() {
-      @Override public void run() {
-        PurchasesResult pr = cab.queryPurchases(SkuType.inapp.toString());
-        if (pr.getPurchases()
-            .size() > 0) {
-          for (Purchase p : pr.getPurchases()) {
-            Log.d(TAG, "Purchase result token: " + p.getToken());
-            Log.d(TAG, "Purchase result sku: " + p.getSku());
-          }
-          token = pr.getPurchases()
-              .get(0)
-              .getToken();
-        } else {
-          Log.d(TAG, "Message: No Available Purchases");
+    Thread t = new Thread(() -> {
+      PurchasesResult pr = cab.queryPurchases(SkuType.inapp.toString());
+      if (pr.getPurchases()
+          .size() > 0) {
+        for (Purchase p : pr.getPurchases()) {
+          Log.d(TAG, "Purchase result token: " + p.getToken());
+          Log.d(TAG, "Purchase result sku: " + p.getSku());
         }
+        token = pr.getPurchases()
+            .get(0)
+            .getToken();
+      } else {
+        Log.d(TAG, "Message: No Available Purchases");
       }
     });
     t.start();
@@ -124,20 +124,21 @@ public class MainActivity extends Activity {
     skusList.add("gas");
 
     skuDetailsParams.setMoreItemSkus(skusList);
-    Thread t = new Thread(
-        () -> cab.querySkuDetailsAsync(skuDetailsParams, (responseCode, skuDetailsList) -> {
+
+    Thread t = new Thread(() -> cab.querySkuDetailsAsync(skuDetailsParams,
+        (responseCode, skuDetailsList) -> {
           Log.d(TAG, "responseCode: " + responseCode + "");
           for (SkuDetails sd : skuDetailsList) {
             Log.d(TAG, sd.toString());
           }
         }));
+
     t.start();
   }
 
   public void makePaymentButtonClicked(View view) {
 
     Thread t = new Thread(() -> {
-
       if (token != null) {
         cab.consumeAsync(token, (responseCode, purchaseToken) -> {
           Log.d(TAG, "consume response: "
@@ -151,7 +152,6 @@ public class MainActivity extends Activity {
         Log.d(TAG, "Message: No purchase tokens available");
       }
     });
-
     t.start();
   }
 

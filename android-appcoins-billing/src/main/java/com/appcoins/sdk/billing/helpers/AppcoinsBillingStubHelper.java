@@ -33,12 +33,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       "appcoins_billing_stub_helper";
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
-
-  public Object lockObject;
+  private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
 
   private AppcoinsBillingStubHelper() {
     this.appcoinsBillingStubHelper = this;
-    this.lockObject = new Object();
   }
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
@@ -79,7 +77,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       if (Looper.myLooper() == Looper.getMainLooper()) {
         Thread t = new Thread(new Runnable() {
           @Override public void run() {
-            getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+            sendSkuDetailsByFifty(packageName, type, skusBundle, responseWs);
             latch.countDown();
           }
         });
@@ -91,25 +89,41 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
           responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
         }
       } else {
-        getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+        sendSkuDetailsByFifty(packageName, type, skusBundle, responseWs);
       }
     }
     return responseWs;
   }
 
-  private void getSkuDetailsFromService(String packageName, String type, Bundle skusBundle,
+  private void sendSkuDetailsByFifty(String packageName, String type, Bundle skusBundle,
       Bundle responseWs) {
 
     List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
-    String response =
-        WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku);
+    ArrayList<SkuDetails> skuDetailsList = sendSkuDetailsByFifty(sku, packageName, type);
+    SkuDetailsResult skuDetailsResult = new SkuDetailsResult(skuDetailsList, 0);
     responseWs.putInt(Utils.RESPONSE_CODE, 0);
-    ArrayList<String> skuDetails = buildResponse(response, type);
+    ArrayList<String> skuDetails = buildResponse(skuDetailsResult);
     responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
   }
 
-  private ArrayList<String> buildResponse(String response, String type) {
-    SkuDetailsResult skuDetailsResult = AndroidBillingMapper.mapSkuDetailsFromWS(type, response);
+  private ArrayList<SkuDetails> sendSkuDetailsByFifty(List<String> sku, String packageName,
+      String type) {
+    List <String> skuSendList = new ArrayList<>();
+    ArrayList<SkuDetails> skuDetailsList = new ArrayList<>();
+
+    for (int i = 1; i <= sku.size(); i++) {
+      skuSendList.add(sku.get(i - 1));
+      if (i % MAX_SKUS_SEND_WS == 0 || i == sku.size()) {
+        String response =
+            WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuSendList);
+        skuDetailsList.addAll(AndroidBillingMapper.mapSkuDetailsFromWS(type, response));
+        skuSendList.clear();
+      }
+    }
+    return skuDetailsList;
+  }
+
+  private ArrayList<String> buildResponse(SkuDetailsResult skuDetailsResult) {
     ArrayList<String> list = new ArrayList<>();
     for (SkuDetails skuDetails : skuDetailsResult.getSkuDetailsList()) {
       list.add(AndroidBillingMapper.mapSkuDetailsResponse(skuDetails));
