@@ -12,7 +12,6 @@ import java.util.List;
 public class GetSkuDetailsService {
 
   private final static String URL_PATH = "/inapp/8.20180518/packages/packageName/products?names=";
-
   private final String serviceUrl;
   private String packageName;
   private List<String> sku;
@@ -24,11 +23,12 @@ public class GetSkuDetailsService {
     this.sku = sku;
   }
 
-  public  String getSkuDetailsForPackageName() {
+  public String getSkuDetailsForPackageName() {
     String response = "";
-    URL url = null;
+    URL url;
     try {
-      url = new URL(buildURL(packageName, sku));
+      String urlBuilt =buildURL(packageName, sku);
+      url = new URL(urlBuilt);
 
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
@@ -68,5 +68,4 @@ public class GetSkuDetailsService {
     }
     return url.substring(0, url.length() - 1);
   }
-
 }
