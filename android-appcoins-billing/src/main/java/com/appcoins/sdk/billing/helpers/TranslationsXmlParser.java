@@ -17,6 +17,10 @@ public class TranslationsXmlParser {
       "To get your reward you need the AppCoins Wallet.";
   private static final String defaultDialogBody = "To buy this item you first need to get the %s.";
   private static final String defaultHighlightText = "AppCoins Wallet";
+  private static final String defaultAlertDialogMessage =
+      "You need the AppCoins Wallet to make this purchase. Download it from Aptoide or Play Store"
+          + " and come back to complete your purchase!";
+  private static final String defaultAlertDialogDismissButton = "GOT IT!";
   private Context context;
 
   public TranslationsXmlParser(Context context) {
@@ -72,6 +76,8 @@ public class TranslationsXmlParser {
     defaultValues.add(defaultHighlightText);
     defaultValues.add(defaultSkipButtonText);
     defaultValues.add(defaultInstallationButtonText);
+    defaultValues.add(defaultAlertDialogMessage);
+    defaultValues.add(defaultAlertDialogDismissButton);
     defaultValues.add(defaultNotificationTitle);
     defaultValues.add(defaultNotificationBody);
     return defaultValues;

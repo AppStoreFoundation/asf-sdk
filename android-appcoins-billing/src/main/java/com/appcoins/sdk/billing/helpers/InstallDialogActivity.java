@@ -1,9 +1,12 @@
 package com.appcoins.sdk.billing.helpers;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -46,10 +49,8 @@ public class InstallDialogActivity extends Activity {
       "dialog_wallet_install_empty_image";
   private static String installButtonColor = "#ffffbb33";
   private static String installButtonTextColor = "#ffffffff";
-  private static String dialogInstallationBody;
-  private static String installButtonText;
-  private static String skipButtonText;
-  private static String dialogHighlightString;
+  private final String URL_BROWSER =
+      "https://play.google.com/store/apps/details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
   private String URL_APTOIDE;
@@ -69,6 +70,8 @@ public class InstallDialogActivity extends Activity {
 
     if (savedInstanceState != null) {
       translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
+    } else {
+      fetchTranslations();
     }
 
     RelativeLayout installationDialog = setupInstallationDialog();
@@ -163,10 +166,11 @@ public class InstallDialogActivity extends Activity {
     TextView dialogBody = buildDialogBody(layoutOrientation, appIcon);
     backgroundLayout.addView(dialogBody);
 
-    Button installButton = buildInstallButton(dialogLayout, installButtonText);
+    Button installButton =
+        buildInstallButton(dialogLayout, translationsModel.getInstallationButtonString());
     backgroundLayout.addView(installButton);
 
-    Button skipButton = buildSkipButton(installButton, skipButtonText);
+    Button skipButton = buildSkipButton(installButton, translationsModel.getSkipButtonString());
     backgroundLayout.addView(skipButton);
 
     showAppRelatedImagery(appIcon, appBanner, dialogBody);
@@ -245,14 +249,23 @@ public class InstallDialogActivity extends Activity {
     installButton.setLayoutParams(installButtonParams);
     installButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        redirectToStore();
+        Intent storeIntent = buildStoreViewIntent();
+        if (resolveActivityInfoForIntent(storeIntent)) {
+          startActivity(storeIntent);
+        } else {
+          Intent browserIntent = buildBrowserIntent();
+          if (resolveActivityInfoForIntent(browserIntent)) {
+            startActivity(browserIntent);
+          } else {
+            buildAlertNoBrowserAndStores();
+          }
+        }
       }
     });
     return installButton;
   }
 
   private TextView buildDialogBody(int layoutOrientation, ImageView appIcon) {
-    setupTranslations();
     int dialogBodyColor = Color.parseColor("#4a4a4a");
     TextView dialogBody = new TextView(this);
     dialogBody.setId(5);
@@ -277,15 +290,18 @@ public class InstallDialogActivity extends Activity {
   }
 
   private SpannableStringBuilder setHighlightDialogBody() {
-    String dialogBody = String.format(dialogInstallationBody, dialogHighlightString);
+    String dialogBody = String.format(translationsModel.getInstallationDialogBody(),
+        translationsModel.getDialogStringHighlight());
     SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialogBody);
-    messageStylized.setSpan(new StyleSpan(BOLD), dialogBody.indexOf(dialogHighlightString),
-        dialogBody.indexOf(dialogHighlightString) + dialogHighlightString.length(),
-        Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+    messageStylized.setSpan(new StyleSpan(BOLD),
+        dialogBody.indexOf(translationsModel.getDialogStringHighlight()),
+        dialogBody.indexOf(translationsModel.getDialogStringHighlight())
+            + translationsModel.getDialogStringHighlight()
+            .length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
     return messageStylized;
   }
 
-  private void setupTranslations() {
+  private void fetchTranslations() {
     Locale locale = Locale.getDefault();
     if (translationsModel == null || !translationsModel.getLanguageCode()
         .equalsIgnoreCase(locale.getLanguage()) || !translationsModel.getCountryCode()
@@ -293,17 +309,7 @@ public class InstallDialogActivity extends Activity {
       TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
       translationsModel =
           translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
-      setInstallationDialogText();
-    } else {
-      setInstallationDialogText();
     }
-  }
-
-  private void setInstallationDialogText() {
-    dialogInstallationBody = translationsModel.getIabInstallationDialogString();
-    installButtonText = translationsModel.getInstallationButtonString();
-    skipButtonText = translationsModel.getSkipButtonString();
-    dialogHighlightString = translationsModel.getDialogStringHighlight();
   }
 
   private ImageView buildAppIcon(int layoutOrientation, RelativeLayout dialogLayout) {
@@ -361,12 +367,8 @@ public class InstallDialogActivity extends Activity {
         .getDisplayMetrics());
   }
 
-  private void redirectToStore() {
-    this.startActivity(buildStoreViewIntent(URL_APTOIDE));
-  }
-
-  private Intent buildStoreViewIntent(String action) {
-    final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(action));
+  private Intent buildStoreViewIntent() {
+    final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_APTOIDE));
     if (WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION) {
       appStoreIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
@@ -431,5 +433,34 @@ public class InstallDialogActivity extends Activity {
 
   private int getLayoutOrientation() {
     return getResources().getConfiguration().orientation;
+  }
+
+  private boolean resolveActivityInfoForIntent(Intent intent) {
+    ActivityInfo activityInfo = intent.resolveActivityInfo(getPackageManager(), 0);
+    return activityInfo != null;
+  }
+
+  private Intent buildBrowserIntent() {
+    return new Intent(Intent.ACTION_VIEW, Uri.parse(URL_BROWSER));
+  }
+
+  private void buildAlertNoBrowserAndStores() {
+    AlertDialog.Builder alert = new AlertDialog.Builder(this);
+    String value = translationsModel.getAlertDialogMessage();
+    String dismissValue = translationsModel.getAlertDialogDismissButton();
+    alert.setMessage(value);
+    alert.setCancelable(true);
+    alert.setPositiveButton(dismissValue, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        Bundle response = new Bundle();
+        response.putInt(Utils.RESPONSE_CODE, RESULT_USER_CANCELED);
+        Intent intent = new Intent();
+        intent.putExtras(response);
+        setResult(Activity.RESULT_CANCELED, intent);
+        finish();
+      }
+    });
+    AlertDialog alertDialog = alert.create();
+    alertDialog.show();
   }
 }
