@@ -50,7 +50,8 @@ public class AppCoinsBilling implements Billing {
       SkuDetailsResponseListener onSkuDetailsResponseListener) {
     SkuDetailsAsync skuDetailsAsync =
         new SkuDetailsAsync(skuDetailsParams, onSkuDetailsResponseListener, repository);
-    skuDetailsAsync.run();
+    Thread t = new Thread(skuDetailsAsync);
+    t.start();
   }
 
   @Override public void consumeAsync(String purchaseToken, ConsumeResponseListener listener) {
