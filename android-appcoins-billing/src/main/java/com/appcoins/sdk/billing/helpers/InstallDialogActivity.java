@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -68,6 +69,10 @@ public class InstallDialogActivity extends Activity {
         + BuildConfig.BDS_WALLET_PACKAGE_NAME
         + "&utm_source=appcoinssdk&app_source="
         + this.getPackageName();
+
+    //This log is necessary for the automatic test that validates the wallet installation dialog
+    Log.d("InstallDialogActivity",
+        "com.appcoins.sdk.billing.helpers.InstallDialogActivity started");
 
     if (savedInstanceState != null) {
       translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
