@@ -21,6 +21,10 @@ public class TranslationsXmlParser {
       "You need the AppCoins Wallet to make this purchase. Download it from Aptoide or Play Store"
           + " and come back to complete your purchase!";
   private static final String defaultAlertDialogDismissButton = "GOT IT!";
+
+  private static final String translationsRelativePath =
+      "appcoins-wallet/resources/translations/values-";
+  private static final String translationsFileName = "/external_strings.xml";
   private Context context;
 
   public TranslationsXmlParser(Context context) {
@@ -31,14 +35,10 @@ public class TranslationsXmlParser {
     String translationXmlPath;
     TranslationsModel translationsModel = new TranslationsModel(language, country);
     if (language.equalsIgnoreCase(country)) {
-      translationXmlPath =
-          "appcoins-wallet/resources/translations/values-" + language + "/external_strings.xml";
+      translationXmlPath = translationsRelativePath + language + translationsFileName;
     } else {
-      translationXmlPath = "appcoins-wallet/resources/translations/values-"
-          + language
-          + "-r"
-          + country.toUpperCase()
-          + "/external_strings.xml";
+      translationXmlPath =
+          translationsRelativePath + language + "-r" + country.toUpperCase() + translationsFileName;
     }
     try {
       InputStream inputStream = context.getAssets()

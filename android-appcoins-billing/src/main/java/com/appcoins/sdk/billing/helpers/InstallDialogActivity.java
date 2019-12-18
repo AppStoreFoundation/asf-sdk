@@ -53,6 +53,7 @@ public class InstallDialogActivity extends Activity {
   private static String installButtonTextColor = "#ffffffff";
   private final String URL_BROWSER =
       "https://play.google.com/store/apps/details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
+  private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
   private String URL_APTOIDE;
@@ -402,7 +403,7 @@ public class InstallDialogActivity extends Activity {
     if (hasImage) {
       appIcon.setVisibility(View.INVISIBLE);
       appBannerDrawable = fetchAppGraphicDrawable(
-          "appcoins-wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_GRAPHIC + ".png");
+          appBannerResourcePath + "/" + DIALOG_WALLET_INSTALL_GRAPHIC + ".png");
       RelativeLayout.LayoutParams dialogParams =
           (RelativeLayout.LayoutParams) dialogLayout.getLayoutParams();
       int textMarginTop = dpToPx(5);
@@ -412,7 +413,7 @@ public class InstallDialogActivity extends Activity {
       appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
       appIcon.setImageDrawable(icon);
       appBannerDrawable = fetchAppGraphicDrawable(
-          "appcoins-wallet/resources/app-banner/" + DIALOG_WALLET_INSTALL_EMPTY_IMAGE + ".png");
+          appBannerResourcePath + "/" + DIALOG_WALLET_INSTALL_EMPTY_IMAGE + ".png");
     }
     appBanner.setImageDrawable(appBannerDrawable);
   }
@@ -420,7 +421,7 @@ public class InstallDialogActivity extends Activity {
   private boolean isAppBannerAvailable() {
     boolean hasImage;
     try {
-      hasImage = Arrays.asList(getAssets().list("appcoins-wallet/resources/app-banner"))
+      hasImage = Arrays.asList(getAssets().list(appBannerResourcePath))
           .contains(DIALOG_WALLET_INSTALL_GRAPHIC + ".png");
     } catch (IOException e) {
       e.printStackTrace();
