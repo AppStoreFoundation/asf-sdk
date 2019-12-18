@@ -22,6 +22,7 @@ import com.appcoins.sdk.billing.WSServiceController;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
@@ -65,7 +66,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   @Override
   public Bundle getSkuDetails(final int apiVersion, final String packageName, final String type,
       final Bundle skusBundle) {
-
+    final CountDownLatch latch = new CountDownLatch(1);
     final Bundle responseWs = new Bundle();
     if (WalletUtils.hasWalletInstalled()) {
       try {
@@ -78,27 +79,26 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       if (Looper.myLooper() == Looper.getMainLooper()) {
         Thread t = new Thread(new Runnable() {
           @Override public void run() {
-            getSkuDetailsFromService(packageName, type, skusBundle, responseWs, lockObject);
+            getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+            latch.countDown();
           }
         });
         t.start();
         try {
-          synchronized (lockObject) {
-            lockObject.wait();
-          }
+          latch.await();
         } catch (InterruptedException e) {
           e.printStackTrace();
           responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
         }
       } else {
-        getSkuDetailsFromService(packageName, type, skusBundle, responseWs, lockObject);
+        getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
       }
     }
     return responseWs;
   }
 
   private void getSkuDetailsFromService(String packageName, String type, Bundle skusBundle,
-      Bundle responseWs, Object lockObject) {
+      Bundle responseWs) {
 
     List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
     String response =
@@ -106,9 +106,6 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     responseWs.putInt(Utils.RESPONSE_CODE, 0);
     ArrayList<String> skuDetails = buildResponse(response, type);
     responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
-    synchronized (lockObject) {
-      lockObject.notify();
-    }
   }
 
   private ArrayList<String> buildResponse(String response, String type) {
