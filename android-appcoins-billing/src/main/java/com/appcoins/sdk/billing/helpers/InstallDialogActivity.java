@@ -1,5 +1,6 @@
 package com.appcoins.sdk.billing.helpers;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -186,7 +187,7 @@ public class InstallDialogActivity extends Activity {
     setContentView(dialogLayout, layoutParams);
   }
 
-  private RelativeLayout buildBackground() {
+  @SuppressLint("ResourceType") private RelativeLayout buildBackground() {
     int backgroundColor = Color.parseColor("#64000000");
     RelativeLayout backgroundLayout = new RelativeLayout(this);
     backgroundLayout.setId(1);
@@ -194,6 +195,7 @@ public class InstallDialogActivity extends Activity {
     return backgroundLayout;
   }
 
+  @SuppressLint("ResourceType")
   private Button buildSkipButton(Button installButton, String skipButtonText) {
     int skipButtonColor = Color.parseColor("#8f000000");
     Button skipButton = new Button(this);
@@ -226,6 +228,7 @@ public class InstallDialogActivity extends Activity {
     return skipButton;
   }
 
+  @SuppressLint("ResourceType")
   private Button buildInstallButton(RelativeLayout dialogLayout, String installButtonText) {
     Button installButton = new Button(this);
     installButton.setText(installButtonText);
@@ -265,6 +268,7 @@ public class InstallDialogActivity extends Activity {
     return installButton;
   }
 
+  @SuppressLint("ResourceType")
   private TextView buildDialogBody(int layoutOrientation, ImageView appIcon) {
     int dialogBodyColor = Color.parseColor("#4a4a4a");
     TextView dialogBody = new TextView(this);
@@ -312,6 +316,7 @@ public class InstallDialogActivity extends Activity {
     }
   }
 
+  @SuppressLint("ResourceType")
   private ImageView buildAppIcon(int layoutOrientation, RelativeLayout dialogLayout) {
     ImageView appIcon = new ImageView(this);
     appIcon.setId(4);
@@ -331,7 +336,7 @@ public class InstallDialogActivity extends Activity {
     return appIcon;
   }
 
-  private ImageView buildAppBanner() {
+  @SuppressLint("ResourceType") private ImageView buildAppBanner() {
     ImageView appBanner = new ImageView(this);
     appBanner.setId(3);
     appBanner.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -342,7 +347,7 @@ public class InstallDialogActivity extends Activity {
     return appBanner;
   }
 
-  private RelativeLayout buildDialogLayout(int layoutOrientation) {
+  @SuppressLint("ResourceType") private RelativeLayout buildDialogLayout(int layoutOrientation) {
     RelativeLayout dialogLayout = new RelativeLayout(this);
     dialogLayout.setClipToPadding(false);
     dialogLayout.setId(2);

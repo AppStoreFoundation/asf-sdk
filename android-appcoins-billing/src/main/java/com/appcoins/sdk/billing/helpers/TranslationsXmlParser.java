@@ -57,7 +57,12 @@ public class TranslationsXmlParser {
         }
         eventType = parser.next();
       }
-      translationsModel.mapStrings(xmlContent);
+      if (xmlContent.size() == 8) {
+        translationsModel.mapStrings(xmlContent);
+      } else {
+        fillInMissingStrings(xmlContent);
+        translationsModel.mapStrings(xmlContent);
+      }
       inputStream.close();
     } catch (XmlPullParserException e) {
       translationsModel.mapStrings(setDefaultValues());
@@ -66,7 +71,6 @@ public class TranslationsXmlParser {
       translationsModel.mapStrings(setDefaultValues());
       e.printStackTrace();
     }
-
     return translationsModel;
   }
 
@@ -81,5 +85,10 @@ public class TranslationsXmlParser {
     defaultValues.add(defaultNotificationTitle);
     defaultValues.add(defaultNotificationBody);
     return defaultValues;
+  }
+
+  private void fillInMissingStrings(ArrayList<String> xmlContent) {
+    xmlContent.add(4, defaultAlertDialogMessage);
+    xmlContent.add(5, defaultAlertDialogDismissButton);
   }
 }
