@@ -16,9 +16,11 @@ import com.appcoins.sdk.billing.PurchasesUpdatedListener;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
+import com.appcoins.sdk.billing.SkuDetailsResponseListener;
 import com.appcoins.sdk.billing.helpers.CatapultBillingAppCoinsFactory;
 import com.appcoins.sdk.billing.types.SkuType;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends Activity {
@@ -118,7 +120,9 @@ public class MainActivity extends Activity {
     SkuDetailsParams skuDetailsParams = new SkuDetailsParams();
     skuDetailsParams.setItemType(SkuType.inapp.toString());
     ArrayList<String> skusList = new ArrayList<String>();
+
     skusList.add("gas");
+
     skuDetailsParams.setMoreItemSkus(skusList);
 
     Thread t = new Thread(() -> cab.querySkuDetailsAsync(skuDetailsParams,
@@ -133,8 +137,8 @@ public class MainActivity extends Activity {
   }
 
   public void makePaymentButtonClicked(View view) {
-    Thread t = new Thread(() -> {
 
+    Thread t = new Thread(() -> {
       if (token != null) {
         cab.consumeAsync(token, (responseCode, purchaseToken) -> {
           Log.d(TAG, "consume response: "

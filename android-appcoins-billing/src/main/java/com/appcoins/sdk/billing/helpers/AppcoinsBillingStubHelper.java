@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 import com.appcoins.billing.AppcoinsBilling;
@@ -21,6 +22,7 @@ import com.appcoins.sdk.billing.WSServiceController;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
@@ -62,8 +64,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   @Override
   public Bundle getSkuDetails(final int apiVersion, final String packageName, final String type,
       final Bundle skusBundle) {
-
-    Bundle responseWs = new Bundle();
+    final CountDownLatch latch = new CountDownLatch(1);
+    final Bundle responseWs = new Bundle();
     if (WalletUtils.hasWalletInstalled()) {
       try {
         return serviceAppcoinsBilling.getSkuDetails(apiVersion, packageName, type, skusBundle);
@@ -72,17 +74,38 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
       }
     } else {
-      List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
-      ArrayList<SkuDetails> skuDetailsList = getSkuDetailsFromService(sku, packageName, type);
-      SkuDetailsResult skuDetailsResult = new SkuDetailsResult(skuDetailsList, 0);
-      responseWs.putInt(Utils.RESPONSE_CODE, 0);
-      ArrayList<String> skuDetails = buildResponse(skuDetailsResult);
-      responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
+      if (Looper.myLooper() == Looper.getMainLooper()) {
+        Thread t = new Thread(new Runnable() {
+          @Override public void run() {
+            getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+            latch.countDown();
+          }
+        });
+        t.start();
+        try {
+          latch.await();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+          responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
+        }
+      } else {
+        getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+      }
     }
     return responseWs;
   }
 
-  private ArrayList<SkuDetails> getSkuDetailsFromService(List<String> sku, String packageName,
+  private void getSkuDetailsFromService(String packageName, String type, Bundle skusBundle,
+      Bundle responseWs) {
+    List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
+    ArrayList<SkuDetails> skuDetailsList = requestSkuDetails(sku, packageName, type);
+    SkuDetailsResult skuDetailsResult = new SkuDetailsResult(skuDetailsList, 0);
+    responseWs.putInt(Utils.RESPONSE_CODE, 0);
+    ArrayList<String> skuDetails = buildResponse(skuDetailsResult);
+    responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
+  }
+
+  private ArrayList<SkuDetails> requestSkuDetails(List<String> sku, String packageName,
       String type) {
     List <String> skuSendList = new ArrayList<>();
     ArrayList<SkuDetails> skuDetailsList = new ArrayList<>();
