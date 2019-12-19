@@ -77,7 +77,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       if (Looper.myLooper() == Looper.getMainLooper()) {
         Thread t = new Thread(new Runnable() {
           @Override public void run() {
-            sendSkuDetailsByFifty(packageName, type, skusBundle, responseWs);
+            getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
             latch.countDown();
           }
         });
@@ -89,24 +89,24 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
           responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
         }
       } else {
-        sendSkuDetailsByFifty(packageName, type, skusBundle, responseWs);
+        getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
       }
     }
     return responseWs;
   }
 
-  private void sendSkuDetailsByFifty(String packageName, String type, Bundle skusBundle,
+  private void getSkuDetailsFromService(String packageName, String type, Bundle skusBundle,
       Bundle responseWs) {
 
     List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
-    ArrayList<SkuDetails> skuDetailsList = sendSkuDetailsByFifty(sku, packageName, type);
+    ArrayList<SkuDetails> skuDetailsList = requestSkuDetails(sku, packageName, type);
     SkuDetailsResult skuDetailsResult = new SkuDetailsResult(skuDetailsList, 0);
     responseWs.putInt(Utils.RESPONSE_CODE, 0);
     ArrayList<String> skuDetails = buildResponse(skuDetailsResult);
     responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
   }
 
-  private ArrayList<SkuDetails> sendSkuDetailsByFifty(List<String> sku, String packageName,
+  private ArrayList<SkuDetails> requestSkuDetails(List<String> sku, String packageName,
       String type) {
     List <String> skuSendList = new ArrayList<>();
     ArrayList<SkuDetails> skuDetailsList = new ArrayList<>();
