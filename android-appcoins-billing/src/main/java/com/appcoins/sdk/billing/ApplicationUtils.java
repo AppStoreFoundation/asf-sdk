@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import org.json.JSONObject;
 
-public class ApplicationUtils {
+class ApplicationUtils {
 
   private static final String RESPONSE_INAPP_PURCHASE_DATA = "INAPP_PURCHASE_DATA";
   private static final String RESPONSE_INAPP_SIGNATURE = "INAPP_DATA_SIGNATURE";
@@ -18,7 +18,7 @@ public class ApplicationUtils {
 
   private final static String TAG = ApplicationUtils.class.getSimpleName();
 
-  public static boolean handleActivityResult(Billing billing, int resultCode, Intent data,
+  static boolean handleActivityResult(Billing billing, int resultCode, Intent data,
       PurchasesUpdatedListener purchaseFinishedListener) {
 
     if (data == null) {

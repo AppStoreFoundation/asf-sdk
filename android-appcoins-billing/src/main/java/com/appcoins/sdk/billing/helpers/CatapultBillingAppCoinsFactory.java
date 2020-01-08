@@ -10,7 +10,7 @@ import com.appcoins.sdk.billing.RepositoryServiceConnection;
 
 public class CatapultBillingAppCoinsFactory {
 
-  public static AppcoinsBillingClient BuildAppcoinsBilling(Context context, String base64PublicKey,
+  public static AppcoinsBillingClient buildAppcoinsBilling(Context context, String base64PublicKey,
       PurchasesUpdatedListener purchaseFinishedListener) {
 
     AppCoinsAndroidBillingRepository repository =

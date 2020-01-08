@@ -44,7 +44,7 @@ android {
               "," +
               project.BDS_WALLET_PACKAGE_NAME_DEV.replace('\"', '') +
               "," +
-              project.CAFE_BAZAR_PACKAGE_NAME.replace('\"', '') +
+              project.CAFE_BAZAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
     }
     release {
@@ -60,7 +60,7 @@ android {
               "," +
               project.BDS_WALLET_PACKAGE_NAME.replace('\"', '') +
               "," +
-              project.CAFE_BAZAR_PACKAGE_NAME.replace('\"', '') +
+              project.CAFE_BAZAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
       minifyEnabled false
     }

@@ -16,11 +16,9 @@ import com.appcoins.sdk.billing.PurchasesUpdatedListener;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
-import com.appcoins.sdk.billing.SkuDetailsResponseListener;
 import com.appcoins.sdk.billing.helpers.CatapultBillingAppCoinsFactory;
 import com.appcoins.sdk.billing.types.SkuType;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends Activity {
@@ -47,7 +45,7 @@ public class MainActivity extends Activity {
             .show();
       }
     };
-    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this, BuildConfig.IAB_KEY,
+    cab = CatapultBillingAppCoinsFactory.buildAppcoinsBilling(this, BuildConfig.IAB_KEY,
         purchaseFinishedListener);
 
     listener = new AppCoinsBillingStateListener() {
@@ -125,8 +123,8 @@ public class MainActivity extends Activity {
 
     skuDetailsParams.setMoreItemSkus(skusList);
 
-    Thread t = new Thread(() -> cab.querySkuDetailsAsync(skuDetailsParams,
-        (responseCode, skuDetailsList) -> {
+    Thread t = new Thread(
+        () -> cab.querySkuDetailsAsync(skuDetailsParams, (responseCode, skuDetailsList) -> {
           Log.d(TAG, "responseCode: " + responseCode + "");
           for (SkuDetails sd : skuDetailsList) {
             Log.d(TAG, sd.toString());

@@ -1,5 +1,6 @@
 package com.asf.appcoins.sdk.ads.poa.manager;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -21,43 +22,32 @@ import java.util.List;
 
 public class WalletUtils {
 
+  private static final String URL_BROWSER = "https://play.google.com/store/apps/details?id="
+      + com.appcoins.billing.sdk.BuildConfig.BDS_WALLET_PACKAGE_NAME;
+  public static Context context;
   private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
-
   private static int POA_NOTIFICATION_ID = 0;
-
   private static int MINIMUM_APTOIDE_VERSION = 9908;
-
   private static int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
-
   private static String URL_INTENT_INSTALL = "market://details?id="
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
       + "&utm_source=appcoinssdk&app_source=";
-
   private static String URL_APTOIDE_PARAMETERS = "&utm_source=appcoinssdk&app_source=";
-
   private static PendingIntent pendingIntent;
-
   private static NotificationManager notificationManager;
-
   private static boolean hasPopup;
-
+  private static String IDENTIFIER_KEY = "identifier";
   private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE =
       "poa_wallet_not_installed_notification_title";
   private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY =
       "poa_wallet_not_installed_notification_body";
-
-  private static final String URL_BROWSER = "https://play.google.com/store/apps/details?id="
-      + com.appcoins.billing.sdk.BuildConfig.BDS_WALLET_PACKAGE_NAME;
-
-  public static Context context;
-
-  public static String billingPackageName;
+  private static String billingPackageName;
 
   public static void setContext(Context cont) {
     context = cont;
   }
 
-  public static boolean hasWalletInstalled() {
+  static boolean hasWalletInstalled() {
     if (billingPackageName == null) {
       getPackageToBind();
     }
@@ -65,7 +55,7 @@ public class WalletUtils {
   }
 
   private static void getPackageToBind() {
-    ArrayList intentServicesResponse = new ArrayList();
+    List<String> intentServicesResponse = new ArrayList<>();
     Intent serviceIntent = new Intent(com.appcoins.billing.sdk.BuildConfig.IAB_BIND_ACTION);
 
     List<ResolveInfo> intentServices = context.getPackageManager()
@@ -79,11 +69,11 @@ public class WalletUtils {
     }
   }
 
-  private static String chooseServiceToBind(ArrayList packageNameServices) {
+  private static String chooseServiceToBind(List<String> packageNameServices) {
     String[] packagesOrded = BuildConfig.SERVICE_BIND_LIST.split(",");
-    for (int i = 0; i < packagesOrded.length; i++) {
-      if (packageNameServices.contains(packagesOrded[i])) {
-        return packagesOrded[i];
+    for (String address : packagesOrded) {
+      if (packageNameServices.contains(address)) {
+        return address;
       }
     }
     return null;
@@ -96,7 +86,7 @@ public class WalletUtils {
     return billingPackageName;
   }
 
-  public static int getAptoideVersion() {
+  private static int getAptoideVersion() {
 
     final PackageInfo pInfo;
     int versionCode = UNINSTALLED_APTOIDE_VERSION_CODE;
@@ -123,14 +113,14 @@ public class WalletUtils {
     return activityInfo == null;
   }
 
-  public static void removeNotification() {
+  static void removeNotification() {
     if (hasPopup) {
       notificationManager.cancel(POA_NOTIFICATION_ID);
       hasPopup = false;
     }
   }
 
-  public static void createInstallWalletNotification() {
+  static void createInstallWalletNotification() {
 
     Intent intent = getNotificationIntentForStore();
 
@@ -196,8 +186,8 @@ public class WalletUtils {
 
   private static Intent buildNotification(Intent intent) {
     PackageManager packageManager = context.getPackageManager();
-    ApplicationInfo applicationInfo = null;
-    Resources resources = null;
+    ApplicationInfo applicationInfo;
+    Resources resources;
 
     try {
       applicationInfo =
@@ -216,11 +206,12 @@ public class WalletUtils {
     String packageName = resources.getResourcePackageName(applicationIconResID);
     int identifier = resources.getIdentifier(iconName, typeName, packageName);
 
-    intent.putExtra("identifier", identifier);
+    intent.putExtra(IDENTIFIER_KEY, identifier);
 
     return intent;
   }
 
+  @SuppressLint("NewApi")
   private static Notification buildNotification(String channelId, Intent intent) {
     Notification.Builder builder;
     pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
@@ -234,7 +225,7 @@ public class WalletUtils {
           context.getPackageName());
 
       builder.setSmallIcon(intent.getExtras()
-          .getInt("identifier"))
+          .getInt(IDENTIFIER_KEY))
           .setAutoCancel(true)
           .setContentTitle(context.getString(titleId))
           .setContentText(context.getString(bodyId));
@@ -262,7 +253,7 @@ public class WalletUtils {
           context.getPackageName());
 
       builder.setSmallIcon(intent.getExtras()
-          .getInt("identifier"))
+          .getInt(IDENTIFIER_KEY))
           .setAutoCancel(true)
           .setContentTitle(context.getString(titleId))
           .setContentText(context.getString(bodyId));
