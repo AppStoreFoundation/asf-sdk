@@ -17,7 +17,7 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
-import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
+import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.WSServiceController;
 import java.io.Serializable;
 import java.util.ArrayList;

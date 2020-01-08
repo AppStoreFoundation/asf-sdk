@@ -29,7 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
-import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
+import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;

@@ -9,6 +9,7 @@ import android.util.Log;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
+import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
 
 public class RepositoryServiceConnection implements ServiceConnection, RepositoryConnection {
   private static final String TAG = RepositoryServiceConnection.class.getSimpleName();

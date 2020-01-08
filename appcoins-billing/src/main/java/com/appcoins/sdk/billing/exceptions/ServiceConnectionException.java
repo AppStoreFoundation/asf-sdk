@@ -1,4 +1,4 @@
-package com.appcoins.sdk.billing;
+package com.appcoins.sdk.billing.exceptions;
 
 public class ServiceConnectionException extends Exception {
 

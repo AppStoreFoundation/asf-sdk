@@ -1,5 +1,8 @@
 package com.appcoins.sdk.billing;
 
+import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
+import com.appcoins.sdk.billing.listeners.ConsumeResponseListener;
+import com.appcoins.sdk.billing.listeners.SkuDetailsResponseListener;
 import java.util.ArrayList;
 import java.util.Collections;
 

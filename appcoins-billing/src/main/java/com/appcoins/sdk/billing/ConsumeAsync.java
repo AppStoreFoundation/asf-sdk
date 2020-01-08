@@ -1,5 +1,8 @@
 package com.appcoins.sdk.billing;
 
+import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
+import com.appcoins.sdk.billing.listeners.ConsumeResponseListener;
+
 public class ConsumeAsync implements Runnable {
 
   private final String token;

@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
+import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.AppcoinsBillingClient;
 import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.Purchase;

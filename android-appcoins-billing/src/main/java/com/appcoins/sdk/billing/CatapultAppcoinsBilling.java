@@ -5,8 +5,12 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.util.Log;
+import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
 import com.appcoins.sdk.billing.helpers.EventLogger;
 import com.appcoins.sdk.billing.helpers.PayloadHelper;
+import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
+import com.appcoins.sdk.billing.listeners.ConsumeResponseListener;
+import com.appcoins.sdk.billing.listeners.SkuDetailsResponseListener;
 
 public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
   private static final int REQUEST_CODE = 51;
