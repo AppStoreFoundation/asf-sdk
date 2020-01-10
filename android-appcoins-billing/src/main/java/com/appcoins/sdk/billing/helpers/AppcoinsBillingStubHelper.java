@@ -206,7 +206,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   }
 
   boolean createRepository(
-      final StartPurchaseAfterBindListener startPurchaseAfterConnectionListenner) {
+      final StartPurchaseAfterBindListener startPurchaseAfterConnectionListener) {
 
     String packageName = WalletUtils.getBillingServicePackageName();
 
@@ -222,7 +222,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       return context.bindService(serviceIntent, new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName name, IBinder service) {
           serviceAppcoinsBilling = Stub.asInterface(service);
-          startPurchaseAfterConnectionListenner.startPurchaseAfterBind();
+          startPurchaseAfterConnectionListener.startPurchaseAfterBind();
           Log.d(TAG, "onServiceConnected() called service = [" + serviceAppcoinsBilling + "]");
         }
 
