@@ -20,10 +20,13 @@ import com.asf.appcoins.sdk.ads.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.appcoins.sdk.billing.helpers.WalletUtils.isAppInstalled;
+
 public class WalletUtils {
 
   private static final String URL_BROWSER = "https://play.google.com/store/apps/details?id="
       + com.appcoins.billing.sdk.BuildConfig.BDS_WALLET_PACKAGE_NAME;
+  private static final String CAFE_BAZAAR_URL = "bazaar://details?id=com.hezardastan.wallet";
   public static Context context;
   private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
   private static int POA_NOTIFICATION_ID = 0;
@@ -167,21 +170,32 @@ public class WalletUtils {
 
   private static Intent getNotificationIntentForStore() {
 
-    String url = URL_INTENT_INSTALL;
-    int verCode = WalletUtils.getAptoideVersion();
-    if (verCode != UNINSTALLED_APTOIDE_VERSION_CODE) {
-      url += URL_APTOIDE_PARAMETERS + context.getPackageName();
+    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_URL));
+    PackageManager packageManager = context.getPackageManager();
+
+    if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager) && isAbleToRedirect(
+        intent, packageManager)) {
+      intent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
+    } else {
+      String url = URL_INTENT_INSTALL;
+      int verCode = WalletUtils.getAptoideVersion();
+      if (verCode != UNINSTALLED_APTOIDE_VERSION_CODE) {
+        url += URL_APTOIDE_PARAMETERS + context.getPackageName();
+      }
+
+      intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+      if (verCode >= MINIMUM_APTOIDE_VERSION) {
+        intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
+      }
     }
-
-    Intent intent;
-    intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-    if (verCode >= MINIMUM_APTOIDE_VERSION) {
-      intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
-    }
-
     return buildNotification(intent);
+  }
+
+  private static boolean isAbleToRedirect(Intent intent, PackageManager packageManager) {
+    ActivityInfo activityInfo = intent.resolveActivityInfo(packageManager, 0);
+    return activityInfo != null;
   }
 
   private static Intent buildNotification(Intent intent) {

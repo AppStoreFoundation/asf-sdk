@@ -49,7 +49,7 @@ public class WalletUtils {
     return null;
   }
 
-  static boolean isAppInstalled(String packageName, PackageManager packageManager) {
+  public static boolean isAppInstalled(String packageName, PackageManager packageManager) {
     try {
       packageManager.getPackageInfo(packageName, 0);
       return true;

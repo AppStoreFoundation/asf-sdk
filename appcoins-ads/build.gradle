@@ -39,6 +39,8 @@ android {
           "\"" + project.APPCOINS_ADVERTISEMENT_BIND + "\""
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
           project.APTOIDE_PACKAGE_NAME_DEV
+      buildConfigField 'String', 'CAFE_BAZAAR_PACKAGE_NAME',
+          project.CAFE_BAZAAR_PACKAGE_NAME
       buildConfigField 'String', 'SERVICE_BIND_LIST',
           "\"" + project.APTOIDE_PACKAGE_NAME_DEV.replace('\"', '') +
               "," +
@@ -55,6 +57,8 @@ android {
           "\"" + project.APPCOINS_ADVERTISEMENT_BIND + "\""
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
           project.APTOIDE_PACKAGE_NAME
+      buildConfigField 'String', 'CAFE_BAZAAR_PACKAGE_NAME',
+          project.CAFE_BAZAAR_PACKAGE_NAME
       buildConfigField 'String', 'SERVICE_BIND_LIST',
           "\"" + project.APTOIDE_PACKAGE_NAME.replace('\"', '') +
               "," +
