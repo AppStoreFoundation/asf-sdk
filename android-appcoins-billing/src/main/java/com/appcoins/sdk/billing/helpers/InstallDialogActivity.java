@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -53,7 +54,7 @@ public class InstallDialogActivity extends Activity {
   private static String installButtonTextColor = "#ffffffff";
   private final String GOOGLE_PLAY_URL =
       "https://play.google.com/store/apps/details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
-  private final String CAFE_BAZAAR_URL = "bazaar://details?id=com.hezardastan.wallet";
+  private final String CAFE_BAZAAR_URL = "https://cafebazaar.ir/app/com.hezardastaan.wallet";
   private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
@@ -265,23 +266,36 @@ public class InstallDialogActivity extends Activity {
     return installButton;
   }
 
-  private void redirectToWalletInstallation(String storeUrl) {
-    Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_URL);
+  private void redirectToWalletInstallation(final String storeUrl) {
+    final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_URL);
     if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
         && isAbleToRedirect(cafeBazaarIntent)) {
-      cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
-      startActivity(cafeBazaarIntent);
-    } else {
-      Intent storeIntent = buildStoreViewIntent(storeUrl);
-      if (isAbleToRedirect(storeIntent)) {
-        startActivity(storeIntent);
-      } else {
-        Intent browserIntent = buildBrowserIntent(GOOGLE_PLAY_URL);
-        if (isAbleToRedirect(browserIntent)) {
-          startActivity(browserIntent);
-        } else {
-          buildAlertNoBrowserAndStores();
+      AsyncTask asyncTask = new ResponseAsync(new ResponseListener() {
+        @Override public void onResponseCode(int code) {
+          if (code < 400) {
+            cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
+            startActivity(cafeBazaarIntent);
+          } else {
+            redirectToRemainingStores(storeUrl);
+          }
         }
+      });
+      asyncTask.execute();
+    } else {
+      redirectToRemainingStores(storeUrl);
+    }
+  }
+
+  private void redirectToRemainingStores(String storeUrl) {
+    Intent storeIntent = buildStoreViewIntent(storeUrl);
+    if (isAbleToRedirect(storeIntent)) {
+      startActivity(storeIntent);
+    } else {
+      Intent browserIntent = buildBrowserIntent(GOOGLE_PLAY_URL);
+      if (isAbleToRedirect(browserIntent)) {
+        startActivity(browserIntent);
+      } else {
+        buildAlertNoBrowserAndStores();
       }
     }
   }
