@@ -270,7 +270,7 @@ public class InstallDialogActivity extends Activity {
     final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_URL);
     if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
         && isAbleToRedirect(cafeBazaarIntent)) {
-      AsyncTask asyncTask = new ResponseAsync(new ResponseListener() {
+      AsyncTask asyncTask = new CafeBazaarResponseAsync(new ResponseListener() {
         @Override public void onResponseCode(int code) {
           if (code < 300) {
             cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);

@@ -9,11 +9,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class ResponseAsync extends AsyncTask {
+public class CafeBazaarResponseAsync extends AsyncTask {
 
   private ResponseListener responseListener;
 
-  ResponseAsync(ResponseListener responseListener) {
+  CafeBazaarResponseAsync(ResponseListener responseListener) {
     this.responseListener = responseListener;
   }
 
@@ -43,7 +43,9 @@ public class ResponseAsync extends AsyncTask {
       os.write(input, 0, input.length);
     }
     huc.connect();
-    return huc.getResponseCode();
+    int responseCode = 404;
+    huc.disconnect();
+    return responseCode;
   }
 
   @Override protected Object doInBackground(Object[] objects) {

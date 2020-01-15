@@ -14,9 +14,12 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
+import com.asf.appcoins.sdk.ads.listeners.CafeBazaarResponseAsync;
+import com.asf.appcoins.sdk.ads.listeners.ResponseListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,11 +112,6 @@ public class WalletUtils {
     return versionCode;
   }
 
-  private static boolean resolveActivityInfoForIntent(Intent intent) {
-    ActivityInfo activityInfo = intent.resolveActivityInfo(context.getPackageManager(), 0);
-    return activityInfo == null;
-  }
-
   static void removeNotification() {
     if (hasPopup) {
       notificationManager.cancel(POA_NOTIFICATION_ID);
@@ -123,40 +121,49 @@ public class WalletUtils {
 
   static void createInstallWalletNotification() {
 
-    Intent intent = getNotificationIntentForStore();
+    PackageManager packageManager = context.getPackageManager();
+    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_URL));
 
-    if (resolveActivityInfoForIntent(intent)) {
+    if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager) && isAbleToRedirect(
+        intent, packageManager)) {
+      checkWalletAvailability(packageManager);
+    } else {
+      intent = redirectToRemainingStores(packageManager);
+    }
+
+    if (intent != null) {
+      createNotification(intent);
+    }
+  }
+
+  private static void checkWalletAvailability(final PackageManager packageManager) {
+    AsyncTask asyncTask = new CafeBazaarResponseAsync(new ResponseListener() {
+      @Override public void onResponseCode(int code) {
+        Intent listenerIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_URL));
+        if (code < 300) {
+          listenerIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
+          listenerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+          buildNotification(listenerIntent);
+        } else {
+          listenerIntent = redirectToRemainingStores(packageManager);
+        }
+        if (listenerIntent != null) {
+          createNotification(listenerIntent);
+        }
+      }
+    });
+    asyncTask.execute();
+  }
+
+  private static Intent redirectToRemainingStores(PackageManager packageManager) {
+    Intent intent = getNotificationIntentForStore();
+    if (!isAbleToRedirect(intent, packageManager)) {
       intent = getNotificationIntentForBrowser();
-      if (resolveActivityInfoForIntent(intent)) {
+      if (!isAbleToRedirect(intent, packageManager)) {
         intent = null;
       }
     }
-
-    if (intent == null) {
-      return;
-    }
-
-    notificationManager =
-        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    hasPopup = true;
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-      NotificationChannel channelHeadUp =
-          new NotificationChannel(Integer.toString(POA_NOTIFICATION_ID), POA_NOTIFICATION_HEADS_UP,
-              NotificationManager.IMPORTANCE_HIGH);
-      channelHeadUp.setImportance(NotificationManager.IMPORTANCE_HIGH);
-      channelHeadUp.setDescription(POA_NOTIFICATION_HEADS_UP);
-      channelHeadUp.setVibrationPattern(new long[0]);
-      channelHeadUp.setShowBadge(true);
-      channelHeadUp.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-      notificationManager.createNotificationChannel(channelHeadUp);
-      notificationManager.notify(0,
-          buildNotification(Integer.toString(POA_NOTIFICATION_ID), intent));
-    } else {
-      Notification notificationHeadsUp = buildNotificationOlderVersion(intent);
-      notificationManager.notify(POA_NOTIFICATION_ID, notificationHeadsUp);
-    }
+    return intent;
   }
 
   private static Intent getNotificationIntentForBrowser() {
@@ -168,26 +175,19 @@ public class WalletUtils {
 
   private static Intent getNotificationIntentForStore() {
 
-    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_URL));
-    PackageManager packageManager = context.getPackageManager();
-
-    if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager) && isAbleToRedirect(
-        intent, packageManager)) {
-      intent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
-    } else {
-      String url = URL_INTENT_INSTALL;
-      int verCode = WalletUtils.getAptoideVersion();
-      if (verCode != UNINSTALLED_APTOIDE_VERSION_CODE) {
-        url += URL_APTOIDE_PARAMETERS + context.getPackageName();
-      }
-
-      intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-      if (verCode >= MINIMUM_APTOIDE_VERSION) {
-        intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
-      }
+    String url = URL_INTENT_INSTALL;
+    int verCode = WalletUtils.getAptoideVersion();
+    if (verCode != UNINSTALLED_APTOIDE_VERSION_CODE) {
+      url += URL_APTOIDE_PARAMETERS + context.getPackageName();
     }
+
+    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+    if (verCode >= MINIMUM_APTOIDE_VERSION) {
+      intent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
+    }
+
     return buildNotification(intent);
   }
 
@@ -253,6 +253,30 @@ public class WalletUtils {
       return true;
     } catch (PackageManager.NameNotFoundException e) {
       return false;
+    }
+  }
+
+  private static void createNotification(Intent intent) {
+    notificationManager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    hasPopup = true;
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+      NotificationChannel channelHeadUp =
+          new NotificationChannel(Integer.toString(POA_NOTIFICATION_ID), POA_NOTIFICATION_HEADS_UP,
+              NotificationManager.IMPORTANCE_HIGH);
+      channelHeadUp.setImportance(NotificationManager.IMPORTANCE_HIGH);
+      channelHeadUp.setDescription(POA_NOTIFICATION_HEADS_UP);
+      channelHeadUp.setVibrationPattern(new long[0]);
+      channelHeadUp.setShowBadge(true);
+      channelHeadUp.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+      notificationManager.createNotificationChannel(channelHeadUp);
+      notificationManager.notify(0,
+          buildNotification(Integer.toString(POA_NOTIFICATION_ID), intent));
+    } else {
+      Notification notificationHeadsUp = buildNotificationOlderVersion(intent);
+      notificationManager.notify(POA_NOTIFICATION_ID, notificationHeadsUp);
     }
   }
 
