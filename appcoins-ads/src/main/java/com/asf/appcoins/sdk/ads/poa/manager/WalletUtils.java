@@ -20,8 +20,6 @@ import com.asf.appcoins.sdk.ads.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.appcoins.sdk.billing.helpers.WalletUtils.isAppInstalled;
-
 public class WalletUtils {
 
   private static final String URL_BROWSER = "https://play.google.com/store/apps/details?id="
@@ -247,6 +245,15 @@ public class WalletUtils {
       e.printStackTrace();
     }
     return builder.build();
+  }
+
+  private static boolean isAppInstalled(String packageName, PackageManager packageManager) {
+    try {
+      packageManager.getPackageInfo(packageName, 0);
+      return true;
+    } catch (PackageManager.NameNotFoundException e) {
+      return false;
+    }
   }
 
   private static Notification buildNotificationOlderVersion(Intent intent) {
