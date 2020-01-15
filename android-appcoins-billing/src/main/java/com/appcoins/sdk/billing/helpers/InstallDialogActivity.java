@@ -272,7 +272,7 @@ public class InstallDialogActivity extends Activity {
         && isAbleToRedirect(cafeBazaarIntent)) {
       AsyncTask asyncTask = new ResponseAsync(new ResponseListener() {
         @Override public void onResponseCode(int code) {
-          if (code < 400) {
+          if (code < 300) {
             cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
             startActivity(cafeBazaarIntent);
           } else {
