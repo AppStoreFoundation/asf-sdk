@@ -127,6 +127,7 @@ public class WalletUtils {
     if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager) && isAbleToRedirect(
         intent, packageManager)) {
       checkWalletAvailability(packageManager);
+      return;
     } else {
       intent = redirectToRemainingStores(packageManager);
     }
