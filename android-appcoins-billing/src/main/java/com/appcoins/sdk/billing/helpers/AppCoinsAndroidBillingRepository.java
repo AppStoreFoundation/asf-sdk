@@ -3,17 +3,15 @@ package com.appcoins.sdk.billing.helpers;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import com.appcoins.sdk.billing.AppCoinsBillingStateListener;
+import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.ConnectionLifeCycle;
 import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.Repository;
 import com.appcoins.sdk.billing.ResponseCode;
-import com.appcoins.sdk.billing.ServiceConnectionException;
+import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.service.WalletBillingService;
-
-import org.json.JSONException;
 
 import java.util.List;
 

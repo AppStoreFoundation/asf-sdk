@@ -12,14 +12,10 @@ import java.util.List;
 
 public class WalletUtils {
 
-  public static final int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
+  private static final int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
 
   public static Context context;
-  public static String billingPackageName;
-
-  public static void setContext(Context context) {
-    WalletUtils.context = context.getApplicationContext();
-  }
+  private static String billingPackageName;
 
   public static boolean hasWalletInstalled() {
     if (billingPackageName == null) {
@@ -29,7 +25,7 @@ public class WalletUtils {
   }
 
   private static void getPackageToBind() {
-    ArrayList intentServicesResponse = new ArrayList();
+    List<String> intentServicesResponse = new ArrayList<>();
     Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
 
     List<ResolveInfo> intentServices = context.getPackageManager()
@@ -43,17 +39,26 @@ public class WalletUtils {
     }
   }
 
-  private static String chooseServiceToBind(ArrayList packageNameServices) {
-    String[] packagesOrded = BuildConfig.SERVICE_BIND_LIST.split(",");
-    for (int i = 0; i < packagesOrded.length; i++) {
-      if (packageNameServices.contains(packagesOrded[i])) {
-        return packagesOrded[i];
+  private static String chooseServiceToBind(List<String> packageNameServices) {
+    String[] packagesOrdered = BuildConfig.SERVICE_BIND_LIST.split(",");
+    for (String address : packagesOrdered) {
+      if (packageNameServices.contains(address)) {
+        return address;
       }
     }
     return null;
   }
 
-  public static int getAptoideVersion() {
+  static boolean isAppInstalled(String packageName, PackageManager packageManager) {
+    try {
+      packageManager.getPackageInfo(packageName, 0);
+      return true;
+    } catch (PackageManager.NameNotFoundException e) {
+      return false;
+    }
+  }
+
+  static int getAptoideVersion() {
 
     final PackageInfo pInfo;
     int versionCode = UNINSTALLED_APTOIDE_VERSION_CODE;
@@ -77,6 +82,10 @@ public class WalletUtils {
 
   public static Context getContext() {
     return context;
+  }
+
+  public static void setContext(Context context) {
+    WalletUtils.context = context.getApplicationContext();
   }
 
   public static String getBillingServicePackageName() {

@@ -24,6 +24,8 @@ android {
           project.BDS_WALLET_PACKAGE_NAME_DEV
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
           project.APTOIDE_PACKAGE_NAME_DEV
+      buildConfigField 'String', 'CAFE_BAZAAR_PACKAGE_NAME',
+          project.CAFE_BAZAAR_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
       buildConfigField 'String', 'SERVICE_BIND_LIST',
@@ -31,7 +33,7 @@ android {
               "," +
               project.BDS_WALLET_PACKAGE_NAME_DEV.replace('\"', '') +
               "," +
-              project.CAFE_BAZAR_PACKAGE_NAME.replace('\"', '') +
+              project.CAFE_BAZAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
     }
     release {
@@ -45,6 +47,8 @@ android {
           project.BDS_WALLET_PACKAGE_NAME
       buildConfigField 'String', 'APTOIDE_PACKAGE_NAME',
           project.APTOIDE_PACKAGE_NAME
+      buildConfigField 'String', 'CAFE_BAZAAR_PACKAGE_NAME',
+          project.CAFE_BAZAAR_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
       buildConfigField 'String', 'SERVICE_BIND_LIST',
@@ -52,7 +56,7 @@ android {
               "," +
               project.BDS_WALLET_PACKAGE_NAME.replace('\"', '') +
               "," +
-              project.CAFE_BAZAR_PACKAGE_NAME.replace('\"', '') +
+              project.CAFE_BAZAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
       minifyEnabled false
     }

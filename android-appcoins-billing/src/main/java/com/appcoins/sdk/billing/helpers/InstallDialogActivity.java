@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -29,7 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
-import com.appcoins.sdk.billing.StartPurchaseAfterBindListener;
+import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -51,12 +52,12 @@ public class InstallDialogActivity extends Activity {
       "dialog_wallet_install_empty_image";
   private static String installButtonColor = "#ffffbb33";
   private static String installButtonTextColor = "#ffffffff";
-  private final String URL_BROWSER =
+  private final String GOOGLE_PLAY_URL =
       "https://play.google.com/store/apps/details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
+  private final String CAFE_BAZAAR_URL = "https://cafebazaar.ir/app/com.hezardastaan.wallet";
   private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
-  private String URL_APTOIDE;
   private View loadingDialogInstall;
   private TranslationsModel translationsModel;
 
@@ -66,7 +67,7 @@ public class InstallDialogActivity extends Activity {
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
 
-    URL_APTOIDE = "market://details?id="
+    String storeUrl = "market://details?id="
         + BuildConfig.BDS_WALLET_PACKAGE_NAME
         + "&utm_source=appcoinssdk&app_source="
         + this.getPackageName();
@@ -81,7 +82,7 @@ public class InstallDialogActivity extends Activity {
       fetchTranslations();
     }
 
-    RelativeLayout installationDialog = setupInstallationDialog();
+    RelativeLayout installationDialog = setupInstallationDialog(storeUrl);
 
     showInstallationDialog(installationDialog);
   }
@@ -156,7 +157,7 @@ public class InstallDialogActivity extends Activity {
     this.finish();
   }
 
-  private RelativeLayout setupInstallationDialog() {
+  private RelativeLayout setupInstallationDialog(String storeUrl) {
     int layoutOrientation = getLayoutOrientation();
 
     RelativeLayout backgroundLayout = buildBackground();
@@ -174,7 +175,7 @@ public class InstallDialogActivity extends Activity {
     backgroundLayout.addView(dialogBody);
 
     Button installButton =
-        buildInstallButton(dialogLayout, translationsModel.getInstallationButtonString());
+        buildInstallButton(dialogLayout, translationsModel.getInstallationButtonString(), storeUrl);
     backgroundLayout.addView(installButton);
 
     Button skipButton = buildSkipButton(installButton, translationsModel.getSkipButtonString());
@@ -235,7 +236,8 @@ public class InstallDialogActivity extends Activity {
   }
 
   @SuppressLint("ResourceType")
-  private Button buildInstallButton(RelativeLayout dialogLayout, String installButtonText) {
+  private Button buildInstallButton(RelativeLayout dialogLayout, String installButtonText,
+      final String storeUrl) {
     Button installButton = new Button(this);
     installButton.setText(installButtonText);
     installButton.setTextSize(12);
@@ -258,20 +260,44 @@ public class InstallDialogActivity extends Activity {
     installButton.setLayoutParams(installButtonParams);
     installButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        Intent storeIntent = buildStoreViewIntent();
-        if (resolveActivityInfoForIntent(storeIntent)) {
-          startActivity(storeIntent);
-        } else {
-          Intent browserIntent = buildBrowserIntent();
-          if (resolveActivityInfoForIntent(browserIntent)) {
-            startActivity(browserIntent);
-          } else {
-            buildAlertNoBrowserAndStores();
-          }
-        }
+        redirectToWalletInstallation(storeUrl);
       }
     });
     return installButton;
+  }
+
+  private void redirectToWalletInstallation(final String storeUrl) {
+    final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_URL);
+    if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
+        && isAbleToRedirect(cafeBazaarIntent)) {
+      AsyncTask asyncTask = new CafeBazaarResponseAsync(new ResponseListener() {
+        @Override public void onResponseCode(int code) {
+          if (code < 300) {
+            cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
+            startActivity(cafeBazaarIntent);
+          } else {
+            redirectToRemainingStores(storeUrl);
+          }
+        }
+      });
+      asyncTask.execute();
+    } else {
+      redirectToRemainingStores(storeUrl);
+    }
+  }
+
+  private void redirectToRemainingStores(String storeUrl) {
+    Intent storeIntent = buildStoreViewIntent(storeUrl);
+    if (isAbleToRedirect(storeIntent)) {
+      startActivity(storeIntent);
+    } else {
+      Intent browserIntent = buildBrowserIntent(GOOGLE_PLAY_URL);
+      if (isAbleToRedirect(browserIntent)) {
+        startActivity(browserIntent);
+      } else {
+        buildAlertNoBrowserAndStores();
+      }
+    }
   }
 
   @SuppressLint("ResourceType")
@@ -378,8 +404,8 @@ public class InstallDialogActivity extends Activity {
         .getDisplayMetrics());
   }
 
-  private Intent buildStoreViewIntent() {
-    final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_APTOIDE));
+  private Intent buildStoreViewIntent(String storeUrl) {
+    final Intent appStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(storeUrl));
     if (WalletUtils.getAptoideVersion() >= MINIMUM_APTOIDE_VERSION) {
       appStoreIntent.setPackage(BuildConfig.APTOIDE_PACKAGE_NAME);
     }
@@ -446,13 +472,13 @@ public class InstallDialogActivity extends Activity {
     return getResources().getConfiguration().orientation;
   }
 
-  private boolean resolveActivityInfoForIntent(Intent intent) {
+  private boolean isAbleToRedirect(Intent intent) {
     ActivityInfo activityInfo = intent.resolveActivityInfo(getPackageManager(), 0);
     return activityInfo != null;
   }
 
-  private Intent buildBrowserIntent() {
-    return new Intent(Intent.ACTION_VIEW, Uri.parse(URL_BROWSER));
+  private Intent buildBrowserIntent(String url) {
+    return new Intent(Intent.ACTION_VIEW, Uri.parse(url));
   }
 
   private void buildAlertNoBrowserAndStores() {

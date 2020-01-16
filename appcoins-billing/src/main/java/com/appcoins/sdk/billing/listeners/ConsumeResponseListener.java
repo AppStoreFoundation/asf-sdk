@@ -1,4 +1,4 @@
-package com.appcoins.sdk.billing;
+package com.appcoins.sdk.billing.listeners;
 
 public interface ConsumeResponseListener {
 

@@ -1,5 +1,7 @@
 package com.appcoins.sdk.billing;
 
+import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
+import com.appcoins.sdk.billing.listeners.SkuDetailsResponseListener;
 import java.util.ArrayList;
 
 public class SkuDetailsAsync implements Runnable {
