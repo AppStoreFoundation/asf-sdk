@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.AppcoinsBillingClient;
 import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.Purchase;
@@ -17,6 +16,7 @@ import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsParams;
 import com.appcoins.sdk.billing.helpers.CatapultBillingAppCoinsFactory;
+import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.types.SkuType;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
             .show();
       }
     };
-    cab = CatapultBillingAppCoinsFactory.buildAppcoinsBilling(this, BuildConfig.IAB_KEY,
+    cab = CatapultBillingAppCoinsFactory.BuildAppcoinsBilling(this, BuildConfig.IAB_KEY,
         purchaseFinishedListener);
 
     listener = new AppCoinsBillingStateListener() {
