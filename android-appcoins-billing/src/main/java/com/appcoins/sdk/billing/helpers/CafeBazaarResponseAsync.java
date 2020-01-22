@@ -2,7 +2,6 @@ package com.appcoins.sdk.billing.helpers;
 
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -17,7 +16,7 @@ public class CafeBazaarResponseAsync extends AsyncTask {
     this.responseListener = responseListener;
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.KITKAT) private int getResponseCode() throws IOException {
+  private int getResponseCode() throws IOException {
     URL url = new URL("https://cdn.api.cafebazaar.ir/rest-v1/process");
     HttpURLConnection huc = (HttpURLConnection) url.openConnection();
     huc.setRequestMethod("POST");
@@ -38,9 +37,13 @@ public class CafeBazaarResponseAsync extends AsyncTask {
         + "\t\t}\n"
         + "\t}\n"
         + "}";
-    try (OutputStream os = huc.getOutputStream()) {
-      byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
-      os.write(input, 0, input.length);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      try (OutputStream os = huc.getOutputStream()) {
+        byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+        os.write(input, 0, input.length);
+      }
+    } else {
+      return 404;
     }
     huc.connect();
     int responseCode = 404;
