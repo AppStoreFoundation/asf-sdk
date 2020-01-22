@@ -54,9 +54,7 @@ public class CafeBazaarResponseAsync extends AsyncTask {
   @Override protected Object doInBackground(Object[] objects) {
     int responseCode = 404;
     try {
-      if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-        responseCode = getResponseCode();
-      }
+      responseCode = getResponseCode();
     } catch (IOException e) {
       e.printStackTrace();
     }
