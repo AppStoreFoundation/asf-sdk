@@ -54,7 +54,7 @@ public class InstallDialogActivity extends Activity {
   private static String installButtonTextColor = "#ffffffff";
   private final String GOOGLE_PLAY_URL =
       "https://play.google.com/store/apps/details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
-  private final String CAFE_BAZAAR_URL = "https://cafebazaar.ir/app/com.hezardastaan.wallet";
+  private final String CAFE_BAZAAR_URL = "bazaar://details?id=com.hezardastan.wallet";
   private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
