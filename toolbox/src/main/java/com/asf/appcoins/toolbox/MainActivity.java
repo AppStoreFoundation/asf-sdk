@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
 
   private static final String TAG = MainActivity.class.getSimpleName();
   private AppcoinsBillingClient cab;
-  private String token = null;
+  private String token;
   private AppCoinsBillingStateListener listener;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
