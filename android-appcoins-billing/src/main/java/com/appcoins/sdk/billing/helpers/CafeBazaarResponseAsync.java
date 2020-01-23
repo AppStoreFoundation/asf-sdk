@@ -38,15 +38,14 @@ public class CafeBazaarResponseAsync extends AsyncTask {
         + "\t}\n"
         + "}";
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      try (OutputStream os = huc.getOutputStream()) {
-        byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
-        os.write(input, 0, input.length);
-      }
+      OutputStream os = huc.getOutputStream();
+      byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+      os.write(input, 0, input.length);
     } else {
       return 404;
     }
     huc.connect();
-    int responseCode = 404;
+    int responseCode = huc.getResponseCode();
     huc.disconnect();
     return responseCode;
   }
