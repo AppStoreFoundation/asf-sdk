@@ -16,7 +16,7 @@ package ethereumj.crypto;
  * limitations under the License.
  */
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import ethereumj.config.Constants;
 import ethereumj.crypto.jce.ECKeyFactory;
 import ethereumj.crypto.jce.ECKeyPairGenerator;
