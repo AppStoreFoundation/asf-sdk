@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
+import com.appcoins.sdk.billing.service.AdyenRepository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -60,9 +61,13 @@ public class InstallDialogActivity extends Activity {
   public BuyItemProperties buyItemProperties;
   private View loadingDialogInstall;
   private TranslationsModel translationsModel;
+  private AdyenRepository adyenRepository;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    /*adyenRepository = new AdyenRepository(
+        new BdsService(BuildConfig.HOST_WS + "/broker/8.20191202/gateways/adyen_v2/"));
+         //Mock implementation*/
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
@@ -260,6 +265,15 @@ public class InstallDialogActivity extends Activity {
     installButton.setLayoutParams(installButtonParams);
     installButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
+        /*AdyenLoadPaymentInfoListener listener = new AdyenLoadPaymentInfoListener() {
+          @Override
+          public void onResponse(int code, PaymentMethodsApiResponse paymentMethodsApiResponse,
+              Exception exception) {
+            //TODO Mocked implementation of Service
+          }
+        };
+        adyenRepository.loadPaymentInfo("paypal", "9.06", "EUR",
+          "walletAddress", listener); *///Mock implementation of Service
         redirectToWalletInstallation(storeUrl);
       }
     });
