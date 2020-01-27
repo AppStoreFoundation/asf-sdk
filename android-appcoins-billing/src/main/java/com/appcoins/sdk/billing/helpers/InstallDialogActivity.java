@@ -30,8 +30,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.listeners.AdyenLoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.service.AdyenRepository;
+import com.appcoins.sdk.billing.service.BdsService;
+import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -65,9 +68,8 @@ public class InstallDialogActivity extends Activity {
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    /*adyenRepository = new AdyenRepository(
+    adyenRepository = new AdyenRepository(
         new BdsService(BuildConfig.HOST_WS + "/broker/8.20191202/gateways/adyen_v2/"));
-         //Mock implementation*/
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
@@ -265,19 +267,52 @@ public class InstallDialogActivity extends Activity {
     installButton.setLayoutParams(installButtonParams);
     installButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        /*AdyenLoadPaymentInfoListener listener = new AdyenLoadPaymentInfoListener() {
-          @Override
-          public void onResponse(int code, PaymentMethodsApiResponse paymentMethodsApiResponse,
-              Exception exception) {
-            //TODO Mocked implementation of Service
+        AdyenLoadPaymentInfoListener listener = new AdyenLoadPaymentInfoListener() {
+          @Override public void onResponse(int code, String response, Exception exception) {
+            if (true) { //insert paypal condition here
+              launchPaypal(code, response, exception);
+            } else {
+              showCreditCardLayout(code, response, exception);
+            }
           }
         };
-        adyenRepository.loadPaymentInfo("paypal", "9.06", "EUR",
-          "walletAddress", listener); *///Mock implementation of Service
+        adyenRepository.loadPaymentInfo("credit_card", "9.06", "EUR", "walletAddress",
+            listener); //Change as needed for each method and insert a specific wallet
+        //makeCreditCardPayment(listener);
         redirectToWalletInstallation(storeUrl);
       }
     });
     return installButton;
+  }
+
+  private void makeCreditCardPayment(AdyenLoadPaymentInfoListener listener) {
+    CardEncryptorImpl cardEncryptor = new CardEncryptorImpl();
+    String cardPaymentMethod = cardEncryptor.encryptFields("", 0, 0, "",
+        BuildConfig.ADYEN_PUBLIC_KEY); // Use test cards values
+    adyenRepository.makePayment(cardPaymentMethod, false,
+        "\"adyencheckout://com.appcoins.wallet.dev\"", "\"9.06\"", "\"EUR\"",
+        "\"orderId=1580121791311\"", "\"credit_card\"", "walletAddress", "\"BDS\"",
+        "\"com.appcoins.trivialdrivesample.test\"", "\"developer payload: gas\"", "\"gas\"", null,
+        "\"INAPP\"", "\"walletAddress\"", "\"walletAddress\"", "\"walletAddress\"",
+        "\"walletAddress\"", listener); //Change walletAddress for a correct wallet
+  }
+
+  private void showCreditCardLayout(int code, String response, Exception exception) {
+    Log.d("TAG", "HERE: " + response);
+  }
+
+  private void launchPaypal(int code, String response, Exception exception) {
+    AdyenLoadPaymentInfoListener listener1 = new AdyenLoadPaymentInfoListener() {
+      @Override public void onResponse(int code, String response, Exception exception) {
+        Log.d("TAG", "SECOND LISTENER: " + response);
+      }
+    };
+    Log.d("TAG", "FIRST LISTENER: " + response);
+    adyenRepository.makePayment(response, false, "\"adyencheckout://com.appcoins.wallet.dev\"",
+        "\"9.06\"", "\"EUR\"", "\"orderId=1580121791311\"", "\"paypal\"", "walletAddress",
+        "\"BDS\"", "\"com.appcoins.trivialdrivesample.test\"", "\"developer payload: gas\"",
+        "\"gas\"", null, "\"INAPP\"", "\"walletAddress\"", "\"walletAddress\"", "\"walletAddress\"",
+        "\"walletAddress\"", listener1); //Change walletAddress for a correct wallet
   }
 
   private void redirectToWalletInstallation(final String storeUrl) {

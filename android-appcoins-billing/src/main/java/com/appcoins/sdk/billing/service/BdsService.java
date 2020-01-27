@@ -27,16 +27,17 @@ public class BdsService implements Service {
       StringBuilder urlBuilder = buildUrl(baseUrl, endPoint, paths, queries);
       URL url = new URL(urlBuilder.toString());
       urlConnection = openUrlConnection(url, httpMethod);
-      int responseCode = urlConnection.getResponseCode();
 
+      if (httpMethod.equals("POST") && body != null) {
+        setPostOutput(urlConnection, body);
+      }
+
+      int responseCode = urlConnection.getResponseCode();
       InputStream inputStream;
       if (responseCode >= 400) {
         inputStream = urlConnection.getErrorStream();
       } else {
         inputStream = urlConnection.getInputStream();
-      }
-      if (httpMethod.equals("POST") && body != null) {
-        setPostOutput(urlConnection, body);
       }
       return readResponse(inputStream, responseCode);
     } catch (Exception firstException) {
@@ -92,6 +93,8 @@ public class BdsService implements Service {
 
   private static void setPostOutput(HttpURLConnection urlConnection, String body)
       throws IOException {
+    urlConnection.setRequestProperty("Content-Type", "application/json");
+    urlConnection.setRequestProperty("Accept", "application/json");
     urlConnection.setDoOutput(true);
     OutputStream os = urlConnection.getOutputStream();
     byte[] input = body.getBytes(StandardCharsets.UTF_8);
