@@ -30,6 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.WebViewActivity;
 import com.appcoins.sdk.billing.listeners.AdyenLoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.service.AdyenRepository;
@@ -48,6 +49,7 @@ public class InstallDialogActivity extends Activity {
   public final static String LOADING_DIALOG_CARD = "loading_dialog_install";
   public final static int REQUEST_CODE = 10001;
   public final static int ERROR_RESULT_CODE = 6;
+  private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private final static String TRANSLATIONS = "translations";
   private final static int MINIMUM_APTOIDE_VERSION = 9908;
   private final static int RESULT_USER_CANCELED = 1;
@@ -276,10 +278,10 @@ public class InstallDialogActivity extends Activity {
             }
           }
         };
-        adyenRepository.loadPaymentInfo("credit_card", "9.06", "EUR", "walletAddress",
+        adyenRepository.loadPaymentInfo("paypal", "9.06", "EUR", "walletAddress",
             listener); //Change as needed for each method and insert a specific wallet
         //makeCreditCardPayment(listener);
-        redirectToWalletInstallation(storeUrl);
+        //redirectToWalletInstallation(storeUrl);
       }
     });
     return installButton;
@@ -302,9 +304,12 @@ public class InstallDialogActivity extends Activity {
   }
 
   private void launchPaypal(int code, String response, Exception exception) {
+    final Activity activity = this;
     AdyenLoadPaymentInfoListener listener1 = new AdyenLoadPaymentInfoListener() {
       @Override public void onResponse(int code, String response, Exception exception) {
         Log.d("TAG", "SECOND LISTENER: " + response);
+        startActivityForResult(WebViewActivity.newIntent(activity, "https://www.google.com"),
+            WEB_VIEW_REQUEST_CODE);
       }
     };
     Log.d("TAG", "FIRST LISTENER: " + response);
