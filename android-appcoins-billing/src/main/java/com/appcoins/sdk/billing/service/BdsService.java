@@ -1,5 +1,6 @@
 package com.appcoins.sdk.billing.service;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +10,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +23,7 @@ public class BdsService implements Service {
     this.baseUrl = baseUrl;
   }
 
-  private static RequestResponse createRequest(String baseUrl, String endPoint, String httpMethod,
+  static RequestResponse createRequest(String baseUrl, String endPoint, String httpMethod,
       List<String> paths, Map<String, String> queries, String body) {
     HttpURLConnection urlConnection = null;
     try {
@@ -59,13 +62,11 @@ public class BdsService implements Service {
       urlBuilder.append("?");
     }
     for (Map.Entry<String, String> entry : queries.entrySet()) {
-      urlBuilder.append(entry.getKey())
-          .append("=")
-          .append(entry.getValue())
-          .append("&");
-    }
-    if (!queries.isEmpty()) {
-      urlBuilder.setLength(urlBuilder.length() - 1);
+      urlBuilder = new StringBuilder(Uri.parse(urlBuilder.toString())
+          .buildUpon()
+          .appendQueryParameter(entry.getKey(), entry.getValue())
+          .build()
+          .toString());
     }
     return urlBuilder;
   }
@@ -114,38 +115,14 @@ public class BdsService implements Service {
 
   public void makeRequest(String endPoint, String httpMethod, List<String> paths,
       Map<String, String> queries, String body, ServiceResponseListener serviceResponseListener) {
+    if (paths == null) {
+      paths = new ArrayList<>();
+    }
+    if (queries == null) {
+      queries = new HashMap<>();
+    }
     AsyncTask asyncTask = new ServiceAsyncTask(baseUrl, endPoint, httpMethod, paths, queries, body,
         serviceResponseListener);
     asyncTask.execute();
-  }
-
-  protected static class ServiceAsyncTask extends AsyncTask {
-
-    private final String httpMethod;
-    private final List<String> paths;
-    private final Map<String, String> queries;
-    private final String body;
-    private String baseUrl;
-    private String endPoint;
-    private ServiceResponseListener serviceResponseListener;
-
-    ServiceAsyncTask(String baseUrl, String endPoint, String httpMethod, List<String> paths,
-        Map<String, String> queries, String body, ServiceResponseListener serviceResponseListener) {
-      this.baseUrl = baseUrl;
-      this.endPoint = endPoint;
-      this.httpMethod = httpMethod;
-      this.paths = paths;
-      this.queries = queries;
-      this.body = body;
-      this.serviceResponseListener = serviceResponseListener;
-    }
-
-    @Override protected Object doInBackground(Object[] objects) {
-      RequestResponse requestResponse =
-          createRequest(baseUrl, endPoint, httpMethod, paths, queries, body);
-      serviceResponseListener.onResponseReceived(requestResponse.getResponseCode(),
-          requestResponse.getResponse(), requestResponse.getException());
-      return null;
-    }
   }
 }

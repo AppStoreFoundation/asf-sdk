@@ -25,9 +25,11 @@ public class AdyenRepository {
     queries.put("price.currency", currency);
     queries.put("method", method);
     ServiceResponseListener serviceResponseListener = new ServiceResponseListener() {
-      @Override public void onResponseReceived(int code, String apiResponse, Exception exception) {
+      @Override public void onResponseReceived(RequestResponse requestResponse) {
         PaymentMethodsApiResponse paymentMethodsApiResponse = null;
         JSONObject jsonObject = new JSONObject();
+        int code = requestResponse.getResponseCode();
+        String apiResponse = requestResponse.getResponse();
         if (code == 200 && apiResponse != null) {
           try {
             jsonObject = new JSONObject(apiResponse);
@@ -37,7 +39,7 @@ public class AdyenRepository {
           }
           paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(jsonObject);
         }
-        listener.onResponse(code, paymentMethodsApiResponse, exception);
+        listener.onResponse(code, paymentMethodsApiResponse, requestResponse.getException());
       }
     };
     bdsService.makeRequest("payment-methods", "GET", new ArrayList<String>(), queries, null,
