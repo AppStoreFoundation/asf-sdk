@@ -25,7 +25,6 @@ public class AdyenRepository {
     queries.put("price.value", value);
     queries.put("price.currency", currency);
     queries.put("method", method);
-
     ServiceResponseListener serviceResponseListener = createLoadPaymentInfoListener(listener);
 
     bdsService.makeRequest("payment-methods", "GET", new ArrayList<String>(), queries, null,
@@ -48,28 +47,6 @@ public class AdyenRepository {
 
     bdsService.makeRequest("transactions", "POST", new ArrayList<String>(), queries, body,
         serviceResponseListener);
-  }
-
-  private ServiceResponseListener createLoadPaymentInfoListener(
-      final AdyenLoadPaymentInfoListener listener) {
-    return new ServiceResponseListener() {
-      @Override public void onResponseReceived(int code, String apiResponse, Exception exception) {
-        JSONObject jsonObject = new JSONObject();
-        if (code == 200 && apiResponse != null) {
-          try {
-            //Only for paypal as we don't need this object for the CC as it would only be used
-            // for the layout which we won't use
-            jsonObject = new JSONObject(apiResponse);
-            jsonObject = new JSONObject(jsonObject.getString("payment"));
-            JSONArray array = jsonObject.optJSONArray("paymentMethods");
-            jsonObject = array.getJSONObject(0);
-          } catch (JSONException e) {
-            e.printStackTrace();
-          }
-        }
-        listener.onResponse(code, jsonObject.toString(), exception);
-      }
-    };
   }
 
   private String buildMockedBody(String adyenPaymentMethod, boolean shouldStorePaymentMethod,
@@ -132,11 +109,37 @@ public class AdyenRepository {
     return body;
   }
 
+  private ServiceResponseListener createLoadPaymentInfoListener(
+      final AdyenLoadPaymentInfoListener listener) {
+    return new ServiceResponseListener() {
+      @Override public void onResponseReceived(RequestResponse requestResponse) {
+        JSONObject jsonObject = new JSONObject();
+        int code = requestResponse.getResponseCode();
+        String apiResponse = requestResponse.getResponse();
+        if (code == 200 && apiResponse != null) {
+          try {
+            //Only for paypal as we don't need this object for the CC as it would only be used
+            // for the layout which we won't use
+            jsonObject = new JSONObject(apiResponse);
+            jsonObject = new JSONObject(jsonObject.getString("payment"));
+            JSONArray array = jsonObject.optJSONArray("paymentMethods");
+            jsonObject = array.getJSONObject(0);
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+        }
+        listener.onResponse(code, jsonObject.toString(), requestResponse.getException());
+      }
+    };
+  }
+
   private ServiceResponseListener createMakePaymentListener(
       final AdyenLoadPaymentInfoListener listener) {
     return new ServiceResponseListener() {
-      @Override public void onResponseReceived(int code, String apiResponse, Exception exception) {
+      @Override public void onResponseReceived(RequestResponse requestResponse) {
         JSONObject jsonObject;
+        int code = requestResponse.getResponseCode();
+        String apiResponse = requestResponse.getResponse();
         if (code == 200 && apiResponse != null) {
           try {
             jsonObject = new JSONObject(apiResponse);
@@ -146,7 +149,7 @@ public class AdyenRepository {
           }
         }
         //TODO map the response to the needed object
-        listener.onResponse(code, apiResponse, exception);
+        listener.onResponse(code, apiResponse, requestResponse.getException());
       }
     };
   }
