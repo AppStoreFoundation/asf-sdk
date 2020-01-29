@@ -9,13 +9,14 @@ public class ServiceAsyncTask extends AsyncTask {
   private final String httpMethod;
   private final List<String> paths;
   private final Map<String, String> queries;
-  private final String body;
+  private final Map<String, String> body;
   private String baseUrl;
   private String endPoint;
   private ServiceResponseListener serviceResponseListener;
 
   ServiceAsyncTask(String baseUrl, String endPoint, String httpMethod, List<String> paths,
-      Map<String, String> queries, String body, ServiceResponseListener serviceResponseListener) {
+      Map<String, String> queries, Map<String, String> body,
+      ServiceResponseListener serviceResponseListener) {
     this.baseUrl = baseUrl;
     this.endPoint = endPoint;
     this.httpMethod = httpMethod;

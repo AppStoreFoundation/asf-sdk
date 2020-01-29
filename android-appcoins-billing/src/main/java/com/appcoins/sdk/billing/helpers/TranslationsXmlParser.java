@@ -25,6 +25,7 @@ public class TranslationsXmlParser {
   private static final String translationsRelativePath =
       "appcoins-wallet/resources/translations/values-";
   private static final String translationsFileName = "/external_strings.xml";
+  private static final int NUMBER_OF_TRANSLATED_STRINGS = 8;
   private Context context;
 
   public TranslationsXmlParser(Context context) {
@@ -43,21 +44,8 @@ public class TranslationsXmlParser {
     try {
       InputStream inputStream = context.getAssets()
           .open(translationXmlPath);
-      XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
-      xmlPullParserFactory.setNamespaceAware(true);
-      XmlPullParser parser = xmlPullParserFactory.newPullParser();
-      parser.setInput(inputStream, null);
-      int eventType = parser.getEventType();
-      ArrayList<String> xmlContent = new ArrayList<>();
-      while (eventType != XmlPullParser.END_DOCUMENT) {
-        String value = parser.getText();
-        if (eventType == XmlPullParser.TEXT && !value.trim()
-            .isEmpty()) {
-          xmlContent.add(value.trim());
-        }
-        eventType = parser.next();
-      }
-      if (xmlContent.size() == 8) {
+      ArrayList<String> xmlContent = parseXml(inputStream);
+      if (xmlContent.size() == NUMBER_OF_TRANSLATED_STRINGS) {
         translationsModel.mapStrings(xmlContent);
       } else {
         fillInMissingStrings(xmlContent);
@@ -72,6 +60,25 @@ public class TranslationsXmlParser {
       e.printStackTrace();
     }
     return translationsModel;
+  }
+
+  private ArrayList<String> parseXml(InputStream inputStream)
+      throws XmlPullParserException, IOException {
+    XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
+    xmlPullParserFactory.setNamespaceAware(true);
+    XmlPullParser parser = xmlPullParserFactory.newPullParser();
+    parser.setInput(inputStream, null);
+    int eventType = parser.getEventType();
+    ArrayList<String> xmlContent = new ArrayList<>();
+    while (eventType != XmlPullParser.END_DOCUMENT) {
+      String value = parser.getText();
+      if (eventType == XmlPullParser.TEXT && !value.trim()
+          .isEmpty()) {
+        xmlContent.add(value.trim());
+      }
+      eventType = parser.next();
+    }
+    return xmlContent;
   }
 
   private ArrayList<String> setDefaultValues() {

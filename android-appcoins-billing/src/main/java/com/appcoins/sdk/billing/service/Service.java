@@ -6,5 +6,6 @@ import java.util.Map;
 public interface Service {
 
   void makeRequest(String endPoint, String httpMethod, List<String> paths,
-      Map<String, String> queries, String body, ServiceResponseListener serviceResponseListener);
+      Map<String, String> queries, Map<String, String> body,
+      ServiceResponseListener serviceResponseListener);
 }
