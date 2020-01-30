@@ -31,7 +31,10 @@ public class BdsService implements Service {
       URL url = new URL(urlBuilder);
       urlConnection = openUrlConnection(url, httpMethod);
 
-      if (httpMethod.equals("POST") && body != null) {
+      if ((httpMethod.equals("POST") || httpMethod.equals("PATCH")) && body != null) {
+        if (httpMethod.equals("PATCH")) {
+          urlConnection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
+        }
         setPostOutput(urlConnection, body);
       }
 

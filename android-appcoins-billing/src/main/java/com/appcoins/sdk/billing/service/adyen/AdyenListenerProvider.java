@@ -9,11 +9,11 @@ import com.appcoins.sdk.billing.service.ServiceResponseListener;
 
 import static com.appcoins.sdk.billing.utils.ServiceUtils.isSuccess;
 
-public class AdyenListenerCreator {
+public class AdyenListenerProvider {
 
   private AdyenMapper adyenMapper;
 
-  public AdyenListenerCreator(AdyenMapper adyenMapper) {
+  public AdyenListenerProvider(AdyenMapper adyenMapper) {
 
     this.adyenMapper = adyenMapper;
   }

@@ -37,7 +37,7 @@ import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
 import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
 import com.appcoins.sdk.billing.service.BdsService;
-import com.appcoins.sdk.billing.service.adyen.AdyenListenerCreator;
+import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
 import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
 import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
@@ -77,7 +77,7 @@ public class InstallDialogActivity extends Activity {
     super.onCreate(savedInstanceState);
     adyenRepository = new AdyenRepository(
         new BdsService(BuildConfig.HOST_WS + "/broker/8.20191202/gateways/adyen_v2/"),
-        new AdyenListenerCreator(new AdyenMapper()));
+        new AdyenListenerProvider(new AdyenMapper()));
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);

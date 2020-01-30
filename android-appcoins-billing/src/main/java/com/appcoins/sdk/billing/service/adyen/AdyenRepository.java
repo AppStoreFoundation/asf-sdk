@@ -15,12 +15,12 @@ import java.util.Map;
 public class AdyenRepository {
 
   private Service bdsService;
-  private AdyenListenerCreator adyenListenerCreator;
+  private AdyenListenerProvider adyenListenerProvider;
 
-  public AdyenRepository(Service bdsService, AdyenListenerCreator adyenListenerCreator) {
+  public AdyenRepository(Service bdsService, AdyenListenerProvider adyenListenerProvider) {
 
     this.bdsService = bdsService;
-    this.adyenListenerCreator = adyenListenerCreator;
+    this.adyenListenerProvider = adyenListenerProvider;
   }
 
   public void loadPaymentInfo(String method, String value, String currency, String walletAddress,
@@ -31,7 +31,7 @@ public class AdyenRepository {
     queries.put("price.currency", currency);
     queries.put("method", method);
     ServiceResponseListener serviceResponseListener =
-        adyenListenerCreator.createLoadPaymentInfoListener(listener);
+        adyenListenerProvider.createLoadPaymentInfoListener(listener);
 
     bdsService.makeRequest("payment-methods", "GET", new ArrayList<String>(), queries, null,
         serviceResponseListener);
@@ -50,7 +50,7 @@ public class AdyenRepository {
             currency, reference, paymentType, origin, packageName, metadata, sku, callbackUrl,
             transactionType, developerWallet, storeWallet, oemWallet, userWallet);
     ServiceResponseListener serviceResponseListener =
-        adyenListenerCreator.createMakePaymentListener(listener);
+        adyenListenerProvider.createMakePaymentListener(listener);
 
     bdsService.makeRequest("transactions", "POST", new ArrayList<String>(), queries, body,
         serviceResponseListener);
@@ -60,7 +60,7 @@ public class AdyenRepository {
       GetTransactionListener getTransactionListener) {
 
     ServiceResponseListener serviceResponseListener =
-        adyenListenerCreator.createGetTransactionListener(getTransactionListener);
+        adyenListenerProvider.createGetTransactionListener(getTransactionListener);
 
     List<String> path = new ArrayList<>();
     path.add(uid);
@@ -75,7 +75,7 @@ public class AdyenRepository {
   public void submitRedirect(String uid, String walletAddress, Object details, String data,
       final MakePaymentListener makePaymentListener) {
     ServiceResponseListener serviceResponseListener =
-        adyenListenerCreator.createSubmitRedirectListener(makePaymentListener);
+        adyenListenerProvider.createSubmitRedirectListener(makePaymentListener);
 
     List<String> path = new ArrayList<>();
     path.add(uid);
@@ -93,7 +93,7 @@ public class AdyenRepository {
   public void disablePayments(String walletAddress,
       final NoInfoResponseListener noInfoResponseListener) {
     ServiceResponseListener serviceResponseListener =
-        adyenListenerCreator.createDisablePaymentsListener(noInfoResponseListener);
+        adyenListenerProvider.createDisablePaymentsListener(noInfoResponseListener);
 
     Map<String, String> body = new LinkedHashMap<>();
     body.put("wallet.address", walletAddress);
