@@ -17,6 +17,13 @@ public class PaymentMethodsResponse {
     this.error = error;
   }
 
+  public PaymentMethodsResponse() {
+    this.value = null;
+    this.currency = "";
+    this.paymentMethod = "";
+    this.error = true;
+  }
+
   public BigDecimal getValue() {
     return value;
   }

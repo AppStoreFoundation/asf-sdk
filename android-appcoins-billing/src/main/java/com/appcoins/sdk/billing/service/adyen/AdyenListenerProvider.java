@@ -21,8 +21,7 @@ public class AdyenListenerProvider {
   ServiceResponseListener createLoadPaymentInfoListener(final LoadPaymentInfoListener listener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        listener.onResponse(adyenMapper.mapPaymentMethodsResponse(requestResponse.getResponseCode(),
-            requestResponse.getResponse()));
+        listener.onResponse(adyenMapper.mapPaymentMethodsResponse(requestResponse));
       }
     };
   }
@@ -30,9 +29,7 @@ public class AdyenListenerProvider {
   ServiceResponseListener createMakePaymentListener(final MakePaymentListener listener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        listener.onResponse(
-            adyenMapper.mapAdyenTransactionResponse(requestResponse.getResponseCode(),
-                requestResponse.getResponse()));
+        listener.onResponse(adyenMapper.mapAdyenTransactionResponse(requestResponse));
       }
     };
   }
@@ -41,9 +38,7 @@ public class AdyenListenerProvider {
       final GetTransactionListener getTransactionListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        getTransactionListener.onResponse(
-            adyenMapper.mapTransactionResponse(requestResponse.getResponseCode(),
-                requestResponse.getResponse()));
+        getTransactionListener.onResponse(adyenMapper.mapTransactionResponse(requestResponse));
       }
     };
   }
@@ -52,9 +47,7 @@ public class AdyenListenerProvider {
       final MakePaymentListener makePaymentListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        makePaymentListener.onResponse(
-            adyenMapper.mapAdyenTransactionResponse(requestResponse.getResponseCode(),
-                requestResponse.getResponse()));
+        makePaymentListener.onResponse(adyenMapper.mapAdyenTransactionResponse(requestResponse));
       }
     };
   }

@@ -36,7 +36,7 @@ android {
               project.CAFE_BAZAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
       buildConfigField 'String', 'ADYEN_PUBLIC_KEY',
-          "\"" + project.ADYEN_PUBLIC_KEY + "\""
+          "\"" + project.ADYEN_PUBLIC_KEY_DEV + "\""
     }
     release {
       minifyEnabled false

@@ -34,8 +34,11 @@ import com.appcoins.sdk.billing.WebViewActivity;
 import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
+import com.appcoins.sdk.billing.models.AdyenPaymentParams;
 import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
 import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
+import com.appcoins.sdk.billing.models.TransactionInformation;
+import com.appcoins.sdk.billing.models.TransactionWallets;
 import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
 import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
@@ -331,10 +334,15 @@ public class InstallDialogActivity extends Activity {
   }
 
   private void makePayment(String cardPaymentMethod, MakePaymentListener makePaymentListener) {
-    adyenRepository.makePayment(cardPaymentMethod, false, "adyencheckout://com.appcoins.wallet.dev",
-        "9.06", "EUR", "orderId=1580121791311", "paypal", "walletAddress", "BDS",
-        "com.appcoins.trivialdrivesample.test", "developer payload: gas", "gas", null, "INAPP",
-        "walletAddress", "walletAddress", "walletAddress", "walletAddress",
+    TransactionWallets transactionWallets =
+        new TransactionWallets("walletAddress", "walletAddress", "walletAddress", "walletAddress",
+            "walletAddress"); //Change walletAddress for a correct wallet
+    AdyenPaymentParams adyenPaymentParams =
+        new AdyenPaymentParams(cardPaymentMethod, false, "adyencheckout://com.appcoins.wallet.dev");
+    TransactionInformation transactionInformation =
+        new TransactionInformation("9.06", "EUR", "orderId=1580121791311", "paypal", "BDS",
+            "com.appcoins.trivialdrivesample.test", "developer payload: gas", "gas", null, "INAPP");
+    adyenRepository.makePayment(adyenPaymentParams, transactionInformation, transactionWallets,
         makePaymentListener); //Change walletAddress for a correct wallet
   }
 

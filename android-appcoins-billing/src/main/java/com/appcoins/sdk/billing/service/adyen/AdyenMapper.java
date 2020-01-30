@@ -4,6 +4,7 @@ import android.util.Log;
 import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
 import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
 import com.appcoins.sdk.billing.models.TransactionResponse;
+import com.appcoins.sdk.billing.service.RequestResponse;
 import java.math.BigDecimal;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,12 +18,15 @@ public class AdyenMapper {
 
   }
 
-  TransactionResponse mapTransactionResponse(int code, String response) {
+  TransactionResponse mapTransactionResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    String uid = "";
-    String hash = "";
-    String orderReference = "";
-    String status = "";
+    TransactionResponse transactionResponse = new TransactionResponse();
+    String response = requestResponse.getResponse();
+    int code = requestResponse.getResponseCode();
+    String uid;
+    String hash;
+    String orderReference;
+    String status;
     if (isSuccess(code) && response != null) {
       Log.d("TAG123", "TransactionResponse: ");
       try {
@@ -31,25 +35,30 @@ public class AdyenMapper {
         hash = jsonObject.getString("hash");
         orderReference = jsonObject.getString("reference");
         status = jsonObject.getString("status");
+        transactionResponse =
+            new TransactionResponse(uid, hash, orderReference, status, !isSuccess(code));
       } catch (JSONException e) {
         e.printStackTrace();
       }
     }
-    return new TransactionResponse(uid, hash, orderReference, status, !isSuccess(code));
+    return transactionResponse;
   }
 
-  AdyenTransactionResponse mapAdyenTransactionResponse(int code, String response) {
+  AdyenTransactionResponse mapAdyenTransactionResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    String uid = "";
-    String hash = "";
-    String orderReference = "";
-    String status = "";
-    String pspReference = "";
-    String resultCode = null;
-    String refusalReason = "";
+    AdyenTransactionResponse adyenTransactionResponse = new AdyenTransactionResponse();
+    String response = requestResponse.getResponse();
+    int code = requestResponse.getResponseCode();
+    String uid;
+    String hash;
+    String orderReference;
+    String status;
+    String pspReference;
+    String resultCode;
+    String refusalReason = null;
     String refusalReasonCode = null;
-    String url = "";
-    String paymentData = "";
+    String url = null;
+    String paymentData = null;
     if (isSuccess(code) && response != null) {
       Log.d("TAG123", "AdyenTransactionResponse: " + response);
       try {
@@ -72,19 +81,24 @@ public class AdyenMapper {
         if (paymentJson.has("refusalReasonCode")) {
           refusalReasonCode = paymentJson.getString("refusalReasonCode");
         }
+        adyenTransactionResponse =
+            new AdyenTransactionResponse(uid, hash, orderReference, status, pspReference,
+                resultCode, url, paymentData, refusalReason, refusalReasonCode, !isSuccess(code));
       } catch (JSONException e) {
         e.printStackTrace();
       }
     }
-    return new AdyenTransactionResponse(uid, hash, orderReference, status, pspReference, resultCode,
-        url, paymentData, refusalReason, refusalReasonCode, !isSuccess(code));
+    return adyenTransactionResponse;
   }
 
-  PaymentMethodsResponse mapPaymentMethodsResponse(int code, String response) {
+  PaymentMethodsResponse mapPaymentMethodsResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    BigDecimal value = null;
-    String currency = "";
-    String paymentMethodsApiResponse = null;
+    PaymentMethodsResponse paymentMethodsResponse = new PaymentMethodsResponse();
+    String response = requestResponse.getResponse();
+    int code = requestResponse.getResponseCode();
+    BigDecimal value;
+    String currency;
+    String paymentMethodsApiResponse;
     if (isSuccess(code) && response != null) {
       Log.d("TAG123", "PaymentMethodsResponse: " + response);
       try {
@@ -97,10 +111,13 @@ public class AdyenMapper {
         JSONArray array = jsonObject.optJSONArray("paymentMethods");
         paymentMethodsApiResponse = array.getJSONObject(0)
             .toString();
+        paymentMethodsResponse =
+            new PaymentMethodsResponse(value, currency, paymentMethodsApiResponse,
+                !isSuccess(code));
       } catch (JSONException e) {
         e.printStackTrace();
       }
     }
-    return new PaymentMethodsResponse(value, currency, paymentMethodsApiResponse, !isSuccess(code));
+    return paymentMethodsResponse;
   }
 }

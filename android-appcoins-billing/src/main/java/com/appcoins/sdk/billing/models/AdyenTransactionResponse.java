@@ -31,6 +31,20 @@ public class AdyenTransactionResponse {
     this.error = error;
   }
 
+  public AdyenTransactionResponse() {
+    this.uid = "";
+    this.hash = "";
+    this.orderReference = "";
+    this.status = "FAILED";
+    this.pspReference = "";
+    this.resultCode = null;
+    this.url = null;
+    this.paymentData = null;
+    this.refusalReason = null;
+    this.refusalReasonCode = null;
+    this.error = true;
+  }
+
   public String getUid() {
     return uid;
   }

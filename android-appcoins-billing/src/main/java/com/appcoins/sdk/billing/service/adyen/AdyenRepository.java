@@ -4,6 +4,9 @@ import com.appcoins.sdk.billing.listeners.GetTransactionListener;
 import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.listeners.NoInfoResponseListener;
+import com.appcoins.sdk.billing.models.AdyenPaymentParams;
+import com.appcoins.sdk.billing.models.TransactionInformation;
+import com.appcoins.sdk.billing.models.TransactionWallets;
 import com.appcoins.sdk.billing.service.Service;
 import com.appcoins.sdk.billing.service.ServiceResponseListener;
 import java.util.ArrayList;
@@ -37,20 +40,16 @@ public class AdyenRepository {
         serviceResponseListener);
   }
 
-  public void makePayment(String adyenPaymentMethod, boolean shouldStorePaymentMethod,
-      String returnUrl, String value, String currency, String reference, String paymentType,
-      String walletAddress, String origin, String packageName, String metadata, String sku,
-      String callbackUrl, String transactionType, String developerWallet, String storeWallet,
-      String oemWallet, String userWallet, final MakePaymentListener listener) {
+  public void makePayment(AdyenPaymentParams adyenPaymentParams,
+      TransactionInformation transactionInformation, TransactionWallets transactionWallets,
+      final MakePaymentListener makePaymentListener) {
     Map<String, String> queries = new HashMap<>();
-    queries.put("wallet.address", walletAddress);
+    queries.put("wallet.address", transactionWallets.getMainWalletAddress());
 
     Map<String, String> body =
-        buildMakePaymentBody(adyenPaymentMethod, shouldStorePaymentMethod, returnUrl, value,
-            currency, reference, paymentType, origin, packageName, metadata, sku, callbackUrl,
-            transactionType, developerWallet, storeWallet, oemWallet, userWallet);
+        buildMakePaymentBody(adyenPaymentParams, transactionInformation, transactionWallets);
     ServiceResponseListener serviceResponseListener =
-        adyenListenerProvider.createMakePaymentListener(listener);
+        adyenListenerProvider.createMakePaymentListener(makePaymentListener);
 
     bdsService.makeRequest("transactions", "POST", new ArrayList<String>(), queries, body,
         serviceResponseListener);
@@ -101,29 +100,27 @@ public class AdyenRepository {
     bdsService.makeRequest("disable-recurring", "POST", null, null, body, serviceResponseListener);
   }
 
-  private Map<String, String> buildMakePaymentBody(String adyenPaymentMethod,
-      boolean shouldStorePaymentMethod, String returnUrl, String value, String currency,
-      String reference, String paymentType, String origin, String packageName, String metadata,
-      String sku, String callbackUrl, String transactionType, String developerWallet,
-      String storeWallet, String oemWallet, String userWallet) {
+  private Map<String, String> buildMakePaymentBody(AdyenPaymentParams adyenPaymentParams,
+      TransactionInformation transactionInformation, TransactionWallets transactionWallets) {
     Map<String, String> body = new LinkedHashMap<>();
-    body.put("payment.method", adyenPaymentMethod);
-    body.put("price.currency", enclosedString(currency));
-    body.put("wallets.developer", enclosedString(developerWallet));
-    body.put("domain", enclosedString(packageName));
-    body.put("metadata", enclosedString(metadata));
-    body.put("method", enclosedString(paymentType));
-    body.put("wallets.oem", enclosedString(oemWallet));
-    body.put("origin", enclosedString(origin));
-    body.put("reference", enclosedString(reference));
-    body.put("payment.return_url", enclosedString(returnUrl));
-    body.put("payment.store_method", Boolean.toString(shouldStorePaymentMethod));
-    body.put("product", enclosedString(sku));
-    body.put("wallets.store", enclosedString(storeWallet));
-    body.put("type", enclosedString(transactionType));
-    body.put("wallets.user", enclosedString(userWallet));
-    body.put("price.value", enclosedString(value));
-    putIfNotNull(body, "callback_url", enclosedString(callbackUrl));
+    body.put("payment.method", adyenPaymentParams.getCardPaymentMethod());
+    body.put("price.currency", enclosedString(transactionInformation.getCurrency()));
+    body.put("wallets.developer", enclosedString(transactionWallets.getDeveloperWalletAddress()));
+    body.put("domain", enclosedString(transactionInformation.getPackageName()));
+    body.put("metadata", enclosedString(transactionInformation.getMetadata()));
+    body.put("method", enclosedString(transactionInformation.getPaymentType()));
+    body.put("wallets.oem", enclosedString(transactionWallets.getOemWalletAddress()));
+    body.put("origin", enclosedString(transactionInformation.getOrigin()));
+    body.put("reference", enclosedString(transactionInformation.getReference()));
+    body.put("payment.return_url", enclosedString(adyenPaymentParams.getReturnUrl()));
+    body.put("payment.store_method",
+        Boolean.toString(adyenPaymentParams.shouldStorePaymentMethod()));
+    body.put("product", enclosedString(transactionInformation.getSku()));
+    body.put("wallets.store", enclosedString(transactionWallets.getStoreWalletAddress()));
+    body.put("type", enclosedString(transactionInformation.getTransactionType()));
+    body.put("wallets.user", enclosedString(transactionWallets.getUserWalletAddress()));
+    body.put("price.value", enclosedString(transactionInformation.getValue()));
+    putIfNotNull(body, "callback_url", enclosedString(transactionInformation.getCallbackUrl()));
     return body;
   }
 

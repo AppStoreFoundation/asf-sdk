@@ -18,6 +18,14 @@ public class TransactionResponse {
     this.error = error;
   }
 
+  public TransactionResponse() {
+    this.uid = "";
+    this.hash = "";
+    this.orderReference = "";
+    this.status = "";
+    this.error = true;
+  }
+
   public String getUid() {
     return uid;
   }
