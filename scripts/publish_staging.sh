@@ -4,6 +4,6 @@ cd ..
 export BUILD_NAME_SUFFIX=".staging"
 export BUILD_TYPE_NAME="release"
 
-./gradlew :appcoins:clean :android-appcoins-billing:clean :appcoins-billing:clean :appcoins-ads:clean :appcoins-core:clean :appcoins-contract-proxy:clean
-./gradlew :appcoins:assemble :android-appcoins-billing:assemble :appcoins-billing:assemble :appcoins-ads:assemble :appcoins-core:assemble :appcoins-contract-proxy:assemble
+./gradlew :appcoins:clean :android-appcoins-billing:clean :appcoins-billing:clean :appcoins-ads:clean :appcoins-adyen:clean
+./gradlew :appcoins:assemble :android-appcoins-billing:assemble :appcoins-billing:assemble :appcoins-ads:assemble :appcoins-adyen:assemble
 ./gradlew publish bintrayUpload
