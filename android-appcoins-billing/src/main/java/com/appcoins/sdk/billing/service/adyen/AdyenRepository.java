@@ -46,7 +46,7 @@ public class AdyenRepository {
     Map<String, String> queries = new HashMap<>();
     queries.put("wallet.address", transactionWallets.getMainWalletAddress());
 
-    Map<String, String> body =
+    Map<String, Object> body =
         buildMakePaymentBody(adyenPaymentParams, transactionInformation, transactionWallets);
     ServiceResponseListener serviceResponseListener =
         adyenListenerProvider.createMakePaymentListener(makePaymentListener);
@@ -82,7 +82,7 @@ public class AdyenRepository {
     Map<String, String> queries = new LinkedHashMap<>();
     queries.put("wallet.address", walletAddress);
 
-    Map<String, String> body = new LinkedHashMap<>();
+    Map<String, Object> body = new LinkedHashMap<>();
     putIfNotNull(body, "payment.details", details.toString());
     putIfNotNull(body, "payment.data", data);
 
@@ -94,43 +94,38 @@ public class AdyenRepository {
     ServiceResponseListener serviceResponseListener =
         adyenListenerProvider.createDisablePaymentsListener(noInfoResponseListener);
 
-    Map<String, String> body = new LinkedHashMap<>();
+    Map<String, Object> body = new LinkedHashMap<>();
     body.put("wallet.address", walletAddress);
 
     bdsService.makeRequest("disable-recurring", "POST", null, null, body, serviceResponseListener);
   }
 
-  private Map<String, String> buildMakePaymentBody(AdyenPaymentParams adyenPaymentParams,
+  private Map<String, Object> buildMakePaymentBody(AdyenPaymentParams adyenPaymentParams,
       TransactionInformation transactionInformation, TransactionWallets transactionWallets) {
-    Map<String, String> body = new LinkedHashMap<>();
+    Map<String, Object> body = new LinkedHashMap<>();
     body.put("payment.method", adyenPaymentParams.getCardPaymentMethod());
-    body.put("price.currency", enclosedString(transactionInformation.getCurrency()));
-    body.put("wallets.developer", enclosedString(transactionWallets.getDeveloperWalletAddress()));
-    body.put("domain", enclosedString(transactionInformation.getPackageName()));
-    body.put("metadata", enclosedString(transactionInformation.getMetadata()));
-    body.put("method", enclosedString(transactionInformation.getPaymentType()));
-    body.put("wallets.oem", enclosedString(transactionWallets.getOemWalletAddress()));
-    body.put("origin", enclosedString(transactionInformation.getOrigin()));
-    body.put("reference", enclosedString(transactionInformation.getReference()));
-    body.put("payment.return_url", enclosedString(adyenPaymentParams.getReturnUrl()));
-    body.put("payment.store_method",
-        Boolean.toString(adyenPaymentParams.shouldStorePaymentMethod()));
-    body.put("product", enclosedString(transactionInformation.getSku()));
-    body.put("wallets.store", enclosedString(transactionWallets.getStoreWalletAddress()));
-    body.put("type", enclosedString(transactionInformation.getTransactionType()));
-    body.put("wallets.user", enclosedString(transactionWallets.getUserWalletAddress()));
-    body.put("price.value", enclosedString(transactionInformation.getValue()));
-    putIfNotNull(body, "callback_url", enclosedString(transactionInformation.getCallbackUrl()));
+    body.put("price.currency", transactionInformation.getCurrency());
+    body.put("domain", transactionInformation.getPackageName());
+    body.put("metadata", transactionInformation.getMetadata());
+    body.put("method", transactionInformation.getPaymentType());
+    body.put("origin", transactionInformation.getOrigin());
+    body.put("reference", transactionInformation.getReference());
+    body.put("payment.return_url", adyenPaymentParams.getReturnUrl());
+    body.put("payment.store_method", adyenPaymentParams.shouldStorePaymentMethod());
+    body.put("product", transactionInformation.getSku());
+    body.put("type", transactionInformation.getTransactionType());
+    body.put("price.value", transactionInformation.getValue());
+    putIfNotNull(body, "wallets.oem", transactionWallets.getOemWalletAddress());
+    putIfNotNull(body, "wallets.store", transactionWallets.getStoreWalletAddress());
+    putIfNotNull(body, "wallets.user", transactionWallets.getUserWalletAddress());
+    putIfNotNull(body, "wallets.developer", transactionWallets.getDeveloperWalletAddress());
+    putIfNotNull(body, "callback_url", transactionInformation.getCallbackUrl());
     return body;
   }
 
-  private void putIfNotNull(Map<String, String> map, String key, String value) {
-    if (value != null && !value.equals("\"null\"")) {
+  private void putIfNotNull(Map<String, Object> map, String key, String value) {
+    if (value != null) {
       map.put(key, value);
     }
-  }
-
-  private String enclosedString(String value) {
-    return "\"" + value + "\"";
   }
 }

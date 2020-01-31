@@ -19,7 +19,8 @@ public class AdyenListenerProvider {
     this.adyenMapper = adyenMapper;
   }
 
-  ServiceResponseListener createLoadPaymentInfoListener(final LoadPaymentInfoListener listener) {
+  public ServiceResponseListener createLoadPaymentInfoListener(
+      final LoadPaymentInfoListener listener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
         Log.d("TAG123", "PaymentMethodsResponse: " + requestResponse);
@@ -28,7 +29,7 @@ public class AdyenListenerProvider {
     };
   }
 
-  ServiceResponseListener createMakePaymentListener(final MakePaymentListener listener) {
+  public ServiceResponseListener createMakePaymentListener(final MakePaymentListener listener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
         Log.d("TAG123", "AdyenTransactionResponse: " + requestResponse);
@@ -37,7 +38,7 @@ public class AdyenListenerProvider {
     };
   }
 
-  ServiceResponseListener createGetTransactionListener(
+  public ServiceResponseListener createGetTransactionListener(
       final GetTransactionListener getTransactionListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
@@ -47,7 +48,7 @@ public class AdyenListenerProvider {
     };
   }
 
-  ServiceResponseListener createSubmitRedirectListener(
+  public ServiceResponseListener createSubmitRedirectListener(
       final MakePaymentListener makePaymentListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
@@ -57,7 +58,7 @@ public class AdyenListenerProvider {
     };
   }
 
-  ServiceResponseListener createDisablePaymentsListener(
+  public ServiceResponseListener createDisablePaymentsListener(
       final NoInfoResponseListener noInfoResponseListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {

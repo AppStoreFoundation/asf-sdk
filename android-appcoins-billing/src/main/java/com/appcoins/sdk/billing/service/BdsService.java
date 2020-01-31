@@ -1,7 +1,7 @@
 package com.appcoins.sdk.billing.service;
 
-import android.net.Uri;
 import android.os.AsyncTask;
+import com.appcoins.sdk.billing.utils.RequestBuilderUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +24,10 @@ public class BdsService implements Service {
   }
 
   RequestResponse createRequest(String baseUrl, String endPoint, String httpMethod,
-      List<String> paths, Map<String, String> queries, Map<String, String> body) {
+      List<String> paths, Map<String, String> queries, Map<String, Object> body) {
     HttpURLConnection urlConnection = null;
     try {
-      String urlBuilder = buildUrl(baseUrl, endPoint, paths, queries);
+      String urlBuilder = RequestBuilderUtils.buildUrl(baseUrl, endPoint, paths, queries);
       URL url = new URL(urlBuilder);
       urlConnection = openUrlConnection(url, httpMethod);
 
@@ -55,43 +55,6 @@ public class BdsService implements Service {
     }
   }
 
-  private String buildUrl(String baseUrl, String endPoint, List<String> paths,
-      Map<String, String> queries) {
-    StringBuilder urlBuilder = new StringBuilder(baseUrl + endPoint);
-    for (String path : paths) {
-      urlBuilder.append("/")
-          .append(path);
-    }
-    if (!queries.isEmpty()) {
-      urlBuilder.append("?");
-    }
-    for (Map.Entry<String, String> entry : queries.entrySet()) {
-      urlBuilder = new StringBuilder(Uri.parse(urlBuilder.toString())
-          .buildUpon()
-          .appendQueryParameter(entry.getKey(), entry.getValue())
-          .build()
-          .toString());
-    }
-    return urlBuilder.toString();
-  }
-
-  private String buildBody(Map<String, String> bodyKeys) {
-    StringBuilder builder = new StringBuilder("{");
-    if (bodyKeys != null) {
-      for (Map.Entry<String, String> entry : bodyKeys.entrySet()) {
-        if (entry.getValue() != null) {
-          builder.append("\"" + entry.getKey() + "\"" + ":" + entry.getValue())
-              .append(",");
-        }
-      }
-      if (!bodyKeys.isEmpty()) {
-        builder.deleteCharAt(builder.length() - 1);
-      }
-      builder.append("}");
-    }
-    return builder.toString();
-  }
-
   private HttpURLConnection openUrlConnection(URL url, String httpMethod) throws IOException {
     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
     urlConnection.setRequestMethod(httpMethod);
@@ -111,13 +74,13 @@ public class BdsService implements Service {
     return new RequestResponse(responseCode, response.toString(), null);
   }
 
-  private void setPostOutput(HttpURLConnection urlConnection, Map<String, String> bodyKeys)
+  private void setPostOutput(HttpURLConnection urlConnection, Map<String, Object> bodyKeys)
       throws IOException {
     urlConnection.setRequestProperty("Content-Type", "application/json");
     urlConnection.setRequestProperty("Accept", "application/json");
     urlConnection.setDoOutput(true);
     OutputStream os = urlConnection.getOutputStream();
-    String body = buildBody(bodyKeys);
+    String body = RequestBuilderUtils.buildBody(bodyKeys);
     byte[] input = body.getBytes(StandardCharsets.UTF_8);
     os.write(input, 0, input.length);
   }
@@ -137,7 +100,7 @@ public class BdsService implements Service {
   }
 
   public void makeRequest(String endPoint, String httpMethod, List<String> paths,
-      Map<String, String> queries, Map<String, String> body,
+      Map<String, String> queries, Map<String, Object> body,
       ServiceResponseListener serviceResponseListener) {
     if (paths == null) {
       paths = new ArrayList<>();

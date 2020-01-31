@@ -72,6 +72,7 @@ dependencies {
 
   testImplementation 'junit:junit:4.12'
   testImplementation 'org.mockito:mockito-core:2.28.2'
+  testImplementation 'org.json:json:20190722'
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
   api project(path: ':appcoins-billing')
