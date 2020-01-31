@@ -23,7 +23,7 @@ public class BdsService implements Service {
     this.baseUrl = baseUrl;
   }
 
-  static RequestResponse createRequest(String baseUrl, String endPoint, String httpMethod,
+  RequestResponse createRequest(String baseUrl, String endPoint, String httpMethod,
       List<String> paths, Map<String, String> queries, Map<String, String> body) {
     HttpURLConnection urlConnection = null;
     try {
@@ -55,7 +55,7 @@ public class BdsService implements Service {
     }
   }
 
-  private static String buildUrl(String baseUrl, String endPoint, List<String> paths,
+  private String buildUrl(String baseUrl, String endPoint, List<String> paths,
       Map<String, String> queries) {
     StringBuilder urlBuilder = new StringBuilder(baseUrl + endPoint);
     for (String path : paths) {
@@ -75,7 +75,7 @@ public class BdsService implements Service {
     return urlBuilder.toString();
   }
 
-  private static String buildBody(Map<String, String> bodyKeys) {
+  private String buildBody(Map<String, String> bodyKeys) {
     StringBuilder builder = new StringBuilder("{");
     if (bodyKeys != null) {
       for (Map.Entry<String, String> entry : bodyKeys.entrySet()) {
@@ -92,14 +92,13 @@ public class BdsService implements Service {
     return builder.toString();
   }
 
-  private static HttpURLConnection openUrlConnection(URL url, String httpMethod)
-      throws IOException {
+  private HttpURLConnection openUrlConnection(URL url, String httpMethod) throws IOException {
     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
     urlConnection.setRequestMethod(httpMethod);
     return urlConnection;
   }
 
-  private static RequestResponse readResponse(InputStream inputStream, int responseCode)
+  private RequestResponse readResponse(InputStream inputStream, int responseCode)
       throws IOException {
     BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
     String inputLine;
@@ -112,7 +111,7 @@ public class BdsService implements Service {
     return new RequestResponse(responseCode, response.toString(), null);
   }
 
-  private static void setPostOutput(HttpURLConnection urlConnection, Map<String, String> bodyKeys)
+  private void setPostOutput(HttpURLConnection urlConnection, Map<String, String> bodyKeys)
       throws IOException {
     urlConnection.setRequestProperty("Content-Type", "application/json");
     urlConnection.setRequestProperty("Accept", "application/json");
@@ -123,7 +122,7 @@ public class BdsService implements Service {
     os.write(input, 0, input.length);
   }
 
-  private static RequestResponse handleException(HttpURLConnection urlConnection,
+  private RequestResponse handleException(HttpURLConnection urlConnection,
       Exception firstException) {
     firstException.printStackTrace();
     int responseCode = 500;
@@ -146,8 +145,9 @@ public class BdsService implements Service {
     if (queries == null) {
       queries = new HashMap<>();
     }
-    AsyncTask asyncTask = new ServiceAsyncTask(baseUrl, endPoint, httpMethod, paths, queries, body,
-        serviceResponseListener);
+    AsyncTask asyncTask =
+        new ServiceAsyncTask(this, baseUrl, endPoint, httpMethod, paths, queries, body,
+            serviceResponseListener);
     asyncTask.execute();
   }
 }

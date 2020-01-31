@@ -36,7 +36,7 @@ public class PaymentMethodsResponse {
     return paymentMethod;
   }
 
-  public boolean isError() {
+  public boolean hasError() {
     return error;
   }
 }

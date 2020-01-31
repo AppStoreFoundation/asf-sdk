@@ -77,7 +77,7 @@ public class AdyenTransactionResponse {
     return refusalReasonCode;
   }
 
-  public boolean isError() {
+  public boolean hasError() {
     return error;
   }
 

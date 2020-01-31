@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.service.adyen;
 
-import android.util.Log;
 import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
 import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
 import com.appcoins.sdk.billing.models.TransactionResponse;
@@ -18,7 +17,7 @@ public class AdyenMapper {
 
   }
 
-  TransactionResponse mapTransactionResponse(RequestResponse requestResponse) {
+  public TransactionResponse mapTransactionResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
     TransactionResponse transactionResponse = new TransactionResponse();
     String response = requestResponse.getResponse();
@@ -28,11 +27,13 @@ public class AdyenMapper {
     String orderReference;
     String status;
     if (isSuccess(code) && response != null) {
-      Log.d("TAG123", "TransactionResponse: ");
       try {
         jsonObject = new JSONObject(response);
         uid = jsonObject.getString("uid");
         hash = jsonObject.getString("hash");
+        if (hash.equals("null")) {
+          hash = null;
+        }
         orderReference = jsonObject.getString("reference");
         status = jsonObject.getString("status");
         transactionResponse =
@@ -44,7 +45,7 @@ public class AdyenMapper {
     return transactionResponse;
   }
 
-  AdyenTransactionResponse mapAdyenTransactionResponse(RequestResponse requestResponse) {
+  public AdyenTransactionResponse mapAdyenTransactionResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
     AdyenTransactionResponse adyenTransactionResponse = new AdyenTransactionResponse();
     String response = requestResponse.getResponse();
@@ -55,32 +56,30 @@ public class AdyenMapper {
     String status;
     String pspReference;
     String resultCode;
-    String refusalReason = null;
-    String refusalReasonCode = null;
+    String refusalReason;
+    String refusalReasonCode;
     String url = null;
     String paymentData = null;
     if (isSuccess(code) && response != null) {
-      Log.d("TAG123", "AdyenTransactionResponse: " + response);
       try {
         jsonObject = new JSONObject(response);
         uid = jsonObject.getString("uid");
         hash = jsonObject.getString("hash");
+        if (hash.equals("null")) {
+          hash = null;
+        }
         orderReference = jsonObject.getString("reference");
         status = jsonObject.getString("status");
-        JSONObject paymentJson = new JSONObject(jsonObject.getString("payment"));
-        pspReference = paymentJson.getString("pspReference");
-        resultCode = paymentJson.getString("resultCode");
+        JSONObject paymentJson = jsonObject.getJSONObject("payment");
+        pspReference = paymentJson.optString("pspReference", null);
+        resultCode = paymentJson.optString("resultCode", null);
         if (paymentJson.has("action")) {
-          JSONObject action = new JSONObject(paymentJson.getString("action"));
+          JSONObject action = paymentJson.getJSONObject("action");
           url = action.getString("url");
           paymentData = action.getString("paymentData");
         }
-        if (paymentJson.has("refusalReason")) {
-          refusalReason = paymentJson.getString("refusalReason");
-        }
-        if (paymentJson.has("refusalReasonCode")) {
-          refusalReasonCode = paymentJson.getString("refusalReasonCode");
-        }
+        refusalReason = paymentJson.optString("refusalReason", null);
+        refusalReasonCode = paymentJson.optString("refusalReasonCode", null);
         adyenTransactionResponse =
             new AdyenTransactionResponse(uid, hash, orderReference, status, pspReference,
                 resultCode, url, paymentData, refusalReason, refusalReasonCode, !isSuccess(code));
@@ -91,26 +90,27 @@ public class AdyenMapper {
     return adyenTransactionResponse;
   }
 
-  PaymentMethodsResponse mapPaymentMethodsResponse(RequestResponse requestResponse) {
+  public PaymentMethodsResponse mapPaymentMethodsResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
     PaymentMethodsResponse paymentMethodsResponse = new PaymentMethodsResponse();
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     BigDecimal value;
     String currency;
-    String paymentMethodsApiResponse;
+    String paymentMethodsApiResponse = "";
     if (isSuccess(code) && response != null) {
-      Log.d("TAG123", "PaymentMethodsResponse: " + response);
       try {
         jsonObject = new JSONObject(response);
-        JSONObject priceJsonObject = new JSONObject(jsonObject.getString("price"));
+        JSONObject priceJsonObject = jsonObject.getJSONObject("price");
         value = new BigDecimal(priceJsonObject.getString("value"));
         currency = priceJsonObject.getString("currency");
 
-        jsonObject = new JSONObject(jsonObject.getString("payment"));
+        jsonObject = jsonObject.getJSONObject("payment");
         JSONArray array = jsonObject.optJSONArray("paymentMethods");
-        paymentMethodsApiResponse = array.getJSONObject(0)
-            .toString();
+        JSONObject paymentJSONObject = array.optJSONObject(0);
+        if (paymentJSONObject != null) {
+          paymentMethodsApiResponse = paymentJSONObject.toString();
+        }
         paymentMethodsResponse =
             new PaymentMethodsResponse(value, currency, paymentMethodsApiResponse,
                 !isSuccess(code));

@@ -41,4 +41,8 @@ public class TransactionResponse {
   public String getStatus() {
     return status;
   }
+
+  public boolean hasError() {
+    return error;
+  }
 }
