@@ -53,13 +53,16 @@ class ApplicationUtils {
         JSONObject purchaseDataJSON = null;
         try {
           purchaseDataJSON = new JSONObject(purchaseData);
+          String developerPayload = getObjectFromJson(purchaseDataJSON, "developerPayload");
+          if (developerPayload != null) {
+            developerPayload = URLDecoder.decode(developerPayload, "utf-8");
+          }
           Purchase purchase =
               new Purchase(getObjectFromJson(purchaseDataJSON, "orderId"), "inapp", purchaseData,
                   Base64.decode(dataSignature, Base64.DEFAULT),
                   Long.parseLong(getObjectFromJson(purchaseDataJSON, "purchaseTime")),
                   Integer.decode(getObjectFromJson(purchaseDataJSON, "purchaseState")),
-                  URLDecoder.decode(getObjectFromJson(purchaseDataJSON, "developerPayload"),
-                      "utf-8"), getObjectFromJson(purchaseDataJSON, "purchaseToken"),
+                  developerPayload, getObjectFromJson(purchaseDataJSON, "purchaseToken"),
                   getObjectFromJson(purchaseDataJSON, "packageName"),
                   getObjectFromJson(purchaseDataJSON, "productId"),
                   Boolean.parseBoolean(getObjectFromJson(purchaseDataJSON, "isAutoRenewing")));

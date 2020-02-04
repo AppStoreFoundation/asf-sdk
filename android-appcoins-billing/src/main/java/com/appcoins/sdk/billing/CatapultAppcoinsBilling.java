@@ -47,8 +47,10 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
     int responseCode;
 
     try {
-      String encodedPayload = URLEncoder.encode(billingFlowParams.getDeveloperPayload(), "utf-8");
-
+      String encodedPayload = billingFlowParams.getDeveloperPayload();
+      if (encodedPayload != null) {
+        encodedPayload = URLEncoder.encode(encodedPayload, "utf-8");
+      }
       String payload =
           PayloadHelper.buildIntentPayload(billingFlowParams.getOrderReference(), encodedPayload,
               billingFlowParams.getOrigin());
@@ -73,13 +75,17 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
       activity.startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE,
           new Intent(), 0, 0, 0);
     } catch (NullPointerException e) {
+      e.printStackTrace();
       return ResponseCode.ERROR.getValue();
     } catch (IntentSender.SendIntentException e) {
+      e.printStackTrace();
       return ResponseCode.ERROR.getValue();
     } catch (ServiceConnectionException e) {
+      e.printStackTrace();
       return ResponseCode.SERVICE_UNAVAILABLE.getValue();
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
+      return ResponseCode.ERROR.getValue();
     }
     return ResponseCode.OK.getValue();
   }
