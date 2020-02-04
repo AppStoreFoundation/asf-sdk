@@ -11,6 +11,8 @@ import com.appcoins.sdk.billing.helpers.PayloadHelper;
 import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.listeners.ConsumeResponseListener;
 import com.appcoins.sdk.billing.listeners.SkuDetailsResponseListener;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
   private static final int REQUEST_CODE = 51;
@@ -43,9 +45,13 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
   @Override public int launchBillingFlow(Activity activity, BillingFlowParams billingFlowParams) {
 
     int responseCode;
+
     try {
-      String payload = PayloadHelper.buildIntentPayload(billingFlowParams.getOrderReference(),
-          billingFlowParams.getDeveloperPayload(), billingFlowParams.getOrigin());
+      String encodedPayload = URLEncoder.encode(billingFlowParams.getDeveloperPayload(), "utf-8");
+
+      String payload =
+          PayloadHelper.buildIntentPayload(billingFlowParams.getOrderReference(), encodedPayload,
+              billingFlowParams.getOrigin());
 
       Log.d("Message: ", payload);
 
@@ -72,6 +78,8 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
       return ResponseCode.ERROR.getValue();
     } catch (ServiceConnectionException e) {
       return ResponseCode.SERVICE_UNAVAILABLE.getValue();
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
     }
     return ResponseCode.OK.getValue();
   }
