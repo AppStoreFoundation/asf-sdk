@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -17,6 +18,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
@@ -54,7 +56,8 @@ public class InstallDialogActivity extends Activity {
   private static String installButtonTextColor = "#ffffffff";
   private final String GOOGLE_PLAY_URL =
       "https://play.google.com/store/apps/details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
-  private final String CAFE_BAZAAR_URL = "bazaar://details?id=com.hezardastan.wallet";
+  private final String CAFE_BAZAAR_APP_URL = "bazaar://details?id=com.hezardastan.wallet";
+  private final String CAFE_BAZAAR_WEB_URL = "https://cafebazaar.ir/app/com.hezardastaan.wallet";
   private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
@@ -267,7 +270,7 @@ public class InstallDialogActivity extends Activity {
   }
 
   private void redirectToWalletInstallation(final String storeUrl) {
-    final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_URL);
+    final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_APP_URL);
     if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
         && isAbleToRedirect(cafeBazaarIntent)) {
       AsyncTask asyncTask = new CafeBazaarResponseAsync(new ResponseListener() {
@@ -287,17 +290,49 @@ public class InstallDialogActivity extends Activity {
   }
 
   private void redirectToRemainingStores(String storeUrl) {
-    Intent storeIntent = buildStoreViewIntent(storeUrl);
-    if (isAbleToRedirect(storeIntent)) {
-      startActivity(storeIntent);
+    if (userFromIran(getUserCountry(getApplicationContext()))) {
+      startActivityForBrowser(CAFE_BAZAAR_WEB_URL);
     } else {
-      Intent browserIntent = buildBrowserIntent(GOOGLE_PLAY_URL);
-      if (isAbleToRedirect(browserIntent)) {
-        startActivity(browserIntent);
+      Intent storeIntent = buildStoreViewIntent(storeUrl);
+      if (isAbleToRedirect(storeIntent)) {
+        startActivity(storeIntent);
       } else {
-        buildAlertNoBrowserAndStores();
+        startActivityForBrowser(GOOGLE_PLAY_URL);
       }
     }
+  }
+
+  private void startActivityForBrowser(String url) {
+    Intent browserIntent = buildBrowserIntent(url);
+    if (isAbleToRedirect(browserIntent)) {
+      startActivity(browserIntent);
+    } else {
+      buildAlertNoBrowserAndStores();
+    }
+  }
+
+  private boolean userFromIran(String userCountry) {
+    String loweredUserCountry = userCountry.toLowerCase();
+    return loweredUserCountry.equals("ir") || loweredUserCountry.equals("iran");
+  }
+
+  private String getUserCountry(Context context) {
+    try {
+      TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+      String simCountry = tm.getSimCountryIso();
+      if (simCountry != null && simCountry.length() == 2) {
+        return simCountry;
+      } else if (tm.getPhoneType()
+          != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
+        String networkCountry = tm.getNetworkCountryIso();
+        if (networkCountry != null && networkCountry.length() == 2) {
+          return networkCountry;
+        }
+      }
+    } catch (Exception ignored) {
+    }
+    return Locale.getDefault()
+        .getCountry();
   }
 
   @SuppressLint("ResourceType")

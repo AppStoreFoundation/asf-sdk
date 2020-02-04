@@ -16,18 +16,22 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.listeners.CafeBazaarResponseAsync;
 import com.asf.appcoins.sdk.ads.listeners.ResponseListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class WalletUtils {
 
   private static final String URL_BROWSER = "https://play.google.com/store/apps/details?id="
       + com.appcoins.billing.sdk.BuildConfig.BDS_WALLET_PACKAGE_NAME;
-  private static final String CAFE_BAZAAR_URL = "bazaar://details?id=com.hezardastan.wallet";
+  private static final String CAFE_BAZAAR_APP_URL = "bazaar://details?id=com.hezardastan.wallet";
+  private static final String CAFE_BAZAAR_WEB_URL =
+      "https://cafebazaar.ir/app/com.hezardastaan.wallet";
   public static Context context;
   private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
   private static int POA_NOTIFICATION_ID = 0;
@@ -122,7 +126,7 @@ public class WalletUtils {
   static void createInstallWalletNotification() {
 
     PackageManager packageManager = context.getPackageManager();
-    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_URL));
+    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_APP_URL));
 
     if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager) && isAbleToRedirect(
         intent, packageManager)) {
@@ -140,7 +144,7 @@ public class WalletUtils {
   private static void checkWalletAvailability(final PackageManager packageManager) {
     AsyncTask asyncTask = new CafeBazaarResponseAsync(new ResponseListener() {
       @Override public void onResponseCode(int code) {
-        Intent listenerIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_URL));
+        Intent listenerIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_APP_URL));
         if (code < 300) {
           listenerIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
           listenerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -157,21 +161,51 @@ public class WalletUtils {
   }
 
   private static Intent redirectToRemainingStores(PackageManager packageManager) {
-    Intent intent = getNotificationIntentForStore();
-    if (!isAbleToRedirect(intent, packageManager)) {
-      intent = getNotificationIntentForBrowser();
+    Intent intent;
+    if (userFromIran(getUserCountry(context))) {
+      intent = getNotificationIntentForBrowser(CAFE_BAZAAR_WEB_URL, packageManager);
+    } else {
+      intent = getNotificationIntentForStore();
       if (!isAbleToRedirect(intent, packageManager)) {
-        intent = null;
+        intent = getNotificationIntentForBrowser(URL_BROWSER, packageManager);
       }
     }
     return intent;
   }
 
-  private static Intent getNotificationIntentForBrowser() {
+  private static boolean userFromIran(String userCountry) {
+    String loweredUserCountry = userCountry.toLowerCase();
+    return loweredUserCountry.equals("ir") || loweredUserCountry.equals("iran");
+  }
+
+  private static String getUserCountry(Context context) {
+    try {
+      TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+      String simCountry = tm.getSimCountryIso();
+      if (simCountry != null && simCountry.length() == 2) {
+        return simCountry;
+      } else if (tm.getPhoneType()
+          != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
+        String networkCountry = tm.getNetworkCountryIso();
+        if (networkCountry != null && networkCountry.length() == 2) {
+          return networkCountry;
+        }
+      }
+    } catch (Exception ignored) {
+    }
+    return Locale.getDefault()
+        .getCountry();
+  }
+
+  private static Intent getNotificationIntentForBrowser(String url, PackageManager packageManager) {
     Intent intent;
-    intent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_BROWSER));
+    intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-    return buildNotification(intent);
+    Intent notificationIntent = buildNotification(intent);
+    if (isAbleToRedirect(notificationIntent, packageManager)) {
+      return null;
+    }
+    return notificationIntent;
   }
 
   private static Intent getNotificationIntentForStore() {
