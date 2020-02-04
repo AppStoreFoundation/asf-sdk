@@ -10,6 +10,9 @@ import com.appcoins.billing.sdk.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.getUserCountry;
+import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.userFromIran;
+
 public class WalletUtils {
 
   private static final int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
@@ -40,10 +43,15 @@ public class WalletUtils {
   }
 
   private static String chooseServiceToBind(List<String> packageNameServices) {
-    String[] packagesOrdered = BuildConfig.SERVICE_BIND_LIST.split(",");
-    for (String address : packagesOrdered) {
-      if (packageNameServices.contains(address)) {
-        return address;
+    if (userFromIran(getUserCountry(context)) && packageNameServices.contains(
+        BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME)) {
+      return BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
+    } else {
+      String[] packagesOrdered = BuildConfig.SERVICE_BIND_LIST.split(",");
+      for (String address : packagesOrdered) {
+        if (packageNameServices.contains(address)) {
+          return address;
+        }
       }
     }
     return null;

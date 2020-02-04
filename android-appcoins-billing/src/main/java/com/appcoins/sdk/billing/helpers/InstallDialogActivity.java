@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -18,7 +17,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
@@ -39,6 +37,8 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import static android.graphics.Typeface.BOLD;
+import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.getUserCountry;
+import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.userFromIran;
 
 public class InstallDialogActivity extends Activity {
 
@@ -309,30 +309,6 @@ public class InstallDialogActivity extends Activity {
     } else {
       buildAlertNoBrowserAndStores();
     }
-  }
-
-  private boolean userFromIran(String userCountry) {
-    String loweredUserCountry = userCountry.toLowerCase();
-    return loweredUserCountry.equals("ir") || loweredUserCountry.equals("iran");
-  }
-
-  private String getUserCountry(Context context) {
-    try {
-      TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-      String simCountry = tm.getSimCountryIso();
-      if (simCountry != null && simCountry.length() == 2) {
-        return simCountry;
-      } else if (tm.getPhoneType()
-          != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
-        String networkCountry = tm.getNetworkCountryIso();
-        if (networkCountry != null && networkCountry.length() == 2) {
-          return networkCountry;
-        }
-      }
-    } catch (Exception ignored) {
-    }
-    return Locale.getDefault()
-        .getCountry();
   }
 
   @SuppressLint("ResourceType")

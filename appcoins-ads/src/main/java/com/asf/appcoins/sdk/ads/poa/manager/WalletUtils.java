@@ -78,10 +78,15 @@ public class WalletUtils {
   }
 
   private static String chooseServiceToBind(List<String> packageNameServices) {
-    String[] packagesOrded = BuildConfig.SERVICE_BIND_LIST.split(",");
-    for (String address : packagesOrded) {
-      if (packageNameServices.contains(address)) {
-        return address;
+    if (userFromIran(getUserCountry(context)) && packageNameServices.contains(
+        BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME)) {
+      return BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
+    } else {
+      String[] packagesOrdered = BuildConfig.SERVICE_BIND_LIST.split(",");
+      for (String address : packagesOrdered) {
+        if (packageNameServices.contains(address)) {
+          return address;
+        }
       }
     }
     return null;

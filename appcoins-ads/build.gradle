@@ -41,12 +41,14 @@ android {
           project.APTOIDE_PACKAGE_NAME_DEV
       buildConfigField 'String', 'CAFE_BAZAAR_PACKAGE_NAME',
           project.CAFE_BAZAAR_PACKAGE_NAME
+      buildConfigField 'String', 'CAFE_BAZAAR_WALLET_PACKAGE_NAME',
+          project.CAFE_BAZAAR_WALLET_PACKAGE_NAME
       buildConfigField 'String', 'SERVICE_BIND_LIST',
           "\"" + project.APTOIDE_PACKAGE_NAME_DEV.replace('\"', '') +
               "," +
               project.BDS_WALLET_PACKAGE_NAME_DEV.replace('\"', '') +
               "," +
-              project.CAFE_BAZAR_WALLET_PACKAGE_NAME.replace('\"', '') +
+              project.CAFE_BAZAAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
     }
     release {
@@ -59,12 +61,14 @@ android {
           project.APTOIDE_PACKAGE_NAME
       buildConfigField 'String', 'CAFE_BAZAAR_PACKAGE_NAME',
           project.CAFE_BAZAAR_PACKAGE_NAME
+      buildConfigField 'String', 'CAFE_BAZAAR_WALLET_PACKAGE_NAME',
+          project.CAFE_BAZAAR_WALLET_PACKAGE_NAME
       buildConfigField 'String', 'SERVICE_BIND_LIST',
           "\"" + project.APTOIDE_PACKAGE_NAME.replace('\"', '') +
               "," +
               project.BDS_WALLET_PACKAGE_NAME.replace('\"', '') +
               "," +
-              project.CAFE_BAZAR_WALLET_PACKAGE_NAME.replace('\"', '') +
+              project.CAFE_BAZAAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
       minifyEnabled false
     }
