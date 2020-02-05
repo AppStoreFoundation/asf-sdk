@@ -57,7 +57,7 @@ public class RequestBuilderUtils {
         if (entry.getValue() != null) {
           String value = entry.getValue()
               .toString();
-          if (entry.getValue() instanceof String && !((String) entry.getValue()).contains("{")) {
+          if (isString(entry.getValue())) {
             value = "\"" + value + "\"";
           }
           builder.append("\"" + entry.getKey() + "\"" + ":" + value)
@@ -70,5 +70,10 @@ public class RequestBuilderUtils {
     }
     builder.append("}");
     return builder.toString();
+  }
+
+  private static boolean isString(Object value) {
+    return value instanceof String && !((String) value).contains("{") && !((String) value).contains(
+        "[");
   }
 }
