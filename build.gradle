@@ -33,6 +33,10 @@ buildscript {
   }
 }
 
+project.ext {
+  adyenVersion = '3.5.1'
+}
+
 configure(allprojects) {
   apply from: "${rootProject.projectDir}/gradle/versions.gradle"
   apply from: "${rootProject.projectDir}/gradle/libraries.gradle"

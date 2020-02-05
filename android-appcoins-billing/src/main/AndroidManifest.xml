@@ -1,10 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.appcoins.billing.sdk">
 
-  <uses-permission android:name="com.appcoins.BILLING" />
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+  <uses-permission android:name="com.appcoins.BILLING"/>
+
   <application>
     <activity
         android:name="com.appcoins.sdk.billing.helpers.InstallDialogActivity"
-        android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
   </application>
 </manifest>

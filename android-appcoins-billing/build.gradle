@@ -65,6 +65,9 @@ android {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
+  //adyen dependency
+  implementation "com.adyen.checkout:redirect:$project.adyenVersion"
+
   api project(path: ':appcoins-billing')
 }
 
