@@ -26,6 +26,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
@@ -58,8 +59,8 @@ public class InstallDialogActivity extends Activity {
   private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
-  private View loadingDialogInstall;
   private TranslationsModel translationsModel;
+  private RelativeLayout installationDialog;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -82,7 +83,7 @@ public class InstallDialogActivity extends Activity {
       fetchTranslations();
     }
 
-    RelativeLayout installationDialog = setupInstallationDialog(storeUrl);
+    installationDialog = setupInstallationDialog(storeUrl);
 
     showInstallationDialog(installationDialog);
   }
@@ -91,7 +92,6 @@ public class InstallDialogActivity extends Activity {
     super.onResume();
     if (WalletUtils.hasWalletInstalled()) {
       showLoadingDialog();
-      loadingDialogInstall.setVisibility(View.VISIBLE);
       appcoinsBillingStubHelper.createRepository(new StartPurchaseAfterBindListener() {
         @Override public void startPurchaseAfterBind() {
           makeTheStoredPurchase();
@@ -120,11 +120,20 @@ public class InstallDialogActivity extends Activity {
   }
 
   private void showLoadingDialog() {
-    this.setContentView(this.getResources()
-        .getIdentifier(LOADING_DIALOG_CARD, "layout", this.getPackageName()));
-    loadingDialogInstall = this.findViewById(this.getResources()
-        .getIdentifier(LOADING_DIALOG_CARD, "id", this.getPackageName()));
-    loadingDialogInstall.setVisibility(View.VISIBLE);
+    int layoutOrientation = getLayoutOrientation();
+
+    RelativeLayout backgroundLayout = buildBackground();
+
+    RelativeLayout dialogLayout = buildDialogLayout(layoutOrientation);
+    backgroundLayout.addView(dialogLayout);
+    ProgressBar progressBar = new ProgressBar(this);
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT);
+    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+    progressBar.setLayoutParams(layoutParams);
+    dialogLayout.addView(progressBar);
+    showInstallationDialog(backgroundLayout);
   }
 
   public void makeTheStoredPurchase() {
@@ -134,7 +143,6 @@ public class InstallDialogActivity extends Activity {
 
     PendingIntent pendingIntent = intent.getParcelable(KEY_BUY_INTENT);
     try {
-      loadingDialogInstall.setVisibility(View.INVISIBLE);
       if (pendingIntent != null) {
         startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE, new Intent(), 0,
             0, 0);
