@@ -17,11 +17,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
+import com.appcoins.sdk.billing.helpers.TranslationsModel;
+import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import com.asf.appcoins.sdk.ads.listeners.CafeBazaarResponseAsync;
 import com.asf.appcoins.sdk.ads.listeners.ResponseListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class WalletUtils {
 
@@ -41,10 +44,6 @@ public class WalletUtils {
   private static NotificationManager notificationManager;
   private static boolean hasPopup;
   private static String IDENTIFIER_KEY = "identifier";
-  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE =
-      "poa_wallet_not_installed_notification_title";
-  private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY =
-      "poa_wallet_not_installed_notification_body";
   private static String billingPackageName;
 
   public static void setContext(Context cont) {
@@ -230,22 +229,21 @@ public class WalletUtils {
     pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
     builder = new Notification.Builder(context, channelId);
     builder.setContentIntent(pendingIntent);
-    try {
-      Resources resources = context.getResources();
-      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE, "string",
-          context.getPackageName());
-      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY, "string",
-          context.getPackageName());
 
-      builder.setSmallIcon(intent.getExtras()
-          .getInt(IDENTIFIER_KEY))
-          .setAutoCancel(true)
-          .setContentTitle(context.getString(titleId))
-          .setContentText(context.getString(bodyId));
-    } catch (NullPointerException e) {
-      e.printStackTrace();
-    }
+    TranslationsModel translationsModel = fetchTranslations();
+
+    builder.setSmallIcon(intent.getExtras()
+        .getInt(IDENTIFIER_KEY))
+        .setAutoCancel(true)
+        .setContentTitle(translationsModel.getPoaNotificationTitle())
+        .setContentText(translationsModel.getPoaNotificationBody());
     return builder.build();
+  }
+
+  private static TranslationsModel fetchTranslations() {
+    Locale locale = Locale.getDefault();
+    TranslationsXmlParser translationsParser = new TranslationsXmlParser(context);
+    return translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
   }
 
   private static boolean isAppInstalled(String packageName, PackageManager packageManager) {
@@ -291,24 +289,14 @@ public class WalletUtils {
     builder.setContentIntent(pendingIntent);
     builder.setVibrate(new long[0]);
 
-    try {
-      Resources resources = context.getResources();
-      int titleId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_TITLE, "string",
-          context.getPackageName());
-      int bodyId = resources.getIdentifier(POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY, "string",
-          context.getPackageName());
+    TranslationsModel translationsModel = fetchTranslations();
 
-      builder.setSmallIcon(intent.getExtras()
-          .getInt(IDENTIFIER_KEY))
-          .setAutoCancel(true)
-          .setContentTitle(context.getString(titleId))
-          .setContentText(context.getString(bodyId));
-    } catch (NullPointerException e) {
-      e.printStackTrace();
-    }
+    builder.setSmallIcon(intent.getExtras()
+        .getInt(IDENTIFIER_KEY))
+        .setAutoCancel(true)
+        .setContentTitle(translationsModel.getPoaNotificationTitle())
+        .setContentText(translationsModel.getPoaNotificationBody());
 
-    Notification notification = builder.build();
-
-    return notification;
+    return builder.build();
   }
 }
