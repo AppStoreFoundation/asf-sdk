@@ -8,5 +8,8 @@
     <activity
         android:name="com.appcoins.sdk.billing.helpers.InstallDialogActivity"
         android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+    <activity
+        android:name="com.appcoins.sdk.billing.WebViewActivity"
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
   </application>
 </manifest>
