@@ -13,6 +13,11 @@ class Person implements Parcelable {
       return new Person[size];
     }
   };
+
+  @SuppressWarnings("NullableProblems") @Override public String toString() {
+    return "Person{" + "name='" + name + '\'' + '}';
+  }
+
   private final String name;
 
   Person(String name) {
