@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.Base64;
 import android.util.Log;
 import com.appcoins.sdk.billing.helpers.Utils;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,13 +53,16 @@ class ApplicationUtils {
         JSONObject purchaseDataJSON = null;
         try {
           purchaseDataJSON = new JSONObject(purchaseData);
+          String developerPayload = getObjectFromJson(purchaseDataJSON, "developerPayload");
+          if (developerPayload != null) {
+            developerPayload = URLDecoder.decode(developerPayload, "utf-8");
+          }
           Purchase purchase =
               new Purchase(getObjectFromJson(purchaseDataJSON, "orderId"), "inapp", purchaseData,
                   Base64.decode(dataSignature, Base64.DEFAULT),
                   Long.parseLong(getObjectFromJson(purchaseDataJSON, "purchaseTime")),
                   Integer.decode(getObjectFromJson(purchaseDataJSON, "purchaseState")),
-                  getObjectFromJson(purchaseDataJSON, "developerPayload"),
-                  getObjectFromJson(purchaseDataJSON, "purchaseToken"),
+                  developerPayload, getObjectFromJson(purchaseDataJSON, "purchaseToken"),
                   getObjectFromJson(purchaseDataJSON, "packageName"),
                   getObjectFromJson(purchaseDataJSON, "productId"),
                   Boolean.parseBoolean(getObjectFromJson(purchaseDataJSON, "isAutoRenewing")));
