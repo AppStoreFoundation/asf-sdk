@@ -17,8 +17,9 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
-import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.WSServiceController;
+import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
+import com.appcoins.sdk.billing.payasguest.IabActivity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     appcoinsBillingStubHelper = this;
   }
 
-  static AppcoinsBillingStubHelper getInstance() {
+  public static AppcoinsBillingStubHelper getInstance() {
     if (appcoinsBillingStubHelper == null) {
       appcoinsBillingStubHelper = new AppcoinsBillingStubHelper();
     }
@@ -113,15 +114,13 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         return response;
       }
     } else {
-      BuyItemProperties buyItemProperties =
+      final BuyItemProperties buyItemProperties =
           new BuyItemProperties(apiVersion, packageName, sku, type, developerPayload);
 
-      Context context = WalletUtils.getContext();
+      final Context context = WalletUtils.getContext();
 
-      Intent intent = new Intent(context, InstallDialogActivity.class);
-      intent.putExtra(APPCOINS_BILLING_STUB_HELPER_INSTANCE, this);
+      Intent intent = new Intent(context, IabActivity.class);
       intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
-
       PendingIntent pendingIntent =
           PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
       Bundle response = new Bundle();
