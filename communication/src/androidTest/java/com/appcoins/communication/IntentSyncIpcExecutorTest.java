@@ -13,7 +13,7 @@ import static org.mockito.Mockito.times;
 
   public static final long MESSAGE_ID = 0L;
   private final int TYPE = 1;
-  private IntentSyncIpcExecutor service;
+  private IntentSyncIpcMessageSender service;
   private MessageResponseSynchronizer messageResponseSynchronizer;
   private MessageSender messageSender;
 
@@ -24,7 +24,8 @@ import static org.mockito.Mockito.times;
     Mockito.when(idGenerator.generateId())
         .thenReturn(0L);
 
-    service = new IntentSyncIpcExecutor(messageSender, messageResponseSynchronizer, idGenerator);
+    service =
+        new IntentSyncIpcMessageSender(messageSender, messageResponseSynchronizer, idGenerator);
   }
 
   @Test public void sendMessageTest() throws InterruptedException {
