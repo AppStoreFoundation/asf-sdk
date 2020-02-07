@@ -29,7 +29,7 @@ import static org.mockito.Mockito.times;
         new IntentSyncIpcMessageSender(messageSender, messageResponseSynchronizer, idGenerator);
   }
 
-  @Test public void sendMessageTest() throws InterruptedException {
+  @Test public void sendMessageTest() throws InterruptedException, MainThreadException {
     Mockito.when(messageResponseSynchronizer.waitMessage(0L))
         .thenReturn(new Person("José"));
     Person arguments = new Person("Fábio");

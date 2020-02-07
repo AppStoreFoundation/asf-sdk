@@ -1,10 +1,10 @@
 package com.appcoins.communication.sender;
 
+import android.os.Looper;
 import android.os.Parcelable;
-import com.appcoins.communication.Person;
 import com.appcoins.communication.SyncIpcMessageSender;
 
-class IntentSyncIpcMessageSender implements SyncIpcMessageSender {
+public class IntentSyncIpcMessageSender implements SyncIpcMessageSender {
   private final MessageSender messageSender;
   private final MessageResponseSynchronizer messageResponseSynchronizer;
   private final IdGenerator idGenerator;
@@ -17,9 +17,12 @@ class IntentSyncIpcMessageSender implements SyncIpcMessageSender {
   }
 
   @Override public Parcelable sendMessage(int type, Parcelable arguments)
-      throws InterruptedException {
+      throws MainThreadException, InterruptedException {
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+      throw new MainThreadException("sendMessage");
+    }
     long messageId = idGenerator.generateId();
     messageSender.sendMessage(messageId, type, arguments);
-    return (Person) messageResponseSynchronizer.waitMessage(messageId);
+    return messageResponseSynchronizer.waitMessage(messageId);
   }
 }

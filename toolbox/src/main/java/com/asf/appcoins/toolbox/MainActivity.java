@@ -3,12 +3,16 @@ package com.asf.appcoins.toolbox;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import com.appcoins.communication.Person;
+import com.appcoins.communication.SyncIpcMessageSender;
+import com.appcoins.communication.sender.MainThreadException;
+import com.appcoins.communication.sender.MessageSenderBuilder;
 import com.appcoins.sdk.billing.AppcoinsBillingClient;
-import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.PurchasesUpdatedListener;
@@ -83,15 +87,33 @@ public class MainActivity extends Activity {
   }
 
   public void onBuyGasButtonClicked(View arg0) {
-    BillingFlowParams billingFlowParams =
-        new BillingFlowParams("gas", SkuType.inapp.toString(), null, null, null);
+    new Thread(() -> {
+      Person person;
+      try {
+        SyncIpcMessageSender messageSender =
+            MessageSenderBuilder.build(MainActivity.this.getApplicationContext(),
+                "com.appcoins.testapp", "appcoins://communication/receiver/test",
+                "appcoins://communication/sender/test");
+        person = (Person) messageSender.sendMessage(1,
+            new Person("Da best!!! -> " + System.currentTimeMillis()));
 
-    Activity act = this;
-    Thread t = new Thread(() -> {
-      int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
-      Log.d(TAG, "BillingFlowResponse: " + launchBillingFlowResponse);
-    });
-    t.start();
+        Intent intent = new Intent("appcoins.communication.receiver.test.pay");
+        intent.putExtra("ARGUMENTS", person);
+        startActivity(intent);
+      } catch (InterruptedException | IntentFilter.MalformedMimeTypeException | MainThreadException e) {
+        e.printStackTrace();
+      }
+    }).start();
+
+    //BillingFlowParams billingFlowParams =
+    //    new BillingFlowParams("gas", SkuType.inapp.toString(), null, null, null);
+    //
+    //Activity act = this;
+    //Thread t = new Thread(() -> {
+    //  int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
+    //  Log.d(TAG, "BillingFlowResponse: " + launchBillingFlowResponse);
+    //});
+    //t.start();
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {

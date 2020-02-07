@@ -9,9 +9,8 @@ import android.os.Parcelable;
 class MessageReceiver extends BroadcastReceiver {
   private MessageReceivedListener listener;
 
-  MessageReceiver(Context context, String receiverUri)
-      throws IntentFilter.MalformedMimeTypeException {
-    IntentFilter filter = new IntentFilter(Intent.ACTION_VIEW, receiverUri);
+  MessageReceiver(Context context, String receiverUri) {
+    IntentFilter filter = new IntentFilter(receiverUri);
     context.registerReceiver(this, filter);
   }
 

@@ -2,7 +2,6 @@ package com.appcoins.communication.sender;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Parcelable;
 
 class MessageSender {
@@ -17,13 +16,13 @@ class MessageSender {
   }
 
   public void sendMessage(long messageId, int type, Parcelable arguments) {
-    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(targetUri));
+    Intent intent = new Intent(targetUri);
 
     intent.putExtra("MESSAGE_ID", messageId);
     intent.putExtra("TYPE", type);
     intent.putExtra("ARGUMENTS", arguments);
     intent.setPackage(targetPackage);
 
-    context.sendBroadcast(intent);
+    context.startActivity(intent);
   }
 }

@@ -13,12 +13,12 @@ import static org.junit.Assert.assertEquals;
 public class MessageSenderTest {
 
   public static final String SENDER_URI = "appcoins://testing";
-  private MessageSender messageSender;
+  private ReturnSender messageSender;
   private Context context;
 
   @Before public void setUp() {
     context = Mockito.mock(Context.class);
-    messageSender = new MessageSender(context, SENDER_URI);
+    messageSender = new ReturnSender(context, SENDER_URI);
   }
 
   @Test public void sendMessage() {
@@ -28,7 +28,7 @@ public class MessageSenderTest {
         .sendBroadcast(argumentCaptor.capture());
 
     Person response = new Person("");
-    messageSender.sendMessage(1L, response);
+    messageSender.returnValue(1L, response);
 
     Intent intent = argumentCaptor.getValue();
 

@@ -28,15 +28,14 @@ public class MessageSenderTest {
     ArgumentCaptor<Intent> argumentCaptor = ArgumentCaptor.forClass(Intent.class);
     Mockito.doNothing()
         .when(context)
-        .sendBroadcast(argumentCaptor.capture());
+        .startActivity(argumentCaptor.capture());
 
     Person arguments = new Person("");
     messageSender.sendMessage(MESSAGE_ID, TYPE, arguments);
 
     Intent intent = argumentCaptor.getValue();
 
-    assertEquals("wrong action view", Intent.ACTION_VIEW, intent.getAction());
-    assertEquals("wrong target uri", TARGET_URI, intent.getDataString());
+    assertEquals("wrong action view", TARGET_URI, intent.getAction());
     assertEquals("wrong target package", PACKAGE, intent.getPackage());
     assertEquals("wrong message id argument", MESSAGE_ID, intent.getLongExtra("MESSAGE_ID", -1));
     assertEquals("wrong method type argument", TYPE, intent.getIntExtra("TYPE", -1));
