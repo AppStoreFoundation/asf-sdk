@@ -17,12 +17,16 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
-import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.WSServiceController;
+import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
@@ -104,9 +108,24 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       String developerPayload) {
     if (WalletUtils.hasWalletInstalled()) {
       try {
-        return serviceAppcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type,
+        Bundle bundle = serviceAppcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type,
             developerPayload);
-      } catch (RemoteException e) {
+        String inappPurchaseData = bundle.getString("INAPP_PURCHASE_DATA");
+        JSONObject jsonObject = new JSONObject(inappPurchaseData);
+        String bundleDevPayload = jsonObject.getString("developerPayload");
+        String decodedDevPayload = bundleDevPayload;
+        try {
+          if (bundleDevPayload != null) {
+            decodedDevPayload = URLDecoder.decode(bundleDevPayload, "utf-8");
+          }
+        } catch (UnsupportedEncodingException e) {
+          e.printStackTrace();
+        }
+        jsonObject.put("developerPayload", "\"" + decodedDevPayload + "\"");
+        Log.d("TAG123", jsonObject.toString());
+        bundle.putString("INAPP_PURCHASE_DATA", jsonObject.toString());
+        return bundle;
+      } catch (RemoteException | JSONException e) {
         e.printStackTrace();
         Bundle response = new Bundle();
         response.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
