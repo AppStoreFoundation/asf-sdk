@@ -2,7 +2,7 @@ package com.appcoins.communication;
 
 import android.os.Parcelable;
 
-class IntentSyncIpcExecutor implements SyncIpcExecutor {
+class IntentSyncIpcExecutor implements SyncIpcMessageSender {
   private final MessageSender messageSender;
   private final MessageResponseSynchronizer messageResponseSynchronizer;
   private final IdGenerator idGenerator;
