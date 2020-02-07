@@ -1,4 +1,4 @@
-package com.appcoins.communication;
+package com.appcoins.communication.sender;
 
 class IdGenerator {
   public long generateId() {

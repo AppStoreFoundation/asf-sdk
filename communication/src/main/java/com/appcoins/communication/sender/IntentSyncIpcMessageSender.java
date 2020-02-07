@@ -1,6 +1,8 @@
-package com.appcoins.communication;
+package com.appcoins.communication.sender;
 
 import android.os.Parcelable;
+import com.appcoins.communication.Person;
+import com.appcoins.communication.SyncIpcMessageSender;
 
 class IntentSyncIpcMessageSender implements SyncIpcMessageSender {
   private final MessageSender messageSender;

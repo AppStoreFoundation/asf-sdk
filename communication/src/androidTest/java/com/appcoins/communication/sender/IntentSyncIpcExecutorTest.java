@@ -1,6 +1,7 @@
-package com.appcoins.communication;
+package com.appcoins.communication.sender;
 
 import android.support.test.runner.AndroidJUnit4;
+import com.appcoins.communication.Person;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

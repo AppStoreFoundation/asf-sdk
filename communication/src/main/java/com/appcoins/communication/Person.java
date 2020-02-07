@@ -3,7 +3,7 @@ package com.appcoins.communication;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class Person implements Parcelable {
+public class Person implements Parcelable {
   public static final Creator<Person> CREATOR = new Creator<Person>() {
     @Override public Person createFromParcel(Parcel in) {
       return new Person(in);
@@ -20,7 +20,7 @@ class Person implements Parcelable {
 
   private final String name;
 
-  Person(String name) {
+  public Person(String name) {
     this.name = name;
   }
 

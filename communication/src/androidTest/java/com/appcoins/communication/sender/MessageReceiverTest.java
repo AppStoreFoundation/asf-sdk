@@ -1,7 +1,8 @@
-package com.appcoins.communication;
+package com.appcoins.communication.sender;
 
 import android.content.Context;
 import android.content.Intent;
+import com.appcoins.communication.Person;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

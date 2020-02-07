@@ -2,6 +2,6 @@ package com.appcoins.communication;
 
 import android.os.Parcelable;
 
-interface SyncIpcMessageSender {
+public interface SyncIpcMessageSender {
   Parcelable sendMessage(int type, Parcelable arguments) throws InterruptedException;
 }

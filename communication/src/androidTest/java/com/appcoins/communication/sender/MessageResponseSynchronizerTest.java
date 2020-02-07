@@ -1,6 +1,7 @@
-package com.appcoins.communication;
+package com.appcoins.communication.sender;
 
 import android.os.Parcelable;
+import com.appcoins.communication.Person;
 import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.appcoins.communication;
+package com.appcoins.communication.sender;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
