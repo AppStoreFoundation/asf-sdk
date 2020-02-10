@@ -207,7 +207,7 @@ public class WalletUtils {
     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
     Intent notificationIntent = buildNotification(intent);
-    if (isAbleToRedirect(notificationIntent, packageManager)) {
+    if (!isAbleToRedirect(notificationIntent, packageManager)) {
       return null;
     }
     return notificationIntent;
