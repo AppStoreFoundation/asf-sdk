@@ -3,12 +3,11 @@ package com.asf.appcoins.toolbox;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-import com.appcoins.communication.Person;
+import com.appcoins.communication.Data;
 import com.appcoins.communication.SyncIpcMessageSender;
 import com.appcoins.communication.sender.MainThreadException;
 import com.appcoins.communication.sender.MessageSenderBuilder;
@@ -88,19 +87,20 @@ public class MainActivity extends Activity {
 
   public void onBuyGasButtonClicked(View arg0) {
     new Thread(() -> {
-      Person person;
+      Data data;
       try {
         SyncIpcMessageSender messageSender =
             MessageSenderBuilder.build(MainActivity.this.getApplicationContext(),
                 "com.appcoins.testapp", "appcoins://communication/receiver/test",
                 "appcoins://communication/sender/test");
-        person = (Person) messageSender.sendMessage(1,
-            new Person("Da best!!! -> " + System.currentTimeMillis()));
+        data = (Data) messageSender.sendMessage(1,
+            new Data("1 - Asking Data to TestApp: " + System.currentTimeMillis() + "ms"));
 
         Intent intent = new Intent("appcoins.communication.receiver.test.pay");
-        intent.putExtra("ARGUMENTS", person);
+        intent.putExtra("ARGUMENTS",
+            new Data(data.getData() + "\n3 - Asking TestApp to show Data"));
         startActivity(intent);
-      } catch (InterruptedException | IntentFilter.MalformedMimeTypeException | MainThreadException e) {
+      } catch (InterruptedException | MainThreadException e) {
         e.printStackTrace();
       }
     }).start();

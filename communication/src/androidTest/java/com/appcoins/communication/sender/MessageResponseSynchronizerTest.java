@@ -1,7 +1,7 @@
 package com.appcoins.communication.sender;
 
 import android.os.Parcelable;
-import com.appcoins.communication.Person;
+import com.appcoins.communication.Data;
 import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class MessageResponseSynchronizerTest {
 
   @Test public void waitForResponse() throws InterruptedException {
 
-    final Person testPerson = new Person("");
+    final Data testPerson = new Data("");
     new Thread(new Runnable() {
       @Override public void run() {
         argumentCaptor.getValue()
@@ -37,7 +37,7 @@ public class MessageResponseSynchronizerTest {
       }
     }).start();
 
-    Person person = (Person) messageResponseSynchronizer.waitMessage(0);
+    Data person = (Data) messageResponseSynchronizer.waitMessage(0);
     assertEquals("Person not returned as expected", testPerson, person);
   }
 }

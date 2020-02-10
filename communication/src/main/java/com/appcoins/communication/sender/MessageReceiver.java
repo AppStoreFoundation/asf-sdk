@@ -4,13 +4,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Parcelable;
 
 class MessageReceiver extends BroadcastReceiver {
   private MessageReceivedListener listener;
 
   MessageReceiver(Context context, String receiverUri) {
-    IntentFilter filter = new IntentFilter(receiverUri);
+    IntentFilter filter = new IntentFilter(Intent.ACTION_VIEW);
+    Uri uri = Uri.parse(receiverUri);
+    filter.addDataScheme(uri.getScheme());
+    filter.addDataPath(uri.getPath(), IntentFilter.MATCH_CATEGORY_PATH);
+    filter.addDataPath(uri.getHost(), IntentFilter.MATCH_CATEGORY_HOST);
     context.registerReceiver(this, filter);
   }
 

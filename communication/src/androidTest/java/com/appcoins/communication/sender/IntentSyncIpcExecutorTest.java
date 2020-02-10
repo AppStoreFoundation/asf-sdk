@@ -1,7 +1,7 @@
 package com.appcoins.communication.sender;
 
 import android.support.test.runner.AndroidJUnit4;
-import com.appcoins.communication.Person;
+import com.appcoins.communication.Data;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,12 +31,12 @@ import static org.mockito.Mockito.times;
 
   @Test public void sendMessageTest() throws InterruptedException, MainThreadException {
     Mockito.when(messageResponseSynchronizer.waitMessage(0L))
-        .thenReturn(new Person("José"));
-    Person arguments = new Person("Fábio");
-    Person person = (Person) service.sendMessage(TYPE, arguments);
+        .thenReturn(new Data("José"));
+    Data arguments = new Data("Fábio");
+    Data person = (Data) service.sendMessage(TYPE, arguments);
     Mockito.verify(messageSender, times(1))
         .sendMessage(MESSAGE_ID, TYPE, arguments);
-    assertEquals("not same person", new Person("José"), person);
+    assertEquals("not same person", new Data("José"), person);
   }
 }
 

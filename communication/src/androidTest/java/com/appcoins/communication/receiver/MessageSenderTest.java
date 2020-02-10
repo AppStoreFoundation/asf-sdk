@@ -2,7 +2,7 @@ package com.appcoins.communication.receiver;
 
 import android.content.Context;
 import android.content.Intent;
-import com.appcoins.communication.Person;
+import com.appcoins.communication.Data;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,7 +27,7 @@ public class MessageSenderTest {
         .when(context)
         .sendBroadcast(argumentCaptor.capture());
 
-    Person response = new Person("");
+    Data response = new Data("");
     messageSender.returnValue(1L, response);
 
     Intent intent = argumentCaptor.getValue();

@@ -2,7 +2,7 @@ package com.appcoins.communication.sender;
 
 import android.content.Context;
 import android.content.Intent;
-import com.appcoins.communication.Person;
+import com.appcoins.communication.Data;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -14,7 +14,7 @@ public class MessageSenderTest {
 
   public static final long MESSAGE_ID = 0L;
   public static final int TYPE = 0;
-  public static final String TARGET_URI = "uri";
+  public static final String TARGET_URI = "appcoins://send/data";
   public static final String PACKAGE = "package";
   private MessageSender messageSender;
   private Context context;
@@ -30,12 +30,13 @@ public class MessageSenderTest {
         .when(context)
         .startActivity(argumentCaptor.capture());
 
-    Person arguments = new Person("");
+    Data arguments = new Data("");
     messageSender.sendMessage(MESSAGE_ID, TYPE, arguments);
 
     Intent intent = argumentCaptor.getValue();
 
-    assertEquals("wrong action view", TARGET_URI, intent.getAction());
+    assertEquals("wrong action view", Intent.ACTION_VIEW, intent.getAction());
+    assertEquals("wrong action view", TARGET_URI, intent.getDataString());
     assertEquals("wrong target package", PACKAGE, intent.getPackage());
     assertEquals("wrong message id argument", MESSAGE_ID, intent.getLongExtra("MESSAGE_ID", -1));
     assertEquals("wrong method type argument", TYPE, intent.getIntExtra("TYPE", -1));
