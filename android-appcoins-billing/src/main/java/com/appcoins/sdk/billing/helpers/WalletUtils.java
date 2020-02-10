@@ -43,9 +43,12 @@ public class WalletUtils {
   }
 
   private static String chooseServiceToBind(List<String> packageNameServices) {
-    if (userFromIran(getUserCountry(context)) && packageNameServices.contains(
-        BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME)) {
-      return BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
+    if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, context.getPackageManager())
+        || userFromIran(getUserCountry(context))) {
+      if (packageNameServices.contains(BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME)) {
+        return BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
+      }
+      return null;
     } else {
       String[] packagesOrdered = BuildConfig.SERVICE_BIND_LIST.split(",");
       for (String address : packagesOrdered) {
