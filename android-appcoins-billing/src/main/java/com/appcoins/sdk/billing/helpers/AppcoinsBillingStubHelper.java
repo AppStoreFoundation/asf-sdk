@@ -28,8 +28,7 @@ import java.util.concurrent.CountDownLatch;
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
-  private final static String APPCOINS_BILLING_STUB_HELPER_INSTANCE =
-      "appcoins_billing_stub_helper";
+
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49

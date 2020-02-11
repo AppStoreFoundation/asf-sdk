@@ -13,7 +13,7 @@ import com.appcoins.sdk.billing.helpers.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
 import java.util.Locale;
 
-public class IabActivity extends Activity {
+public class IabActivity extends Activity implements IabView {
 
   private final static String TRANSLATIONS = "translations";
   private AppcoinsBillingStubHelper appcoinsBillingStubHelper;
@@ -42,7 +42,11 @@ public class IabActivity extends Activity {
 
     setContentView(frameLayout);
 
-    navigateTo(new PaymentMethodsFragment(), frameLayout);
+    PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
+    Bundle bundle = new Bundle();
+    bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
+    paymentMethodsFragment.setArguments(bundle);
+    navigateTo(paymentMethodsFragment, frameLayout);
   }
 
   private void fetchTranslations() {
