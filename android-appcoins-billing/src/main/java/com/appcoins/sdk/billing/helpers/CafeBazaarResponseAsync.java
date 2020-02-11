@@ -42,7 +42,7 @@ public class CafeBazaarResponseAsync extends AsyncTask {
       byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
       os.write(input, 0, input.length);
     } else {
-      return 404;
+      return 200;
     }
     huc.connect();
     int responseCode = huc.getResponseCode();

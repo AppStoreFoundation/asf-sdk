@@ -24,6 +24,8 @@ import com.asf.appcoins.sdk.ads.listeners.ResponseListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class WalletUtils {
 
@@ -50,6 +52,7 @@ public class WalletUtils {
   private static String POA_WALLET_NOT_INSTALLED_NOTIFICATION_BODY =
       "poa_wallet_not_installed_notification_body";
   private static String billingPackageName;
+  private static boolean cafeBazaarWalletAvailable;
 
   public static void setContext(Context cont) {
     context = cont;
@@ -68,7 +71,7 @@ public class WalletUtils {
     String iabAction = com.appcoins.billing.sdk.BuildConfig.IAB_BIND_ACTION;
     if (isAppInstalled(com.appcoins.billing.sdk.BuildConfig.CAFE_BAZAAR_PACKAGE_NAME,
         context.getPackageManager()) || userFromIran(getUserCountry(context))) {
-      iabAction = com.appcoins.billing.sdk.BuildConfig.CB_IAB_BIND_ACTION;
+      iabAction = getIabAction();
     }
     Intent serviceIntent = new Intent(iabAction);
 
@@ -137,54 +140,34 @@ public class WalletUtils {
   }
 
   static void createInstallWalletNotification() {
-
     PackageManager packageManager = context.getPackageManager();
     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_APP_URL));
-
-    boolean hasCafeBazaarStoreInstalled =
-        isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager) && isAbleToRedirect(
-            intent, packageManager);
-    boolean isUserFromIran = userFromIran(getUserCountry(context));
-    if (hasCafeBazaarStoreInstalled || isUserFromIran) {
-      checkWalletAvailability(packageManager, hasCafeBazaarStoreInstalled);
-      return;
+    if (cafeBazaarWalletAvailable) {
+      intent = cafeBazaarFlow(intent, packageManager);
     } else {
       intent = redirectToRemainingStores(packageManager);
     }
-
     if (intent != null) {
       createNotification(intent);
     }
   }
 
-  private static void checkWalletAvailability(final PackageManager packageManager,
-      final boolean hasCafeBazaarStoreInstalled) {
-    AsyncTask asyncTask = new CafeBazaarResponseAsync(new ResponseListener() {
-      @Override public void onResponseCode(int code) {
-        Intent listenerIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_APP_URL));
-        if (code < 300) {
-          if (hasCafeBazaarStoreInstalled) {
-            listenerIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
-            listenerIntent.setFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            buildNotification(listenerIntent);
-          } else {
-            listenerIntent = getNotificationIntentForBrowser(CAFE_BAZAAR_WEB_URL, packageManager);
-          }
-        } else {
-          listenerIntent = redirectToRemainingStores(packageManager);
-        }
-        if (listenerIntent != null) {
-          createNotification(listenerIntent);
-        }
-      }
-    });
-    asyncTask.execute();
+  private static Intent cafeBazaarFlow(Intent intent, PackageManager packageManager) {
+    if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager) && isAbleToRedirect(
+        intent, packageManager)) {
+      intent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
+      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+      buildNotification(intent);
+    } else if (userFromIran(getUserCountry(context))) {
+      intent = getNotificationIntentForBrowser(CAFE_BAZAAR_WEB_URL, packageManager);
+    } else {
+      intent = redirectToRemainingStores(packageManager);
+    }
+    return intent;
   }
 
   private static Intent redirectToRemainingStores(PackageManager packageManager) {
-    Intent intent;
-    intent = getNotificationIntentForStore();
+    Intent intent = getNotificationIntentForStore();
     if (!isAbleToRedirect(intent, packageManager)) {
       intent = getNotificationIntentForBrowser(URL_BROWSER, packageManager);
     }
@@ -213,6 +196,33 @@ public class WalletUtils {
     }
     return Locale.getDefault()
         .getCountry();
+  }
+
+  private static String getIabAction() {
+    final CountDownLatch latch = new CountDownLatch(1);
+    ResponseListener responseListener = new ResponseListener() {
+      @Override public void onResponseCode(int code) {
+        if (code < 300) {
+          cafeBazaarWalletAvailable = true;
+        }
+        latch.countDown();
+      }
+    };
+    AsyncTask asyncTask = new CafeBazaarResponseAsync(responseListener);
+    asyncTask.execute();
+    try {
+      latch.await(5, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      cafeBazaarWalletAvailable = false;
+      e.printStackTrace();
+    }
+    String iabAction;
+    if (cafeBazaarWalletAvailable) {
+      iabAction = com.appcoins.billing.sdk.BuildConfig.CB_IAB_BIND_ACTION;
+    } else {
+      iabAction = com.appcoins.billing.sdk.BuildConfig.IAB_BIND_ACTION;
+    }
+    return iabAction;
   }
 
   private static Intent getNotificationIntentForBrowser(String url, PackageManager packageManager) {

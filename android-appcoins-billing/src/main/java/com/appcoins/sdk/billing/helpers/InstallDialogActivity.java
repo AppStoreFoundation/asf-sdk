@@ -15,7 +15,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -271,33 +270,26 @@ public class InstallDialogActivity extends Activity {
 
   private void redirectToWalletInstallation(final String storeUrl) {
     final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_APP_URL);
-    final boolean cafeBazaarStoreInstalled =
-        WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
-            && isAbleToRedirect(cafeBazaarIntent);
-    boolean userFromIran = userFromIran(getUserCountry(getApplicationContext()));
-    if (cafeBazaarStoreInstalled || userFromIran) {
-      AsyncTask asyncTask = new CafeBazaarResponseAsync(new ResponseListener() {
-        @Override public void onResponseCode(int code) {
-          if (code < 300) {
-            if (cafeBazaarStoreInstalled) {
-              cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
-              startActivity(cafeBazaarIntent);
-            } else {
-              startActivityForBrowser(CAFE_BAZAAR_WEB_URL);
-            }
-          } else {
-            redirectToRemainingStores(storeUrl);
-          }
-        }
-      });
-      asyncTask.execute();
+    if (WalletUtils.isCafeBazaarWalletAvailable()) {
+      cafeBazaarFlow(cafeBazaarIntent, storeUrl);
+    } else {
+      redirectToRemainingStores(storeUrl);
+    }
+  }
+
+  private void cafeBazaarFlow(Intent cafeBazaarIntent, String storeUrl) {
+    if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
+        && isAbleToRedirect(cafeBazaarIntent)) {
+      cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
+      startActivity(cafeBazaarIntent);
+    } else if (userFromIran(getUserCountry(getApplicationContext()))) {
+      startActivityForBrowser(CAFE_BAZAAR_WEB_URL);
     } else {
       redirectToRemainingStores(storeUrl);
     }
   }
 
   private void redirectToRemainingStores(String storeUrl) {
-    startActivityForBrowser(CAFE_BAZAAR_WEB_URL);
     Intent storeIntent = buildStoreViewIntent(storeUrl);
     if (isAbleToRedirect(storeIntent)) {
       startActivity(storeIntent);

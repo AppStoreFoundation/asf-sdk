@@ -5,10 +5,13 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.AsyncTask;
 import android.os.Build;
 import com.appcoins.billing.sdk.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.getUserCountry;
 import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.userFromIran;
@@ -20,6 +23,7 @@ public class WalletUtils {
   public static Context context;
   private static String billingPackageName;
   private static String iabAction;
+  private static boolean cafeBazaarWalletAvailable = false;
 
   public static boolean hasWalletInstalled() {
     if (billingPackageName == null) {
@@ -31,9 +35,9 @@ public class WalletUtils {
   private static void getPackageToBind() {
     List<String> intentServicesResponse = new ArrayList<>();
     iabAction = BuildConfig.IAB_BIND_ACTION;
-    if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, context.getPackageManager())
-        || userFromIran(getUserCountry(context))) {
-      iabAction = BuildConfig.CB_IAB_BIND_ACTION;
+    if ((isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, context.getPackageManager())
+        || userFromIran(getUserCountry(context))) && cafeBazaarWalletAvailable) {
+      checkForBazaarWalletAvailability();
     }
     Intent serviceIntent = new Intent(iabAction);
 
@@ -116,5 +120,32 @@ public class WalletUtils {
       iabAction = BuildConfig.IAB_BIND_ACTION;
     }
     return iabAction;
+  }
+
+  private static void checkForBazaarWalletAvailability() {
+    final CountDownLatch latch = new CountDownLatch(1);
+    ResponseListener responseListener = new ResponseListener() {
+      @Override public void onResponseCode(int code) {
+        if (code < 300) {
+          cafeBazaarWalletAvailable = true;
+        }
+        latch.countDown();
+      }
+    };
+    AsyncTask asyncTask = new CafeBazaarResponseAsync(responseListener);
+    asyncTask.execute();
+    try {
+      latch.await(5, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      cafeBazaarWalletAvailable = false;
+      e.printStackTrace();
+    }
+    if (cafeBazaarWalletAvailable) {
+      iabAction = BuildConfig.CB_IAB_BIND_ACTION;
+    }
+  }
+
+  public static boolean isCafeBazaarWalletAvailable() {
+    return cafeBazaarWalletAvailable;
   }
 }
