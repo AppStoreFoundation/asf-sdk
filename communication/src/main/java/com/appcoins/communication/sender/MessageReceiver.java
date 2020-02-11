@@ -8,7 +8,7 @@ import android.net.Uri;
 import android.os.Parcelable;
 
 class MessageReceiver extends BroadcastReceiver {
-  private MessageReceivedListener listener;
+  static MessageReceivedListener messageListener;
 
   MessageReceiver(Context context, String receiverUri) {
     IntentFilter filter = new IntentFilter(Intent.ACTION_VIEW);
@@ -16,17 +16,17 @@ class MessageReceiver extends BroadcastReceiver {
     filter.addDataScheme(uri.getScheme());
     filter.addDataPath(uri.getPath(), IntentFilter.MATCH_CATEGORY_PATH);
     filter.addDataPath(uri.getHost(), IntentFilter.MATCH_CATEGORY_HOST);
-    context.registerReceiver(this, filter);
+    //context.registerReceiver(this, filter);
   }
 
   public void setListener(MessageReceivedListener listener) {
-    this.listener = listener;
+    messageListener = listener;
   }
 
   @Override public void onReceive(Context context, Intent intent) {
     long messageId = intent.getLongExtra("MESSAGE_ID", -1);
     Parcelable returnValue = intent.getParcelableExtra("RETURN_VALUE");
-    listener.onMessageReceived(messageId, returnValue);
+    messageListener.onMessageReceived(messageId, returnValue);
   }
 
   interface MessageReceivedListener {
