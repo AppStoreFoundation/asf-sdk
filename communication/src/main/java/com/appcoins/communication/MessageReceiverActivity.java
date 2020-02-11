@@ -10,12 +10,12 @@ public abstract class MessageReceiverActivity extends Activity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Intent intent = getIntent();
-    long messageId = intent.getLongExtra("MESSAGE_ID", -1);
+    long requestCode = intent.getLongExtra("MESSAGE_ID", -1);
     int methodId = intent.getIntExtra("TYPE", -1);
     Parcelable arguments = intent.getParcelableExtra("ARGUMENTS");
-    onReceived(messageId, methodId, arguments);
+    onReceived(requestCode, methodId, arguments);
   }
 
-  public abstract void onReceived(long messageId, int methodId, Parcelable arguments);
+  public abstract void onReceived(long requestCode, int methodId, Parcelable arguments);
 }
 

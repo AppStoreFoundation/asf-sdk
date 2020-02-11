@@ -1,7 +1,7 @@
 package com.appcoins.communication.sender;
 
 class IdGenerator {
-  public long generateId() {
+  public long generateRequestCode() {
     return System.currentTimeMillis() + Thread.currentThread()
         .getId();
   }

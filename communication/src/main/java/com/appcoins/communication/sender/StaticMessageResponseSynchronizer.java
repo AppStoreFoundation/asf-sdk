@@ -17,11 +17,11 @@ class StaticMessageResponseSynchronizer {
 
   static void init() {
     messageReceivedListener = new MessageReceivedListener() {
-      @Override public void onMessageReceived(long messageId, Parcelable returnValue) {
-        responses.put(messageId, returnValue);
-        Object blockingObject = blockingObjects.get(messageId);
+      @Override public void onMessageReceived(long requestCode, Parcelable returnValue) {
+        responses.put(requestCode, returnValue);
+        Object blockingObject = blockingObjects.get(requestCode);
         if (blockingObject == null) {
-          Log.w(TAG, "there is no request for message id: " + messageId);
+          Log.w(TAG, "there is no request for message id: " + requestCode);
           return;
         }
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
@@ -37,7 +37,7 @@ class StaticMessageResponseSynchronizer {
    * {@link StaticMessageResponseSynchronizer} should be initialized before calling waitMessage
    * method. See {@link StaticMessageResponseSynchronizer#init()}
    *
-   * @param messageId id of the message to wait for
+   * @param requestCode id of the message to wait for
    *
    * @return the response from the target application
    *
@@ -46,18 +46,18 @@ class StaticMessageResponseSynchronizer {
    * before calling waitMessage method
    * @see StaticMessageResponseSynchronizer#init()
    */
-  public static Parcelable waitMessage(long messageId)
+  public static Parcelable waitMessage(long requestCode)
       throws InterruptedException, IllegalStateException {
     checkIfInitialized();
-    if (!responses.containsKey(messageId)) {
+    if (!responses.containsKey(requestCode)) {
       Object blockingObject = new Object();
-      blockingObjects.put(messageId, blockingObject);
+      blockingObjects.put(requestCode, blockingObject);
       //noinspection SynchronizationOnLocalVariableOrMethodParameter
       synchronized (blockingObject) {
         blockingObject.wait();
       }
     }
-    return responses.get(messageId);
+    return responses.get(requestCode);
   }
 
   private static void checkIfInitialized() throws IllegalStateException {

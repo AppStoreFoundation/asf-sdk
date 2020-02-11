@@ -16,10 +16,10 @@ class MessageSender {
     this.targetUri = targetUri;
   }
 
-  public void sendMessage(long messageId, int type, Parcelable arguments) {
+  public void sendMessage(long requestCode, int type, Parcelable arguments) {
     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(targetUri));
 
-    intent.putExtra("MESSAGE_ID", messageId);
+    intent.putExtra("MESSAGE_ID", requestCode);
     intent.putExtra("TYPE", type);
     intent.putExtra("ARGUMENTS", arguments);
     intent.setPackage(targetPackage);

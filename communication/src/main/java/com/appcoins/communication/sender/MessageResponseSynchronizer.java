@@ -7,7 +7,7 @@ class MessageResponseSynchronizer {
     StaticMessageResponseSynchronizer.init();
   }
 
-  public Parcelable waitMessage(long messageId) throws InterruptedException {
-    return StaticMessageResponseSynchronizer.waitMessage(messageId);
+  public Parcelable waitMessage(long requestCode) throws InterruptedException {
+    return StaticMessageResponseSynchronizer.waitMessage(requestCode);
   }
 }

@@ -21,8 +21,8 @@ public class IntentSyncIpcMessageSender implements SyncIpcMessageSender {
     if (Looper.myLooper() == Looper.getMainLooper()) {
       throw new MainThreadException("sendMessage");
     }
-    long messageId = idGenerator.generateId();
-    messageSender.sendMessage(messageId, type, arguments);
-    return messageResponseSynchronizer.waitMessage(messageId);
+    long requestCode = idGenerator.generateRequestCode();
+    messageSender.sendMessage(requestCode, type, arguments);
+    return messageResponseSynchronizer.waitMessage(requestCode);
   }
 }

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.times;
     messageSender = Mockito.mock(MessageSender.class);
     messageResponseSynchronizer = Mockito.mock(MessageResponseSynchronizer.class);
     IdGenerator idGenerator = Mockito.mock(IdGenerator.class);
-    Mockito.when(idGenerator.generateId())
+    Mockito.when(idGenerator.generateRequestCode())
         .thenReturn(0L);
 
     service =

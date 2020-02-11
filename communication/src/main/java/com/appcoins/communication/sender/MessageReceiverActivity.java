@@ -8,10 +8,10 @@ public class MessageReceiverActivity extends Activity {
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    long messageId = getIntent().getLongExtra("MESSAGE_ID", -1);
+    long requestCode = getIntent().getLongExtra("REQUEST_CODE", -1);
     Parcelable returnValue = getIntent().getParcelableExtra("RETURN_VALUE");
     StaticMessageResponseSynchronizer.getMessageListener()
-        .onMessageReceived(messageId, returnValue);
+        .onMessageReceived(requestCode, returnValue);
     finish();
   }
 }
