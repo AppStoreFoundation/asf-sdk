@@ -1,15 +1,15 @@
-package com.appcoins.communication.receiver;
+package com.appcoins.communication.processor;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcelable;
 
-public class ReturnSender {
+public class ProcessedValueReturner {
   private final Context context;
   private final String senderUri;
 
-  public ReturnSender(Context context, String senderUri) {
+  public ProcessedValueReturner(Context context, String senderUri) {
     this.context = context;
     this.senderUri = senderUri;
   }

@@ -1,4 +1,4 @@
-package com.appcoins.communication.receiver;
+package com.appcoins.communication.processor;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,12 +13,12 @@ import static org.junit.Assert.assertEquals;
 public class MessageSenderTest {
 
   public static final String SENDER_URI = "appcoins://testing";
-  private ReturnSender messageSender;
+  private ProcessedValueReturner messageSender;
   private Context context;
 
   @Before public void setUp() {
     context = Mockito.mock(Context.class);
-    messageSender = new ReturnSender(context, SENDER_URI);
+    messageSender = new ProcessedValueReturner(context, SENDER_URI);
   }
 
   @Test public void sendMessage() {
