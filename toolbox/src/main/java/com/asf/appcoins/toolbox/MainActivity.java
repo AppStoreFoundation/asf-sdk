@@ -7,10 +7,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-import com.appcoins.communication.Data;
-import com.appcoins.communication.SyncIpcMessageSender;
-import com.appcoins.communication.sender.MainThreadException;
-import com.appcoins.communication.sender.MessageSenderBuilder;
+import com.appcoins.communication.SyncIpcMessageRequester;
+import com.appcoins.communication.requester.MainThreadException;
+import com.appcoins.communication.requester.MessageRequesterFactory;
 import com.appcoins.sdk.billing.AppcoinsBillingClient;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
@@ -88,18 +87,19 @@ public class MainActivity extends Activity {
 
   public void onBuyGasButtonClicked(View arg0) {
     new Thread(() -> {
-      Data data;
+      Intent data;
       Log.d(TAG2, "onBuyGasButtonClicked: ");
       try {
-        SyncIpcMessageSender messageSender =
-            MessageSenderBuilder.build(MainActivity.this.getApplicationContext(),
+        SyncIpcMessageRequester messageSender =
+            MessageRequesterFactory.create(MainActivity.this.getApplicationContext(),
                 "com.appcoins.testapp", "appcoins://communication/receiver/test");
-        data = (Data) messageSender.sendMessage(1,
-            new Data("1 - Asking Data to TestApp_v2: " + System.currentTimeMillis() + "ms"));
+        data = (Intent) messageSender.sendMessage(1,
+            new Intent("1 - Asking Data to TestApp_v2: " + System.currentTimeMillis() + "ms"));
 
-        Log.d(TAG2, "testApp returned: " + data);
+        String action = data.getAction();
+        Log.d(TAG2, "testApp returned: " + action);
         Intent intent = new Intent("appcoins.communication.receiver.test.pay");
-        Data valueToShow = new Data(data.getData() + "\n3 - Asking TestApp_v2 to show Data");
+        Intent valueToShow = new Intent(action + "\n3 - Asking TestApp_v2 to show Data");
         intent.putExtra("ARGUMENTS", valueToShow);
         Log.d(TAG2, "asking testApp to show: " + valueToShow);
         startActivity(intent);

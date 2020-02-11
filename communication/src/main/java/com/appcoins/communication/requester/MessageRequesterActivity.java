@@ -1,10 +1,10 @@
-package com.appcoins.communication.sender;
+package com.appcoins.communication.requester;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
 
-public class MessageReceiverActivity extends Activity {
+public abstract class MessageRequesterActivity extends Activity {
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

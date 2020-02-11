@@ -1,9 +1,9 @@
-package com.appcoins.communication.sender;
+package com.appcoins.communication.requester;
 
 import android.os.Parcelable;
 
-class MessageResponseSynchronizer {
-  public MessageResponseSynchronizer() {
+class MessageRequesterSynchronizer {
+  public MessageRequesterSynchronizer() {
     StaticMessageResponseSynchronizer.init();
   }
 

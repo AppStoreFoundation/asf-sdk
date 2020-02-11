@@ -2,7 +2,6 @@ package com.appcoins.communication.processor;
 
 import android.content.Context;
 import android.content.Intent;
-import com.appcoins.communication.Data;
 import com.appcoins.communication.ProcessedValueReturner;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,7 @@ public class MessageSenderTest {
         .when(context)
         .startActivity(argumentCaptor.capture());
 
-    Data response = new Data("");
+    Intent response = new Intent("");
     messageSender.returnValue(PACKAGE_NAME, 1L, response);
 
     Intent intent = argumentCaptor.getValue();

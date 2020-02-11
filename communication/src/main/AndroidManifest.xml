@@ -1,18 +1,1 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.appcoins.communication">
-
-  <application>
-    <activity
-        android:name=".sender.MessageReceiverActivity"
-        android:exported="true">
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <data
-            android:host="communication"
-            android:path="/sender/test"
-            android:scheme="appcoins" />
-        <category android:name="android.intent.category.DEFAULT" />
-      </intent-filter>
-    </activity>
-  </application>
-</manifest>
+<manifest package="com.appcoins.communication" />

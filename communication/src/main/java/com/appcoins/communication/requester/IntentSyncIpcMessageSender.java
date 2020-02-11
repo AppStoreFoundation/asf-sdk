@@ -1,16 +1,16 @@
-package com.appcoins.communication.sender;
+package com.appcoins.communication.requester;
 
 import android.os.Looper;
 import android.os.Parcelable;
-import com.appcoins.communication.SyncIpcMessageSender;
+import com.appcoins.communication.SyncIpcMessageRequester;
 
-public class IntentSyncIpcMessageSender implements SyncIpcMessageSender {
-  private final MessageSender messageSender;
-  private final MessageResponseSynchronizer messageResponseSynchronizer;
+public class IntentSyncIpcMessageSender implements SyncIpcMessageRequester {
+  private final MessageRequesterSender messageSender;
+  private final MessageRequesterSynchronizer messageResponseSynchronizer;
   private final IdGenerator idGenerator;
 
-  public IntentSyncIpcMessageSender(MessageSender messageSender,
-      MessageResponseSynchronizer messageResponseSynchronizer, IdGenerator idGenerator) {
+  public IntentSyncIpcMessageSender(MessageRequesterSender messageSender,
+      MessageRequesterSynchronizer messageResponseSynchronizer, IdGenerator idGenerator) {
     this.messageSender = messageSender;
     this.messageResponseSynchronizer = messageResponseSynchronizer;
     this.idGenerator = idGenerator;

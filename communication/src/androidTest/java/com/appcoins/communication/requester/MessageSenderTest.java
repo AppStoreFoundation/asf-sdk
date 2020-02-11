@@ -1,8 +1,7 @@
-package com.appcoins.communication.sender;
+package com.appcoins.communication.requester;
 
 import android.content.Context;
 import android.content.Intent;
-import com.appcoins.communication.Data;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -16,12 +15,12 @@ public class MessageSenderTest {
   public static final int TYPE = 0;
   public static final String TARGET_URI = "appcoins://send/data";
   public static final String PACKAGE = "package";
-  private MessageSender messageSender;
+  private MessageRequesterSender messageSender;
   private Context context;
 
   @Before public void setUp() {
     context = Mockito.mock(Context.class);
-    messageSender = new MessageSender(context, PACKAGE, TARGET_URI);
+    messageSender = new MessageRequesterSender(context, PACKAGE, TARGET_URI);
   }
 
   @Test public void sendMessage() {
@@ -30,7 +29,7 @@ public class MessageSenderTest {
         .when(context)
         .startActivity(argumentCaptor.capture());
 
-    Data arguments = new Data("");
+    Intent arguments = new Intent("");
     messageSender.sendMessage(MESSAGE_ID, TYPE, arguments);
 
     Intent intent = argumentCaptor.getValue();

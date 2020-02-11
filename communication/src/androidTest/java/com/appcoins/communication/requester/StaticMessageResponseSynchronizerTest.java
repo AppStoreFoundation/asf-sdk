@@ -1,4 +1,4 @@
-package com.appcoins.communication.sender;
+package com.appcoins.communication.requester;
 
 import android.content.Intent;
 import org.junit.Assert;
@@ -8,14 +8,14 @@ public class StaticMessageResponseSynchronizerTest {
 
   @Test public void init() {
     StaticMessageResponseSynchronizer.init();
-    MessageReceivedListener messageListener =
+    MessageRequesterListener messageListener =
         StaticMessageResponseSynchronizer.getMessageListener();
     Assert.assertNotEquals(null, messageListener);
   }
 
   @Test public void waitMessage() throws InterruptedException {
     StaticMessageResponseSynchronizer.init();
-    MessageReceivedListener messageListener =
+    MessageRequesterListener messageListener =
         StaticMessageResponseSynchronizer.getMessageListener();
     Intent returnValue = new Intent();
     messageListener.onMessageReceived(1, returnValue);

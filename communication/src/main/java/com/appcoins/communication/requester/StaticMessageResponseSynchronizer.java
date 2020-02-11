@@ -1,4 +1,4 @@
-package com.appcoins.communication.sender;
+package com.appcoins.communication.requester;
 
 import android.os.Parcelable;
 import android.util.Log;
@@ -10,13 +10,13 @@ class StaticMessageResponseSynchronizer {
   static private final Map<Long, Object> blockingObjects = new HashMap<>();
   static private final Map<Long, Parcelable> responses = new HashMap<>();
   static private final String TAG = StaticMessageResponseSynchronizer.class.getSimpleName();
-  static private MessageReceivedListener messageReceivedListener;
+  static private MessageRequesterListener messageReceivedListener;
 
   private StaticMessageResponseSynchronizer() {
   }
 
   static void init() {
-    messageReceivedListener = new MessageReceivedListener() {
+    messageReceivedListener = new MessageRequesterListener() {
       @Override public void onMessageReceived(long requestCode, Parcelable returnValue) {
         responses.put(requestCode, returnValue);
         Object blockingObject = blockingObjects.get(requestCode);
@@ -72,7 +72,7 @@ class StaticMessageResponseSynchronizer {
    * * before calling waitMessage method
    * * @see StaticMessageResponseSynchronizer#init()
    */
-  public static MessageReceivedListener getMessageListener() throws IllegalStateException {
+  public static MessageRequesterListener getMessageListener() throws IllegalStateException {
     checkIfInitialized();
     return messageReceivedListener;
   }

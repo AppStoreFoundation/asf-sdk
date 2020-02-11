@@ -1,16 +1,16 @@
-package com.appcoins.communication.sender;
+package com.appcoins.communication.requester;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcelable;
 
-class MessageSender {
+class MessageRequesterSender {
   private final Context context;
   private final String targetPackage;
   private final String targetUri;
 
-  MessageSender(Context context, String targetPackage, String targetUri) {
+  MessageRequesterSender(Context context, String targetPackage, String targetUri) {
     this.context = context;
     this.targetPackage = targetPackage;
     this.targetUri = targetUri;

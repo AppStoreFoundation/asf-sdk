@@ -1,9 +1,9 @@
 package com.appcoins.communication;
 
 import android.os.Parcelable;
-import com.appcoins.communication.sender.MainThreadException;
+import com.appcoins.communication.requester.MainThreadException;
 
-public interface SyncIpcMessageSender {
+public interface SyncIpcMessageRequester {
   /**
    * @param methodId id of the method that should be used to process your data
    * @param arguments arguments for the corresponding method

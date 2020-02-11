@@ -1,7 +1,7 @@
-package com.appcoins.communication.sender;
+package com.appcoins.communication.requester;
 
+import android.content.Intent;
 import android.support.test.runner.AndroidJUnit4;
-import com.appcoins.communication.Data;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,12 +15,12 @@ import static org.mockito.Mockito.times;
   public static final long MESSAGE_ID = 0L;
   private final int TYPE = 1;
   private IntentSyncIpcMessageSender service;
-  private MessageResponseSynchronizer messageResponseSynchronizer;
-  private MessageSender messageSender;
+  private MessageRequesterSynchronizer messageResponseSynchronizer;
+  private MessageRequesterSender messageSender;
 
   @Before public void setup() {
-    messageSender = Mockito.mock(MessageSender.class);
-    messageResponseSynchronizer = Mockito.mock(MessageResponseSynchronizer.class);
+    messageSender = Mockito.mock(MessageRequesterSender.class);
+    messageResponseSynchronizer = Mockito.mock(MessageRequesterSynchronizer.class);
     IdGenerator idGenerator = Mockito.mock(IdGenerator.class);
     Mockito.when(idGenerator.generateRequestCode())
         .thenReturn(0L);
@@ -31,12 +31,12 @@ import static org.mockito.Mockito.times;
 
   @Test public void sendMessageTest() throws InterruptedException, MainThreadException {
     Mockito.when(messageResponseSynchronizer.waitMessage(0L))
-        .thenReturn(new Data("José"));
-    Data arguments = new Data("Fábio");
-    Data person = (Data) service.sendMessage(TYPE, arguments);
+        .thenReturn(new Intent("intent1"));
+    Intent arguments = new Intent("intent2");
+    Intent intent = (Intent) service.sendMessage(TYPE, arguments);
     Mockito.verify(messageSender, times(1))
         .sendMessage(MESSAGE_ID, TYPE, arguments);
-    assertEquals("not same person", new Data("José"), person);
+    assertEquals("not same intent", "intent1", intent.getAction());
   }
 }
 

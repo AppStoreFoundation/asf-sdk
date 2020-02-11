@@ -1,7 +1,7 @@
-package com.appcoins.communication.sender;
+package com.appcoins.communication.requester;
 
 import android.os.Parcelable;
 
-interface MessageReceivedListener {
+interface MessageRequesterListener {
   void onMessageReceived(long requestCode, Parcelable returnValue);
 }
