@@ -136,9 +136,12 @@ public class WalletUtils {
     PackageManager packageManager = context.getPackageManager();
     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_APP_URL));
 
-    if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager) && isAbleToRedirect(
-        intent, packageManager)) {
-      checkWalletAvailability(packageManager);
+    boolean hasCafeBazaarStoreInstalled =
+        isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager) && isAbleToRedirect(
+            intent, packageManager);
+    boolean isUserFromIran = userFromIran(getUserCountry(context));
+    if (hasCafeBazaarStoreInstalled || isUserFromIran) {
+      checkWalletAvailability(packageManager, hasCafeBazaarStoreInstalled);
       return;
     } else {
       intent = redirectToRemainingStores(packageManager);
@@ -149,14 +152,20 @@ public class WalletUtils {
     }
   }
 
-  private static void checkWalletAvailability(final PackageManager packageManager) {
+  private static void checkWalletAvailability(final PackageManager packageManager,
+      final boolean hasCafeBazaarStoreInstalled) {
     AsyncTask asyncTask = new CafeBazaarResponseAsync(new ResponseListener() {
       @Override public void onResponseCode(int code) {
         Intent listenerIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_APP_URL));
         if (code < 300) {
-          listenerIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
-          listenerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-          buildNotification(listenerIntent);
+          if (hasCafeBazaarStoreInstalled) {
+            listenerIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
+            listenerIntent.setFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            buildNotification(listenerIntent);
+          } else {
+            listenerIntent = getNotificationIntentForBrowser(CAFE_BAZAAR_WEB_URL, packageManager);
+          }
         } else {
           listenerIntent = redirectToRemainingStores(packageManager);
         }
@@ -170,13 +179,9 @@ public class WalletUtils {
 
   private static Intent redirectToRemainingStores(PackageManager packageManager) {
     Intent intent;
-    if (userFromIran(getUserCountry(context))) {
-      intent = getNotificationIntentForBrowser(CAFE_BAZAAR_WEB_URL, packageManager);
-    } else {
-      intent = getNotificationIntentForStore();
-      if (!isAbleToRedirect(intent, packageManager)) {
-        intent = getNotificationIntentForBrowser(URL_BROWSER, packageManager);
-      }
+    intent = getNotificationIntentForStore();
+    if (!isAbleToRedirect(intent, packageManager)) {
+      intent = getNotificationIntentForBrowser(URL_BROWSER, packageManager);
     }
     return intent;
   }

@@ -29,7 +29,12 @@ public class WalletUtils {
 
   private static void getPackageToBind() {
     List<String> intentServicesResponse = new ArrayList<>();
-    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
+    String action = BuildConfig.IAB_BIND_ACTION;
+    if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, context.getPackageManager())
+        || userFromIran(getUserCountry(context))) {
+      action = BuildConfig.CB_IAB_BIND_ACTION;
+    }
+    Intent serviceIntent = new Intent(action);
 
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
@@ -38,13 +43,12 @@ public class WalletUtils {
       for (ResolveInfo intentService : intentServices) {
         intentServicesResponse.add(intentService.serviceInfo.packageName);
       }
-      billingPackageName = chooseServiceToBind(intentServicesResponse);
+      billingPackageName = chooseServiceToBind(intentServicesResponse, action);
     }
   }
 
-  private static String chooseServiceToBind(List<String> packageNameServices) {
-    if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, context.getPackageManager())
-        || userFromIran(getUserCountry(context))) {
+  private static String chooseServiceToBind(List<String> packageNameServices, String action) {
+    if (action.equals(BuildConfig.CB_IAB_BIND_ACTION)) {
       if (packageNameServices.contains(BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME)) {
         return BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
       }

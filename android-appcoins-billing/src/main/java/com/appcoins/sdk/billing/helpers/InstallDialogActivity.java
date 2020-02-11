@@ -271,13 +271,20 @@ public class InstallDialogActivity extends Activity {
 
   private void redirectToWalletInstallation(final String storeUrl) {
     final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_APP_URL);
-    if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
-        && isAbleToRedirect(cafeBazaarIntent)) {
+    final boolean cafeBazaarStoreInstalled =
+        WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
+            && isAbleToRedirect(cafeBazaarIntent);
+    boolean userFromIran = userFromIran(getUserCountry(getApplicationContext()));
+    if (cafeBazaarStoreInstalled || userFromIran) {
       AsyncTask asyncTask = new CafeBazaarResponseAsync(new ResponseListener() {
         @Override public void onResponseCode(int code) {
           if (code < 300) {
-            cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
-            startActivity(cafeBazaarIntent);
+            if (cafeBazaarStoreInstalled) {
+              cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
+              startActivity(cafeBazaarIntent);
+            } else {
+              startActivityForBrowser(CAFE_BAZAAR_WEB_URL);
+            }
           } else {
             redirectToRemainingStores(storeUrl);
           }
@@ -290,15 +297,12 @@ public class InstallDialogActivity extends Activity {
   }
 
   private void redirectToRemainingStores(String storeUrl) {
-    if (userFromIran(getUserCountry(getApplicationContext()))) {
-      startActivityForBrowser(CAFE_BAZAAR_WEB_URL);
+    startActivityForBrowser(CAFE_BAZAAR_WEB_URL);
+    Intent storeIntent = buildStoreViewIntent(storeUrl);
+    if (isAbleToRedirect(storeIntent)) {
+      startActivity(storeIntent);
     } else {
-      Intent storeIntent = buildStoreViewIntent(storeUrl);
-      if (isAbleToRedirect(storeIntent)) {
-        startActivity(storeIntent);
-      } else {
-        startActivityForBrowser(GOOGLE_PLAY_URL);
-      }
+      startActivityForBrowser(GOOGLE_PLAY_URL);
     }
   }
 

@@ -18,6 +18,8 @@ android {
       minifyEnabled false
       buildConfigField "String", "IAB_BIND_ACTION",
           "\"" + project.APPCOINS_DEV_IAB_BIND_ACTION + "\""
+      buildConfigField "String", "CB_IAB_BIND_ACTION",
+          "\"" + project.CAFE_BAZAAR_IAB_BIND_ACTION + "\""
       buildConfigField "String", "IAB_BIND_PACKAGE",
           "\"" + project.APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
@@ -43,6 +45,8 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       buildConfigField "String", "IAB_BIND_ACTION",
           "\"" + project.APPCOINS_IAB_BIND_ACTION + "\""
+      buildConfigField "String", "CB_IAB_BIND_ACTION",
+          "\"" + project.CAFE_BAZAAR_IAB_BIND_ACTION + "\""
       buildConfigField "String", "IAB_BIND_PACKAGE",
           "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
