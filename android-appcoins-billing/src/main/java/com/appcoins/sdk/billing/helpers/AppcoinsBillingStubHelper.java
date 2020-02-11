@@ -17,8 +17,8 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
-import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.WSServiceController;
+import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -209,9 +209,9 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       final StartPurchaseAfterBindListener startPurchaseAfterConnectionListener) {
 
     String packageName = WalletUtils.getBillingServicePackageName();
+    String iabAction = WalletUtils.getIabAction();
 
-    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
-    serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
+    Intent serviceIntent = new Intent(iabAction);
     serviceIntent.setPackage(packageName);
 
     final Context context = WalletUtils.getContext();

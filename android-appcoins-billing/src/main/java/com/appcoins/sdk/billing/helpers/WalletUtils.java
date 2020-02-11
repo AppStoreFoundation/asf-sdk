@@ -19,6 +19,7 @@ public class WalletUtils {
 
   public static Context context;
   private static String billingPackageName;
+  private static String iabAction;
 
   public static boolean hasWalletInstalled() {
     if (billingPackageName == null) {
@@ -29,12 +30,12 @@ public class WalletUtils {
 
   private static void getPackageToBind() {
     List<String> intentServicesResponse = new ArrayList<>();
-    String action = BuildConfig.IAB_BIND_ACTION;
+    iabAction = BuildConfig.IAB_BIND_ACTION;
     if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, context.getPackageManager())
         || userFromIran(getUserCountry(context))) {
-      action = BuildConfig.CB_IAB_BIND_ACTION;
+      iabAction = BuildConfig.CB_IAB_BIND_ACTION;
     }
-    Intent serviceIntent = new Intent(action);
+    Intent serviceIntent = new Intent(iabAction);
 
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
@@ -43,7 +44,7 @@ public class WalletUtils {
       for (ResolveInfo intentService : intentServices) {
         intentServicesResponse.add(intentService.serviceInfo.packageName);
       }
-      billingPackageName = chooseServiceToBind(intentServicesResponse, action);
+      billingPackageName = chooseServiceToBind(intentServicesResponse, iabAction);
     }
   }
 
@@ -108,5 +109,12 @@ public class WalletUtils {
       getPackageToBind();
     }
     return billingPackageName;
+  }
+
+  public static String getIabAction() {
+    if (iabAction == null) {
+      iabAction = BuildConfig.IAB_BIND_ACTION;
+    }
+    return iabAction;
   }
 }
