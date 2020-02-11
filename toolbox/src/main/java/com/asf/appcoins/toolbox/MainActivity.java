@@ -27,6 +27,7 @@ import java.util.Locale;
 public class MainActivity extends Activity {
 
   private static final String TAG = MainActivity.class.getSimpleName();
+  private static final String TAG2 = "THIS_IS_A_GREAT_TEST";
   private AppcoinsBillingClient cab;
   private String token;
   private AppCoinsBillingStateListener listener;
@@ -88,17 +89,19 @@ public class MainActivity extends Activity {
   public void onBuyGasButtonClicked(View arg0) {
     new Thread(() -> {
       Data data;
+      Log.d(TAG2, "onBuyGasButtonClicked: ");
       try {
         SyncIpcMessageSender messageSender =
             MessageSenderBuilder.build(MainActivity.this.getApplicationContext(),
-                "com.appcoins.testapp", "appcoins://communication/receiver/test",
-                "appcoins://communication/sender/test");
+                "com.appcoins.testapp", "appcoins://communication/receiver/test");
         data = (Data) messageSender.sendMessage(1,
-            new Data("1 - Asking Data to TestApp: " + System.currentTimeMillis() + "ms"));
+            new Data("1 - Asking Data to TestApp_v2: " + System.currentTimeMillis() + "ms"));
 
+        Log.d(TAG2, "testApp returned: " + data);
         Intent intent = new Intent("appcoins.communication.receiver.test.pay");
-        intent.putExtra("ARGUMENTS",
-            new Data(data.getData() + "\n3 - Asking TestApp to show Data"));
+        Data valueToShow = new Data(data.getData() + "\n3 - Asking TestApp_v2 to show Data");
+        intent.putExtra("ARGUMENTS", valueToShow);
+        Log.d(TAG2, "asking testApp to show: " + valueToShow);
         startActivity(intent);
       } catch (InterruptedException | MainThreadException e) {
         e.printStackTrace();
@@ -139,7 +142,7 @@ public class MainActivity extends Activity {
   public void onSkuDetailsButtonClicked(View view) {
     SkuDetailsParams skuDetailsParams = new SkuDetailsParams();
     skuDetailsParams.setItemType(SkuType.inapp.toString());
-    ArrayList<String> skusList = new ArrayList<String>();
+    ArrayList<String> skusList = new ArrayList<>();
 
     skusList.add("gas");
 

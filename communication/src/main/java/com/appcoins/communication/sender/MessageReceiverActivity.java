@@ -10,7 +10,8 @@ public class MessageReceiverActivity extends Activity {
     super.onCreate(savedInstanceState);
     long messageId = getIntent().getLongExtra("MESSAGE_ID", -1);
     Parcelable returnValue = getIntent().getParcelableExtra("RETURN_VALUE");
-    MessageReceiver.messageListener.onMessageReceived(messageId, returnValue);
+    StaticMessageResponseSynchronizer.getMessageListener()
+        .onMessageReceived(messageId, returnValue);
     finish();
   }
 }
