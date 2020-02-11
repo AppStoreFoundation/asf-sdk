@@ -2,8 +2,6 @@ package com.appcoins.sdk.billing.helpers;
 
 import android.net.Uri;
 import com.appcoins.billing.AppcoinsBilling;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * Intent payload helper class that provide a way to send the developers wallet address together
@@ -37,11 +35,6 @@ public class PayloadHelper {
     builder.scheme(SCHEME)
         .authority("appcoins.io");
     if (developerPayload != null) {
-      try {
-        developerPayload = URLEncoder.encode(developerPayload, "utf-8");
-      } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
       builder.appendQueryParameter(PAYLOAD_PARAMETER, developerPayload);
     }
     if (orderReference != null) {
