@@ -16,13 +16,13 @@ public class IntentSyncIpcMessageSender implements SyncIpcMessageSender {
     this.idGenerator = idGenerator;
   }
 
-  @Override public Parcelable sendMessage(int type, Parcelable arguments)
+  @Override public Parcelable sendMessage(int methodId, Parcelable arguments)
       throws MainThreadException, InterruptedException {
     if (Looper.myLooper() == Looper.getMainLooper()) {
       throw new MainThreadException("sendMessage");
     }
     long requestCode = idGenerator.generateRequestCode();
-    messageSender.sendMessage(requestCode, type, arguments);
+    messageSender.sendMessage(requestCode, methodId, arguments);
     return messageResponseSynchronizer.waitMessage(requestCode);
   }
 }

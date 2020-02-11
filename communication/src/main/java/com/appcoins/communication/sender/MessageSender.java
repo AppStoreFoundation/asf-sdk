@@ -20,6 +20,7 @@ class MessageSender {
     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(targetUri));
 
     intent.putExtra("MESSAGE_ID", requestCode);
+    intent.putExtra("REQUESTER_PACKAGE_NAME", context.getPackageName());
     intent.putExtra("TYPE", type);
     intent.putExtra("ARGUMENTS", arguments);
     intent.setPackage(targetPackage);

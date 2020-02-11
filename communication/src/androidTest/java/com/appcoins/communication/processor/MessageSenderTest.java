@@ -3,6 +3,7 @@ package com.appcoins.communication.processor;
 import android.content.Context;
 import android.content.Intent;
 import com.appcoins.communication.Data;
+import com.appcoins.communication.ProcessedValueReturner;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -13,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 public class MessageSenderTest {
 
   public static final String SENDER_URI = "appcoins://testing";
+  public static final String PACKAGE_NAME = "package_name";
   private ProcessedValueReturner messageSender;
   private Context context;
 
@@ -25,14 +27,15 @@ public class MessageSenderTest {
     ArgumentCaptor<Intent> argumentCaptor = ArgumentCaptor.forClass(Intent.class);
     Mockito.doNothing()
         .when(context)
-        .sendBroadcast(argumentCaptor.capture());
+        .startActivity(argumentCaptor.capture());
 
     Data response = new Data("");
-    messageSender.returnValue(1L, response);
+    messageSender.returnValue(PACKAGE_NAME, 1L, response);
 
     Intent intent = argumentCaptor.getValue();
 
-    assertEquals(1L, intent.getLongExtra("MESSAGE_ID", -1));
+    assertEquals(1L, intent.getLongExtra("REQUEST_CODE", -1));
     assertEquals(response, intent.getParcelableExtra("RETURN_VALUE"));
+    assertEquals(PACKAGE_NAME, intent.getPackage());
   }
 }

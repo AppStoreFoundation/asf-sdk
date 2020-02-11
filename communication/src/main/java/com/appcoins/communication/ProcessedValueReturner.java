@@ -1,4 +1,4 @@
-package com.appcoins.communication.processor;
+package com.appcoins.communication;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,10 +14,11 @@ public class ProcessedValueReturner {
     this.senderUri = senderUri;
   }
 
-  public void returnValue(long requestCode, Parcelable response) {
+  public void returnValue(String packageName, long requestCode, Parcelable response) {
     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(senderUri));
+    intent.setPackage(packageName);
     intent.putExtra("REQUEST_CODE", requestCode);
     intent.putExtra("RETURN_VALUE", response);
-    context.sendBroadcast(intent);
+    context.startActivity(intent);
   }
 }
