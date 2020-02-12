@@ -223,7 +223,7 @@ public class AndroidBillingMapper {
             priceCurrencyCode = APPC;
           }
 
-          String appcPrice = getAppcPrice(priceObj);
+          String appcPrice = priceObj.getString("appc");
           long appcPriceAmountMicros = getAppcAmountInMicros(priceObj);
 
           String fiatPrice = priceObj.getJSONObject("fiat")

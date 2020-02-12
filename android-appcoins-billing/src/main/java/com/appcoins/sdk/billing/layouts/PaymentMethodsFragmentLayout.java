@@ -2,6 +2,7 @@ package com.appcoins.sdk.billing.layouts;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -27,9 +28,23 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class PaymentMethodsFragmentLayoutBuilder {
+public class PaymentMethodsFragmentLayout {
 
+  private static final int INSTALL_MAIN_TEXT_ID = 22;
+  private static final int INSTALL_PAYPAL_ID = 21;
+  private static final int INSTALL_CREDIT_CARD_ID = 20;
+  private static final int PAYPAL_IMAGE_ID = 18;
+  private static final int CREDIT_CARD_IMAGE_ID = 16;
+  private static final int PAY_AS_GUEST_TEXT_ID = 15;
+  private static final int HEADER_ID = 14;
+  private static final int PAYMENT_METHODS_ID = 13;
+  private static final int PAYMENT_METHODS_HEADER = 12;
+  private static final int FIAT_PRICE_VIEW_ID = 11;
+  private static final int APPC_PRICE_VIEW_ID = 10;
+  private static final int APP_NAME_ID = 8;
+  private static final int APP_ICON_ID = 7;
   private static String BUTTONS_RESOURCE_PATH = "appcoins-wallet/resources/buttons/";
+  private static String IMAGES_RESOURCE_PATH = "appcoins-wallet/resources/images/";
   private Activity activity;
   private int orientation;
   private BuyItemProperties buyItemProperties;
@@ -51,8 +66,9 @@ public class PaymentMethodsFragmentLayoutBuilder {
   private TextView installMainText;
   private TextView installSecondaryText;
   private RadioButton installRadioButton;
+  private String densityPath;
 
-  public PaymentMethodsFragmentLayoutBuilder(Activity activity, int orientation,
+  public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
 
     this.activity = activity;
@@ -61,6 +77,11 @@ public class PaymentMethodsFragmentLayoutBuilder {
   }
 
   public View build() {
+    DisplayMetrics displayMetrics = new DisplayMetrics();
+    activity.getWindowManager()
+        .getDefaultDisplay()
+        .getMetrics(displayMetrics);
+    densityPath = mapDisplayMetrics(displayMetrics);
     RelativeLayout mainLayout = buildMainLayout();
     RelativeLayout dialogLayout = buildDialogLayout();
     mainLayout.addView(dialogLayout);
@@ -72,14 +93,17 @@ public class PaymentMethodsFragmentLayoutBuilder {
     paymentMethodHeaderLayout.setLayoutParams(
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT));
-    paymentMethodHeaderLayout.setId(100);
+    paymentMethodHeaderLayout.setId(PAYMENT_METHODS_HEADER);
     Drawable icon = null;
     String appName = "";
     PackageManager packageManager = activity.getApplicationContext()
         .getPackageManager();
     try {
       icon = packageManager.getApplicationIcon(buyItemProperties.getPackageName());
-      appName = packageManager.getApplicationInfo(buyItemProperties.getPackageName(), 0).name;
+      ApplicationInfo applicationInfo =
+          packageManager.getApplicationInfo(buyItemProperties.getPackageName(), 0);
+      appName = packageManager.getApplicationLabel(applicationInfo)
+          .toString();
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -99,12 +123,12 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private TextView createAppcPriceView() {
     TextView textView = new TextView(activity);
-    textView.setId(10);
+    textView.setId(APPC_PRICE_VIEW_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.setMargins(0, 0, dpToPx(16), 0);
-    layoutParams.addRule(RelativeLayout.BELOW, 11);
+    layoutParams.addRule(RelativeLayout.BELOW, FIAT_PRICE_VIEW_ID);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
       layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
     } else {
@@ -112,14 +136,13 @@ public class PaymentMethodsFragmentLayoutBuilder {
     }
     textView.setTextColor(Color.parseColor("#828282"));
     textView.setTextSize(12);
-    textView.setText("DEBUG");
     textView.setLayoutParams(layoutParams);
     return textView;
   }
 
   @SuppressLint("ResourceType") private TextView createFiatPriceView() {
     TextView textView = new TextView(activity);
-    textView.setId(11);
+    textView.setId(FIAT_PRICE_VIEW_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -131,7 +154,6 @@ public class PaymentMethodsFragmentLayoutBuilder {
     }
     textView.setTextColor(Color.parseColor("#000000"));
     textView.setTextSize(15);
-    textView.setText("DEBUG");
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setLayoutParams(layoutParams);
     return textView;
@@ -139,22 +161,21 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private TextView createSkuLayout(String sku) {
     TextView textView = new TextView(activity);
-    textView.setId(9);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
-    layoutParams.addRule(RelativeLayout.BELOW, 8);
+    layoutParams.addRule(RelativeLayout.BELOW, APP_NAME_ID);
     layoutParams.setMargins(dpToPx(10), 0, dpToPx(12), 0);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(RelativeLayout.START_OF, 10);
+      layoutParams.addRule(RelativeLayout.START_OF, APPC_PRICE_VIEW_ID);
     } else {
-      layoutParams.addRule(RelativeLayout.LEFT_OF, 10);
+      layoutParams.addRule(RelativeLayout.LEFT_OF, APPC_PRICE_VIEW_ID);
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(RelativeLayout.END_OF, 7);
+      layoutParams.addRule(RelativeLayout.END_OF, APP_ICON_ID);
       layoutParams.setMarginStart(dpToPx(10));
     } else {
-      layoutParams.addRule(RelativeLayout.RIGHT_OF, 7);
+      layoutParams.addRule(RelativeLayout.RIGHT_OF, APP_ICON_ID);
     }
     textView.setEllipsize(TextUtils.TruncateAt.END);
     textView.setLines(1);
@@ -167,29 +188,26 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private TextView createAppNameLayout(String appName) {
     TextView textView = new TextView(activity);
-    textView.setId(8);
+    textView.setId(APP_NAME_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.setMargins(dpToPx(10), dpToPx(15), dpToPx(12), 0);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(RelativeLayout.START_OF, 11);
+      layoutParams.addRule(RelativeLayout.START_OF, FIAT_PRICE_VIEW_ID);
     } else {
-      layoutParams.addRule(RelativeLayout.LEFT_OF, 11);
+      layoutParams.addRule(RelativeLayout.LEFT_OF, FIAT_PRICE_VIEW_ID);
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(RelativeLayout.END_OF, 7);
+      layoutParams.addRule(RelativeLayout.END_OF, APP_ICON_ID);
       layoutParams.setMarginStart(dpToPx(10));
     } else {
-      layoutParams.addRule(RelativeLayout.RIGHT_OF, 7);
+      layoutParams.addRule(RelativeLayout.RIGHT_OF, APP_ICON_ID);
     }
     textView.setEllipsize(TextUtils.TruncateAt.END);
     textView.setLines(1);
     textView.setTextColor(Color.parseColor("#de000000"));
     textView.setTextSize(16);
-    if (appName == null) {
-      appName = "DEBUG";
-    }
     textView.setText(appName);
     textView.setLayoutParams(layoutParams);
     return textView;
@@ -197,7 +215,7 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private ImageView createAppIconLayout(Drawable icon) {
     ImageView imageView = new ImageView(activity);
-    imageView.setId(7);
+    imageView.setId(APP_ICON_ID);
     if (icon != null) {
       imageView.setImageDrawable(icon);
     }
@@ -211,7 +229,6 @@ public class PaymentMethodsFragmentLayoutBuilder {
   @SuppressLint("ResourceType") private RelativeLayout buildMainLayout() {
     int backgroundColor = Color.parseColor("#64000000");
     RelativeLayout backgroundLayout = new RelativeLayout(activity);
-    backgroundLayout.setId(5);
     backgroundLayout.setBackgroundColor(backgroundColor);
     return backgroundLayout;
   }
@@ -219,9 +236,11 @@ public class PaymentMethodsFragmentLayoutBuilder {
   @SuppressLint("ResourceType") private RelativeLayout buildDialogLayout() {
     RelativeLayout dialogLayout = new RelativeLayout(activity);
     dialogLayout.setClipToPadding(false);
-    dialogLayout.setId(6);
 
-    dialogLayout.setBackgroundColor(Color.WHITE);
+    GradientDrawable gradientDrawable = new GradientDrawable();
+    gradientDrawable.setColor(Color.WHITE);
+    gradientDrawable.setCornerRadius(dpToPx(8));
+    dialogLayout.setBackground(gradientDrawable);
 
     RelativeLayout.LayoutParams dialogLayoutParams =
         new RelativeLayout.LayoutParams(dpToPx(340), ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -242,11 +261,11 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private RelativeLayout buildPaymentMethodsLayout() {
     RelativeLayout parentLayout = new RelativeLayout(activity);
-    parentLayout.setId(13);
+    parentLayout.setId(PAYMENT_METHODS_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
-    layoutParams.addRule(RelativeLayout.BELOW, 14);
+    layoutParams.addRule(RelativeLayout.BELOW, HEADER_ID);
     parentLayout.setLayoutParams(layoutParams);
 
     payAsGuestView = buildPayAsGuestTextView();
@@ -263,7 +282,7 @@ public class PaymentMethodsFragmentLayoutBuilder {
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
-    layoutParams.addRule(RelativeLayout.BELOW, 13);
+    layoutParams.addRule(RelativeLayout.BELOW, PAYMENT_METHODS_ID);
     layoutParams.setMargins(dpToPx(12), dpToPx(24), 0, dpToPx(24));
     linearLayout.setGravity(Gravity.END);
     linearLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -285,9 +304,9 @@ public class PaymentMethodsFragmentLayoutBuilder {
         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(32));
     layoutParams.gravity = Gravity.CENTER_VERTICAL;
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.setMarginEnd(16);
+      layoutParams.setMarginEnd(dpToPx(12));
     } else {
-      layoutParams.setMargins(0, 0, dpToPx(16), 0);
+      layoutParams.setMargins(0, 0, dpToPx(12), 0);
     }
     int[] gradientColors = { Color.parseColor("#FC9D48"), Color.parseColor("#FF578C") };
     GradientDrawable background =
@@ -316,7 +335,7 @@ public class PaymentMethodsFragmentLayoutBuilder {
     layoutParams.gravity = Gravity.CENTER_VERTICAL;
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
-    background.setStroke(dpToPx(1), Color.parseColor("#00000000"));
+    background.setStroke(dpToPx(1), Color.WHITE);
     background.setCornerRadius(dpToPx(6));
     button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     button.setBackgroundDrawable(background);
@@ -336,8 +355,8 @@ public class PaymentMethodsFragmentLayoutBuilder {
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
-    layoutParams.addRule(RelativeLayout.BELOW, 15);
-    layoutParams.setMargins(dpToPx(16), dpToPx(12), dpToPx(16), 0);
+    layoutParams.addRule(RelativeLayout.BELOW, PAY_AS_GUEST_TEXT_ID);
+    layoutParams.setMargins(dpToPx(12), dpToPx(12), dpToPx(12), 0);
     radioGroup.setLayoutParams(layoutParams);
 
     RelativeLayout creditCardWrapperLayout = buildCreditCardWrapperLayout();
@@ -365,10 +384,10 @@ public class PaymentMethodsFragmentLayoutBuilder {
     layoutParams.setMargins(0, dpToPx(12), 0, 0);
     relativeLayout.setLayoutParams(layoutParams);
 
-    installCreditCardImage = buildInstallImage1();
-    installPaypalImage = buildInstallImage2();
-    installMainText = buildInstallTextView1();
-    installSecondaryText = buildInstallTextView2();
+    installCreditCardImage = buildInstallCreditCardImage();
+    installPaypalImage = buildInstallPaypalImage();
+    installMainText = buildInstallMainText();
+    installSecondaryText = buildInstallSecondaryText();
     installRadioButton = buildRadioButton();
 
     relativeLayout.addView(installCreditCardImage);
@@ -379,18 +398,18 @@ public class PaymentMethodsFragmentLayoutBuilder {
     return relativeLayout;
   }
 
-  @SuppressLint("ResourceType") private TextView buildInstallTextView1() {
+  @SuppressLint("ResourceType") private TextView buildInstallMainText() {
     TextView textView = new TextView(activity);
-    textView.setId(22);
+    textView.setId(INSTALL_MAIN_TEXT_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.setMargins(dpToPx(10), dpToPx(12), 0, 0);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(RelativeLayout.END_OF, 21);
+      layoutParams.addRule(RelativeLayout.END_OF, INSTALL_PAYPAL_ID);
       layoutParams.setMarginStart(dpToPx(10));
     } else {
-      layoutParams.addRule(RelativeLayout.RIGHT_OF, 21);
+      layoutParams.addRule(RelativeLayout.RIGHT_OF, INSTALL_PAYPAL_ID);
       layoutParams.setMargins(dpToPx(10), dpToPx(12), 0, 0);
     }
     textView.setEllipsize(TextUtils.TruncateAt.END);
@@ -403,17 +422,17 @@ public class PaymentMethodsFragmentLayoutBuilder {
     return textView;
   }
 
-  private TextView buildInstallTextView2() {
+  private TextView buildInstallSecondaryText() {
     TextView textView = new TextView(activity);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-    layoutParams.addRule(RelativeLayout.BELOW, 22);
+    layoutParams.addRule(RelativeLayout.BELOW, INSTALL_MAIN_TEXT_ID);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(RelativeLayout.ALIGN_START, 22);
+      layoutParams.addRule(RelativeLayout.ALIGN_START, INSTALL_MAIN_TEXT_ID);
     } else {
-      layoutParams.addRule(RelativeLayout.ALIGN_LEFT, 22);
+      layoutParams.addRule(RelativeLayout.ALIGN_LEFT, INSTALL_MAIN_TEXT_ID);
     }
     textView.setEllipsize(TextUtils.TruncateAt.END);
     textView.setLines(1);
@@ -425,42 +444,35 @@ public class PaymentMethodsFragmentLayoutBuilder {
     return textView;
   }
 
-  @SuppressLint("ResourceType") private ImageView buildInstallImage1() {
+  @SuppressLint("ResourceType") private ImageView buildInstallCreditCardImage() {
     ImageView imageView = new ImageView(activity);
-    imageView.setId(20);
+    imageView.setId(INSTALL_CREDIT_CARD_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(24), dpToPx(24));
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-    try {
-      Drawable icon = activity.getPackageManager()
-          .getApplicationIcon(buyItemProperties.getPackageName());
-      imageView.setImageDrawable(icon);
-    } catch (PackageManager.NameNotFoundException e) {
-      e.printStackTrace();
-    }
+    Drawable creditCard = convertAssetDrawable(
+        IMAGES_RESOURCE_PATH + "credit_card/" + densityPath + "ic_credit_card.png");
+    imageView.setImageDrawable(creditCard);
     layoutParams.setMargins(dpToPx(8), 0, 0, 0);
     imageView.setLayoutParams(layoutParams);
     return imageView;
   }
 
-  @SuppressLint("ResourceType") private ImageView buildInstallImage2() {
+  @SuppressLint("ResourceType") private ImageView buildInstallPaypalImage() {
     ImageView imageView = new ImageView(activity);
-    imageView.setId(21);
+    imageView.setId(INSTALL_PAYPAL_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(20), dpToPx(20));
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-    try {
-      Drawable icon = activity.getPackageManager()
-          .getApplicationIcon(buyItemProperties.getPackageName());
-      imageView.setImageDrawable(icon);
-    } catch (PackageManager.NameNotFoundException e) {
-      e.printStackTrace();
-    }
+    Drawable paypal =
+        convertAssetDrawable(IMAGES_RESOURCE_PATH + "paypal/" + densityPath + "ic_paypal.png");
+    imageView.setImageDrawable(paypal);
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(RelativeLayout.END_OF, 20);
+      layoutParams.addRule(RelativeLayout.END_OF, INSTALL_CREDIT_CARD_ID);
       layoutParams.setMarginStart(dpToPx(1));
     } else {
-      layoutParams.addRule(RelativeLayout.RIGHT_OF, 20);
+      layoutParams.addRule(RelativeLayout.RIGHT_OF, INSTALL_CREDIT_CARD_ID);
       layoutParams.setMargins(dpToPx(1), 0, 0, 0);
     }
     imageView.setLayoutParams(layoutParams);
@@ -491,17 +503,16 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private TextView buildPaypalTextView() {
     TextView textView = new TextView(activity);
-    textView.setId(19);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     layoutParams.setMargins(dpToPx(20), 0, 0, 0);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(RelativeLayout.END_OF, 18);
+      layoutParams.addRule(RelativeLayout.END_OF, PAYPAL_IMAGE_ID);
       layoutParams.setMarginStart(dpToPx(20));
     } else {
-      layoutParams.addRule(RelativeLayout.RIGHT_OF, 18);
+      layoutParams.addRule(RelativeLayout.RIGHT_OF, PAYPAL_IMAGE_ID);
     }
     textView.setEllipsize(TextUtils.TruncateAt.END);
     textView.setLines(1);
@@ -515,17 +526,14 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private ImageView buildPaypalImage() {
     ImageView imageView = new ImageView(activity);
-    imageView.setId(18);
+    imageView.setId(PAYPAL_IMAGE_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(25), dpToPx(25));
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-    try {
-      Drawable icon = activity.getPackageManager()
-          .getApplicationIcon(buyItemProperties.getPackageName());
-      imageView.setImageDrawable(icon);
-    } catch (PackageManager.NameNotFoundException e) {
-      e.printStackTrace();
-    }
+    Drawable paypal =
+        convertAssetDrawable(IMAGES_RESOURCE_PATH + "paypal/" + densityPath + "ic_paypal.png");
+    imageView.setImageDrawable(paypal);
+
     layoutParams.setMargins(dpToPx(18), 0, 0, 0);
     imageView.setLayoutParams(layoutParams);
     return imageView;
@@ -624,17 +632,13 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private ImageView buildCreditCardImage() {
     ImageView imageView = new ImageView(activity);
-    imageView.setId(16);
+    imageView.setId(CREDIT_CARD_IMAGE_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(25), dpToPx(25));
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-    try {
-      Drawable icon = activity.getPackageManager()
-          .getApplicationIcon(buyItemProperties.getPackageName());
-      imageView.setImageDrawable(icon);
-    } catch (PackageManager.NameNotFoundException e) {
-      e.printStackTrace();
-    }
+    Drawable creditCard = convertAssetDrawable(
+        IMAGES_RESOURCE_PATH + "credit_card/" + densityPath + "ic_credit_card.png");
+    imageView.setImageDrawable(creditCard);
     layoutParams.setMargins(dpToPx(18), 0, 0, 0);
     imageView.setLayoutParams(layoutParams);
     return imageView;
@@ -642,17 +646,16 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private TextView buildCreditCardTextView() {
     TextView textView = new TextView(activity);
-    textView.setId(17);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     layoutParams.setMargins(dpToPx(20), 0, 0, 0);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(RelativeLayout.END_OF, 16);
+      layoutParams.addRule(RelativeLayout.END_OF, CREDIT_CARD_IMAGE_ID);
       layoutParams.setMarginStart(dpToPx(20));
     } else {
-      layoutParams.addRule(RelativeLayout.RIGHT_OF, 16);
+      layoutParams.addRule(RelativeLayout.RIGHT_OF, CREDIT_CARD_IMAGE_ID);
     }
     textView.setEllipsize(TextUtils.TruncateAt.END);
     textView.setLines(1);
@@ -666,7 +669,7 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private TextView buildPayAsGuestTextView() {
     TextView textView = new TextView(activity);
-    textView.setId(15);
+    textView.setId(PAY_AS_GUEST_TEXT_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -681,12 +684,12 @@ public class PaymentMethodsFragmentLayoutBuilder {
 
   @SuppressLint("ResourceType") private View buildHeaderSeparatorLayout() {
     View view = new View(activity);
-    view.setId(14);
+    view.setId(HEADER_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(1));
     layoutParams.setMargins(dpToPx(16), dpToPx(20), dpToPx(16), 0);
     view.setBackgroundColor(Color.parseColor("#eaeaea"));
-    layoutParams.addRule(RelativeLayout.BELOW, 100);
+    layoutParams.addRule(RelativeLayout.BELOW, PAYMENT_METHODS_HEADER);
     view.setLayoutParams(layoutParams);
     return view;
   }

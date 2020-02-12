@@ -8,11 +8,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SharedPreferencesRepository;
 import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
-import com.appcoins.sdk.billing.layouts.PaymentMethodsFragmentLayoutBuilder;
+import com.appcoins.sdk.billing.layouts.PaymentMethodsFragmentLayout;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 public class PaymentMethodsFragment extends Fragment implements PaymentMethodsView {
 
@@ -20,6 +23,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private IabView iabView;
   private BuyItemProperties buyItemProperties;
   private PaymentMethodsPresenter paymentMethodsPresenter;
+  private PaymentMethodsFragmentLayout layout;
 
   @Override public void onAttach(Context context) {
     super.onAttach(context);
@@ -39,11 +43,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
-    PaymentMethodsFragmentLayoutBuilder builder =
-        new PaymentMethodsFragmentLayoutBuilder(getActivity(),
-            getResources().getConfiguration().orientation, buyItemProperties);
+    layout = new PaymentMethodsFragmentLayout(getActivity(),
+        getResources().getConfiguration().orientation, buyItemProperties);
 
-    return builder.build();
+    return layout.build();
   }
 
   @SuppressLint("ResourceType") @Override
@@ -55,7 +58,13 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void setSkuInformation(String fiatPrice, String currencyCode, String appcPrice,
       String sku) {
-    Log.d("TAG123", "VIEW: " + fiatPrice + " " + currencyCode + " : " + appcPrice + " : " + sku);
+    TextView fiatPriceView = layout.getFiatPriceView();
+    TextView appcPriceView = layout.getAppcPriceView();
+    DecimalFormat df = new DecimalFormat("0.00");
+    String fiatText = df.format(new BigDecimal(fiatPrice));
+    String appcText = df.format(new BigDecimal(appcPrice));
+    fiatPriceView.setText(String.format("%s %s", fiatText, currencyCode));
+    appcPriceView.setText(String.format("%s %s", appcText, "APPC"));
   }
 
   @Override public void showError() {

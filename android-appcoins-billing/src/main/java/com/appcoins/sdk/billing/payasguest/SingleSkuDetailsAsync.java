@@ -9,7 +9,7 @@ import com.appcoins.sdk.billing.helpers.AndroidBillingMapper;
 import java.util.ArrayList;
 import java.util.List;
 
-class SingleSkuDetailsAsync extends AsyncTask {
+class SingleSkuDetailsAsync extends AsyncTask<Object, Object, SkuDetails> {
 
   private final BuyItemProperties buyItemProperties;
   private final SingleSkuDetailsListener listener;
@@ -21,16 +21,19 @@ class SingleSkuDetailsAsync extends AsyncTask {
     this.listener = listener;
   }
 
-  @Override protected Object doInBackground(Object[] objects) {
+  @Override protected SkuDetails doInBackground(Object[] objects) {
     SkuDetails skuDetails =
         getSkuDetails(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
             buyItemProperties.getType());
+    return skuDetails;
+  }
+
+  @Override protected void onPostExecute(SkuDetails skuDetails) {
     if (skuDetails == null) {
       listener.onResponse(true, null);
     } else {
       listener.onResponse(false, skuDetails);
     }
-    return null;
   }
 
   private SkuDetails getSkuDetails(String packageName, String sku, String type) {
