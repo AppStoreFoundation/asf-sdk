@@ -33,6 +33,15 @@ public abstract class MessageProcessorActivity extends Activity {
     }).start();
   }
 
+  /**
+   * This method will be called in to process data to be returned
+   * the method is run on a worker thread
+   *
+   * @param methodId method id sent by requester
+   * @param arguments arguments send by requester
+   *
+   * @return data that should be returned to requester
+   */
   public abstract Parcelable processValue(int methodId, Parcelable arguments);
 }
 
