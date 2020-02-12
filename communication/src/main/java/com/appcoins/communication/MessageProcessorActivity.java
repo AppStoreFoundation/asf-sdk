@@ -35,7 +35,10 @@ public abstract class MessageProcessorActivity extends Activity {
 
   /**
    * This method will be called in to process data to be returned
-   * the method is run on a worker thread
+   * <dl>
+   *  <dt><b>Thread:</b></dt>
+   *  <dd>{@code processValue} runs on a worker thread.</dd>
+   * </dl>
    *
    * @param methodId method id sent by requester
    * @param arguments arguments send by requester
