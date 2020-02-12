@@ -92,7 +92,8 @@ public class MainActivity extends Activity {
       try {
         SyncIpcMessageRequester messageSender =
             MessageRequesterFactory.create(MainActivity.this.getApplicationContext(),
-                "com.appcoins.testapp", "appcoins://communication/receiver/test");
+                "com.appcoins.testapp", "appcoins://communication/receiver/test",
+                "appcoins://communication/sender/test");
         data = (Intent) messageSender.sendMessage(1,
             new Intent("1 - Asking Data to TestApp_v2: " + System.currentTimeMillis() + "ms"));
 

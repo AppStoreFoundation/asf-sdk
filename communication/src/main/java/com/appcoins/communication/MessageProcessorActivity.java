@@ -7,26 +7,31 @@ import android.os.Parcelable;
 
 public abstract class MessageProcessorActivity extends Activity {
 
+  public static final String MESSAGE_ID = "MESSAGE_ID";
+  public static final String TYPE = "TYPE";
+  public static final String REQUESTER_PACKAGE_NAME = "REQUESTER_PACKAGE_NAME";
+  public static final String ARGUMENTS = "ARGUMENTS";
+  public static final String REQUESTER_ACTIVITY_URI = "REQUESTER_ACTIVITY_URI";
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    String requesterUri = getIntent().getStringExtra(REQUESTER_ACTIVITY_URI);
     final ProcessedValueReturner processedValueReturner =
-        new ProcessedValueReturner(this, getRequesterUri());
+        new ProcessedValueReturner(this, requesterUri);
 
     new Thread(new Runnable() {
       @Override public void run() {
         Intent intent = getIntent();
-        long requestCode = intent.getLongExtra("MESSAGE_ID", -1);
-        int methodId = intent.getIntExtra("TYPE", -1);
-        String packageName = intent.getStringExtra("REQUESTER_PACKAGE_NAME");
-        Parcelable arguments = intent.getParcelableExtra("ARGUMENTS");
+        long requestCode = intent.getLongExtra(MESSAGE_ID, -1);
+        int methodId = intent.getIntExtra(TYPE, -1);
+        String packageName = intent.getStringExtra(REQUESTER_PACKAGE_NAME);
+        Parcelable arguments = intent.getParcelableExtra(ARGUMENTS);
         Parcelable returnValue = processValue(methodId, arguments);
         processedValueReturner.returnValue(packageName, requestCode, returnValue);
         finish();
       }
     }).start();
   }
-
-  protected abstract String getRequesterUri();
 
   public abstract Parcelable processValue(int methodId, Parcelable arguments);
 }
