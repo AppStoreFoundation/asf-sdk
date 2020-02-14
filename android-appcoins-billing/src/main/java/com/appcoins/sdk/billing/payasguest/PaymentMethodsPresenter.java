@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
-import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.WalletInteractListener;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.models.WalletGenerationModel;
@@ -14,19 +13,20 @@ import com.appcoins.sdk.billing.models.WalletGenerationModel;
 class PaymentMethodsPresenter {
 
   private final PaymentMethodsView fragmentView;
-  private WalletInteract walletInteract;
+  private PaymentMethodsInteract paymentMethodsInteract;
   private WalletInstallationIntentBuilder walletInstallationIntentBuilder;
 
-  public PaymentMethodsPresenter(PaymentMethodsView view, WalletInteract walletInteract,
+  public PaymentMethodsPresenter(PaymentMethodsView view,
+      PaymentMethodsInteract paymentMethodsInteract,
       WalletInstallationIntentBuilder walletInstallationIntentBuilder) {
 
     this.fragmentView = view;
-    this.walletInteract = walletInteract;
+    this.paymentMethodsInteract = paymentMethodsInteract;
     this.walletInstallationIntentBuilder = walletInstallationIntentBuilder;
   }
 
   public void requestWallet() {
-    String id = walletInteract.retrieveId();
+    String id = paymentMethodsInteract.retrieveId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
         Log.d("TAG123", walletGenerationModel.getWalletAddress()
@@ -36,7 +36,7 @@ class PaymentMethodsPresenter {
             + walletGenerationModel.hasError());
       }
     };
-    walletInteract.requestWallet(id, walletInteractListener);
+    paymentMethodsInteract.requestWallet(id, walletInteractListener);
   }
 
   public void provideSkuDetailsInformation(BuyItemProperties buyItemProperties) {
@@ -51,9 +51,7 @@ class PaymentMethodsPresenter {
         }
       }
     };
-    SingleSkuDetailsAsync singleSkuDetailsAsync =
-        new SingleSkuDetailsAsync(buyItemProperties, listener);
-    singleSkuDetailsAsync.execute();
+    paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
   }
 
   public void onCancelButtonClicked(Button cancelButton) {

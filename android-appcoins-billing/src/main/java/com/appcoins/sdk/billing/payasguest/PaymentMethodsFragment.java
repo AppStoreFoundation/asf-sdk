@@ -45,9 +45,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     walletInteract = new WalletInteract(new SharedPreferencesRepository(getActivity()));
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
-    paymentMethodsPresenter = new PaymentMethodsPresenter(this, walletInteract,
-        new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
-            getActivity().getPackageName()));
+    paymentMethodsPresenter =
+        new PaymentMethodsPresenter(this, new PaymentMethodsInteract(walletInteract),
+            new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
+                getActivity().getPackageName()));
   }
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
