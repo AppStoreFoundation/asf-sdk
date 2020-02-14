@@ -22,10 +22,8 @@ class SingleSkuDetailsAsync extends AsyncTask<Object, Object, SkuDetails> {
   }
 
   @Override protected SkuDetails doInBackground(Object[] objects) {
-    SkuDetails skuDetails =
-        getSkuDetails(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
-            buyItemProperties.getType());
-    return skuDetails;
+    return getSkuDetails(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
+        buyItemProperties.getType());
   }
 
   @Override protected void onPostExecute(SkuDetails skuDetails) {
