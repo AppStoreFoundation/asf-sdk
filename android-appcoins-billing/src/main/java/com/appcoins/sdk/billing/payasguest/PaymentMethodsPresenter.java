@@ -1,7 +1,6 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -30,11 +29,7 @@ class PaymentMethodsPresenter {
     String id = paymentMethodsInteract.retrieveId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
-        Log.d("TAG123", walletGenerationModel.getWalletAddress()
-            + "ewt: "
-            + walletGenerationModel.getEwt()
-            + " "
-            + walletGenerationModel.hasError());
+        fragmentView.saveWalletInformation(walletGenerationModel);
       }
     };
     paymentMethodsInteract.requestWallet(id, walletInteractListener);
@@ -46,9 +41,9 @@ class PaymentMethodsPresenter {
         if (error) {
           fragmentView.showError();
         } else {
-          fragmentView.setSkuInformation(skuDetails.getFiatPrice(),
-              skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
-              skuDetails.getSku());
+          fragmentView.setSkuInformation(
+              new SkuDetailsModel(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode(),
+                  skuDetails.getAppcPrice(), skuDetails.getSku()));
         }
       }
     };

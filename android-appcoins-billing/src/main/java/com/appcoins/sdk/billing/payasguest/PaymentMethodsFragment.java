@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -20,6 +21,7 @@ import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.layouts.PaymentMethodsFragmentLayout;
+import com.appcoins.sdk.billing.models.WalletGenerationModel;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
@@ -34,6 +36,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private PaymentMethodsPresenter paymentMethodsPresenter;
   private PaymentMethodsFragmentLayout layout;
   private String selectedRadioButton;
+  private SkuDetailsModel skuDetailsModel;
+  private WalletGenerationModel walletGenerationModel;
 
   @Override public void onAttach(Context context) {
     super.onAttach(context);
@@ -100,18 +104,24 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     }
   }
 
-  @Override public void setSkuInformation(String fiatPrice, String currencyCode, String appcPrice,
-      String sku) {
+  @Override public void setSkuInformation(SkuDetailsModel skuDetailsModel) {
+    this.skuDetailsModel = skuDetailsModel;
     TextView fiatPriceView = layout.getFiatPriceView();
     TextView appcPriceView = layout.getAppcPriceView();
     DecimalFormat df = new DecimalFormat("0.00");
-    String fiatText = df.format(new BigDecimal(fiatPrice));
-    String appcText = df.format(new BigDecimal(appcPrice));
-    fiatPriceView.setText(String.format("%s %s", fiatText, currencyCode));
+    String fiatText = df.format(new BigDecimal(skuDetailsModel.getFiatPrice()));
+    String appcText = df.format(new BigDecimal(skuDetailsModel.getAppcPrice()));
+    fiatPriceView.setText(
+        String.format("%s %s", fiatText, skuDetailsModel.getFiatPriceCurrencyCode()));
     appcPriceView.setText(String.format("%s %s", appcText, "APPC"));
+    if (walletGenerationModel != null) {
+      showPaymentView();
+    }
   }
 
   @Override public void showError() {
+    ProgressBar progressBar = layout.getProgressBar();
+    progressBar.setVisibility(View.INVISIBLE);
     Log.d("TAG123", "ERROR");
   }
 
@@ -143,6 +153,22 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     } else {
       positiveButton.setText("NEXT");
     }
+  }
+
+  @Override public void saveWalletInformation(WalletGenerationModel walletGenerationModel) {
+    this.walletGenerationModel = walletGenerationModel;
+    if (skuDetailsModel != null) {
+      showPaymentView();
+    }
+  }
+
+  private void showPaymentView() {
+    layout.getProgressBar()
+        .setVisibility(View.INVISIBLE);
+    layout.getPaymentMethodsLayout()
+        .setVisibility(View.VISIBLE);
+    layout.getPositiveButton()
+        .setEnabled(true);
   }
 
   private void attach(Context context) {

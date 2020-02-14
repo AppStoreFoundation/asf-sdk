@@ -1,9 +1,10 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.content.Intent;
+import com.appcoins.sdk.billing.models.WalletGenerationModel;
 
 interface PaymentMethodsView {
-  void setSkuInformation(String fiatPrice, String currencyCode, String appcPrice, String sku);
+  void setSkuInformation(SkuDetailsModel skuDetailsModel);
 
   void showError();
 
@@ -18,4 +19,6 @@ interface PaymentMethodsView {
   void setRadioButtonSelected(String radioButtonSelected);
 
   void setPositiveButtonText(String text);
+
+  void saveWalletInformation(WalletGenerationModel walletGenerationModel);
 }
