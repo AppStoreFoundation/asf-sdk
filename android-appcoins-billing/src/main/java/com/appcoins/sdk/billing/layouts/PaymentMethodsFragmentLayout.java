@@ -73,6 +73,8 @@ public class PaymentMethodsFragmentLayout {
   private TextView installSecondaryText;
   private RadioButton installRadioButton;
   private String densityPath;
+  private Button cancelButton;
+  private Button buyButton;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
@@ -298,7 +300,7 @@ public class PaymentMethodsFragmentLayout {
     linearLayout.setClipToPadding(false);
     linearLayout.setLayoutParams(layoutParams);
 
-    Button cancelButton = buildCancelButtonLayout();
+    cancelButton = buildCancelButtonLayout();
     Button buyButton = buildBuyButtonLayout();
 
     linearLayout.addView(cancelButton);
@@ -986,5 +988,13 @@ public class PaymentMethodsFragmentLayout {
 
   public RadioButton getInstallRadioButton() {
     return installRadioButton;
+  }
+
+  public Button getCancelButton() {
+    return cancelButton;
+  }
+
+  public Button getBuyButton() {
+    return buyButton;
   }
 }
