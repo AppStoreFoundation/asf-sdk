@@ -23,7 +23,7 @@ public class WalletUtils {
   public static Context context;
   private static String billingPackageName;
   private static String iabAction;
-  private static boolean cafeBazaarWalletAvailable = false;
+  private static boolean cafeBazaarWalletAvailable = true;
 
   public static boolean hasWalletInstalled() {
     if (billingPackageName == null) {
@@ -126,9 +126,7 @@ public class WalletUtils {
     final CountDownLatch latch = new CountDownLatch(1);
     ResponseListener responseListener = new ResponseListener() {
       @Override public void onResponseCode(int code) {
-        if (code < 300) {
-          cafeBazaarWalletAvailable = true;
-        }
+        cafeBazaarWalletAvailable = code < 300 || code == 600;
         latch.countDown();
       }
     };

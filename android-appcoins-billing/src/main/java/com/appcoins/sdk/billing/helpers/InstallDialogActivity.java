@@ -69,7 +69,6 @@ public class InstallDialogActivity extends Activity {
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
-
     String storeUrl = "market://details?id="
         + BuildConfig.BDS_WALLET_PACKAGE_NAME
         + "&utm_source=appcoinssdk&app_source="

@@ -51,7 +51,7 @@ public class CafeBazaarResponseAsync extends AsyncTask {
   }
 
   @Override protected Object doInBackground(Object[] objects) {
-    int responseCode = 404;
+    int responseCode = 600;
     try {
       responseCode = getResponseCode();
     } catch (IOException e) {

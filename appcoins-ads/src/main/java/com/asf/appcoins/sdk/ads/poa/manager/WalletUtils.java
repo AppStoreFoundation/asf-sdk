@@ -50,7 +50,7 @@ public class WalletUtils {
   private static boolean hasPopup;
   private static String IDENTIFIER_KEY = "identifier";
   private static String billingPackageName;
-  private static boolean cafeBazaarWalletAvailable;
+  private static boolean cafeBazaarWalletAvailable = true;
 
   public static void setContext(Context cont) {
     context = cont;
@@ -200,9 +200,7 @@ public class WalletUtils {
     final CountDownLatch latch = new CountDownLatch(1);
     ResponseListener responseListener = new ResponseListener() {
       @Override public void onResponseCode(int code) {
-        if (code < 300) {
-          cafeBazaarWalletAvailable = true;
-        }
+        cafeBazaarWalletAvailable = code < 300 || code == 600;
         latch.countDown();
       }
     };
