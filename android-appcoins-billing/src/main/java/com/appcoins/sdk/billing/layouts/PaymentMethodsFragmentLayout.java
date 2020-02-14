@@ -33,26 +33,26 @@ import java.io.InputStream;
 
 public class PaymentMethodsFragmentLayout {
 
-  private static final int ERROR_MESSAGE_ID = 26;
-  private static final int ERROR_TITLE_ID = 25;
-  private static final int PAYPAL_WRAPPER_ID = 24;
-  private static final int CREDIT_CARD_WRAPPER_ID = 23;
-  private static final int INSTALL_MAIN_TEXT_ID = 22;
-  private static final int INSTALL_PAYPAL_ID = 21;
-  private static final int INSTALL_CREDIT_CARD_ID = 20;
-  private static final int INSTALL_RADIO_BUTTON_ID = 19;
-  private static final int PAYPAL_IMAGE_ID = 18;
-  private static final int PAYPAL_RADIO_BUTTON_ID = 17;
-  private static final int CREDIT_CARD_IMAGE_ID = 16;
-  private static final int PAY_AS_GUEST_TEXT_ID = 15;
-  private static final int HEADER_ID = 14;
-  private static final int PAYMENT_METHODS_ID = 13;
-  private static final int PAYMENT_METHODS_HEADER = 12;
-  private static final int FIAT_PRICE_VIEW_ID = 11;
-  private static final int APPC_PRICE_VIEW_ID = 10;
-  private static final int CREDIT_CARD_RADIO_BUTTON_ID = 9;
-  private static final int APP_NAME_ID = 8;
-  private static final int APP_ICON_ID = 7;
+  private static int ERROR_MESSAGE_ID = 26;
+  private static int ERROR_TITLE_ID = 25;
+  private static int PAYPAL_WRAPPER_ID = 24;
+  private static int CREDIT_CARD_WRAPPER_ID = 23;
+  private static int INSTALL_MAIN_TEXT_ID = 22;
+  private static int INSTALL_PAYPAL_ID = 21;
+  private static int INSTALL_CREDIT_CARD_ID = 20;
+  private static int INSTALL_RADIO_BUTTON_ID = 19;
+  private static int PAYPAL_IMAGE_ID = 18;
+  private static int PAYPAL_RADIO_BUTTON_ID = 17;
+  private static int CREDIT_CARD_IMAGE_ID = 16;
+  private static int PAY_AS_GUEST_TEXT_ID = 15;
+  private static int HEADER_ID = 14;
+  private static int PAYMENT_METHODS_ID = 13;
+  private static int PAYMENT_METHODS_HEADER_ID = 12;
+  private static int FIAT_PRICE_VIEW_ID = 11;
+  private static int APPC_PRICE_VIEW_ID = 10;
+  private static int CREDIT_CARD_RADIO_BUTTON_ID = 9;
+  private static int APP_NAME_ID = 8;
+  private static int APP_ICON_ID = 7;
   private static final String BUTTONS_RESOURCE_PATH = "appcoins-wallet/resources/buttons/";
   private static final String IMAGES_RESOURCE_PATH = "appcoins-wallet/resources/images/";
   private Activity activity;
@@ -73,14 +73,12 @@ public class PaymentMethodsFragmentLayout {
   private GradientDrawable defaultBackground;
   private ProgressBar progressBar;
   private RelativeLayout paymentMethodsLayout;
-  private TextView errorMessage;
   private Button errorPositiveButton;
   private RelativeLayout errorView;
   private RelativeLayout dialogLayout;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
-
     this.activity = activity;
     this.orientation = orientation;
     this.buyItemProperties = buyItemProperties;
@@ -108,7 +106,10 @@ public class PaymentMethodsFragmentLayout {
     paymentMethodHeaderLayout.setLayoutParams(
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT));
-    paymentMethodHeaderLayout.setId(PAYMENT_METHODS_HEADER);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      PAYMENT_METHODS_HEADER_ID = View.generateViewId();
+    }
+    paymentMethodHeaderLayout.setId(PAYMENT_METHODS_HEADER_ID);
     Drawable icon = null;
     String appName = "";
     PackageManager packageManager = activity.getApplicationContext()
@@ -138,6 +139,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint({ "ResourceType", "InlinedApi" }) private TextView createAppcPriceView() {
     TextView textView = new TextView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      APPC_PRICE_VIEW_ID = View.generateViewId();
+    }
     textView.setId(APPC_PRICE_VIEW_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -153,6 +157,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint({ "ResourceType", "InlinedApi" }) private TextView createFiatPriceView() {
     TextView textView = new TextView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      FIAT_PRICE_VIEW_ID = View.generateViewId();
+    }
     textView.setId(FIAT_PRICE_VIEW_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -187,6 +194,9 @@ public class PaymentMethodsFragmentLayout {
   @SuppressLint({ "ResourceType", "InlinedApi" })
   private TextView createAppNameLayout(String appName) {
     TextView textView = new TextView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      APP_NAME_ID = View.generateViewId();
+    }
     textView.setId(APP_NAME_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -205,6 +215,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint("ResourceType") private ImageView createAppIconLayout(Drawable icon) {
     ImageView imageView = new ImageView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      APP_ICON_ID = View.generateViewId();
+    }
     imageView.setId(APP_ICON_ID);
     if (icon != null) {
       imageView.setImageDrawable(icon);
@@ -294,7 +307,7 @@ public class PaymentMethodsFragmentLayout {
     relativeLayout.setLayoutParams(layoutParams);
 
     TextView errorTitle = buildErrorTitle();
-    errorMessage = buildErrorMessage();
+    TextView errorMessage = buildErrorMessage();
     errorPositiveButton = buildErrorPositiveButton();
 
     relativeLayout.addView(errorTitle);
@@ -306,6 +319,9 @@ public class PaymentMethodsFragmentLayout {
 
   private TextView buildErrorTitle() {
     TextView textView = new TextView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      ERROR_TITLE_ID = View.generateViewId();
+    }
     textView.setId(ERROR_TITLE_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -320,6 +336,9 @@ public class PaymentMethodsFragmentLayout {
 
   private TextView buildErrorMessage() {
     TextView textView = new TextView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      ERROR_MESSAGE_ID = View.generateViewId();
+    }
     textView.setId(ERROR_MESSAGE_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -375,6 +394,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint("ResourceType") private RelativeLayout buildPaymentMethodsLayout() {
     RelativeLayout parentLayout = new RelativeLayout(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      PAYMENT_METHODS_ID = View.generateViewId();
+    }
     parentLayout.setId(PAYMENT_METHODS_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -555,6 +577,9 @@ public class PaymentMethodsFragmentLayout {
     ImageView installPaypalImage = buildInstallPaypalImage();
     TextView installMainText = buildInstallMainText();
     TextView installSecondaryText = buildInstallSecondaryText();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      INSTALL_RADIO_BUTTON_ID = View.generateViewId();
+    }
     installRadioButton = buildRadioButton(INSTALL_RADIO_BUTTON_ID);
 
     relativeLayout.addView(installCreditCardImage);
@@ -567,6 +592,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint({ "ResourceType", "InlinedApi" }) private TextView buildInstallMainText() {
     TextView textView = new TextView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      INSTALL_MAIN_TEXT_ID = View.generateViewId();
+    }
     textView.setId(INSTALL_MAIN_TEXT_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -630,6 +658,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint("ResourceType") private ImageView buildInstallCreditCardImage() {
     ImageView imageView = new ImageView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      INSTALL_CREDIT_CARD_ID = View.generateViewId();
+    }
     imageView.setId(INSTALL_CREDIT_CARD_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(24), dpToPx(24));
@@ -655,6 +686,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint({ "ResourceType", "InlinedApi" }) private ImageView buildInstallPaypalImage() {
     ImageView imageView = new ImageView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      INSTALL_PAYPAL_ID = View.generateViewId();
+    }
     imageView.setId(INSTALL_PAYPAL_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(20), dpToPx(20));
@@ -679,6 +713,9 @@ public class PaymentMethodsFragmentLayout {
 
   private RelativeLayout buildPaypalWrapperLayout() {
     RelativeLayout relativeLayout = new RelativeLayout(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      PAYPAL_WRAPPER_ID = View.generateViewId();
+    }
     relativeLayout.setId(PAYPAL_WRAPPER_ID);
 
     int width, height, top, start;
@@ -707,6 +744,9 @@ public class PaymentMethodsFragmentLayout {
 
     ImageView paypalImage = buildPaypalImage();
     TextView paypalTextView = buildPaypalTextView();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      PAYPAL_RADIO_BUTTON_ID = View.generateViewId();
+    }
     paypalRadioButton = buildRadioButton(PAYPAL_RADIO_BUTTON_ID);
 
     relativeLayout.addView(paypalImage);
@@ -750,6 +790,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint("ResourceType") private ImageView buildPaypalImage() {
     ImageView imageView = new ImageView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      PAYPAL_IMAGE_ID = View.generateViewId();
+    }
     imageView.setId(PAYPAL_IMAGE_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(25), dpToPx(25));
@@ -776,6 +819,9 @@ public class PaymentMethodsFragmentLayout {
 
   private RelativeLayout buildCreditCardWrapperLayout() {
     RelativeLayout relativeLayout = new RelativeLayout(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      CREDIT_CARD_WRAPPER_ID = View.generateViewId();
+    }
     relativeLayout.setId(CREDIT_CARD_WRAPPER_ID);
     int width, height;
 
@@ -798,6 +844,9 @@ public class PaymentMethodsFragmentLayout {
 
     ImageView creditCardImage = buildCreditCardImage();
     TextView creditCardText = buildCreditCardTextView();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      CREDIT_CARD_RADIO_BUTTON_ID = View.generateViewId();
+    }
     creditCardRadioButton = buildRadioButton(CREDIT_CARD_RADIO_BUTTON_ID);
 
     relativeLayout.addView(creditCardImage);
@@ -886,6 +935,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint("ResourceType") private ImageView buildCreditCardImage() {
     ImageView imageView = new ImageView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      CREDIT_CARD_IMAGE_ID = View.generateViewId();
+    }
     imageView.setId(CREDIT_CARD_IMAGE_ID);
 
     int width, height, start, rule, top;
@@ -953,6 +1005,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint("ResourceType") private TextView buildPayAsGuestTextView() {
     TextView textView = new TextView(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      PAY_AS_GUEST_TEXT_ID = View.generateViewId();
+    }
     textView.setId(PAY_AS_GUEST_TEXT_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -976,6 +1031,9 @@ public class PaymentMethodsFragmentLayout {
 
   @SuppressLint("ResourceType") private View buildHeaderSeparatorLayout() {
     View view = new View(activity);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      HEADER_ID = View.generateViewId();
+    }
     view.setId(HEADER_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(1));
@@ -991,7 +1049,7 @@ public class PaymentMethodsFragmentLayout {
     }
     setMargins(layoutParams, start, top, end, 0);
     view.setBackgroundColor(Color.parseColor("#eaeaea"));
-    layoutParams.addRule(RelativeLayout.BELOW, PAYMENT_METHODS_HEADER);
+    layoutParams.addRule(RelativeLayout.BELOW, PAYMENT_METHODS_HEADER_ID);
     view.setLayoutParams(layoutParams);
     return view;
   }
@@ -1152,10 +1210,6 @@ public class PaymentMethodsFragmentLayout {
 
   public RelativeLayout getPaymentMethodsLayout() {
     return paymentMethodsLayout;
-  }
-
-  public TextView getErrorMessage() {
-    return errorMessage;
   }
 
   public Button getErrorPositiveButton() {
