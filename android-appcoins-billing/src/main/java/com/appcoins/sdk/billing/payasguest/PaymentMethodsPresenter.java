@@ -29,7 +29,11 @@ class PaymentMethodsPresenter {
     String id = paymentMethodsInteract.retrieveId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
-        fragmentView.saveWalletInformation(walletGenerationModel);
+        if (true) {
+          fragmentView.showError();
+        } else {
+          fragmentView.saveWalletInformation(walletGenerationModel);
+        }
       }
     };
     paymentMethodsInteract.requestWallet(id, walletInteractListener);
@@ -91,6 +95,14 @@ class PaymentMethodsPresenter {
     paypalWrapper.setOnClickListener(paypalListener);
     installRadioButton.setOnClickListener(installListener);
     installWrapper.setOnClickListener(installListener);
+  }
+
+  void onErrorButtonClicked(Button errorButton) {
+    errorButton.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        fragmentView.close();
+      }
+    });
   }
 
   public class RadioButtonClickListener implements View.OnClickListener {

@@ -33,6 +33,8 @@ import java.io.InputStream;
 
 public class PaymentMethodsFragmentLayout {
 
+  private static final int ERROR_MESSAGE_ID = 26;
+  private static final int ERROR_TITLE_ID = 25;
   private static final int PAYPAL_WRAPPER_ID = 24;
   private static final int CREDIT_CARD_WRAPPER_ID = 23;
   private static final int INSTALL_MAIN_TEXT_ID = 22;
@@ -71,6 +73,10 @@ public class PaymentMethodsFragmentLayout {
   private GradientDrawable defaultBackground;
   private ProgressBar progressBar;
   private RelativeLayout paymentMethodsLayout;
+  private TextView errorMessage;
+  private Button errorPositiveButton;
+  private RelativeLayout errorView;
+  private RelativeLayout dialogLayout;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
@@ -86,9 +92,14 @@ public class PaymentMethodsFragmentLayout {
         .getDefaultDisplay()
         .getMetrics(displayMetrics);
     densityPath = mapDisplayMetrics(displayMetrics);
+
     RelativeLayout mainLayout = buildMainLayout();
-    RelativeLayout dialogLayout = buildDialogLayout();
+    errorView = buildErrorView();
+    errorView.setVisibility(View.INVISIBLE);
+    dialogLayout = buildDialogLayout();
+
     mainLayout.addView(dialogLayout);
+    mainLayout.addView(errorView);
     return mainLayout;
   }
 
@@ -241,6 +252,7 @@ public class PaymentMethodsFragmentLayout {
     dialogLayout.setLayoutParams(dialogLayoutParams);
 
     progressBar = buildProgressBar();
+
     RelativeLayout paymentMethodsHeaderLayout = buildPaymentMethodsHeaderLayout();
     View headerSeparator = buildHeaderSeparatorLayout();
     paymentMethodsLayout = buildPaymentMethodsLayout();
@@ -253,6 +265,92 @@ public class PaymentMethodsFragmentLayout {
     dialogLayout.addView(paymentMethodsLayout);
     dialogLayout.addView(buttonsView);
     return dialogLayout;
+  }
+
+  private RelativeLayout buildErrorView() {
+    RelativeLayout relativeLayout = new RelativeLayout(activity);
+    setPadding(relativeLayout, 16, 16, 16, 16);
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(160));
+
+    GradientDrawable gradientDrawable = new GradientDrawable();
+    gradientDrawable.setColor(Color.WHITE);
+    gradientDrawable.setCornerRadius(dpToPx(8));
+    relativeLayout.setBackground(gradientDrawable);
+
+    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+    setMargins(layoutParams, 16, 0, 16, 0);
+
+    relativeLayout.setLayoutParams(layoutParams);
+
+    TextView errorTitle = buildErrorTitle();
+    errorMessage = buildErrorMessage();
+    errorPositiveButton = buildErrorPositiveButton();
+
+    relativeLayout.addView(errorTitle);
+    relativeLayout.addView(errorMessage);
+    relativeLayout.addView(errorPositiveButton);
+
+    return relativeLayout;
+  }
+
+  private TextView buildErrorTitle() {
+    TextView textView = new TextView(activity);
+    textView.setId(ERROR_TITLE_ID);
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT);
+    textView.setLayoutParams(layoutParams);
+    textView.setText("Error");
+    textView.setTextColor(Color.BLACK);
+    textView.setTextSize(16);
+
+    return textView;
+  }
+
+  private TextView buildErrorMessage() {
+    TextView textView = new TextView(activity);
+    textView.setId(ERROR_MESSAGE_ID);
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT);
+    layoutParams.addRule(RelativeLayout.BELOW, ERROR_TITLE_ID);
+    setMargins(layoutParams, 0, 8, 0, 0);
+
+    textView.setLayoutParams(layoutParams);
+    textView.setMaxLines(3);
+    textView.setText("An error as ocurred");
+    textView.setTextColor(Color.parseColor("#8a8a8a"));
+    textView.setTextSize(12);
+    return textView;
+  }
+
+  @SuppressLint("InlinedApi") private Button buildErrorPositiveButton() {
+    Button button = new Button(activity);
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(36));
+    setPadding(button, 0, 0, 4, 0);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_BOTTOM);
+    setMargins(layoutParams, 0, 56, 0, 0);
+    int[] gradientColors = { Color.parseColor("#FC9D48"), Color.parseColor("#FF578C") };
+    GradientDrawable enableBackground =
+        new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, gradientColors);
+    enableBackground.setShape(GradientDrawable.RECTANGLE);
+    enableBackground.setStroke(dpToPx(1), Color.WHITE);
+    enableBackground.setCornerRadius(dpToPx(16));
+    button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+    button.setBackground(enableBackground);
+
+    button.setMaxWidth(dpToPx(126));
+    button.setMinWidth(dpToPx(80));
+
+    button.setTextColor(Color.WHITE);
+    button.setTextSize(14);
+    button.setText("OK".toUpperCase());
+    button.setLayoutParams(layoutParams);
+
+    return button;
   }
 
   private ProgressBar buildProgressBar() {
@@ -310,7 +408,7 @@ public class PaymentMethodsFragmentLayout {
     linearLayout.setLayoutParams(layoutParams);
 
     cancelButton = buildCancelButtonLayout();
-    positiveButton = buildBuyButtonLayout();
+    positiveButton = buildPositiveButtonLayout();
     positiveButton.setEnabled(false);
 
     linearLayout.addView(cancelButton);
@@ -318,7 +416,7 @@ public class PaymentMethodsFragmentLayout {
     return linearLayout;
   }
 
-  private Button buildBuyButtonLayout() {
+  private Button buildPositiveButtonLayout() {
     Button button = new Button(activity);
     LinearLayout.LayoutParams layoutParams =
         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(36));
@@ -349,7 +447,7 @@ public class PaymentMethodsFragmentLayout {
     button.setMaxWidth(dpToPx(142));
     button.setMinWidth(dpToPx(96));
 
-    button.setPadding(0, 0, dpToPx(4), 0);
+    setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.WHITE);
     button.setTextSize(14);
     button.setText("NEXT".toUpperCase());
@@ -371,7 +469,7 @@ public class PaymentMethodsFragmentLayout {
     button.setMaxWidth(dpToPx(126));
     button.setMinWidth(dpToPx(80));
 
-    button.setPaddingRelative(0, 0, dpToPx(4), 0);
+    setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.parseColor("#8a000000"));
     button.setTextSize(14);
     button.setText("Cancel".toUpperCase());
@@ -942,6 +1040,14 @@ public class PaymentMethodsFragmentLayout {
     }
   }
 
+  private void setPadding(View view, int start, int top, int end, int bottom) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      view.setPaddingRelative(dpToPx(start), dpToPx(top), dpToPx(end), dpToPx(bottom));
+    } else {
+      view.setPadding(dpToPx(start), dpToPx(top), dpToPx(end), dpToPx(bottom));
+    }
+  }
+
   public void selectRadioButton(String selectedRadioButton) {
     if (selectedRadioButton.equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
       creditCardWrapperLayout.setBackground(getSelectedGradientDrawable());
@@ -1036,5 +1142,21 @@ public class PaymentMethodsFragmentLayout {
 
   public RelativeLayout getPaymentMethodsLayout() {
     return paymentMethodsLayout;
+  }
+
+  public TextView getErrorMessage() {
+    return errorMessage;
+  }
+
+  public Button getErrorPositiveButton() {
+    return errorPositiveButton;
+  }
+
+  public RelativeLayout getErrorView() {
+    return errorView;
+  }
+
+  public RelativeLayout getDialogLayout() {
+    return dialogLayout;
   }
 }

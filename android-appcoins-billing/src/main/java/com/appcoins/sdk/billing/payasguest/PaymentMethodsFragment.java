@@ -80,11 +80,13 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     RelativeLayout creditWrapper = layout.getCreditCardWrapperLayout();
     RelativeLayout paypalWrapper = layout.getPaypalWrapperLayout();
     RelativeLayout installWrapper = layout.getInstallWrapperLayout();
+    Button errorButton = layout.getErrorPositiveButton();
     onRotation(savedInstanceState);
     paymentMethodsPresenter.onCancelButtonClicked(cancelButton);
     paymentMethodsPresenter.onPositiveButtonClicked(positiveButton, selectedRadioButton);
     paymentMethodsPresenter.onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton,
         creditWrapper, paypalWrapper, installWrapper);
+    paymentMethodsPresenter.onErrorButtonClicked(errorButton);
     paymentMethodsPresenter.requestWallet();
     paymentMethodsPresenter.provideSkuDetailsInformation(buyItemProperties);
   }
@@ -121,7 +123,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void showError() {
     ProgressBar progressBar = layout.getProgressBar();
+    RelativeLayout dialogLayout = layout.getDialogLayout();
+    RelativeLayout errorLayout = layout.getErrorView();
     progressBar.setVisibility(View.INVISIBLE);
+    dialogLayout.setVisibility(View.GONE);
+    errorLayout.setVisibility(View.VISIBLE);
     Log.d("TAG123", "ERROR");
   }
 
