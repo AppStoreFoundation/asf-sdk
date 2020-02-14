@@ -279,7 +279,17 @@ public class PaymentMethodsFragmentLayout {
     relativeLayout.setBackground(gradientDrawable);
 
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-    setMargins(layoutParams, 16, 0, 16, 0);
+
+    int start, end;
+
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      start = 16;
+      end = 16;
+    } else {
+      start = 64;
+      end = 64;
+    }
+    setMargins(layoutParams, start, 0, end, 0);
 
     relativeLayout.setLayoutParams(layoutParams);
 

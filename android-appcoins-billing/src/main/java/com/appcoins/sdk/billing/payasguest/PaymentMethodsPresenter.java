@@ -29,7 +29,7 @@ class PaymentMethodsPresenter {
     String id = paymentMethodsInteract.retrieveId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
-        if (true) {
+        if (walletGenerationModel.hasError()) {
           fragmentView.showError();
         } else {
           fragmentView.saveWalletInformation(walletGenerationModel);
