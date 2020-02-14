@@ -28,18 +28,9 @@ public class IabActivity extends Activity implements IabView {
 
   @SuppressLint("ResourceType") @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
-    buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
-        AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
 
     //This log is necessary for the automatic test that validates the wallet installation dialog
     Log.d("InstallDialog", "com.appcoins.sdk.billing.helpers.InstallDialogActivity started");
-
-    if (savedInstanceState != null) {
-      translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
-    } else {
-      fetchTranslations();
-    }
 
     int backgroundColor = Color.parseColor("#64000000");
     FrameLayout frameLayout = new FrameLayout(this);
@@ -48,11 +39,20 @@ public class IabActivity extends Activity implements IabView {
 
     setContentView(frameLayout);
 
-    PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
-    Bundle bundle = new Bundle();
-    bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
-    paymentMethodsFragment.setArguments(bundle);
-    navigateTo(paymentMethodsFragment, frameLayout);
+    appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
+    buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
+        AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
+
+    if (savedInstanceState != null) {
+      translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
+    } else {
+      fetchTranslations();
+      PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
+      Bundle bundle = new Bundle();
+      bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
+      paymentMethodsFragment.setArguments(bundle);
+      navigateTo(paymentMethodsFragment, frameLayout);
+    }
   }
 
   private void fetchTranslations() {

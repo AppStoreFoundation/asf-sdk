@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
@@ -16,8 +18,7 @@ class PaymentMethodsPresenter {
   private PaymentMethodsInteract paymentMethodsInteract;
   private WalletInstallationIntentBuilder walletInstallationIntentBuilder;
 
-  public PaymentMethodsPresenter(PaymentMethodsView view,
-      PaymentMethodsInteract paymentMethodsInteract,
+  PaymentMethodsPresenter(PaymentMethodsView view, PaymentMethodsInteract paymentMethodsInteract,
       WalletInstallationIntentBuilder walletInstallationIntentBuilder) {
 
     this.fragmentView = view;
@@ -25,7 +26,7 @@ class PaymentMethodsPresenter {
     this.walletInstallationIntentBuilder = walletInstallationIntentBuilder;
   }
 
-  public void requestWallet() {
+  void requestWallet() {
     String id = paymentMethodsInteract.retrieveId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
@@ -39,7 +40,7 @@ class PaymentMethodsPresenter {
     paymentMethodsInteract.requestWallet(id, walletInteractListener);
   }
 
-  public void provideSkuDetailsInformation(BuyItemProperties buyItemProperties) {
+  void provideSkuDetailsInformation(BuyItemProperties buyItemProperties) {
     SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
       @Override public void onResponse(boolean error, SkuDetails skuDetails) {
         if (error) {
@@ -54,7 +55,7 @@ class PaymentMethodsPresenter {
     paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
   }
 
-  public void onCancelButtonClicked(Button cancelButton) {
+  void onCancelButtonClicked(Button cancelButton) {
     cancelButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
         fragmentView.close();
@@ -62,7 +63,7 @@ class PaymentMethodsPresenter {
     });
   }
 
-  public void onPositiveButtonClicked(Button positiveButton, final String selectedRadioButton) {
+  void onPositiveButtonClicked(Button positiveButton, final String selectedRadioButton) {
     positiveButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
         if (selectedRadioButton.equals("paypal") || selectedRadioButton.equals("credit_card")) {
@@ -77,5 +78,37 @@ class PaymentMethodsPresenter {
         }
       }
     });
+  }
+
+  void onRadioButtonClicked(RadioButton creditCardButton, RadioButton paypalButton,
+      RadioButton installRadioButton, RelativeLayout creditWrapper, RelativeLayout paypalWrapper,
+      RelativeLayout installWrapper) {
+    RadioButtonClickListener creditCardListener =
+        new RadioButtonClickListener(PaymentMethodsFragment.CREDIT_CARD_RADIO);
+    RadioButtonClickListener paypalListener =
+        new RadioButtonClickListener(PaymentMethodsFragment.PAYPAL_RADIO);
+    RadioButtonClickListener installListener =
+        new RadioButtonClickListener(PaymentMethodsFragment.INSTALL_RADIO);
+
+    creditCardButton.setOnClickListener(creditCardListener);
+    creditWrapper.setOnClickListener(creditCardListener);
+    paypalButton.setOnClickListener(paypalListener);
+    paypalWrapper.setOnClickListener(paypalListener);
+    installRadioButton.setOnClickListener(installListener);
+    installWrapper.setOnClickListener(installListener);
+  }
+
+  public class RadioButtonClickListener implements View.OnClickListener {
+
+    private String selectedRadioButton;
+
+    RadioButtonClickListener(String selectedRadioButton) {
+      this.selectedRadioButton = selectedRadioButton;
+    }
+
+    @Override public void onClick(View view) {
+      fragmentView.setRadioButtonSelected(selectedRadioButton);
+      fragmentView.setPositiveButtonText(selectedRadioButton);
+    }
   }
 }

@@ -8,20 +8,20 @@ class PaymentMethodsInteract {
 
   private WalletInteract walletInteract;
 
-  public PaymentMethodsInteract(WalletInteract walletInteract) {
+  PaymentMethodsInteract(WalletInteract walletInteract) {
 
     this.walletInteract = walletInteract;
   }
 
-  public String retrieveId() {
+  String retrieveId() {
     return walletInteract.retrieveId();
   }
 
-  public void requestWallet(String id, WalletInteractListener walletInteractListener) {
+  void requestWallet(String id, WalletInteractListener walletInteractListener) {
     walletInteract.requestWallet(id, walletInteractListener);
   }
 
-  public void requestSkuDetails(BuyItemProperties buyItemProperties,
+  void requestSkuDetails(BuyItemProperties buyItemProperties,
       SingleSkuDetailsListener skuDetailsListener) {
     SingleSkuDetailsAsync singleSkuDetailsAsync =
         new SingleSkuDetailsAsync(buyItemProperties, skuDetailsListener);

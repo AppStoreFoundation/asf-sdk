@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SharedPreferencesRepository;
@@ -23,7 +25,10 @@ import java.text.DecimalFormat;
 
 public class PaymentMethodsFragment extends Fragment implements PaymentMethodsView {
 
-  private WalletInteract walletInteract;
+  public static String CREDIT_CARD_RADIO = "credit_card";
+  public static String PAYPAL_RADIO = "paypal";
+  public static String INSTALL_RADIO = "install";
+  private static String SELECTED_RADIO_KEY = "selected_radio";
   private IabView iabView;
   private BuyItemProperties buyItemProperties;
   private PaymentMethodsPresenter paymentMethodsPresenter;
@@ -42,7 +47,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    walletInteract = new WalletInteract(new SharedPreferencesRepository(getActivity()));
+    WalletInteract walletInteract =
+        new WalletInteract(new SharedPreferencesRepository(getActivity()));
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
     paymentMethodsPresenter =
@@ -63,11 +69,35 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     Button cancelButton = layout.getCancelButton();
-    Button positiveButton = layout.getBuyButton();
+    Button positiveButton = layout.getPositiveButton();
+    RadioButton creditCardButton = layout.getCreditCardRadioButton();
+    RadioButton paypalButton = layout.getPaypalRadioButton();
+    RadioButton installRadioButton = layout.getInstallRadioButton();
+    RelativeLayout creditWrapper = layout.getCreditCardWrapperLayout();
+    RelativeLayout paypalWrapper = layout.getPaypalWrapperLayout();
+    RelativeLayout installWrapper = layout.getInstallWrapperLayout();
+    onRotation(savedInstanceState);
     paymentMethodsPresenter.onCancelButtonClicked(cancelButton);
     paymentMethodsPresenter.onPositiveButtonClicked(positiveButton, selectedRadioButton);
+    paymentMethodsPresenter.onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton,
+        creditWrapper, paypalWrapper, installWrapper);
     paymentMethodsPresenter.requestWallet();
     paymentMethodsPresenter.provideSkuDetailsInformation(buyItemProperties);
+  }
+
+  @Override public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putString(SELECTED_RADIO_KEY, selectedRadioButton);
+  }
+
+  private void onRotation(Bundle savedInstanceState) {
+    if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_RADIO_KEY)) {
+      selectedRadioButton = savedInstanceState.getString(SELECTED_RADIO_KEY);
+      setRadioButtonSelected(selectedRadioButton);
+      setPositiveButtonText(selectedRadioButton);
+    } else {
+      setRadioButtonSelected(CREDIT_CARD_RADIO);
+    }
   }
 
   @Override public void setSkuInformation(String fiatPrice, String currencyCode, String appcPrice,
@@ -99,6 +129,20 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void navigateToAdyen(String selectedRadioButton) {
     iabView.navigateToAdyen(selectedRadioButton);
+  }
+
+  @Override public void setRadioButtonSelected(String radioButtonSelected) {
+    selectedRadioButton = radioButtonSelected;
+    layout.selectRadioButton(radioButtonSelected);
+  }
+
+  @Override public void setPositiveButtonText(String selectedRadioButton) {
+    Button positiveButton = layout.getPositiveButton();
+    if (selectedRadioButton.equals(PaymentMethodsFragment.INSTALL_RADIO)) {
+      positiveButton.setText("INSTALL");
+    } else {
+      positiveButton.setText("NEXT");
+    }
   }
 
   private void attach(Context context) {

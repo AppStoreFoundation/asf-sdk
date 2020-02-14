@@ -26,6 +26,7 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.payasguest.PaymentMethodsFragment;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -54,27 +55,19 @@ public class PaymentMethodsFragmentLayout {
   private Activity activity;
   private int orientation;
   private BuyItemProperties buyItemProperties;
-  private ImageView iconImageView;
-  private TextView appNameView;
-  private TextView skuView;
   private TextView fiatPriceView;
   private TextView appcPriceView;
-  private TextView payAsGuestView;
-  private RadioGroup radioGroup;
-  private ImageView creditCardImage;
-  private TextView creditCardText;
   private RadioButton creditCardRadioButton;
-  private ImageView paypalImage;
-  private TextView paypalTextView;
   private RadioButton paypalRadioButton;
-  private ImageView installCreditCardImage;
-  private ImageView installPaypalImage;
-  private TextView installMainText;
-  private TextView installSecondaryText;
   private RadioButton installRadioButton;
   private String densityPath;
   private Button cancelButton;
-  private Button buyButton;
+  private Button positiveButton;
+  private RelativeLayout creditCardWrapperLayout;
+  private RelativeLayout paypalWrapperLayout;
+  private RelativeLayout installWrapperLayout;
+  private GradientDrawable selectedBackground;
+  private GradientDrawable defaultBackground;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
@@ -115,9 +108,9 @@ public class PaymentMethodsFragmentLayout {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    iconImageView = createAppIconLayout(icon);
-    appNameView = createAppNameLayout(appName);
-    skuView = createSkuLayout(buyItemProperties.getSku());
+    ImageView iconImageView = createAppIconLayout(icon);
+    TextView appNameView = createAppNameLayout(appName);
+    TextView skuView = createSkuLayout(buyItemProperties.getSku());
     fiatPriceView = createFiatPriceView();
     appcPriceView = createAppcPriceView();
 
@@ -265,8 +258,8 @@ public class PaymentMethodsFragmentLayout {
     layoutParams.addRule(RelativeLayout.BELOW, HEADER_ID);
     parentLayout.setLayoutParams(layoutParams);
 
-    payAsGuestView = buildPayAsGuestTextView();
-    radioGroup = buildRadioGroupView();
+    TextView payAsGuestView = buildPayAsGuestTextView();
+    RadioGroup radioGroup = buildRadioGroupView();
 
     parentLayout.addView(payAsGuestView);
     parentLayout.addView(radioGroup);
@@ -301,10 +294,10 @@ public class PaymentMethodsFragmentLayout {
     linearLayout.setLayoutParams(layoutParams);
 
     cancelButton = buildCancelButtonLayout();
-    Button buyButton = buildBuyButtonLayout();
+    positiveButton = buildBuyButtonLayout();
 
     linearLayout.addView(cancelButton);
-    linearLayout.addView(buyButton);
+    linearLayout.addView(positiveButton);
     return linearLayout;
   }
 
@@ -317,13 +310,13 @@ public class PaymentMethodsFragmentLayout {
     GradientDrawable background =
         new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, gradientColors);
     background.setShape(GradientDrawable.RECTANGLE);
-    background.setStroke(dpToPx(1), Color.parseColor("#00000000"));
+    background.setStroke(dpToPx(1), Color.WHITE);
     background.setCornerRadius(dpToPx(16));
     button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     button.setBackgroundDrawable(background);
 
-    button.setMaxWidth(dpToPx(126));
-    button.setMinWidth(dpToPx(80));
+    button.setMaxWidth(dpToPx(142));
+    button.setMinWidth(dpToPx(96));
 
     button.setPadding(0, 0, dpToPx(4), 0);
     button.setTextColor(Color.WHITE);
@@ -381,9 +374,9 @@ public class PaymentMethodsFragmentLayout {
     setMargins(layoutParams, start, top, end, 0);
     radioGroup.setLayoutParams(layoutParams);
 
-    RelativeLayout creditCardWrapperLayout = buildCreditCardWrapperLayout();
-    RelativeLayout paypalWrapperLayout = buildPaypalWrapperLayout();
-    RelativeLayout installWrapperLayout = buildInstallWrapperLayout();
+    creditCardWrapperLayout = buildCreditCardWrapperLayout();
+    paypalWrapperLayout = buildPaypalWrapperLayout();
+    installWrapperLayout = buildInstallWrapperLayout();
 
     radioGroup.addView(creditCardWrapperLayout);
     radioGroup.addView(paypalWrapperLayout);
@@ -419,10 +412,10 @@ public class PaymentMethodsFragmentLayout {
     setMargins(layoutParams, start, top, 0, 0);
     relativeLayout.setLayoutParams(layoutParams);
 
-    installCreditCardImage = buildInstallCreditCardImage();
-    installPaypalImage = buildInstallPaypalImage();
-    installMainText = buildInstallMainText();
-    installSecondaryText = buildInstallSecondaryText();
+    ImageView installCreditCardImage = buildInstallCreditCardImage();
+    ImageView installPaypalImage = buildInstallPaypalImage();
+    TextView installMainText = buildInstallMainText();
+    TextView installSecondaryText = buildInstallSecondaryText();
     installRadioButton = buildRadioButton(INSTALL_RADIO_BUTTON_ID);
 
     relativeLayout.addView(installCreditCardImage);
@@ -573,8 +566,8 @@ public class PaymentMethodsFragmentLayout {
     setMargins(layoutParams, start, top, 0, 0);
     relativeLayout.setLayoutParams(layoutParams);
 
-    paypalImage = buildPaypalImage();
-    paypalTextView = buildPaypalTextView();
+    ImageView paypalImage = buildPaypalImage();
+    TextView paypalTextView = buildPaypalTextView();
     paypalRadioButton = buildRadioButton(PAYPAL_RADIO_BUTTON_ID);
 
     relativeLayout.addView(paypalImage);
@@ -664,8 +657,8 @@ public class PaymentMethodsFragmentLayout {
     relativeLayout.setBackgroundDrawable(background);
     relativeLayout.setLayoutParams(layoutParams);
 
-    creditCardImage = buildCreditCardImage();
-    creditCardText = buildCreditCardTextView();
+    ImageView creditCardImage = buildCreditCardImage();
+    TextView creditCardText = buildCreditCardTextView();
     creditCardRadioButton = buildRadioButton(CREDIT_CARD_RADIO_BUTTON_ID);
 
     relativeLayout.addView(creditCardImage);
@@ -918,16 +911,52 @@ public class PaymentMethodsFragmentLayout {
     }
   }
 
-  public ImageView getIconImageView() {
-    return iconImageView;
+  public void selectRadioButton(String selectedRadioButton) {
+    if (selectedRadioButton.equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
+      creditCardWrapperLayout.setBackgroundDrawable(getSelectedGradientDrawable());
+      paypalWrapperLayout.setBackgroundDrawable(getDefaultGradientDrawable());
+      installWrapperLayout.setBackgroundDrawable(getDefaultGradientDrawable());
+
+      creditCardRadioButton.setChecked(true);
+      paypalRadioButton.setChecked(false);
+      installRadioButton.setChecked(false);
+    } else if (selectedRadioButton.equals(PaymentMethodsFragment.PAYPAL_RADIO)) {
+      paypalWrapperLayout.setBackgroundDrawable(getSelectedGradientDrawable());
+      creditCardWrapperLayout.setBackgroundDrawable(getDefaultGradientDrawable());
+      installWrapperLayout.setBackgroundDrawable(getDefaultGradientDrawable());
+
+      creditCardRadioButton.setChecked(false);
+      paypalRadioButton.setChecked(true);
+      installRadioButton.setChecked(false);
+    } else {
+      installWrapperLayout.setBackgroundDrawable(getSelectedGradientDrawable());
+      creditCardWrapperLayout.setBackgroundDrawable(getDefaultGradientDrawable());
+      paypalWrapperLayout.setBackgroundDrawable(getDefaultGradientDrawable());
+
+      creditCardRadioButton.setChecked(false);
+      paypalRadioButton.setChecked(false);
+      installRadioButton.setChecked(true);
+    }
   }
 
-  public TextView getAppNameView() {
-    return appNameView;
+  private GradientDrawable getSelectedGradientDrawable() {
+    if (selectedBackground == null) {
+      selectedBackground = new GradientDrawable();
+      selectedBackground.setShape(GradientDrawable.RECTANGLE);
+      selectedBackground.setStroke(dpToPx(1), Color.parseColor("#fe6e76"));
+      selectedBackground.setCornerRadius(dpToPx(6));
+    }
+    return selectedBackground;
   }
 
-  public TextView getSkuView() {
-    return skuView;
+  private GradientDrawable getDefaultGradientDrawable() {
+    if (defaultBackground == null) {
+      defaultBackground = new GradientDrawable();
+      defaultBackground.setShape(GradientDrawable.RECTANGLE);
+      defaultBackground.setStroke(dpToPx(1), Color.parseColor("#e3e3e3"));
+      defaultBackground.setCornerRadius(dpToPx(6));
+    }
+    return defaultBackground;
   }
 
   public TextView getFiatPriceView() {
@@ -938,52 +967,12 @@ public class PaymentMethodsFragmentLayout {
     return appcPriceView;
   }
 
-  public TextView getPayAsGuestView() {
-    return payAsGuestView;
-  }
-
-  public RadioGroup getRadioGroup() {
-    return radioGroup;
-  }
-
-  public ImageView getCreditCardImage() {
-    return creditCardImage;
-  }
-
-  public TextView getCreditCardText() {
-    return creditCardText;
-  }
-
   public RadioButton getCreditCardRadioButton() {
     return creditCardRadioButton;
   }
 
-  public ImageView getPaypalImage() {
-    return paypalImage;
-  }
-
-  public TextView getPaypalTextView() {
-    return paypalTextView;
-  }
-
   public RadioButton getPaypalRadioButton() {
     return paypalRadioButton;
-  }
-
-  public ImageView getInstallCreditCardImage() {
-    return installCreditCardImage;
-  }
-
-  public ImageView getInstallPaypalImage() {
-    return installPaypalImage;
-  }
-
-  public TextView getInstallMainText() {
-    return installMainText;
-  }
-
-  public TextView getInstallSecondaryText() {
-    return installSecondaryText;
   }
 
   public RadioButton getInstallRadioButton() {
@@ -994,7 +983,19 @@ public class PaymentMethodsFragmentLayout {
     return cancelButton;
   }
 
-  public Button getBuyButton() {
-    return buyButton;
+  public Button getPositiveButton() {
+    return positiveButton;
+  }
+
+  public RelativeLayout getCreditCardWrapperLayout() {
+    return creditCardWrapperLayout;
+  }
+
+  public RelativeLayout getPaypalWrapperLayout() {
+    return paypalWrapperLayout;
+  }
+
+  public RelativeLayout getInstallWrapperLayout() {
+    return installWrapperLayout;
   }
 }
