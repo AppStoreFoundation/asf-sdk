@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import com.appcoins.billing.AppcoinsBilling;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.communication.SyncIpcMessageRequester;
 import com.appcoins.communication.requester.MessageRequesterFactory;
 import com.appcoins.sdk.billing.ConnectionLifeCycle;
@@ -38,7 +39,7 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
     if (name.getClassName()
         .equals(UriCommunicationAppcoinsBilling.class.getSimpleName())) {
       SyncIpcMessageRequester messageRequester =
-          MessageRequesterFactory.create(context, "com.appcoins.wallet.dev",
+          MessageRequesterFactory.create(context, BuildConfig.BDS_WALLET_PACKAGE_NAME,
               "appcoins://billing/communication/processor/1",
               "appcoins://billing/communication/requester/1");
       this.service = new UriCommunicationAppcoinsBilling(messageRequester);
