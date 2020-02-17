@@ -36,7 +36,7 @@ public class AdyenRepository {
     ServiceResponseListener serviceResponseListener =
         adyenListenerProvider.createLoadPaymentInfoListener(listener);
 
-    bdsService.makeRequest("payment-methods", "GET", new ArrayList<String>(), queries, null,
+    bdsService.makeRequest("payment-methods", "GET", new ArrayList<String>(), queries, null, true,
         serviceResponseListener);
   }
 
@@ -51,7 +51,7 @@ public class AdyenRepository {
     ServiceResponseListener serviceResponseListener =
         adyenListenerProvider.createMakePaymentListener(makePaymentListener);
 
-    bdsService.makeRequest("transactions", "POST", new ArrayList<String>(), queries, body,
+    bdsService.makeRequest("transactions", "POST", new ArrayList<String>(), queries, body, true,
         serviceResponseListener);
   }
 
@@ -68,7 +68,8 @@ public class AdyenRepository {
     queries.put("wallet.address", walletAddress);
     queries.put("wallet.signature", walletSignature);
 
-    bdsService.makeRequest("transactions", "GET", path, queries, null, serviceResponseListener);
+    bdsService.makeRequest("transactions", "GET", path, queries, null, true,
+        serviceResponseListener);
   }
 
   public void submitRedirect(String uid, String walletAddress, Object details, String data,
@@ -86,7 +87,8 @@ public class AdyenRepository {
     putIfNotNull(body, "payment.details", details.toString());
     putIfNotNull(body, "payment.data", data);
 
-    bdsService.makeRequest("transactions", "PATCH", path, queries, body, serviceResponseListener);
+    bdsService.makeRequest("transactions", "PATCH", path, queries, body, true,
+        serviceResponseListener);
   }
 
   public void disablePayments(String walletAddress,
@@ -97,7 +99,8 @@ public class AdyenRepository {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("wallet.address", walletAddress);
 
-    bdsService.makeRequest("disable-recurring", "POST", null, null, body, serviceResponseListener);
+    bdsService.makeRequest("disable-recurring", "POST", null, null, body, true,
+        serviceResponseListener);
   }
 
   private Map<String, Object> buildMakePaymentBody(AdyenPaymentParams adyenPaymentParams,

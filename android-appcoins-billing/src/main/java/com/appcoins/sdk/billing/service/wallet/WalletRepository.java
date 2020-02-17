@@ -25,15 +25,14 @@ public class WalletRepository {
     queries.put("id", id);
     ServiceResponseListener serviceResponseListener = new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        WalletGenerationResponse walletGenerationResponse =
-            walletGenerationMapper.mapWalletGenerationResponse(requestResponse);
+        WalletGenerationResponse walletGenerationResponse = new WalletGenerationResponse();
         WalletGenerationModel walletGenerationModel =
             new WalletGenerationModel(walletGenerationResponse.getAddress(),
                 walletGenerationResponse.getEwt(), walletGenerationResponse.hasError());
         walletInteractListener.walletIdRetrieved(walletGenerationModel);
       }
     };
-    service.makeRequest("/appc/guest_wallet", "GET", new ArrayList<String>(), queries, null,
+    service.makeRequest("/appc/guest_wallet", "GET", new ArrayList<String>(), queries, null, true,
         serviceResponseListener);
   }
 }

@@ -1,16 +1,22 @@
 package com.appcoins.sdk.billing.payasguest;
 
+import android.os.AsyncTask;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.WalletInteractListener;
+import com.appcoins.sdk.billing.service.BdsService;
 
 class PaymentMethodsInteract {
 
+  private final PaymentMethodsRepository paymentMethodsRepository;
   private WalletInteract walletInteract;
 
   PaymentMethodsInteract(WalletInteract walletInteract) {
 
     this.walletInteract = walletInteract;
+    this.paymentMethodsRepository =
+        new PaymentMethodsRepository(new BdsService(BuildConfig.HOST_WS));
   }
 
   String retrieveId() {
@@ -25,6 +31,11 @@ class PaymentMethodsInteract {
       SingleSkuDetailsListener skuDetailsListener) {
     SingleSkuDetailsAsync singleSkuDetailsAsync =
         new SingleSkuDetailsAsync(buyItemProperties, skuDetailsListener);
-    singleSkuDetailsAsync.execute();
+    singleSkuDetailsAsync.execute(AsyncTask.THREAD_POOL_EXECUTOR);
+  }
+
+  void loadPaymentsAvailable(String fiatPrice, String fiatCurrency,
+      PaymentMethodsListener paymentMethodsListener) {
+    paymentMethodsRepository.loadPaymentMethods(fiatPrice, fiatCurrency, paymentMethodsListener);
   }
 }

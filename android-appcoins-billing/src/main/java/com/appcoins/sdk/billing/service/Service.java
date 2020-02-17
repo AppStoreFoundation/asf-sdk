@@ -14,6 +14,6 @@ public interface Service {
    * @param serviceResponseListener Listener in which the response will be sent.
    */
   void makeRequest(String endPoint, String httpMethod, List<String> paths,
-      Map<String, String> queries, Map<String, Object> body,
+      Map<String, String> queries, Map<String, Object> body, boolean async,
       ServiceResponseListener serviceResponseListener);
 }

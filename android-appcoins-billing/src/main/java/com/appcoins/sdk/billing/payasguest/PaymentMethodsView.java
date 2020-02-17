@@ -21,4 +21,8 @@ interface PaymentMethodsView {
   void setPositiveButtonText(String text);
 
   void saveWalletInformation(WalletGenerationModel walletGenerationModel);
+
+  void addPayment(String name);
+
+  void showPaymentView();
 }

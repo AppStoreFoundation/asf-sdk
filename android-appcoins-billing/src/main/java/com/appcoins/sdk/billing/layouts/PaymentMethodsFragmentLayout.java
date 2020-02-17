@@ -33,6 +33,8 @@ import java.io.InputStream;
 
 public class PaymentMethodsFragmentLayout {
 
+  private static final String BUTTONS_RESOURCE_PATH = "appcoins-wallet/resources/buttons/";
+  private static final String IMAGES_RESOURCE_PATH = "appcoins-wallet/resources/images/";
   private static int ERROR_MESSAGE_ID = 26;
   private static int ERROR_TITLE_ID = 25;
   private static int PAYPAL_WRAPPER_ID = 24;
@@ -53,8 +55,6 @@ public class PaymentMethodsFragmentLayout {
   private static int CREDIT_CARD_RADIO_BUTTON_ID = 9;
   private static int APP_NAME_ID = 8;
   private static int APP_ICON_ID = 7;
-  private static final String BUTTONS_RESOURCE_PATH = "appcoins-wallet/resources/buttons/";
-  private static final String IMAGES_RESOURCE_PATH = "appcoins-wallet/resources/images/";
   private Activity activity;
   private int orientation;
   private BuyItemProperties buyItemProperties;
@@ -502,6 +502,7 @@ public class PaymentMethodsFragmentLayout {
       radioGroup.setOrientation(LinearLayout.VERTICAL);
     } else {
       radioGroup.setOrientation(LinearLayout.HORIZONTAL);
+      layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
     }
 
     layoutParams.addRule(RelativeLayout.BELOW, PAY_AS_GUEST_TEXT_ID);
@@ -521,6 +522,9 @@ public class PaymentMethodsFragmentLayout {
     creditCardWrapperLayout = buildCreditCardWrapperLayout();
     paypalWrapperLayout = buildPaypalWrapperLayout();
     installWrapperLayout = buildInstallWrapperLayout();
+
+    creditCardWrapperLayout.setVisibility(View.GONE);
+    paypalWrapperLayout.setVisibility(View.GONE);
 
     radioGroup.addView(creditCardWrapperLayout);
     radioGroup.addView(paypalWrapperLayout);
@@ -820,7 +824,7 @@ public class PaymentMethodsFragmentLayout {
     return relativeLayout;
   }
 
-  private RadioButton buildRadioButton(int id) {
+  @SuppressLint("InlinedApi") private RadioButton buildRadioButton(int id) {
     RadioButton radioButton = new RadioButton(activity);
     radioButton.setId(id);
     RelativeLayout.LayoutParams layoutParams =

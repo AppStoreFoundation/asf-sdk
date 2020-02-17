@@ -1,12 +1,10 @@
 package com.appcoins.sdk.billing.payasguest;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,8 +67,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     return layout.build();
   }
 
-  @SuppressLint("ResourceType") @Override
-  public void onViewCreated(View view, Bundle savedInstanceState) {
+  @Override public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     Button cancelButton = layout.getCancelButton();
     Button positiveButton = layout.getPositiveButton();
@@ -87,8 +84,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     paymentMethodsPresenter.onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton,
         creditWrapper, paypalWrapper, installWrapper);
     paymentMethodsPresenter.onErrorButtonClicked(errorButton);
-    paymentMethodsPresenter.requestWallet();
-    paymentMethodsPresenter.provideSkuDetailsInformation(buyItemProperties);
+    paymentMethodsPresenter.prepareUi(buyItemProperties);
   }
 
   @Override public void onSaveInstanceState(Bundle outState) {
@@ -101,8 +97,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
       selectedRadioButton = savedInstanceState.getString(SELECTED_RADIO_KEY);
       setRadioButtonSelected(selectedRadioButton);
       setPositiveButtonText(selectedRadioButton);
-    } else {
-      setRadioButtonSelected(CREDIT_CARD_RADIO);
     }
   }
 
@@ -116,9 +110,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     fiatPriceView.setText(
         String.format("%s %s", fiatText, skuDetailsModel.getFiatPriceCurrencyCode()));
     appcPriceView.setText(String.format("%s %s", appcText, "APPC"));
-    if (walletGenerationModel != null) {
-      showPaymentView();
-    }
   }
 
   @Override public void showError() {
@@ -128,7 +119,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     progressBar.setVisibility(View.INVISIBLE);
     dialogLayout.setVisibility(View.GONE);
     errorLayout.setVisibility(View.VISIBLE);
-    Log.d("TAG123", "ERROR");
   }
 
   @Override public void close() {
@@ -163,18 +153,49 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void saveWalletInformation(WalletGenerationModel walletGenerationModel) {
     this.walletGenerationModel = walletGenerationModel;
-    if (skuDetailsModel != null) {
-      showPaymentView();
+  }
+
+  @Override public void addPayment(String name) {
+    if (name.equalsIgnoreCase(CREDIT_CARD_RADIO)) {
+      layout.getCreditCardWrapperLayout()
+          .setVisibility(View.VISIBLE);
+    } else {
+      layout.getPaypalWrapperLayout()
+          .setVisibility(View.VISIBLE);
     }
   }
 
-  private void showPaymentView() {
+  @Override public void showPaymentView() {
+    if (selectedRadioButton == null) {
+      setInitialRadioButtonSelected();
+    } else {
+      setRadioButtonSelected(selectedRadioButton);
+    }
     layout.getProgressBar()
         .setVisibility(View.INVISIBLE);
     layout.getPaymentMethodsLayout()
         .setVisibility(View.VISIBLE);
     layout.getPositiveButton()
         .setEnabled(true);
+  }
+
+  private void setInitialRadioButtonSelected() {
+    RadioButton creditCardButton = layout.getCreditCardRadioButton();
+    RadioButton paypalButton = layout.getPaypalRadioButton();
+    RadioButton installButton = layout.getInstallRadioButton();
+    if (layout.getCreditCardWrapperLayout()
+        .getVisibility() == View.VISIBLE) {
+      creditCardButton.setChecked(true);
+      selectedRadioButton = CREDIT_CARD_RADIO;
+    } else if (layout.getPaypalWrapperLayout()
+        .getVisibility() == View.VISIBLE) {
+      paypalButton.setChecked(true);
+      selectedRadioButton = PAYPAL_RADIO;
+    } else if (layout.getInstallWrapperLayout()
+        .getVisibility() == View.VISIBLE) {
+      installButton.setChecked(true);
+      selectedRadioButton = INSTALL_RADIO;
+    }
   }
 
   private void attach(Context context) {

@@ -25,33 +25,15 @@ class PaymentMethodsPresenter {
     this.walletInstallationIntentBuilder = walletInstallationIntentBuilder;
   }
 
-  void requestWallet() {
+  void prepareUi(final BuyItemProperties buyItemProperties) {
     String id = paymentMethodsInteract.retrieveId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
-        if (walletGenerationModel.hasError()) {
-          fragmentView.showError();
-        } else {
-          fragmentView.saveWalletInformation(walletGenerationModel);
-        }
+        fragmentView.saveWalletInformation(walletGenerationModel);
+        provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
       }
     };
     paymentMethodsInteract.requestWallet(id, walletInteractListener);
-  }
-
-  void provideSkuDetailsInformation(BuyItemProperties buyItemProperties) {
-    SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
-      @Override public void onResponse(boolean error, SkuDetails skuDetails) {
-        if (error) {
-          fragmentView.showError();
-        } else {
-          fragmentView.setSkuInformation(
-              new SkuDetailsModel(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode(),
-                  skuDetails.getAppcPrice(), skuDetails.getSku()));
-        }
-      }
-    };
-    paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
   }
 
   void onCancelButtonClicked(Button cancelButton) {
@@ -103,6 +85,43 @@ class PaymentMethodsPresenter {
         fragmentView.close();
       }
     });
+  }
+
+  private void provideSkuDetailsInformation(BuyItemProperties buyItemProperties,
+      boolean walletGenerated) {
+    if (!walletGenerated) {
+      SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
+        @Override public void onResponse(boolean error, SkuDetails skuDetails) {
+          if (!error) {
+            loadPaymentsAvailable(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode());
+            fragmentView.setSkuInformation(new SkuDetailsModel(skuDetails.getFiatPrice(),
+                skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
+                skuDetails.getSku()));
+          } else {
+            fragmentView.showPaymentView();
+          }
+        }
+      };
+      paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
+    } else {
+      fragmentView.showPaymentView();
+    }
+  }
+
+  private void loadPaymentsAvailable(String fiatPrice, String fiatCurrency) {
+    PaymentMethodsListener paymentMethodsListener = new PaymentMethodsListener() {
+      @Override public void onResponse(PaymentMethodsModel paymentMethodsModel) {
+        if (!paymentMethodsModel.hasError()) {
+          for (PaymentMethod paymentMethod : paymentMethodsModel.getPaymentMethods()) {
+            if (paymentMethod.isAvailable()) {
+              fragmentView.addPayment(paymentMethod.getName());
+            }
+          }
+        }
+        fragmentView.showPaymentView();
+      }
+    };
+    paymentMethodsInteract.loadPaymentsAvailable(fiatPrice, fiatCurrency, paymentMethodsListener);
   }
 
   public class RadioButtonClickListener implements View.OnClickListener {
