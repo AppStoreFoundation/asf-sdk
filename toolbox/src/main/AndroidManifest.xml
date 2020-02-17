@@ -18,12 +18,12 @@
       </intent-filter>
     </activity>
     <activity android:name=".EmptyActivity" />
-    <activity android:name=".TestActivity">
+    <activity android:name=".UriCommunicationActivity">
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <data
-            android:host="communication"
-            android:path="/sender/test"
+            android:host="billing"
+            android:path="/communication/requester/1"
             android:scheme="appcoins" />
         <category android:name="android.intent.category.DEFAULT" />
       </intent-filter>

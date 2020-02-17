@@ -25,7 +25,6 @@
       android:layout_height="wrap_content"
       android:onClick="onUpgradeAppButtonClicked"
       android:text="@string/query_purchases"
-      android:visibility="gone"
       app:layout_constraintBottom_toBottomOf="@id/buyButton"
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toTopOf="@id/buyButton"
@@ -36,7 +35,6 @@
       android:layout_height="wrap_content"
       android:onClick="onSkuDetailsButtonClicked"
       android:text="@string/sku_details"
-      android:visibility="gone"
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toBottomOf="@id/upgradeButton"
       />
@@ -47,7 +45,6 @@
       android:layout_height="wrap_content"
       android:onClick="makePaymentButtonClicked"
       android:text="@string/consume"
-      android:visibility="gone"
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toBottomOf="@id/sku_details"
       />
@@ -57,7 +54,6 @@
       android:layout_height="wrap_content"
       android:onClick="onCloseChannelButtonClicked"
       android:text="@string/closeChannelButton"
-      android:visibility="gone"
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toBottomOf="@id/makePaymentButton"
       />
@@ -67,7 +63,6 @@
       android:layout_height="wrap_content"
       android:onClick="checkChannelAvailable"
       android:text="@string/is_ready"
-      android:visibility="gone"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/buyButton"
       />
@@ -78,7 +73,6 @@
       android:layout_height="wrap_content"
       android:onClick="onOpenChannelButtonClicked"
       android:text="@string/openChannelButton"
-      android:visibility="gone"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/isReady"
       />

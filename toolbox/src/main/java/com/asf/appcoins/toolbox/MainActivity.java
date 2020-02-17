@@ -7,10 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-import com.appcoins.communication.SyncIpcMessageRequester;
-import com.appcoins.communication.requester.MainThreadException;
-import com.appcoins.communication.requester.MessageRequesterFactory;
 import com.appcoins.sdk.billing.AppcoinsBillingClient;
+import com.appcoins.sdk.billing.BillingFlowParams;
 import com.appcoins.sdk.billing.Purchase;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.PurchasesUpdatedListener;
@@ -86,38 +84,15 @@ public class MainActivity extends Activity {
   }
 
   public void onBuyGasButtonClicked(View arg0) {
-    new Thread(() -> {
-      Intent data;
-      Log.d(TAG2, "onBuyGasButtonClicked: ");
-      try {
-        SyncIpcMessageRequester messageSender =
-            MessageRequesterFactory.create(MainActivity.this.getApplicationContext(),
-                "com.appcoins.testapp", "appcoins://communication/receiver/test",
-                "appcoins://communication/sender/test");
-        data = (Intent) messageSender.sendMessage(1,
-            new Intent("1 - Asking Data to TestApp_v2: " + System.currentTimeMillis() + "ms"));
+    BillingFlowParams billingFlowParams =
+        new BillingFlowParams("gas", SkuType.inapp.toString(), null, null, null);
 
-        String action = data.getAction();
-        Log.d(TAG2, "testApp returned: " + action);
-        Intent intent = new Intent("appcoins.communication.receiver.test.pay");
-        Intent valueToShow = new Intent(action + "\n3 - Asking TestApp_v2 to show Data");
-        intent.putExtra("ARGUMENTS", valueToShow);
-        Log.d(TAG2, "asking testApp to show: " + valueToShow);
-        startActivity(intent);
-      } catch (InterruptedException | MainThreadException e) {
-        e.printStackTrace();
-      }
-    }).start();
-
-    //BillingFlowParams billingFlowParams =
-    //    new BillingFlowParams("gas", SkuType.inapp.toString(), null, null, null);
-    //
-    //Activity act = this;
-    //Thread t = new Thread(() -> {
-    //  int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
-    //  Log.d(TAG, "BillingFlowResponse: " + launchBillingFlowResponse);
-    //});
-    //t.start();
+    Activity act = this;
+    Thread t = new Thread(() -> {
+      int launchBillingFlowResponse = cab.launchBillingFlow(act, billingFlowParams);
+      Log.d(TAG, "BillingFlowResponse: " + launchBillingFlowResponse);
+    });
+    t.start();
   }
 
   public void onUpgradeAppButtonClicked(View arg0) {
