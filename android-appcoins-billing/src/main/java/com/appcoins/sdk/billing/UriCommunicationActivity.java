@@ -1,4 +1,4 @@
-package com.asf.appcoins.toolbox;
+package com.appcoins.sdk.billing;
 
 import com.appcoins.communication.requester.MessageRequesterActivity;
 
