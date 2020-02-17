@@ -19,6 +19,7 @@ import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.userFromIran;
 public class WalletUtils {
 
   private static final int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
+  private static final int UNKNOWN_ERROR_CODE = 600;
 
   public static Context context;
   private static String billingPackageName;
@@ -126,7 +127,7 @@ public class WalletUtils {
     final CountDownLatch latch = new CountDownLatch(1);
     ResponseListener responseListener = new ResponseListener() {
       @Override public void onResponseCode(int code) {
-        cafeBazaarWalletAvailable = code < 300 || code == 600;
+        cafeBazaarWalletAvailable = code < 300 || code == UNKNOWN_ERROR_CODE;
         latch.countDown();
       }
     };

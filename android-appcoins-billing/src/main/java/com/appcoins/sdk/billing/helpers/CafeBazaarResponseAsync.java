@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 public class CafeBazaarResponseAsync extends AsyncTask {
 
+  private static final int UNKNOWN_ERROR_CODE = 600;
   private ResponseListener responseListener;
 
   CafeBazaarResponseAsync(ResponseListener responseListener) {
@@ -51,7 +52,7 @@ public class CafeBazaarResponseAsync extends AsyncTask {
   }
 
   @Override protected Object doInBackground(Object[] objects) {
-    int responseCode = 600;
+    int responseCode = UNKNOWN_ERROR_CODE;
     try {
       responseCode = getResponseCode();
     } catch (IOException e) {

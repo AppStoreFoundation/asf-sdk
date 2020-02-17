@@ -41,6 +41,7 @@ public class WalletUtils {
   private static int POA_NOTIFICATION_ID = 0;
   private static int MINIMUM_APTOIDE_VERSION = 9908;
   private static int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
+  private static int UNKNOWN_ERROR_CODE = 600;
   private static String URL_INTENT_INSTALL = "market://details?id="
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
       + "&utm_source=appcoinssdk&app_source=";
@@ -200,7 +201,7 @@ public class WalletUtils {
     final CountDownLatch latch = new CountDownLatch(1);
     ResponseListener responseListener = new ResponseListener() {
       @Override public void onResponseCode(int code) {
-        cafeBazaarWalletAvailable = code < 300 || code == 600;
+        cafeBazaarWalletAvailable = code < 300 || code == UNKNOWN_ERROR_CODE;
         latch.countDown();
       }
     };
