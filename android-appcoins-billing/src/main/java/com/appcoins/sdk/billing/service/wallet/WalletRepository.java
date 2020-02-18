@@ -25,7 +25,8 @@ public class WalletRepository {
     queries.put("id", id);
     ServiceResponseListener serviceResponseListener = new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        WalletGenerationResponse walletGenerationResponse = new WalletGenerationResponse();
+        WalletGenerationResponse walletGenerationResponse =
+            walletGenerationMapper.mapWalletGenerationResponse(requestResponse);
         WalletGenerationModel walletGenerationModel =
             new WalletGenerationModel(walletGenerationResponse.getAddress(),
                 walletGenerationResponse.getEwt(), walletGenerationResponse.hasError());
