@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
@@ -50,17 +51,22 @@ class PaymentMethodsPresenter {
     });
   }
 
-  void onPositiveButtonClicked(Button positiveButton, final String selectedRadioButton) {
+  void onPositiveButtonClicked(Button positiveButton) {
     positiveButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        if (selectedRadioButton.equals("paypal") || selectedRadioButton.equals("credit_card")) {
-          fragmentView.navigateToAdyen(selectedRadioButton);
-        } else {
-          Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
-          if (intent != null) {
-            fragmentView.redirectToWalletInstallation(intent);
+        String selectedRadioButton = fragmentView.getSelectedRadioButton();
+        if (selectedRadioButton != null) {
+          if (selectedRadioButton.equals("paypal") || selectedRadioButton.equals("credit_card")) {
+            fragmentView.navigateToAdyen(selectedRadioButton);
           } else {
-            fragmentView.showAlertNoBrowserAndStores();
+            Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
+            if (intent != null) {
+              boolean shouldHide = intent.getPackage() != null && intent.getPackage()
+                  .equals(BuildConfig.APTOIDE_PACKAGE_NAME);
+              fragmentView.redirectToWalletInstallation(intent, shouldHide);
+            } else {
+              fragmentView.showAlertNoBrowserAndStores();
+            }
           }
         }
       }

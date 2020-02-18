@@ -76,6 +76,7 @@ public class PaymentMethodsFragmentLayout {
   private RelativeLayout errorView;
   private RelativeLayout dialogLayout;
   private TextView installSecondaryText;
+  private RelativeLayout intentLoadingView;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
@@ -94,11 +95,35 @@ public class PaymentMethodsFragmentLayout {
     RelativeLayout mainLayout = buildMainLayout();
     errorView = buildErrorView();
     errorView.setVisibility(View.INVISIBLE);
+
+    intentLoadingView = buildIntentLoadingView();
+    intentLoadingView.setVisibility(View.GONE);
+
     dialogLayout = buildDialogLayout();
 
     mainLayout.addView(dialogLayout);
     mainLayout.addView(errorView);
+    mainLayout.addView(intentLoadingView);
     return mainLayout;
+  }
+
+  private RelativeLayout buildIntentLoadingView() {
+    RelativeLayout relativeLayout = new RelativeLayout(activity);
+
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(dpToPx(262), dpToPx(254));
+    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+    relativeLayout.setLayoutParams(layoutParams);
+
+    GradientDrawable gradientDrawable = new GradientDrawable();
+    gradientDrawable.setColor(Color.WHITE);
+    gradientDrawable.setCornerRadius(dpToPx(8));
+    relativeLayout.setBackground(gradientDrawable);
+
+    ProgressBar progressBar = buildProgressBar();
+
+    relativeLayout.addView(progressBar);
+    return relativeLayout;
   }
 
   private RelativeLayout buildPaymentMethodsHeaderLayout() {
@@ -1197,5 +1222,9 @@ public class PaymentMethodsFragmentLayout {
 
   public TextView getInstallSecondaryText() {
     return installSecondaryText;
+  }
+
+  public RelativeLayout getIntentLoadingView() {
+    return intentLoadingView;
   }
 }

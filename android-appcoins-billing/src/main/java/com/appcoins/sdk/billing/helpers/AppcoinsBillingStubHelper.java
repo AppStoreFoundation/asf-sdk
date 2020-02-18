@@ -203,7 +203,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     return null;
   }
 
-  boolean createRepository(
+  public boolean createRepository(
       final StartPurchaseAfterBindListener startPurchaseAfterConnectionListener) {
 
     String packageName = WalletUtils.getBillingServicePackageName();
