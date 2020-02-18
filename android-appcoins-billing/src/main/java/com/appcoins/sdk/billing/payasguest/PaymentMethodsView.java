@@ -25,4 +25,6 @@ interface PaymentMethodsView {
   void addPayment(String name);
 
   void showPaymentView();
+
+  void showBonus(int bonus);
 }

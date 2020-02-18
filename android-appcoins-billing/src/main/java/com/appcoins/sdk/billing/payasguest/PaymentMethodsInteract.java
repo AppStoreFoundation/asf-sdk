@@ -11,10 +11,12 @@ class PaymentMethodsInteract {
 
   private final PaymentMethodsRepository paymentMethodsRepository;
   private WalletInteract walletInteract;
+  private GamificationInteract gamificationInteract;
 
-  PaymentMethodsInteract(WalletInteract walletInteract) {
+  PaymentMethodsInteract(WalletInteract walletInteract, GamificationInteract gamificationInteract) {
 
     this.walletInteract = walletInteract;
+    this.gamificationInteract = gamificationInteract;
     this.paymentMethodsRepository =
         new PaymentMethodsRepository(new BdsService(BuildConfig.HOST_WS));
   }
@@ -37,5 +39,9 @@ class PaymentMethodsInteract {
   void loadPaymentsAvailable(String fiatPrice, String fiatCurrency,
       PaymentMethodsListener paymentMethodsListener) {
     paymentMethodsRepository.loadPaymentMethods(fiatPrice, fiatCurrency, paymentMethodsListener);
+  }
+
+  void requestMaxBonus(MaxBonusListener maxBonusListener) {
+    gamificationInteract.loadMaxBonus(maxBonusListener);
   }
 }

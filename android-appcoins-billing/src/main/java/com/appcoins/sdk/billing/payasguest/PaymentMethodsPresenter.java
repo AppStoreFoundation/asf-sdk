@@ -34,6 +34,12 @@ class PaymentMethodsPresenter {
       }
     };
     paymentMethodsInteract.requestWallet(id, walletInteractListener);
+    MaxBonusListener maxBonusListener = new MaxBonusListener() {
+      @Override public void onBonusReceived(int bonus) {
+        fragmentView.showBonus(bonus);
+      }
+    };
+    paymentMethodsInteract.requestMaxBonus(maxBonusListener);
   }
 
   void onCancelButtonClicked(Button cancelButton) {

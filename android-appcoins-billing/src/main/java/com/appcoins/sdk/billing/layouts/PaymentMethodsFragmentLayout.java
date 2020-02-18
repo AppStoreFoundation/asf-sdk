@@ -76,6 +76,7 @@ public class PaymentMethodsFragmentLayout {
   private Button errorPositiveButton;
   private RelativeLayout errorView;
   private RelativeLayout dialogLayout;
+  private TextView installSecondaryText;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
@@ -563,9 +564,11 @@ public class PaymentMethodsFragmentLayout {
     ImageView installCreditCardImage = buildInstallCreditCardImage();
     ImageView installPaypalImage = buildInstallPaypalImage();
     TextView installMainText = buildInstallMainText();
-    TextView installSecondaryText = buildInstallSecondaryText();
+    installSecondaryText = buildInstallSecondaryText();
     INSTALL_RADIO_BUTTON_ID = generateRandomId(INSTALL_RADIO_BUTTON_ID);
     installRadioButton = buildRadioButton(INSTALL_RADIO_BUTTON_ID);
+
+    installSecondaryText.setVisibility(View.GONE);
 
     relativeLayout.addView(installCreditCardImage);
     relativeLayout.addView(installPaypalImage);
@@ -634,7 +637,6 @@ public class PaymentMethodsFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#FA6249"));
     textView.setTextSize(10);
-    textView.setText("Get up to 30% bonus");
     textView.setLayoutParams(layoutParams);
     return textView;
   }
@@ -1192,5 +1194,9 @@ public class PaymentMethodsFragmentLayout {
 
   public RelativeLayout getDialogLayout() {
     return dialogLayout;
+  }
+
+  public TextView getInstallSecondaryText() {
+    return installSecondaryText;
   }
 }

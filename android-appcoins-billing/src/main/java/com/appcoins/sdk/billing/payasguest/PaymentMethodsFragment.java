@@ -49,14 +49,20 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    SharedPreferencesRepository sharedPreferencesRepository =
+        new SharedPreferencesRepository(getActivity());
     WalletInteract walletInteract =
         new WalletInteract(new SharedPreferencesRepository(getActivity()));
+    GamificationInteract gamificationInteract =
+        new GamificationInteract(sharedPreferencesRepository);
+
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
-    paymentMethodsPresenter =
-        new PaymentMethodsPresenter(this, new PaymentMethodsInteract(walletInteract),
-            new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
-                getActivity().getPackageName()));
+    paymentMethodsPresenter = new PaymentMethodsPresenter(this,
+        new PaymentMethodsInteract(walletInteract, gamificationInteract),
+        new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
+            getActivity().getPackageName()));
   }
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -177,6 +183,17 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         .setVisibility(View.VISIBLE);
     layout.getPositiveButton()
         .setEnabled(true);
+  }
+
+  @Override public void showBonus(int bonus) {
+    TextView bonusText = layout.getInstallSecondaryText();
+    if (bonus > 0) {
+      bonusText.setText(String.format("Get up to %s%% bonus", bonus));
+      bonusText.setVisibility(View.VISIBLE);
+    } else if (bonus == -1) { //-1 -> Request fail code
+      bonusText.setText("Earn bonus with the purchase");
+      bonusText.setVisibility(View.VISIBLE);
+    }
   }
 
   private void setInitialRadioButtonSelected() {
