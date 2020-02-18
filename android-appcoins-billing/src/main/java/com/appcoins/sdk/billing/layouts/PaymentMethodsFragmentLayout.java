@@ -23,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.sdk.billing.BuyItemProperties;
@@ -389,7 +388,7 @@ public class PaymentMethodsFragmentLayout {
     parentLayout.setLayoutParams(layoutParams);
 
     TextView payAsGuestView = buildPayAsGuestTextView();
-    RadioGroup radioGroup = buildRadioGroupView();
+    LinearLayout radioGroup = buildRadioGroupView();
 
     parentLayout.addView(payAsGuestView);
     parentLayout.addView(radioGroup);
@@ -493,8 +492,8 @@ public class PaymentMethodsFragmentLayout {
     return button;
   }
 
-  private RadioGroup buildRadioGroupView() {
-    RadioGroup radioGroup = new RadioGroup(activity);
+  private LinearLayout buildRadioGroupView() {
+    LinearLayout radioGroup = new LinearLayout(activity);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -551,7 +550,7 @@ public class PaymentMethodsFragmentLayout {
       start = 12;
     }
 
-    RadioGroup.LayoutParams layoutParams = new RadioGroup.LayoutParams(width, height);
+    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
 
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
@@ -711,7 +710,7 @@ public class PaymentMethodsFragmentLayout {
       start = 8;
     }
 
-    RadioGroup.LayoutParams layoutParams = new RadioGroup.LayoutParams(width, height);
+    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
 
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
@@ -806,7 +805,7 @@ public class PaymentMethodsFragmentLayout {
       height = dpToPx(94);
     }
 
-    RadioGroup.LayoutParams layoutParams = new RadioGroup.LayoutParams(width, height);
+    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
 
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
