@@ -211,6 +211,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     } else if (layout.getInstallWrapperLayout()
         .getVisibility() == View.VISIBLE) {
       installButton.setChecked(true);
+      layout.getPositiveButton()
+          .setText("INSTALL");
       selectedRadioButton = INSTALL_RADIO;
     }
   }
