@@ -15,7 +15,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -39,6 +38,8 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import static android.graphics.Typeface.BOLD;
+import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.getUserCountry;
+import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.userFromIran;
 
 public class InstallDialogActivity extends Activity {
 
@@ -56,7 +57,8 @@ public class InstallDialogActivity extends Activity {
   private static String installButtonTextColor = "#ffffffff";
   private final String GOOGLE_PLAY_URL =
       "https://play.google.com/store/apps/details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
-  private final String CAFE_BAZAAR_URL = "bazaar://details?id=com.hezardastan.wallet";
+  private final String CAFE_BAZAAR_APP_URL = "bazaar://details?id=com.hezardastan.wallet";
+  private final String CAFE_BAZAAR_WEB_URL = "https://cafebazaar.ir/app/com.hezardastaan.wallet";
   private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
@@ -72,7 +74,6 @@ public class InstallDialogActivity extends Activity {
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
-
     String storeUrl = "market://details?id="
         + BuildConfig.BDS_WALLET_PACKAGE_NAME
         + "&utm_source=appcoinssdk&app_source="
@@ -289,20 +290,21 @@ public class InstallDialogActivity extends Activity {
   }
 
   private void redirectToWalletInstallation(final String storeUrl) {
-    final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_URL);
+    final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_APP_URL);
+    if (WalletUtils.isCafeBazaarWalletAvailable()) {
+      cafeBazaarFlow(cafeBazaarIntent, storeUrl);
+    } else {
+      redirectToRemainingStores(storeUrl);
+    }
+  }
+
+  private void cafeBazaarFlow(Intent cafeBazaarIntent, String storeUrl) {
     if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
         && isAbleToRedirect(cafeBazaarIntent)) {
-      AsyncTask asyncTask = new CafeBazaarResponseAsync(new ResponseListener() {
-        @Override public void onResponseCode(int code) {
-          if (code < 300) {
-            cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
-            startActivity(cafeBazaarIntent);
-          } else {
-            redirectToRemainingStores(storeUrl);
-          }
-        }
-      });
-      asyncTask.execute();
+      cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
+      startActivity(cafeBazaarIntent);
+    } else if (userFromIran(getUserCountry(getApplicationContext()))) {
+      startActivityForBrowser(CAFE_BAZAAR_WEB_URL);
     } else {
       redirectToRemainingStores(storeUrl);
     }
@@ -313,12 +315,16 @@ public class InstallDialogActivity extends Activity {
     if (isAbleToRedirect(storeIntent)) {
       startActivity(storeIntent);
     } else {
-      Intent browserIntent = buildBrowserIntent(GOOGLE_PLAY_URL);
-      if (isAbleToRedirect(browserIntent)) {
-        startActivity(browserIntent);
-      } else {
-        buildAlertNoBrowserAndStores();
-      }
+      startActivityForBrowser(GOOGLE_PLAY_URL);
+    }
+  }
+
+  private void startActivityForBrowser(String url) {
+    Intent browserIntent = buildBrowserIntent(url);
+    if (isAbleToRedirect(browserIntent)) {
+      startActivity(browserIntent);
+    } else {
+      buildAlertNoBrowserAndStores();
     }
   }
 

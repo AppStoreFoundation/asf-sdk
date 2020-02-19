@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <color name="dialog_wallet_install_download_button_text_color">#ffffff</color>
-  <color name="btn_start_gradient_color">#fc9d48</color>
-  <color name="btn_end_gradient_color">#ff578c</color>
-  <color name="transparent">#00000000</color>
-  <color name="white">#FFFFFFFF</color>
-</resources>
