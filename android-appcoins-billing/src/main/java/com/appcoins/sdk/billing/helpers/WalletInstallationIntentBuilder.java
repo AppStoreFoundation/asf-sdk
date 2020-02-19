@@ -24,13 +24,9 @@ public class WalletInstallationIntentBuilder {
         + packageName;
   }
 
-  public PackageManager getPackageManager() {
-    return packageManager;
-  }
-
   public Intent getWalletInstallationIntent() {
     final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_APP_URL);
-    if (false) { //WalletUtils.isCafeBazaarWalletAvailable()
+    if (WalletUtils.isCafeBazaarWalletAvailable()) {
       return cafeBazaarFlow(cafeBazaarIntent, storeUrl);
     } else {
       return redirectToRemainingStores(storeUrl);
@@ -38,11 +34,11 @@ public class WalletInstallationIntentBuilder {
   }
 
   private Intent cafeBazaarFlow(Intent cafeBazaarIntent, String storeUrl) {
-    if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
+    if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager)
         && isAbleToRedirect(cafeBazaarIntent)) {
       cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
       return cafeBazaarIntent;
-    } else if (false) { // CafeBazaarUtils.userFromIran(getUserCountry(getApplicationContext()))
+    } else if (WalletUtils.isCafeBazaarWalletAvailable()) {
       return startActivityForBrowser(CAFE_BAZAAR_WEB_URL);
     } else {
       return redirectToRemainingStores(storeUrl);
@@ -80,7 +76,7 @@ public class WalletInstallationIntentBuilder {
   }
 
   private boolean isAbleToRedirect(Intent intent) {
-    ActivityInfo activityInfo = intent.resolveActivityInfo(getPackageManager(), 0);
+    ActivityInfo activityInfo = intent.resolveActivityInfo(packageManager, 0);
     return activityInfo != null;
   }
 }
