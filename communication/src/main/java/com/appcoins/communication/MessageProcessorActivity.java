@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.WindowManager;
 
 public abstract class MessageProcessorActivity extends Activity {
 
@@ -15,6 +16,7 @@ public abstract class MessageProcessorActivity extends Activity {
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     String requesterUri = getIntent().getStringExtra(REQUESTER_ACTIVITY_URI);
     final ProcessedValueReturner processedValueReturner =
         new ProcessedValueReturner(this, requesterUri);
