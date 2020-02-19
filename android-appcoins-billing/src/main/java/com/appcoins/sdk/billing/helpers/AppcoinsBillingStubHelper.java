@@ -207,9 +207,9 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       final StartPurchaseAfterBindListener startPurchaseAfterConnectionListener) {
 
     String packageName = WalletUtils.getBillingServicePackageName();
+    String iabAction = WalletUtils.getIabAction();
 
-    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
-    serviceIntent.setPackage(BuildConfig.IAB_BIND_PACKAGE);
+    Intent serviceIntent = new Intent(iabAction);
     serviceIntent.setPackage(packageName);
 
     final Context context = WalletUtils.getContext();

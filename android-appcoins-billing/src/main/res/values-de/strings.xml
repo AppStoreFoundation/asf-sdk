@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<resources>
-    <string name="app_wallet_install">INSTALLIEREN</string>
-    <string name="app_wallet_install_wallet_from_ads">Um Ihre Belohnung mit AppCoins einzulösen, müssen Sie die AppCoins Wallet-App installieren.</string>
-    <string name="app_wallet_install_wallet_from_iab">Um den Verkauf abzuschließen, müssen Sie die AppCoins-Geldbörse installieren</string>
-    <string name="app_wallet_skip">ÜBERSPRINGEN</string>
-    <string name="app_wallet_wallet_missing">APPC Wallet nicht installiert</string>
-</resources>

@@ -18,6 +18,8 @@ android {
       minifyEnabled false
       buildConfigField "String", "IAB_BIND_ACTION",
           "\"" + project.APPCOINS_DEV_IAB_BIND_ACTION + "\""
+      buildConfigField "String", "CB_IAB_BIND_ACTION",
+          "\"" + project.CAFE_BAZAAR_IAB_BIND_ACTION + "\""
       buildConfigField "String", "IAB_BIND_PACKAGE",
           "\"" + project.APPCOINS_DEV_IAB_BIND_PACKAGE + "\""
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
@@ -26,6 +28,8 @@ android {
           project.APTOIDE_PACKAGE_NAME_DEV
       buildConfigField 'String', 'CAFE_BAZAAR_PACKAGE_NAME',
           project.CAFE_BAZAAR_PACKAGE_NAME
+      buildConfigField 'String', 'CAFE_BAZAAR_WALLET_PACKAGE_NAME',
+          project.CAFE_BAZAAR_WALLET_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
       buildConfigField 'String', 'BACKEND_BASE',
@@ -35,7 +39,7 @@ android {
               "," +
               project.BDS_WALLET_PACKAGE_NAME_DEV.replace('\"', '') +
               "," +
-              project.CAFE_BAZAR_WALLET_PACKAGE_NAME.replace('\"', '') +
+              project.CAFE_BAZAAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
       buildConfigField 'String', 'ADYEN_PUBLIC_KEY',
           "\"" + project.ADYEN_PUBLIC_KEY_DEV + "\""
@@ -45,6 +49,8 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       buildConfigField "String", "IAB_BIND_ACTION",
           "\"" + project.APPCOINS_IAB_BIND_ACTION + "\""
+      buildConfigField "String", "CB_IAB_BIND_ACTION",
+          "\"" + project.CAFE_BAZAAR_IAB_BIND_ACTION + "\""
       buildConfigField "String", "IAB_BIND_PACKAGE",
           "\"" + project.APPCOINS_IAB_BIND_PACKAGE + "\""
       buildConfigField 'String', 'BDS_WALLET_PACKAGE_NAME',
@@ -53,6 +59,8 @@ android {
           project.APTOIDE_PACKAGE_NAME
       buildConfigField 'String', 'CAFE_BAZAAR_PACKAGE_NAME',
           project.CAFE_BAZAAR_PACKAGE_NAME
+      buildConfigField 'String', 'CAFE_BAZAAR_WALLET_PACKAGE_NAME',
+          project.CAFE_BAZAAR_WALLET_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
       buildConfigField 'String', 'BACKEND_BASE',
@@ -62,7 +70,7 @@ android {
               "," +
               project.BDS_WALLET_PACKAGE_NAME.replace('\"', '') +
               "," +
-              project.CAFE_BAZAR_WALLET_PACKAGE_NAME.replace('\"', '') +
+              project.CAFE_BAZAAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
       buildConfigField 'String', 'ADYEN_PUBLIC_KEY',
           "\"" + project.ADYEN_PUBLIC_KEY + "\""
