@@ -5,7 +5,6 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import com.appcoins.billing.AppcoinsBilling;
 import com.appcoins.communication.SyncIpcMessageRequester;
-import com.appcoins.communication.requester.MainThreadException;
 import java.io.Serializable;
 
 public class UriCommunicationAppcoinsBilling implements AppcoinsBilling, Serializable {
@@ -69,7 +68,7 @@ public class UriCommunicationAppcoinsBilling implements AppcoinsBilling, Seriali
   private Bundle callMethod(int methodId, Bundle arguments) throws RemoteException {
     try {
       return ((Bundle) messageRequester.sendMessage(methodId, arguments));
-    } catch (InterruptedException | MainThreadException e) {
+    } catch (Exception e) {
       throw new RemoteException(e.getMessage());
     }
   }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
-import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
@@ -48,8 +47,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     if (WalletUtils.hasWalletInstalled()) {
       hasWalletInstalled = true;
       String packageName = WalletUtils.getBillingServicePackageName();
-      //walletInstalledBehaviour(packageName);
-      bindFailedBehaviour();
+      walletInstalledBehaviour(packageName);
     } else {
       hasWalletInstalled = false;
       walletNotInstalledBehaviour();
