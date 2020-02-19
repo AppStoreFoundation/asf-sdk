@@ -30,8 +30,20 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.WebViewActivity;
+import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
+import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
-import com.appcoins.sdk.billing.service.AdyenRepository;
+import com.appcoins.sdk.billing.models.AdyenPaymentParams;
+import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
+import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
+import com.appcoins.sdk.billing.models.TransactionInformation;
+import com.appcoins.sdk.billing.models.TransactionWallets;
+import com.appcoins.sdk.billing.service.BdsService;
+import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
+import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
+import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
+import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -47,6 +59,7 @@ public class InstallDialogActivity extends Activity {
   public final static String LOADING_DIALOG_CARD = "loading_dialog_install";
   public final static int REQUEST_CODE = 10001;
   public final static int ERROR_RESULT_CODE = 6;
+  private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private final static String TRANSLATIONS = "translations";
   private final static int MINIMUM_APTOIDE_VERSION = 9908;
   private final static int RESULT_USER_CANCELED = 1;
@@ -68,9 +81,9 @@ public class InstallDialogActivity extends Activity {
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    /*adyenRepository = new AdyenRepository(
-        new BdsService(BuildConfig.HOST_WS + "/broker/8.20191202/gateways/adyen_v2/"));
-         //Mock implementation*/
+    adyenRepository = new AdyenRepository(
+        new BdsService(BuildConfig.HOST_WS + "/broker/8.20191202/gateways/adyen_v2/"),
+        new AdyenListenerProvider(new AdyenMapper()));
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
@@ -274,19 +287,81 @@ public class InstallDialogActivity extends Activity {
     installButton.setLayoutParams(installButtonParams);
     installButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        /*AdyenLoadPaymentInfoListener listener = new AdyenLoadPaymentInfoListener() {
-          @Override
-          public void onResponse(int code, PaymentMethodsApiResponse paymentMethodsApiResponse,
-              Exception exception) {
-            //TODO Mocked implementation of Service
-          }
-        };
-        adyenRepository.loadPaymentInfo("paypal", "9.06", "EUR",
-          "walletAddress", listener); *///Mock implementation of Service
+        //loadPaymentFlow("credit_card");
         redirectToWalletInstallation(storeUrl);
       }
     });
     return installButton;
+  }
+
+  private void loadPaymentFlow(final String method) { //Test method only
+    LoadPaymentInfoListener loadPaymentInfoListener = new LoadPaymentInfoListener() {
+      @Override public void onResponse(PaymentMethodsResponse paymentMethodsResponse) {
+        Log.d("TAG123", "Payment Info: "
+            + paymentMethodsResponse.getValue()
+            + paymentMethodsResponse.getCurrency());
+        if (method.equals("paypal")) {
+          launchPaypal(paymentMethodsResponse);
+        } else {
+          showCreditCardLayout(paymentMethodsResponse);
+        }
+      }
+    };
+    adyenRepository.loadPaymentInfo(method, "9.06", "EUR", "walletAddress",
+        loadPaymentInfoListener);
+  }
+
+  private void makeCreditCardPayment() {
+    MakePaymentListener makePaymentListener = new MakePaymentListener() {
+      @Override public void onResponse(AdyenTransactionResponse adyenTransactionResponse) {
+        if (adyenTransactionResponse != null) {
+          Log.d("TAG123", "Payment Made -> uid: " + adyenTransactionResponse.getUid());
+        }
+        handleTransaction(adyenTransactionResponse);
+      }
+    };
+    CardEncryptorImpl cardEncryptor = new CardEncryptorImpl();
+    String cardPaymentMethod = cardEncryptor.encryptFields("", 0, 0, "",
+        BuildConfig.ADYEN_PUBLIC_KEY); // Use test cards values
+    makePayment(cardPaymentMethod, makePaymentListener);
+  }
+
+  private void launchPaypal(PaymentMethodsResponse paymentMethodsResponse) {
+    final Activity activity = this;
+    MakePaymentListener makePaymentListener = new MakePaymentListener() {
+      @Override public void onResponse(AdyenTransactionResponse adyenTransactionResponse) {
+        if (adyenTransactionResponse == null) {
+          Log.d("TAG123", "NULL");
+        }
+        Log.d("TAG123", "Transaction created: uid -> " + adyenTransactionResponse.getUid());
+        startActivityForResult(WebViewActivity.newIntent(activity, "https://www.google.com"),
+            WEB_VIEW_REQUEST_CODE);
+      }
+    };
+    Log.d("TAG123", "launching webview: " + paymentMethodsResponse);
+    makePayment(paymentMethodsResponse.getPaymentMethod(), makePaymentListener);
+  }
+
+  private void makePayment(String cardPaymentMethod, MakePaymentListener makePaymentListener) {
+    TransactionWallets transactionWallets =
+        new TransactionWallets("walletAddress", "walletAddress", "walletAddress", "walletAddress",
+            "walletAddress"); //Change walletAddress for a correct wallet
+    AdyenPaymentParams adyenPaymentParams =
+        new AdyenPaymentParams(cardPaymentMethod, false, "adyencheckout://com.appcoins.wallet.dev");
+    TransactionInformation transactionInformation =
+        new TransactionInformation("9.06", "EUR", "orderId=1580121791311", "paypal", "BDS",
+            "com.appcoins.trivialdrivesample.test", "developer payload: gas", "gas", null, "INAPP");
+    adyenRepository.makePayment(adyenPaymentParams, transactionInformation, transactionWallets,
+        makePaymentListener); //Change walletAddress for a correct wallet
+  }
+
+  private void handleTransaction(AdyenTransactionResponse adyenTransactionResponse) {
+    //TODO
+  }
+
+  private void showCreditCardLayout(PaymentMethodsResponse paymentMethodsResponse) {
+    Log.d("TAG123", "INSERTING USER CARD");
+    makeCreditCardPayment();
   }
 
   private void redirectToWalletInstallation(final String storeUrl) {

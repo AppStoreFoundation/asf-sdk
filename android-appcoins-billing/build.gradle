@@ -39,6 +39,8 @@ android {
               "," +
               project.CAFE_BAZAAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
+      buildConfigField 'String', 'ADYEN_PUBLIC_KEY',
+          "\"" + project.ADYEN_PUBLIC_KEY_DEV + "\""
     }
     release {
       minifyEnabled false
@@ -66,6 +68,8 @@ android {
               "," +
               project.CAFE_BAZAAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
+      buildConfigField 'String', 'ADYEN_PUBLIC_KEY',
+          "\"" + project.ADYEN_PUBLIC_KEY + "\""
       minifyEnabled false
     }
   }
@@ -73,10 +77,14 @@ android {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-  //adyen dependency
-  implementation "com.adyen.checkout:redirect:$project.adyenVersion"
+
+  testImplementation 'junit:junit:4.12'
+  testImplementation 'org.mockito:mockito-core:2.28.2'
+  testImplementation 'org.json:json:20190722'
+  androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
   api project(path: ':appcoins-billing')
+  api project(':appcoins-adyen')
 }
 
 //region Publishing
