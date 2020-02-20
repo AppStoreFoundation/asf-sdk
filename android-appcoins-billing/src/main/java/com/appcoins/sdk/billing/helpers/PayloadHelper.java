@@ -29,8 +29,8 @@ public class PayloadHelper {
    *
    * @return The final developers payload to be sent
    */
-  public static String buildIntentPayload( String orderReference,
-      String developerPayload, String origin) {
+  public static String buildIntentPayload(String orderReference, String developerPayload,
+      String origin) {
     Uri.Builder builder = new Uri.Builder();
     builder.scheme(SCHEME)
         .authority("appcoins.io");

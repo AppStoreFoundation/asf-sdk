@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<resources>
-    <string name="app_wallet_install">INSTALACIÓN</string>
-    <string name="app_wallet_install_wallet_from_ads">Para rescatar su recompensa con AppCoins, es necesario instalar la aplicación AppCoins Wallet.</string>
-    <string name="app_wallet_install_wallet_from_iab">Para completar la venta, debe instalar AppCoins wallet</string>
-    <string name="app_wallet_skip">OMITIR</string>
-    <string name="app_wallet_wallet_missing">APPC Wallet no instalada</string>
-</resources>

@@ -46,6 +46,10 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
     return started != -1;
   }
 
+  private boolean isAppResumed() {
+    return resumed != -1;
+  }
+
   public void setListener(Listener listener) {
     this.listener = listener;
   }
@@ -62,14 +66,14 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
   }
 
   @Override public void onActivityStarted(Activity activity) {
-    if (isAppStarted() && listener != null) {
+    if (!isAppStarted() && listener != null) {
       listener.onBecameForeground(activity);
     }
     started = activity.hashCode();
   }
 
   @Override public void onActivityResumed(Activity activity) {
-    if (isAppStarted() && listener != null) {
+    if (!isAppStarted() && !isAppResumed() && listener != null) {
       listener.onBecameForeground(activity);
     }
     resumed = activity.hashCode();
@@ -93,7 +97,6 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
   }
 
   @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
   }
 
   @Override public void onActivityDestroyed(Activity activity) {

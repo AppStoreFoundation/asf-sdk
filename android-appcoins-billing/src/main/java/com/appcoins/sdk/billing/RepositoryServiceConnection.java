@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
-import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
+import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
 
 public class RepositoryServiceConnection implements ServiceConnection, RepositoryConnection {
   private static final String TAG = RepositoryServiceConnection.class.getSimpleName();
@@ -53,20 +53,21 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     }
   }
 
-  private void walletNotInstalledBehaviour() {
-    onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
-  }
-
-  private void walletInstalledBehaviour(String packageName) {
-    Intent serviceIntent = new Intent(BuildConfig.IAB_BIND_ACTION);
-    serviceIntent.setPackage(packageName);
-    context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
-  }
-
   @Override public void endConnection() {
     if (hasWalletInstalled) {
       context.unbindService(this);
     }
     connectionLifeCycle.onDisconnect(listener);
+  }
+
+  private void walletNotInstalledBehaviour() {
+    onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
+  }
+
+  private void walletInstalledBehaviour(String packageName) {
+    String iabAction = WalletUtils.getIabAction();
+    Intent serviceIntent = new Intent(iabAction);
+    serviceIntent.setPackage(packageName);
+    context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
   }
 }

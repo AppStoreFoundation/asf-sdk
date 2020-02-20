@@ -78,55 +78,24 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
     this.networkId = networkId;
   }
 
-  @Override public void registerCampaign(Context context, String campaignId)
-      throws RemoteException {
-    Bundle bundle = new Bundle();
-    bundle.putString("packageName", context.getPackageName());
-    bundle.putString("campaignId", campaignId);
-
-    Message msg = Message.obtain(null, MSG_REGISTER_CAMPAIGN, 0, 0);
-    msg.setData(bundle);
-    msg.replyTo = clientMessenger;
-    serviceMessenger.send(msg);
-  }
-
   @Override public boolean connectToService(Context context,
       WalletPoAServiceListenner walletPoAServiceListenner) {
 
     this.walletPoAServiceListenner = walletPoAServiceListenner;
     startWalletPoaService(context);
 
-    boolean result = false;
-    Intent i = new Intent(ACTION_BIND);
-    i.setPackage(WalletUtils.getBillingServicePackageName());
+    boolean result;
+    Intent intent = new Intent(ACTION_BIND);
+    intent.setPackage(WalletUtils.getBillingServicePackageName());
 
     result = context.getApplicationContext()
-        .bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        .bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
     if (!result) {
       context.getApplicationContext()
           .unbindService(mConnection);
     }
     return result;
-  }
-
-  @Override public boolean isConnectionReady() {
-    return isBound;
-  }
-
-  public void startWalletPoaService(Context context) {
-    Intent serviceIntent = new Intent();
-    serviceIntent.setComponent(new ComponentName(WalletUtils.getBillingServicePackageName(),
-        BuildConfig.APPCOINS_POA_SERVICE_NAME));
-    serviceIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
-    serviceIntent.putExtra(PARAM_APP_SERVICE_NAME, SDKPoAService.class.getName());
-    serviceIntent.putExtra(PARAM_NETWORK_ID, networkId);
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      context.startForegroundService(serviceIntent);
-    } else {
-      context.startService(serviceIntent);
-    }
   }
 
   @Override public void disconnectFromService(Context context) {
@@ -161,6 +130,37 @@ public class PoAServiceConnectorImpl implements PoAServiceConnector {
           sendPendingMessages();
         }
       }
+    }
+  }
+
+  @Override public void registerCampaign(Context context, String campaignId)
+      throws RemoteException {
+    Bundle bundle = new Bundle();
+    bundle.putString("packageName", context.getPackageName());
+    bundle.putString("campaignId", campaignId);
+
+    Message msg = Message.obtain(null, MSG_REGISTER_CAMPAIGN, 0, 0);
+    msg.setData(bundle);
+    msg.replyTo = clientMessenger;
+    serviceMessenger.send(msg);
+  }
+
+  @Override public boolean isConnectionReady() {
+    return isBound;
+  }
+
+  private void startWalletPoaService(Context context) {
+    Intent serviceIntent = new Intent();
+    serviceIntent.setComponent(new ComponentName(WalletUtils.getBillingServicePackageName(),
+        BuildConfig.APPCOINS_POA_SERVICE_NAME));
+    serviceIntent.putExtra(PARAM_APP_PACKAGE_NAME, context.getPackageName());
+    serviceIntent.putExtra(PARAM_APP_SERVICE_NAME, SDKPoAService.class.getName());
+    serviceIntent.putExtra(PARAM_NETWORK_ID, networkId);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      context.startForegroundService(serviceIntent);
+    } else {
+      context.startService(serviceIntent);
     }
   }
 

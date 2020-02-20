@@ -1,5 +1,6 @@
 package com.appcoins.sdk.billing;
 
+import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
 import java.util.List;
 
 public interface Repository {

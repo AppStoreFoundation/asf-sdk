@@ -1,5 +1,9 @@
 package com.appcoins.sdk.billing;
 
+import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
+import com.appcoins.sdk.billing.listeners.ConsumeResponseListener;
+import com.appcoins.sdk.billing.listeners.SkuDetailsResponseListener;
+
 public interface Billing {
 
   PurchasesResult queryPurchases(String skuType);
