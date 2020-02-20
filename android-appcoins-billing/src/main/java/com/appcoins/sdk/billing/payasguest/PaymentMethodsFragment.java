@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SharedPreferencesRepository;
 import com.appcoins.sdk.billing.WalletInteract;
@@ -20,6 +21,9 @@ import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.layouts.PaymentMethodsFragmentLayout;
 import com.appcoins.sdk.billing.models.WalletGenerationModel;
+import com.appcoins.sdk.billing.service.BdsService;
+import com.appcoins.sdk.billing.service.wallet.WalletGenerationMapper;
+import com.appcoins.sdk.billing.service.wallet.WalletRepository;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
@@ -37,6 +41,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private SkuDetailsModel skuDetailsModel;
   private WalletGenerationModel walletGenerationModel;
 
+  public static PaymentMethodsFragment newInstance(BuyItemProperties buyItemProperties) {
+    PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
+    Bundle bundle = new Bundle();
+    bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
+    paymentMethodsFragment.setArguments(bundle);
+    return paymentMethodsFragment;
+  }
+
   @Override public void onAttach(Context context) {
     super.onAttach(context);
     attach(context);
@@ -50,12 +62,16 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    BdsService bdsService = new BdsService(BuildConfig.BACKEND_BASE);
+
     SharedPreferencesRepository sharedPreferencesRepository =
         new SharedPreferencesRepository(getActivity());
+    WalletRepository walletRepository =
+        new WalletRepository(bdsService, new WalletGenerationMapper());
     WalletInteract walletInteract =
-        new WalletInteract(new SharedPreferencesRepository(getActivity()));
+        new WalletInteract(new SharedPreferencesRepository(getActivity()), walletRepository);
     GamificationInteract gamificationInteract =
-        new GamificationInteract(sharedPreferencesRepository);
+        new GamificationInteract(sharedPreferencesRepository, new GamificationMapper(), bdsService);
 
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);

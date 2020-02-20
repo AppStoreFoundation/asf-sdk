@@ -26,7 +26,7 @@ class PaymentMethodsPresenter {
   }
 
   void prepareUi(final BuyItemProperties buyItemProperties) {
-    String id = paymentMethodsInteract.retrieveId();
+    String id = paymentMethodsInteract.retrieveWalletId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
         fragmentView.saveWalletInformation(walletGenerationModel);

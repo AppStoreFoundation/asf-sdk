@@ -4,7 +4,7 @@ public class WalletGenerationModel {
 
   private final String walletAddress;
   private final String ewt;
-  private boolean error;
+  private final boolean error;
 
   public WalletGenerationModel(String walletAddress, String ewt, boolean error) {
 
