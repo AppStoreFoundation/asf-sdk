@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.AsyncTask;
 import android.os.Build;
 import com.appcoins.billing.sdk.BuildConfig;
 import java.util.ArrayList;
@@ -131,7 +130,7 @@ public class WalletUtils {
         latch.countDown();
       }
     };
-    AsyncTask asyncTask = new CafeBazaarResponseAsync(responseListener);
+    CafeBazaarResponseAsync asyncTask = new CafeBazaarResponseAsync(responseListener);
     asyncTask.execute();
     try {
       latch.await(5, TimeUnit.SECONDS);
