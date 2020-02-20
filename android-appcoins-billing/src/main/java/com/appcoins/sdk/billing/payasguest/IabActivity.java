@@ -24,9 +24,17 @@ import static com.appcoins.sdk.billing.helpers.Utils.RESPONSE_CODE;
 public class IabActivity extends Activity implements IabView {
 
   public final static int LAUNCH_BILLING_FLOW_REQUEST_CODE = 10001;
+  public final static String PAYMENT_METHOD_KEY = "payment_method";
+  public final static String WALLET_ADDRESS_KEY = "wallet_address_key";
+  public final static String EWT_KEY = "ewt_key";
+  public final static String FIAT_VALUE_KEY = "fiat_value";
+  public final static String FIAT_CURRENCY_KEY = "fiat_currency";
+  public final static String APPC_VALUE_KEY = "appc_value";
+  public final static String SKU_KEY = "sku_key";
   private final static String TRANSLATIONS = "translations";
-  private BuyItemProperties buyItemProperties;
   private TranslationsModel translationsModel;
+  private FrameLayout frameLayout;
+  private BuyItemProperties buyItemProperties;
 
   @SuppressLint("ResourceType") @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -35,7 +43,7 @@ public class IabActivity extends Activity implements IabView {
     Log.d("InstallDialog", "com.appcoins.sdk.billing.helpers.InstallDialogActivity started");
 
     int backgroundColor = Color.parseColor("#64000000");
-    FrameLayout frameLayout = new FrameLayout(this);
+    frameLayout = new FrameLayout(this);
     frameLayout.setId(3);
     frameLayout.setBackgroundColor(backgroundColor);
 
@@ -52,7 +60,7 @@ public class IabActivity extends Activity implements IabView {
       Bundle bundle = new Bundle();
       bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
       paymentMethodsFragment.setArguments(bundle);
-      navigateTo(paymentMethodsFragment, frameLayout);
+      navigateTo(paymentMethodsFragment);
     }
   }
 
@@ -74,8 +82,7 @@ public class IabActivity extends Activity implements IabView {
     }
   }
 
-  @SuppressLint("ResourceType")
-  private void navigateTo(Fragment fragment, FrameLayout frameLayout) {
+  @SuppressLint("ResourceType") private void navigateTo(Fragment fragment) {
     getFragmentManager().beginTransaction()
         .replace(frameLayout.getId(), fragment)
         .commit();
@@ -109,8 +116,21 @@ public class IabActivity extends Activity implements IabView {
     startActivity(intent);
   }
 
-  @Override public void navigateToAdyen(String selectedRadioButton) {
-
+  @Override
+  public void navigateToAdyen(String selectedRadioButton, String walletAddress, String ewt,
+      String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku) {
+    AdyenPaymentFragment adyenPaymentFragment = new AdyenPaymentFragment();
+    Bundle bundle = new Bundle();
+    bundle.putString(PAYMENT_METHOD_KEY, selectedRadioButton);
+    bundle.putString(WALLET_ADDRESS_KEY, walletAddress);
+    bundle.putString(EWT_KEY, ewt);
+    bundle.putString(FIAT_VALUE_KEY, fiatPrice);
+    bundle.putString(FIAT_CURRENCY_KEY, fiatPriceCurrencyCode);
+    bundle.putString(APPC_VALUE_KEY, appcPrice);
+    bundle.putString(SKU_KEY, sku);
+    bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
+    adyenPaymentFragment.setArguments(bundle);
+    navigateTo(adyenPaymentFragment);
   }
 
   @Override public void startIntentSenderForResult(IntentSender intentSender, int requestCode) {

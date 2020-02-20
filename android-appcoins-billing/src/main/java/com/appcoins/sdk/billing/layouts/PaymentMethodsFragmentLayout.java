@@ -5,16 +5,13 @@ import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,15 +24,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.payasguest.PaymentMethodsFragment;
+import com.appcoins.sdk.billing.utils.PaymentErrorViewLayout;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.appcoins.sdk.billing.utils.LayoutUtils.BUTTONS_RESOURCE_PATH;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.IMAGES_RESOURCE_PATH;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.mapDisplayMetrics;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.setConstraint;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
+
 public class PaymentMethodsFragmentLayout {
 
-  private static final String BUTTONS_RESOURCE_PATH = "appcoins-wallet/resources/buttons/";
-  private static final String IMAGES_RESOURCE_PATH = "appcoins-wallet/resources/images/";
-  private static int ERROR_MESSAGE_ID = 26;
-  private static int ERROR_TITLE_ID = 25;
   private static int PAYPAL_WRAPPER_ID = 24;
   private static int CREDIT_CARD_WRAPPER_ID = 23;
   private static int INSTALL_MAIN_TEXT_ID = 22;
@@ -72,11 +75,11 @@ public class PaymentMethodsFragmentLayout {
   private GradientDrawable defaultBackground;
   private ProgressBar progressBar;
   private RelativeLayout paymentMethodsLayout;
-  private Button errorPositiveButton;
   private RelativeLayout errorView;
   private RelativeLayout dialogLayout;
   private TextView installSecondaryText;
   private RelativeLayout intentLoadingView;
+  private PaymentErrorViewLayout paymentErrorViewLayout;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
@@ -93,7 +96,9 @@ public class PaymentMethodsFragmentLayout {
     densityPath = mapDisplayMetrics(displayMetrics);
 
     RelativeLayout mainLayout = buildMainLayout();
-    errorView = buildErrorView();
+
+    paymentErrorViewLayout = new PaymentErrorViewLayout(activity, orientation);
+    errorView = paymentErrorViewLayout.buildErrorView();
     errorView.setVisibility(View.INVISIBLE);
 
     intentLoadingView = buildIntentLoadingView();
@@ -292,104 +297,6 @@ public class PaymentMethodsFragmentLayout {
     dialogLayout.addView(paymentMethodsLayout);
     dialogLayout.addView(buttonsView);
     return dialogLayout;
-  }
-
-  private RelativeLayout buildErrorView() {
-    RelativeLayout relativeLayout = new RelativeLayout(activity);
-    setPadding(relativeLayout, 16, 16, 16, 16);
-    RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(160));
-
-    GradientDrawable gradientDrawable = new GradientDrawable();
-    gradientDrawable.setColor(Color.WHITE);
-    gradientDrawable.setCornerRadius(dpToPx(8));
-    relativeLayout.setBackground(gradientDrawable);
-
-    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-
-    int start, end;
-
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-      start = 16;
-      end = 16;
-    } else {
-      start = 64;
-      end = 64;
-    }
-    setMargins(layoutParams, start, 0, end, 0);
-
-    relativeLayout.setLayoutParams(layoutParams);
-
-    TextView errorTitle = buildErrorTitle();
-    TextView errorMessage = buildErrorMessage();
-    errorPositiveButton = buildErrorPositiveButton();
-
-    relativeLayout.addView(errorTitle);
-    relativeLayout.addView(errorMessage);
-    relativeLayout.addView(errorPositiveButton);
-
-    return relativeLayout;
-  }
-
-  private TextView buildErrorTitle() {
-    TextView textView = new TextView(activity);
-    ERROR_TITLE_ID = generateRandomId(ERROR_TITLE_ID);
-    textView.setId(ERROR_TITLE_ID);
-    RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT);
-    textView.setLayoutParams(layoutParams);
-    textView.setText("Error");
-    textView.setTextColor(Color.BLACK);
-    textView.setTextSize(16);
-
-    return textView;
-  }
-
-  private TextView buildErrorMessage() {
-    TextView textView = new TextView(activity);
-    ERROR_MESSAGE_ID = generateRandomId(ERROR_MESSAGE_ID);
-    textView.setId(ERROR_MESSAGE_ID);
-    RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT);
-    layoutParams.addRule(RelativeLayout.BELOW, ERROR_TITLE_ID);
-    setMargins(layoutParams, 0, 8, 0, 0);
-
-    textView.setLayoutParams(layoutParams);
-    textView.setMaxLines(3);
-    textView.setText("An error as ocurred");
-    textView.setTextColor(Color.parseColor("#8a8a8a"));
-    textView.setTextSize(12);
-    return textView;
-  }
-
-  private Button buildErrorPositiveButton() {
-    Button button = new Button(activity);
-    RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(36));
-    setPadding(button, 0, 0, 4, 0);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_BOTTOM);
-    setMargins(layoutParams, 0, 56, 0, 0);
-    int[] gradientColors = { Color.parseColor("#FC9D48"), Color.parseColor("#FF578C") };
-    GradientDrawable enableBackground =
-        new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, gradientColors);
-    enableBackground.setShape(GradientDrawable.RECTANGLE);
-    enableBackground.setStroke(dpToPx(1), Color.WHITE);
-    enableBackground.setCornerRadius(dpToPx(16));
-    button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-    button.setBackground(enableBackground);
-
-    button.setMaxWidth(dpToPx(126));
-    button.setMinWidth(dpToPx(80));
-
-    button.setTextColor(Color.WHITE);
-    button.setTextSize(14);
-    button.setText("OK".toUpperCase());
-    button.setLayoutParams(layoutParams);
-
-    return button;
   }
 
   private ProgressBar buildProgressBar() {
@@ -893,41 +800,6 @@ public class PaymentMethodsFragmentLayout {
     radioButton.setButtonDrawable(stateListDrawable);
   }
 
-  private String mapDisplayMetrics(DisplayMetrics displayMetrics) {
-    String densityPath;
-    switch (displayMetrics.densityDpi) {
-      case DisplayMetrics.DENSITY_LOW:
-        densityPath = "drawable-ldpi";
-        break;
-      case DisplayMetrics.DENSITY_MEDIUM:
-        densityPath = "drawable-mdpi";
-        break;
-      case DisplayMetrics.DENSITY_HIGH:
-      case DisplayMetrics.DENSITY_260:
-      case DisplayMetrics.DENSITY_280:
-        densityPath = "drawable-hdpi/";
-        break;
-      case DisplayMetrics.DENSITY_XHIGH:
-      case DisplayMetrics.DENSITY_300:
-      case DisplayMetrics.DENSITY_360:
-      case DisplayMetrics.DENSITY_340:
-      case DisplayMetrics.DENSITY_400:
-        densityPath = "drawable-xhdpi/";
-        break;
-      case DisplayMetrics.DENSITY_XXHIGH:
-      case DisplayMetrics.DENSITY_440:
-      case DisplayMetrics.DENSITY_420:
-        densityPath = "drawable-xxhdpi/";
-        break;
-      case DisplayMetrics.DENSITY_XXXHIGH:
-      case DisplayMetrics.DENSITY_560:
-      default:
-        densityPath = "drawable-xxxhdpi/";
-        break;
-    }
-    return densityPath;
-  }
-
   private ImageView buildCreditCardImage() {
     ImageView imageView = new ImageView(activity);
     CREDIT_CARD_IMAGE_ID = generateRandomId(CREDIT_CARD_IMAGE_ID);
@@ -1043,11 +915,6 @@ public class PaymentMethodsFragmentLayout {
     return view;
   }
 
-  private int dpToPx(int dp) {
-    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem()
-        .getDisplayMetrics());
-  }
-
   private Drawable convertAssetDrawable(String path) {
     InputStream inputStream = null;
     try {
@@ -1060,76 +927,33 @@ public class PaymentMethodsFragmentLayout {
     return Drawable.createFromStream(inputStream, null);
   }
 
-  private void setMargins(ViewGroup.MarginLayoutParams layoutParams, int start, int top, int end,
-      int bottom) {
-    layoutParams.setMargins(0, dpToPx(top), 0, dpToPx(bottom));
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.setMarginStart(dpToPx(start));
-      layoutParams.setMarginEnd(dpToPx(end));
-    } else {
-      layoutParams.setMargins(dpToPx(start), dpToPx(top), dpToPx(end), dpToPx(bottom));
-    }
-  }
-
-  private void setConstraint(RelativeLayout.LayoutParams layoutParams, int rule, int id) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(rule, id);
-    } else {
-      if (rule == RelativeLayout.END_OF) {
-        layoutParams.addRule(RelativeLayout.RIGHT_OF, id);
-      } else if (rule == RelativeLayout.START_OF) {
-        layoutParams.addRule(RelativeLayout.LEFT_OF, id);
-      } else if (rule == RelativeLayout.ALIGN_END) {
-        layoutParams.addRule(RelativeLayout.ALIGN_RIGHT, id);
-      } else if (rule == RelativeLayout.ALIGN_START) {
-        layoutParams.addRule(RelativeLayout.ALIGN_LEFT, id);
-      }
-    }
-  }
-
-  private void setConstraint(RelativeLayout.LayoutParams layoutParams, int rule) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      layoutParams.addRule(rule);
-    } else if (rule == RelativeLayout.ALIGN_PARENT_END) {
-      layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-    } else if (rule == RelativeLayout.ALIGN_PARENT_START) {
-      layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-    }
-  }
-
-  private void setPadding(View view, int start, int top, int end, int bottom) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      view.setPaddingRelative(dpToPx(start), dpToPx(top), dpToPx(end), dpToPx(bottom));
-    } else {
-      view.setPadding(dpToPx(start), dpToPx(top), dpToPx(end), dpToPx(bottom));
-    }
-  }
-
   public void selectRadioButton(String selectedRadioButton) {
-    if (selectedRadioButton.equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
-      creditCardWrapperLayout.setBackground(getSelectedGradientDrawable());
-      paypalWrapperLayout.setBackground(getDefaultGradientDrawable());
-      installWrapperLayout.setBackground(getDefaultGradientDrawable());
+    if (selectedRadioButton != null) {
+      if (selectedRadioButton.equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
+        creditCardWrapperLayout.setBackground(getSelectedGradientDrawable());
+        paypalWrapperLayout.setBackground(getDefaultGradientDrawable());
+        installWrapperLayout.setBackground(getDefaultGradientDrawable());
 
-      creditCardRadioButton.setChecked(true);
-      paypalRadioButton.setChecked(false);
-      installRadioButton.setChecked(false);
-    } else if (selectedRadioButton.equals(PaymentMethodsFragment.PAYPAL_RADIO)) {
-      paypalWrapperLayout.setBackground(getSelectedGradientDrawable());
-      creditCardWrapperLayout.setBackground(getDefaultGradientDrawable());
-      installWrapperLayout.setBackground(getDefaultGradientDrawable());
+        creditCardRadioButton.setChecked(true);
+        paypalRadioButton.setChecked(false);
+        installRadioButton.setChecked(false);
+      } else if (selectedRadioButton.equals(PaymentMethodsFragment.PAYPAL_RADIO)) {
+        paypalWrapperLayout.setBackground(getSelectedGradientDrawable());
+        creditCardWrapperLayout.setBackground(getDefaultGradientDrawable());
+        installWrapperLayout.setBackground(getDefaultGradientDrawable());
 
-      creditCardRadioButton.setChecked(false);
-      paypalRadioButton.setChecked(true);
-      installRadioButton.setChecked(false);
-    } else {
-      installWrapperLayout.setBackground(getSelectedGradientDrawable());
-      creditCardWrapperLayout.setBackground(getDefaultGradientDrawable());
-      paypalWrapperLayout.setBackground(getDefaultGradientDrawable());
+        creditCardRadioButton.setChecked(false);
+        paypalRadioButton.setChecked(true);
+        installRadioButton.setChecked(false);
+      } else {
+        installWrapperLayout.setBackground(getSelectedGradientDrawable());
+        creditCardWrapperLayout.setBackground(getDefaultGradientDrawable());
+        paypalWrapperLayout.setBackground(getDefaultGradientDrawable());
 
-      creditCardRadioButton.setChecked(false);
-      paypalRadioButton.setChecked(false);
-      installRadioButton.setChecked(true);
+        creditCardRadioButton.setChecked(false);
+        paypalRadioButton.setChecked(false);
+        installRadioButton.setChecked(true);
+      }
     }
   }
 
@@ -1151,13 +975,6 @@ public class PaymentMethodsFragmentLayout {
       defaultBackground.setCornerRadius(dpToPx(6));
     }
     return defaultBackground;
-  }
-
-  private int generateRandomId(int currentId) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      return View.generateViewId();
-    }
-    return currentId;
   }
 
   public TextView getFiatPriceView() {
@@ -1209,7 +1026,7 @@ public class PaymentMethodsFragmentLayout {
   }
 
   public Button getErrorPositiveButton() {
-    return errorPositiveButton;
+    return paymentErrorViewLayout.getErrorPositiveButton();
   }
 
   public RelativeLayout getErrorView() {
