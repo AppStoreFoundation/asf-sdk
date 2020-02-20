@@ -1,11 +1,14 @@
 package com.sdk.appcoins_adyen.utils;
 
 import android.text.TextUtils;
-import com.sdk.appcoins_adyen.card.CardType;
 import com.sdk.appcoins_adyen.card.ValidatedField;
 import com.sdk.appcoins_adyen.models.ExpiryDate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public final class CardValidationUtils {
@@ -16,6 +19,7 @@ public final class CardValidationUtils {
   public static final int AMEX_CARD_NUMBER_LENGTH = 15;
   public static final int CVV_MAX_LENGTH = 4;
   public static final int DATE_MAX_LENGTH = 5;
+  private static final String DATE_FORMAT = "MM/yy";
   private static final String PUBLIC_KEY_PATTERN = "([0-9]){5}\\|([A-Z]|[0-9]){512}";
   private static final char DIGIT_SEPARATOR = ' ';
   // Luhn Check
@@ -88,51 +92,14 @@ public final class CardValidationUtils {
   }
 
   /**
-   * Validate Expiry Date.
-   */
-  public static ValidatedField<ExpiryDate> validateExpiryDate(ExpiryDate expiryDate) {
-
-    if (dateExists(expiryDate)) {
-      final Calendar expiryDateCalendar = getExpiryCalendar(expiryDate);
-
-      final Calendar maxFutureCalendar = GregorianCalendar.getInstance();
-      maxFutureCalendar.add(Calendar.YEAR, MAXIMUM_YEARS_IN_FUTURE);
-
-      final Calendar maxPastCalendar = GregorianCalendar.getInstance();
-      maxPastCalendar.add(Calendar.MONTH, -MAXIMUM_EXPIRED_MONTHS);
-
-      // higher than maxPast and lower than maxFuture
-      if (expiryDateCalendar.compareTo(maxPastCalendar) >= 0
-          && expiryDateCalendar.compareTo(maxFutureCalendar) <= 0) {
-        return new ValidatedField<>(expiryDate, ValidatedField.Validation.VALID);
-      }
-    }
-
-    return new ValidatedField<>(expiryDate, ValidatedField.Validation.INVALID);
-  }
-
-  /**
    * Validate Security Code.
-   * We always pass CardType null, but we can enforce size validation for Amex or otherwise if
-   * necessary.
    */
-  @SuppressWarnings("SameParameterValue") public static ValidatedField<String> validateSecurityCode(
-      String securityCode, CardType cardType) {
+  public static boolean isValidSecurityCode(String securityCode) {
     final String normalizedSecurityCode = StringUtil.normalize(securityCode);
     final int length = normalizedSecurityCode.length();
 
-    ValidatedField.Validation validation = ValidatedField.Validation.INVALID;
-
-    if (StringUtil.isDigitsAndSeparatorsOnly(normalizedSecurityCode)) {
-      if (cardType == CardType.AMERICAN_EXPRESS && length == AMEX_SECURITY_CODE_SIZE) {
-        validation = ValidatedField.Validation.VALID;
-      } else if (length == GENERAL_CARD_SECURITY_CODE_SIZE
-          && cardType != CardType.AMERICAN_EXPRESS) {
-        validation = ValidatedField.Validation.VALID;
-      }
-    }
-
-    return new ValidatedField<>(normalizedSecurityCode, validation);
+    return StringUtil.isDigitsAndSeparatorsOnly(normalizedSecurityCode) && (length == 3
+        || length == 4);
   }
 
   private static boolean dateExists(ExpiryDate expiryDate) {
@@ -160,8 +127,59 @@ public final class CardValidationUtils {
     return expiryCalendar;
   }
 
-  private static String getCardNumberRawValue(String text) {
+  public static String getCardNumberRawValue(String text) {
     return text.replace(DIGIT_SEPARATOR + "", "");
+  }
+
+  public static boolean isValidExpiryDate(ExpiryDate expiryDate) {
+
+    if (dateExists(expiryDate)) {
+      final Calendar expiryDateCalendar = getExpiryCalendar(expiryDate);
+
+      final Calendar maxFutureCalendar = GregorianCalendar.getInstance();
+      maxFutureCalendar.add(Calendar.YEAR, MAXIMUM_YEARS_IN_FUTURE);
+
+      final Calendar maxPastCalendar = GregorianCalendar.getInstance();
+      maxPastCalendar.add(Calendar.MONTH, -MAXIMUM_EXPIRED_MONTHS);
+
+      // higher than maxPast and lower than maxFuture
+      return expiryDateCalendar.compareTo(maxPastCalendar) >= 0
+          && expiryDateCalendar.compareTo(maxFutureCalendar) <= 0;
+    }
+
+    return false;
+  }
+
+  public static ExpiryDate getDate(String date) {
+    final SimpleDateFormat mDateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.ROOT);
+    final String normalizedExpiryDate = StringUtil.normalize(date);
+    try {
+      final Date parsedDate = mDateFormat.parse(normalizedExpiryDate);
+      final Calendar calendar = GregorianCalendar.getInstance();
+      calendar.setTime(parsedDate);
+      // GregorianCalendar is 0 based
+      return new ExpiryDate(calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR));
+    } catch (ParseException e) {
+      return ExpiryDate.EMPTY_DATE;
+    }
+  }
+
+  /**
+   * Set an {@link ExpiryDate} to be displayed on the field.
+   *
+   * @param expiryDate The new value.
+   */
+  public static String getStringDate(ExpiryDate expiryDate) {
+    final SimpleDateFormat mDateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.ROOT);
+    if (expiryDate != null && expiryDate != ExpiryDate.EMPTY_DATE) {
+      final Calendar calendar = GregorianCalendar.getInstance();
+      calendar.clear();
+      // first day of month, GregorianCalendar month is 0 based.
+      calendar.set(expiryDate.getExpiryYear(), expiryDate.getExpiryMonth() - 1, 1);
+      return mDateFormat.format(calendar.getTime());
+    } else {
+      return "";
+    }
   }
 }
 

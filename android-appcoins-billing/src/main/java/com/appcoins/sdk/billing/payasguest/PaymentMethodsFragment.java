@@ -175,10 +175,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   @Override public void navigateToAdyen(String selectedRadioButton) {
-    iabView.navigateToAdyen(selectedRadioButton, walletGenerationModel.getWalletAddress(),
-        walletGenerationModel.getEwt(), skuDetailsModel.getFiatPrice(),
-        skuDetailsModel.getFiatPriceCurrencyCode(), skuDetailsModel.getAppcPrice(),
-        skuDetailsModel.getSku());
+    if (walletGenerationModel.getWalletAddress() != null && skuDetailsModel != null) {
+      iabView.navigateToAdyen(selectedRadioButton, walletGenerationModel.getWalletAddress(),
+          walletGenerationModel.getEwt(), skuDetailsModel.getFiatPrice(),
+          skuDetailsModel.getFiatPriceCurrencyCode(), skuDetailsModel.getAppcPrice(),
+          skuDetailsModel.getSku());
+    } else {
+      showError();
+    }
   }
 
   @Override public void setRadioButtonSelected(String radioButtonSelected) {

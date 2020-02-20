@@ -31,6 +31,7 @@ public class BdsService implements Service {
       URL url = new URL(urlBuilder);
       urlConnection = openUrlConnection(url, httpMethod);
 
+      urlConnection.setReadTimeout(300000);
       if ((httpMethod.equals("POST") || httpMethod.equals("PATCH")) && body != null) {
         if (httpMethod.equals("PATCH")) {
           urlConnection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
@@ -108,7 +109,7 @@ public class BdsService implements Service {
     if (queries == null) {
       queries = new HashMap<>();
     }
-    AsyncTask asyncTask =
+    ServiceAsyncTask asyncTask =
         new ServiceAsyncTask(this, baseUrl, endPoint, httpMethod, paths, queries, body,
             serviceResponseListener);
     if (async) {

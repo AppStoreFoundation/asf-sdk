@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.sdk.billing.listeners.CardNumberTextWatcher;
+import com.appcoins.sdk.billing.listeners.CvvTextWatcher;
 import com.appcoins.sdk.billing.listeners.ExpiryDateTextWatcher;
 import com.appcoins.sdk.billing.utils.PaymentErrorViewLayout;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
@@ -263,6 +264,11 @@ public class AdyenPaymentFragmentLayout {
     EditText expiryDateEditText = buildExpiryDateEditText();
     EditText cvvEditText = buildCvvEditText();
 
+    cardNumberEditText.addTextChangedListener(
+        new CardNumberTextWatcher(cardNumberEditText, expiryDateEditText));
+    expiryDateEditText.addTextChangedListener(
+        new ExpiryDateTextWatcher(expiryDateEditText, cvvEditText, cardNumberEditText));
+    cvvEditText.addTextChangedListener(new CvvTextWatcher(expiryDateEditText));
     linearLayout.addView(genericCardView);
     linearLayout.addView(cardNumberEditText);
     linearLayout.addView(expiryDateEditText);
@@ -306,7 +312,6 @@ public class AdyenPaymentFragmentLayout {
 
   private EditText buildExpiryDateEditText() {
     EditText editText = new EditText(activity);
-    editText.addTextChangedListener(new ExpiryDateTextWatcher(editText));
     LinearLayout.LayoutParams layoutParams =
         new LinearLayout.LayoutParams(dpToPx(60), ViewGroup.LayoutParams.MATCH_PARENT);
     editText.setFilters(new InputFilter[] {
@@ -327,7 +332,6 @@ public class AdyenPaymentFragmentLayout {
 
   private EditText buildCardNumberEditText() {
     EditText editText = new EditText(activity);
-    editText.addTextChangedListener(new CardNumberTextWatcher(editText));
     editText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.MAXIMUM_CARD_NUMBER_LENGTH
             + CardValidationUtils.MAX_DIGIT_SEPARATOR_COUNT)
