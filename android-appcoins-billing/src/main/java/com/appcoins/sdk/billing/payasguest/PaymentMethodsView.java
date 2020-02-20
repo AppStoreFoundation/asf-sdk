@@ -27,6 +27,4 @@ interface PaymentMethodsView {
   void showPaymentView();
 
   void showBonus(int bonus);
-
-  String getSelectedRadioButton();
 }

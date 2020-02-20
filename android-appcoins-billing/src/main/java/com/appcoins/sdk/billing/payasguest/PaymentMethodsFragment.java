@@ -168,10 +168,12 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     installWrapper.setOnClickListener(installListener);
   }
 
-  private void onPositiveButtonClicked(Button positiveButton) {
+  private void onPositiveButtonClicked(final Button positiveButton) {
     positiveButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        paymentMethodsPresenter.onPositiveButtonClicked(selectedRadioButton);
+        if (selectedRadioButton != null) {
+          paymentMethodsPresenter.onPositiveButtonClicked(selectedRadioButton);
+        }
       }
     });
   }
