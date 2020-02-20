@@ -101,17 +101,60 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     RelativeLayout installWrapper = layout.getInstallWrapperLayout();
     Button errorButton = layout.getErrorPositiveButton();
     onRotation(savedInstanceState);
-    paymentMethodsPresenter.onCancelButtonClicked(cancelButton);
-    paymentMethodsPresenter.onPositiveButtonClicked(positiveButton, selectedRadioButton);
-    paymentMethodsPresenter.onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton,
-        creditWrapper, paypalWrapper, installWrapper);
-    paymentMethodsPresenter.onErrorButtonClicked(errorButton);
+    onCancelButtonClicked(cancelButton);
+    onPositiveButtonClicked(positiveButton);
+    onErrorButtonClicked(errorButton);
+    onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton, creditWrapper,
+        paypalWrapper, installWrapper);
     paymentMethodsPresenter.prepareUi(buyItemProperties);
   }
 
   @Override public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     outState.putString(SELECTED_RADIO_KEY, selectedRadioButton);
+  }
+
+  private void onErrorButtonClicked(Button errorButton) {
+    errorButton.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        paymentMethodsPresenter.onErrorButtonClicked();
+      }
+    });
+  }
+
+  private void onRadioButtonClicked(RadioButton creditCardButton, RadioButton paypalButton,
+      RadioButton installRadioButton, RelativeLayout creditWrapper, RelativeLayout paypalWrapper,
+      RelativeLayout installWrapper) {
+    RadioButtonClickListener creditCardListener =
+        new RadioButtonClickListener(PaymentMethodsFragment.CREDIT_CARD_RADIO);
+    RadioButtonClickListener paypalListener =
+        new RadioButtonClickListener(PaymentMethodsFragment.PAYPAL_RADIO);
+    RadioButtonClickListener installListener =
+        new RadioButtonClickListener(PaymentMethodsFragment.INSTALL_RADIO);
+
+    creditCardButton.setOnClickListener(creditCardListener);
+    paypalButton.setOnClickListener(paypalListener);
+    installRadioButton.setOnClickListener(installListener);
+
+    creditWrapper.setOnClickListener(creditCardListener);
+    paypalWrapper.setOnClickListener(paypalListener);
+    installWrapper.setOnClickListener(installListener);
+  }
+
+  private void onPositiveButtonClicked(Button positiveButton) {
+    positiveButton.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        paymentMethodsPresenter.onPositiveButtonClicked(selectedRadioButton);
+      }
+    });
+  }
+
+  private void onCancelButtonClicked(Button cancelButton) {
+    cancelButton.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        paymentMethodsPresenter.onCancelButtonClicked();
+      }
+    });
   }
 
   private void onRotation(Bundle savedInstanceState) {
@@ -238,5 +281,18 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
       throw new IllegalStateException("PaymentMethodsFragment must be attached to IabActivity");
     }
     iabView = (IabView) context;
+  }
+
+  public class RadioButtonClickListener implements View.OnClickListener {
+
+    private String selectedRadioButton;
+
+    RadioButtonClickListener(String selectedRadioButton) {
+      this.selectedRadioButton = selectedRadioButton;
+    }
+
+    @Override public void onClick(View view) {
+      paymentMethodsPresenter.onRadioButtonClicked(selectedRadioButton);
+    }
   }
 }

@@ -1,10 +1,6 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.content.Intent;
-import android.view.View;
-import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.RelativeLayout;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
@@ -42,55 +38,30 @@ class PaymentMethodsPresenter {
     paymentMethodsInteract.requestMaxBonus(maxBonusListener);
   }
 
-  void onCancelButtonClicked(Button cancelButton) {
-    cancelButton.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View view) {
-        fragmentView.close();
-      }
-    });
+  void onCancelButtonClicked() {
+    fragmentView.close();
   }
 
-  void onPositiveButtonClicked(Button positiveButton, final String selectedRadioButton) {
-    positiveButton.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View view) {
-        if (selectedRadioButton.equals("paypal") || selectedRadioButton.equals("credit_card")) {
-          fragmentView.navigateToAdyen(selectedRadioButton);
-        } else {
-          Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
-          if (intent != null) {
-            fragmentView.redirectToWalletInstallation(intent);
-          } else {
-            fragmentView.showAlertNoBrowserAndStores();
-          }
-        }
+  void onPositiveButtonClicked(String selectedRadioButton) {
+    if (selectedRadioButton.equals("paypal") || selectedRadioButton.equals("credit_card")) {
+      fragmentView.navigateToAdyen(selectedRadioButton);
+    } else {
+      Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
+      if (intent != null) {
+        fragmentView.redirectToWalletInstallation(intent);
+      } else {
+        fragmentView.showAlertNoBrowserAndStores();
       }
-    });
+    }
   }
 
-  void onRadioButtonClicked(RadioButton creditCardButton, RadioButton paypalButton,
-      RadioButton installRadioButton, RelativeLayout creditWrapper, RelativeLayout paypalWrapper,
-      RelativeLayout installWrapper) {
-    RadioButtonClickListener creditCardListener =
-        new RadioButtonClickListener(PaymentMethodsFragment.CREDIT_CARD_RADIO);
-    RadioButtonClickListener paypalListener =
-        new RadioButtonClickListener(PaymentMethodsFragment.PAYPAL_RADIO);
-    RadioButtonClickListener installListener =
-        new RadioButtonClickListener(PaymentMethodsFragment.INSTALL_RADIO);
-
-    creditCardButton.setOnClickListener(creditCardListener);
-    creditWrapper.setOnClickListener(creditCardListener);
-    paypalButton.setOnClickListener(paypalListener);
-    paypalWrapper.setOnClickListener(paypalListener);
-    installRadioButton.setOnClickListener(installListener);
-    installWrapper.setOnClickListener(installListener);
+  void onRadioButtonClicked(String selectedRadioButton) {
+    fragmentView.setRadioButtonSelected(selectedRadioButton);
+    fragmentView.setPositiveButtonText(selectedRadioButton);
   }
 
-  void onErrorButtonClicked(Button errorButton) {
-    errorButton.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View view) {
-        fragmentView.close();
-      }
-    });
+  void onErrorButtonClicked() {
+    fragmentView.close();
   }
 
   private void provideSkuDetailsInformation(BuyItemProperties buyItemProperties,
@@ -128,19 +99,5 @@ class PaymentMethodsPresenter {
       }
     };
     paymentMethodsInteract.loadPaymentsAvailable(fiatPrice, fiatCurrency, paymentMethodsListener);
-  }
-
-  public class RadioButtonClickListener implements View.OnClickListener {
-
-    private String selectedRadioButton;
-
-    RadioButtonClickListener(String selectedRadioButton) {
-      this.selectedRadioButton = selectedRadioButton;
-    }
-
-    @Override public void onClick(View view) {
-      fragmentView.setRadioButtonSelected(selectedRadioButton);
-      fragmentView.setPositiveButtonText(selectedRadioButton);
-    }
   }
 }
