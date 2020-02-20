@@ -71,6 +71,8 @@ public class WalletUtils {
     if (isAppInstalled(com.appcoins.billing.sdk.BuildConfig.CAFE_BAZAAR_PACKAGE_NAME,
         context.getPackageManager()) || userFromIran(getUserCountry(context))) {
       iabAction = getIabAction();
+    } else {
+      cafeBazaarWalletAvailable = false;
     }
     Intent serviceIntent = new Intent(iabAction);
 
