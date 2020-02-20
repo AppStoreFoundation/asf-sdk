@@ -48,11 +48,7 @@ public class IabActivity extends Activity implements IabView {
       translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
     } else {
       fetchTranslations();
-      PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
-      Bundle bundle = new Bundle();
-      bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
-      paymentMethodsFragment.setArguments(bundle);
-      navigateTo(paymentMethodsFragment, frameLayout);
+      navigateTo(PaymentMethodsFragment.newInstance(buyItemProperties), frameLayout);
     }
   }
 
@@ -74,7 +70,6 @@ public class IabActivity extends Activity implements IabView {
     }
   }
 
-  @SuppressLint("ResourceType")
   private void navigateTo(Fragment fragment, FrameLayout frameLayout) {
     getFragmentManager().beginTransaction()
         .replace(frameLayout.getId(), fragment)
