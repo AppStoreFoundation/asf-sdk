@@ -85,7 +85,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     paymentMethodsPresenter = new PaymentMethodsPresenter(this,
         new PaymentMethodsInteract(walletInteract, gamificationInteract),
         new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
-            getActivity().getPackageName()));
+            getActivity().getPackageName(), getActivity().getApplicationContext()));
   }
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
