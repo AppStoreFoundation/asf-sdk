@@ -21,8 +21,8 @@ class PaymentMethodsInteract {
         new PaymentMethodsRepository(new BdsService(BuildConfig.HOST_WS));
   }
 
-  String retrieveId() {
-    return walletInteract.retrieveId();
+  String retrieveWalletId() {
+    return walletInteract.retrieveWalletId();
   }
 
   void requestWallet(String id, WalletInteractListener walletInteractListener) {

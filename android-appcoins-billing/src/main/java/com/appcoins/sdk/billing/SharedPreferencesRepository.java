@@ -9,11 +9,13 @@ public class SharedPreferencesRepository {
   private static final String WALLET_ID_KEY = "WALLET_ID";
   private static final String MAX_BONUS_KEY = "MAX_BONUS";
   private static final String MAX_BONUS_TTL_SECONDS_KEY = "MAX_BONUS_TTL";
+  private final int ttlValue;
   private SharedPreferences sharedPreferences;
 
   public SharedPreferencesRepository(Context context) {
 
     this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    ttlValue = 86400 * 30;
   }
 
   public String getWalletId() {
@@ -45,7 +47,7 @@ public class SharedPreferencesRepository {
     if (sharedPreferences.contains(MAX_BONUS_KEY)) {
       if (sharedPreferences.contains(MAX_BONUS_TTL_SECONDS_KEY)) {
         return (timeInMillis / 1000 - sharedPreferences.getLong(MAX_BONUS_TTL_SECONDS_KEY, 0))
-            < 86400 * 30;
+            < ttlValue;
       }
     }
     return false;

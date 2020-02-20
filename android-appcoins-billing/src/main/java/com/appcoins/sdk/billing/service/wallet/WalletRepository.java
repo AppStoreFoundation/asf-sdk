@@ -6,7 +6,7 @@ import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.Service;
 import com.appcoins.sdk.billing.service.ServiceResponseListener;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class WalletRepository {
@@ -21,7 +21,7 @@ public class WalletRepository {
   }
 
   public void requestWallet(String id, final WalletInteractListener walletInteractListener) {
-    Map<String, String> queries = new LinkedHashMap<>();
+    Map<String, String> queries = new HashMap<>();
     queries.put("id", id);
     ServiceResponseListener serviceResponseListener = new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {

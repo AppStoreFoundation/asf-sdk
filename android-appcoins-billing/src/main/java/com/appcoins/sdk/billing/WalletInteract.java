@@ -1,8 +1,5 @@
 package com.appcoins.sdk.billing;
 
-import com.appcoins.billing.sdk.BuildConfig;
-import com.appcoins.sdk.billing.service.BdsService;
-import com.appcoins.sdk.billing.service.wallet.WalletGenerationMapper;
 import com.appcoins.sdk.billing.service.wallet.WalletRepository;
 import java.util.Random;
 
@@ -12,14 +9,13 @@ public class WalletInteract {
   private WalletRepository walletRepository;
   private SharedPreferencesRepository sharedPreferencesRepository;
 
-  public WalletInteract(SharedPreferencesRepository sharedPreferencesRepository) {
-
-    this.walletRepository = new WalletRepository(new BdsService(BuildConfig.BACKEND_BASE),
-        new WalletGenerationMapper());
+  public WalletInteract(SharedPreferencesRepository sharedPreferencesRepository,
+      WalletRepository walletRepository) {
     this.sharedPreferencesRepository = sharedPreferencesRepository;
+    this.walletRepository = walletRepository;
   }
 
-  public String retrieveId() {
+  public String retrieveWalletId() {
     String savedId = sharedPreferencesRepository.getWalletId();
     if (savedId != null) {
       return savedId;

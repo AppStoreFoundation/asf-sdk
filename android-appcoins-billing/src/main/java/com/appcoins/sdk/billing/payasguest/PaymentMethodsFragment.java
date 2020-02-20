@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SharedPreferencesRepository;
 import com.appcoins.sdk.billing.WalletInteract;
@@ -23,6 +24,9 @@ import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.layouts.PaymentMethodsFragmentLayout;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.models.WalletGenerationModel;
+import com.appcoins.sdk.billing.service.BdsService;
+import com.appcoins.sdk.billing.service.wallet.WalletGenerationMapper;
+import com.appcoins.sdk.billing.service.wallet.WalletRepository;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
@@ -43,6 +47,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private WalletGenerationModel walletGenerationModel;
   private AppcoinsBillingStubHelper appcoinsBillingStubHelper;
 
+  public static PaymentMethodsFragment newInstance(BuyItemProperties buyItemProperties) {
+    PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
+    Bundle bundle = new Bundle();
+    bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
+    paymentMethodsFragment.setArguments(bundle);
+    return paymentMethodsFragment;
+  }
+
   @Override public void onAttach(Context context) {
     super.onAttach(context);
     attach(context);
@@ -56,12 +68,16 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    BdsService bdsService = new BdsService(BuildConfig.BACKEND_BASE);
+
     SharedPreferencesRepository sharedPreferencesRepository =
         new SharedPreferencesRepository(getActivity());
+    WalletRepository walletRepository =
+        new WalletRepository(bdsService, new WalletGenerationMapper());
     WalletInteract walletInteract =
-        new WalletInteract(new SharedPreferencesRepository(getActivity()));
+        new WalletInteract(new SharedPreferencesRepository(getActivity()), walletRepository);
     GamificationInteract gamificationInteract =
-        new GamificationInteract(sharedPreferencesRepository);
+        new GamificationInteract(sharedPreferencesRepository, new GamificationMapper(), bdsService);
 
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
@@ -92,11 +108,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     RelativeLayout installWrapper = layout.getInstallWrapperLayout();
     Button errorButton = layout.getErrorPositiveButton();
     onRotation(savedInstanceState);
-    paymentMethodsPresenter.onCancelButtonClicked(cancelButton);
-    paymentMethodsPresenter.onPositiveButtonClicked(positiveButton);
-    paymentMethodsPresenter.onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton,
-        creditWrapper, paypalWrapper, installWrapper);
-    paymentMethodsPresenter.onErrorButtonClicked(errorButton);
+    onCancelButtonClicked(cancelButton);
+    onPositiveButtonClicked(positiveButton);
+    onErrorButtonClicked(errorButton);
+    onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton, creditWrapper,
+        paypalWrapper, installWrapper);
     paymentMethodsPresenter.prepareUi(buyItemProperties);
   }
 
@@ -123,6 +139,49 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     outState.putString(SELECTED_RADIO_KEY, selectedRadioButton);
+  }
+
+  private void onErrorButtonClicked(Button errorButton) {
+    errorButton.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        paymentMethodsPresenter.onErrorButtonClicked();
+      }
+    });
+  }
+
+  private void onRadioButtonClicked(RadioButton creditCardButton, RadioButton paypalButton,
+      RadioButton installRadioButton, RelativeLayout creditWrapper, RelativeLayout paypalWrapper,
+      RelativeLayout installWrapper) {
+    RadioButtonClickListener creditCardListener =
+        new RadioButtonClickListener(PaymentMethodsFragment.CREDIT_CARD_RADIO);
+    RadioButtonClickListener paypalListener =
+        new RadioButtonClickListener(PaymentMethodsFragment.PAYPAL_RADIO);
+    RadioButtonClickListener installListener =
+        new RadioButtonClickListener(PaymentMethodsFragment.INSTALL_RADIO);
+
+    creditCardButton.setOnClickListener(creditCardListener);
+    paypalButton.setOnClickListener(paypalListener);
+    installRadioButton.setOnClickListener(installListener);
+
+    creditWrapper.setOnClickListener(creditCardListener);
+    paypalWrapper.setOnClickListener(paypalListener);
+    installWrapper.setOnClickListener(installListener);
+  }
+
+  private void onPositiveButtonClicked(Button positiveButton) {
+    positiveButton.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        paymentMethodsPresenter.onPositiveButtonClicked(selectedRadioButton);
+      }
+    });
+  }
+
+  private void onCancelButtonClicked(Button cancelButton) {
+    cancelButton.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View view) {
+        paymentMethodsPresenter.onCancelButtonClicked();
+      }
+    });
   }
 
   private void onRotation(Bundle savedInstanceState) {
@@ -240,10 +299,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     }
   }
 
-  @Override public String getSelectedRadioButton() {
-    return selectedRadioButton;
-  }
-
   private void setInitialRadioButtonSelected() {
     RadioButton creditCardButton = layout.getCreditCardRadioButton();
     RadioButton paypalButton = layout.getPaypalRadioButton();
@@ -285,6 +340,19 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
           IabActivity.LAUNCH_BILLING_FLOW_REQUEST_CODE);
     } else {
       iabView.finishWithError();
+    }
+  }
+
+  public class RadioButtonClickListener implements View.OnClickListener {
+
+    private String selectedRadioButton;
+
+    RadioButtonClickListener(String selectedRadioButton) {
+      this.selectedRadioButton = selectedRadioButton;
+    }
+
+    @Override public void onClick(View view) {
+      paymentMethodsPresenter.onRadioButtonClicked(selectedRadioButton);
     }
   }
 }

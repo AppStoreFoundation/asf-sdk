@@ -101,7 +101,7 @@ public class BdsService implements Service {
   }
 
   public void makeRequest(String endPoint, String httpMethod, List<String> paths,
-      Map<String, String> queries, Map<String, Object> body, boolean async,
+      Map<String, String> queries, Map<String, Object> body, boolean shouldParallelize,
       ServiceResponseListener serviceResponseListener) {
     if (paths == null) {
       paths = new ArrayList<>();
@@ -112,7 +112,7 @@ public class BdsService implements Service {
     ServiceAsyncTask asyncTask =
         new ServiceAsyncTask(this, baseUrl, endPoint, httpMethod, paths, queries, body,
             serviceResponseListener);
-    if (async) {
+    if (shouldParallelize) {
       asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     } else {
       asyncTask.execute();

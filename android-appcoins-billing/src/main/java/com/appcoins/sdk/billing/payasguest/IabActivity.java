@@ -18,7 +18,6 @@ import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
 import com.appcoins.sdk.billing.helpers.Utils;
 import java.util.Locale;
 
-import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.ERROR_RESULT_CODE;
 import static com.appcoins.sdk.billing.helpers.Utils.RESPONSE_CODE;
 
 public class IabActivity extends Activity implements IabView {
@@ -56,11 +55,7 @@ public class IabActivity extends Activity implements IabView {
       translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
     } else {
       fetchTranslations();
-      PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
-      Bundle bundle = new Bundle();
-      bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
-      paymentMethodsFragment.setArguments(bundle);
-      navigateTo(paymentMethodsFragment);
+      navigateTo(PaymentMethodsFragment.newInstance(buyItemProperties), frameLayout);
     }
   }
 
@@ -82,7 +77,7 @@ public class IabActivity extends Activity implements IabView {
     }
   }
 
-  @SuppressLint("ResourceType") private void navigateTo(Fragment fragment) {
+  private void navigateTo(Fragment fragment) {
     getFragmentManager().beginTransaction()
         .replace(frameLayout.getId(), fragment)
         .commit();
