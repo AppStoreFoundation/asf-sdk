@@ -46,7 +46,7 @@ public class MessageSenderTest {
     assertEquals("wrong message id argument", MESSAGE_ID,
         intent.getLongExtra(MessageProcessorActivity.MESSAGE_ID, -1));
     assertEquals("wrong method type argument", TYPE,
-        intent.getIntExtra(MessageProcessorActivity.TYPE, -1));
+        intent.getIntExtra(MessageProcessorActivity.METHOD_ID, -1));
     assertEquals("wrong sender package name", BuildConfig.APPLICATION_ID,
         intent.getStringExtra(MessageProcessorActivity.REQUESTER_PACKAGE_NAME));
     assertEquals("wrong sender package name", RECEIVE_TARGET_URI,

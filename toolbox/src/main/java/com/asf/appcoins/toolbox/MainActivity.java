@@ -24,7 +24,6 @@ import java.util.Locale;
 public class MainActivity extends Activity {
 
   private static final String TAG = MainActivity.class.getSimpleName();
-  private static final String TAG2 = "THIS_IS_A_GREAT_TEST";
   private AppcoinsBillingClient cab;
   private String token;
   private AppCoinsBillingStateListener listener;

@@ -9,7 +9,7 @@ import android.view.WindowManager;
 public abstract class MessageProcessorActivity extends Activity {
 
   public static final String MESSAGE_ID = "MESSAGE_ID";
-  public static final String TYPE = "TYPE";
+  public static final String METHOD_ID = "METHOD_ID";
   public static final String REQUESTER_PACKAGE_NAME = "REQUESTER_PACKAGE_NAME";
   public static final String ARGUMENTS = "ARGUMENTS";
   public static final String REQUESTER_ACTIVITY_URI = "REQUESTER_ACTIVITY_URI";
@@ -25,7 +25,7 @@ public abstract class MessageProcessorActivity extends Activity {
       @Override public void run() {
         Intent intent = getIntent();
         long requestCode = intent.getLongExtra(MESSAGE_ID, -1);
-        int methodId = intent.getIntExtra(TYPE, -1);
+        int methodId = intent.getIntExtra(METHOD_ID, -1);
         String packageName = intent.getStringExtra(REQUESTER_PACKAGE_NAME);
         Parcelable arguments = intent.getParcelableExtra(ARGUMENTS);
         Parcelable returnValue = processValue(methodId, arguments);

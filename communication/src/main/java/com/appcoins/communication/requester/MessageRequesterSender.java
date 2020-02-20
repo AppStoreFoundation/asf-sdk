@@ -20,13 +20,13 @@ class MessageRequesterSender {
     this.requesterActivityUri = requesterActivityUri;
   }
 
-  public void sendMessage(long requestCode, int type, Parcelable arguments) {
+  public void sendMessage(long requestCode, int methodId, Parcelable arguments) {
     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(targetUri));
 
     intent.putExtra(MessageProcessorActivity.REQUESTER_ACTIVITY_URI, requesterActivityUri);
     intent.putExtra(MessageProcessorActivity.MESSAGE_ID, requestCode);
     intent.putExtra(MessageProcessorActivity.REQUESTER_PACKAGE_NAME, context.getPackageName());
-    intent.putExtra(MessageProcessorActivity.TYPE, type);
+    intent.putExtra(MessageProcessorActivity.METHOD_ID, methodId);
     intent.putExtra(MessageProcessorActivity.ARGUMENTS, arguments);
     intent.setPackage(targetPackage);
 
