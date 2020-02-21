@@ -1,11 +1,9 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.os.AsyncTask;
-import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.WalletInteractListener;
-import com.appcoins.sdk.billing.service.BdsService;
 
 class PaymentMethodsInteract {
 
@@ -13,12 +11,12 @@ class PaymentMethodsInteract {
   private WalletInteract walletInteract;
   private GamificationInteract gamificationInteract;
 
-  PaymentMethodsInteract(WalletInteract walletInteract, GamificationInteract gamificationInteract) {
+  PaymentMethodsInteract(WalletInteract walletInteract, GamificationInteract gamificationInteract,
+      PaymentMethodsRepository paymentMethodsRepository) {
 
     this.walletInteract = walletInteract;
     this.gamificationInteract = gamificationInteract;
-    this.paymentMethodsRepository =
-        new PaymentMethodsRepository(new BdsService(BuildConfig.HOST_WS));
+    this.paymentMethodsRepository = paymentMethodsRepository;
   }
 
   String retrieveWalletId() {
