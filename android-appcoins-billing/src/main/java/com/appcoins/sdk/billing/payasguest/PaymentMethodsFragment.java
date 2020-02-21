@@ -72,11 +72,13 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         new WalletInteract(new SharedPreferencesRepository(getActivity()), walletRepository);
     GamificationInteract gamificationInteract =
         new GamificationInteract(sharedPreferencesRepository, new GamificationMapper(), bdsService);
+    PaymentMethodsRepository paymentMethodsRepository =
+        new PaymentMethodsRepository(new BdsService(BuildConfig.HOST_WS));
 
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
     paymentMethodsPresenter = new PaymentMethodsPresenter(this,
-        new PaymentMethodsInteract(walletInteract, gamificationInteract),
+        new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository),
         new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
             getActivity().getPackageName()));
   }

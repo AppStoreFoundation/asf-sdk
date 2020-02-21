@@ -54,7 +54,7 @@ public class AdyenRepositoryTest {
         serviceResponseListener);
     adyenRepository.loadPaymentInfo("credit_card", "9.06", "EUR", "0x212", loadPaymentInfoListener);
     verify(bdsService).makeRequest("payment-methods", "GET", new ArrayList<String>(), queries, null,
-        true, serviceResponseListener);
+        serviceResponseListener);
   }
 
   @Test public void makePaymentTest() {
@@ -94,6 +94,6 @@ public class AdyenRepositoryTest {
         new TransactionInformation("", "", "", "", "", "", "", "", "", ""),
         new TransactionWallets("0x123", "", "", "", ""), makePaymentListener);
     verify(bdsService).makeRequest("transactions", "POST", new ArrayList<String>(), queries, body,
-        true, serviceResponseListener);
+        serviceResponseListener);
   }
 }
