@@ -1,12 +1,11 @@
 package com.asf.appcoins.sdk.ads.listeners;
 
 import android.os.AsyncTask;
-import android.os.Build;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 public class CafeBazaarResponseAsync extends AsyncTask {
 
@@ -37,13 +36,9 @@ public class CafeBazaarResponseAsync extends AsyncTask {
         + "\t\t}\n"
         + "\t}\n"
         + "}";
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      OutputStream os = huc.getOutputStream();
-      byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
-      os.write(input, 0, input.length);
-    } else {
-      return 404;
-    }
+    OutputStream os = huc.getOutputStream();
+    byte[] input = jsonInputString.getBytes(Charset.forName("UTF-8"));
+    os.write(input, 0, input.length);
     huc.connect();
     int responseCode = huc.getResponseCode();
     huc.disconnect();

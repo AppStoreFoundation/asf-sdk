@@ -10,7 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.SecureRandom;
@@ -164,7 +164,7 @@ public class PRNGFixes {
       result.append(serial);
     }
     return result.toString()
-        .getBytes(StandardCharsets.UTF_8);
+        .getBytes(Charset.forName("UTF-8"));
   }
 
   /**

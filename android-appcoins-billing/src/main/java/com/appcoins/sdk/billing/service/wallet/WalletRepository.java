@@ -33,7 +33,7 @@ public class WalletRepository {
         walletInteractListener.walletIdRetrieved(walletGenerationModel);
       }
     };
-    service.makeRequest("/appc/guest_wallet", "GET", new ArrayList<String>(), queries, null, true,
+    service.makeRequest("/appc/guest_wallet", "GET", new ArrayList<String>(), queries, null,
         serviceResponseListener);
   }
 }

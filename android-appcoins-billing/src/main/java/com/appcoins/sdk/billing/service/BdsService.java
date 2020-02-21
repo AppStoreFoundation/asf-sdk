@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,7 +82,7 @@ public class BdsService implements Service {
     urlConnection.setDoOutput(true);
     OutputStream os = urlConnection.getOutputStream();
     String body = RequestBuilderUtils.buildBody(bodyKeys);
-    byte[] input = body.getBytes(StandardCharsets.UTF_8);
+    byte[] input = body.getBytes(Charset.forName("UTF-8"));
     os.write(input, 0, input.length);
   }
 
@@ -101,7 +101,7 @@ public class BdsService implements Service {
   }
 
   public void makeRequest(String endPoint, String httpMethod, List<String> paths,
-      Map<String, String> queries, Map<String, Object> body, boolean shouldParallelize,
+      Map<String, String> queries, Map<String, Object> body,
       ServiceResponseListener serviceResponseListener) {
     if (paths == null) {
       paths = new ArrayList<>();
@@ -112,10 +112,6 @@ public class BdsService implements Service {
     ServiceAsyncTask asyncTask =
         new ServiceAsyncTask(this, baseUrl, endPoint, httpMethod, paths, queries, body,
             serviceResponseListener);
-    if (shouldParallelize) {
-      asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    } else {
-      asyncTask.execute();
-    }
+    asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
   }
 }
