@@ -41,6 +41,8 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
 
 public class AdyenPaymentFragmentLayout {
+  private static int MORE_PAYMENTS_ID = 36;
+  private static int CREDIT_CARD_INPUT_ID = 35;
   private static int CREDIT_CARD_HEADER_ID = 34;
   private static int CREDIT_CARD_VIEW_ID = 33;
   private static int HEADER_ID = 32;
@@ -61,6 +63,9 @@ public class AdyenPaymentFragmentLayout {
   private Button cancelButton;
   private Button positiveButton;
   private LinearLayout buttonsView;
+  private TextView morePaymentsText;
+  private TextView changeCard;
+  private RelativeLayout paypalLoading;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -81,11 +86,33 @@ public class AdyenPaymentFragmentLayout {
     errorView = paymentErrorViewLayout.buildErrorView();
     errorView.setVisibility(View.INVISIBLE);
 
+    paypalLoading = buildPaypalLoading();
+    paypalLoading.setVisibility(View.INVISIBLE);
+
     dialogLayout = buildDialogLayout(fiatPrice, fiatCurrency, appcPrice, sku, packageName);
 
     mainLayout.addView(dialogLayout);
     mainLayout.addView(errorView);
     return mainLayout;
+  }
+
+  private RelativeLayout buildPaypalLoading() {
+    RelativeLayout relativeLayout = new RelativeLayout(activity);
+
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(dpToPx(262), dpToPx(254));
+    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+    relativeLayout.setLayoutParams(layoutParams);
+
+    GradientDrawable gradientDrawable = new GradientDrawable();
+    gradientDrawable.setColor(Color.WHITE);
+    gradientDrawable.setCornerRadius(dpToPx(8));
+    relativeLayout.setBackground(gradientDrawable);
+
+    ProgressBar progressBar = buildProgressBar();
+
+    relativeLayout.addView(progressBar);
+    return relativeLayout;
   }
 
   private RelativeLayout buildDialogLayout(String fiatPrice, String fiatCurrency, String appcPrice,
@@ -139,10 +166,10 @@ public class AdyenPaymentFragmentLayout {
 
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
       end = 12;
-      top = 24;
+      top = 60;
       bottom = 24;
     } else {
-      top = 24;
+      top = 42;
       end = 22;
       bottom = 16;
     }
@@ -197,7 +224,7 @@ public class AdyenPaymentFragmentLayout {
     setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.WHITE);
     button.setTextSize(14);
-    button.setText("NEXT".toUpperCase());
+    button.setText("BUY".toUpperCase());
     button.setLayoutParams(layoutParams);
     return button;
   }
@@ -236,22 +263,90 @@ public class AdyenPaymentFragmentLayout {
 
     RelativeLayout creditCardHeader = buildCreditCardHeader();
     LinearLayout creditCardEditTextLayout = buildCreditCardEditTextLayout();
+    changeCard = buildChangeCardTextLayout();
+    morePaymentsText = buildMorePaymentsView();
 
     parentLayout.addView(creditCardHeader);
     parentLayout.addView(creditCardEditTextLayout);
+    parentLayout.addView(changeCard);
+    parentLayout.addView(morePaymentsText);
 
     return parentLayout;
   }
 
+  @SuppressLint("InlinedApi") private TextView buildChangeCardTextLayout() {
+    TextView textView = new TextView(activity);
+
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT);
+
+    int top, constraint;
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      constraint = RelativeLayout.ALIGN_END;
+      top = 26;
+    } else {
+      constraint = RelativeLayout.ALIGN_START;
+      top = 16;
+    }
+    layoutParams.addRule(RelativeLayout.BELOW, CREDIT_CARD_INPUT_ID);
+    setConstraint(layoutParams, constraint, CREDIT_CARD_INPUT_ID);
+    setMargins(layoutParams, 0, top, 0, 0);
+    textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+    textView.setTextColor(Color.parseColor("#fd786b"));
+    textView.setTextSize(12);
+    textView.setText("CHANGE CARD");
+    textView.setLayoutParams(layoutParams);
+
+    return textView;
+  }
+
+  @SuppressLint("InlinedApi") private TextView buildMorePaymentsView() {
+    TextView textView = new TextView(activity);
+
+    MORE_PAYMENTS_ID = generateRandomId(MORE_PAYMENTS_ID);
+    textView.setId(MORE_PAYMENTS_ID);
+
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT);
+
+    int end, top, belowId;
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      belowId = CREDIT_CARD_INPUT_ID;
+      end = 14;
+      top = 88;
+    } else {
+      belowId = HEADER_ID;
+      end = 38;
+      top = 66;
+      textView.setMaxWidth(dpToPx(152));
+      textView.setGravity(Gravity.CENTER);
+    }
+    layoutParams.addRule(RelativeLayout.BELOW, belowId);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setMargins(layoutParams, 0, top, end, 0);
+    textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+    textView.setTextColor(Color.parseColor("#fd786b"));
+    textView.setTextSize(12);
+    textView.setText("MORE PAYMENTS METHODS");
+    textView.setLayoutParams(layoutParams);
+
+    return textView;
+  }
+
   @SuppressLint("InlinedApi") private LinearLayout buildCreditCardEditTextLayout() {
     LinearLayout linearLayout = new LinearLayout(activity);
+
+    CREDIT_CARD_INPUT_ID = generateRandomId(CREDIT_CARD_INPUT_ID);
+    linearLayout.setId(CREDIT_CARD_INPUT_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(44));
     linearLayout.setOrientation(LinearLayout.HORIZONTAL);
     layoutParams.addRule(RelativeLayout.BELOW, CREDIT_CARD_HEADER_ID);
     setConstraint(layoutParams, RelativeLayout.ALIGN_START, CREDIT_CARD_HEADER_ID);
     setConstraint(layoutParams, RelativeLayout.ALIGN_END, CREDIT_CARD_HEADER_ID);
-    setMargins(layoutParams, 0, 20, 0, 0);
+    setMargins(layoutParams, 0, 28, 0, 0);
 
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
@@ -636,5 +731,17 @@ public class AdyenPaymentFragmentLayout {
 
   public LinearLayout getButtonsView() {
     return buttonsView;
+  }
+
+  public TextView getMorePaymentsText() {
+    return morePaymentsText;
+  }
+
+  public TextView getChangeCard() {
+    return changeCard;
+  }
+
+  public RelativeLayout getPaypalLoading() {
+    return paypalLoading;
   }
 }
