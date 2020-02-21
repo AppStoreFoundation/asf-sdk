@@ -75,7 +75,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     String iabAction = WalletUtils.getIabAction();
     Intent serviceIntent = new Intent(iabAction);
     serviceIntent.setPackage(packageName);
-    if (context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)) {
+    if (!context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)) {
       bindFailedBehaviour();
     }
   }
