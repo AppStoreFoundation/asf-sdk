@@ -23,7 +23,7 @@ public class AdyenListenerProvider {
       final LoadPaymentInfoListener listener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        Log.d("TAG123", "PaymentMethodsResponse: " + requestResponse);
+        Log.d("TAG123", "PaymentMethodsModel: " + requestResponse);
         listener.onResponse(adyenMapper.mapPaymentMethodsResponse(requestResponse));
       }
     };
@@ -32,7 +32,7 @@ public class AdyenListenerProvider {
   public ServiceResponseListener createMakePaymentListener(final MakePaymentListener listener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        Log.d("TAG123", "AdyenTransactionResponse: " + requestResponse);
+        Log.d("TAG123", "AdyenTransactionModel: " + requestResponse);
         listener.onResponse(adyenMapper.mapAdyenTransactionResponse(requestResponse));
       }
     };
@@ -52,7 +52,7 @@ public class AdyenListenerProvider {
       final MakePaymentListener makePaymentListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        Log.d("TAG123", "AdyenTransactionResponse: " + requestResponse);
+        Log.d("TAG123", "AdyenTransactionModel: " + requestResponse);
         makePaymentListener.onResponse(adyenMapper.mapAdyenTransactionResponse(requestResponse));
       }
     };

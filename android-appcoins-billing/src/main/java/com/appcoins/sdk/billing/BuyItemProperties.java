@@ -8,10 +8,10 @@ public class BuyItemProperties implements Serializable {
   private String packageName;
   private String sku;
   private String type;
-  private String developerPayload;
+  private DeveloperPayload developerPayload;
 
   public BuyItemProperties(int apiVersion, String packageName, String sku, String type,
-      String developerPayload) {
+      DeveloperPayload developerPayload) {
     this.apiVersion = apiVersion;
     this.packageName = packageName;
     this.sku = sku;
@@ -19,7 +19,7 @@ public class BuyItemProperties implements Serializable {
     this.developerPayload = developerPayload;
   }
 
-  public String getDeveloperPayload() {
+  public DeveloperPayload getDeveloperPayload() {
     return developerPayload;
   }
 

@@ -35,8 +35,8 @@ import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.models.AdyenPaymentParams;
-import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
-import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
+import com.appcoins.sdk.billing.models.AdyenTransactionModel;
+import com.appcoins.sdk.billing.models.PaymentMethodsModel;
 import com.appcoins.sdk.billing.models.TransactionInformation;
 import com.appcoins.sdk.billing.models.TransactionWallets;
 import com.appcoins.sdk.billing.service.BdsService;
@@ -158,7 +158,8 @@ public class InstallDialogActivity extends Activity {
   private void makeTheStoredPurchase() {
     Bundle intent = appcoinsBillingStubHelper.getBuyIntent(buyItemProperties.getApiVersion(),
         buyItemProperties.getPackageName(), buyItemProperties.getSku(), buyItemProperties.getType(),
-        buyItemProperties.getDeveloperPayload());
+        buyItemProperties.getDeveloperPayload()
+            .getRawPayload());
 
     PendingIntent pendingIntent = intent.getParcelable(KEY_BUY_INTENT);
     try {
@@ -296,7 +297,7 @@ public class InstallDialogActivity extends Activity {
 
   private void loadPaymentFlow(final String method) { //Test method only
     LoadPaymentInfoListener loadPaymentInfoListener = new LoadPaymentInfoListener() {
-      @Override public void onResponse(PaymentMethodsResponse paymentMethodsResponse) {
+      @Override public void onResponse(PaymentMethodsModel paymentMethodsResponse) {
         Log.d("TAG123", "Payment Info: "
             + paymentMethodsResponse.getValue()
             + paymentMethodsResponse.getCurrency());
@@ -313,7 +314,7 @@ public class InstallDialogActivity extends Activity {
 
   private void makeCreditCardPayment() {
     MakePaymentListener makePaymentListener = new MakePaymentListener() {
-      @Override public void onResponse(AdyenTransactionResponse adyenTransactionResponse) {
+      @Override public void onResponse(AdyenTransactionModel adyenTransactionResponse) {
         if (adyenTransactionResponse != null) {
           Log.d("TAG123", "Payment Made -> uid: " + adyenTransactionResponse.getUid());
         }
@@ -326,10 +327,10 @@ public class InstallDialogActivity extends Activity {
     makePayment(cardPaymentMethod, makePaymentListener);
   }
 
-  private void launchPaypal(PaymentMethodsResponse paymentMethodsResponse) {
+  private void launchPaypal(PaymentMethodsModel paymentMethodsResponse) {
     final Activity activity = this;
     MakePaymentListener makePaymentListener = new MakePaymentListener() {
-      @Override public void onResponse(AdyenTransactionResponse adyenTransactionResponse) {
+      @Override public void onResponse(AdyenTransactionModel adyenTransactionResponse) {
         if (adyenTransactionResponse == null) {
           Log.d("TAG123", "NULL");
         }
@@ -355,11 +356,10 @@ public class InstallDialogActivity extends Activity {
         makePaymentListener); //Change walletAddress for a correct wallet
   }
 
-  private void handleTransaction(AdyenTransactionResponse adyenTransactionResponse) {
-    //TODO
+  private void handleTransaction(AdyenTransactionModel adyenTransactionModel) {
   }
 
-  private void showCreditCardLayout(PaymentMethodsResponse paymentMethodsResponse) {
+  private void showCreditCardLayout(PaymentMethodsModel paymentMethodsResponse) {
     Log.d("TAG123", "INSERTING USER CARD");
     makeCreditCardPayment();
   }

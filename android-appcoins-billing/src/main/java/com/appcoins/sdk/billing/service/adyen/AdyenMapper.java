@@ -1,7 +1,7 @@
 package com.appcoins.sdk.billing.service.adyen;
 
-import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
-import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
+import com.appcoins.sdk.billing.models.AdyenTransactionModel;
+import com.appcoins.sdk.billing.models.PaymentMethodsModel;
 import com.appcoins.sdk.billing.models.TransactionResponse;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import java.math.BigDecimal;
@@ -45,9 +45,9 @@ public class AdyenMapper {
     return transactionResponse;
   }
 
-  public AdyenTransactionResponse mapAdyenTransactionResponse(RequestResponse requestResponse) {
+  public AdyenTransactionModel mapAdyenTransactionResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    AdyenTransactionResponse adyenTransactionResponse = new AdyenTransactionResponse();
+    AdyenTransactionModel adyenTransactionModel = new AdyenTransactionModel();
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     String uid;
@@ -80,19 +80,19 @@ public class AdyenMapper {
         }
         refusalReason = paymentJson.optString("refusalReason", null);
         refusalReasonCode = paymentJson.optString("refusalReasonCode", null);
-        adyenTransactionResponse =
-            new AdyenTransactionResponse(uid, hash, orderReference, status, pspReference,
-                resultCode, url, paymentData, refusalReason, refusalReasonCode, !isSuccess(code));
+        adyenTransactionModel =
+            new AdyenTransactionModel(uid, hash, orderReference, status, pspReference, resultCode,
+                url, paymentData, refusalReason, refusalReasonCode, !isSuccess(code));
       } catch (JSONException e) {
         e.printStackTrace();
       }
     }
-    return adyenTransactionResponse;
+    return adyenTransactionModel;
   }
 
-  public PaymentMethodsResponse mapPaymentMethodsResponse(RequestResponse requestResponse) {
+  public PaymentMethodsModel mapPaymentMethodsResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    PaymentMethodsResponse paymentMethodsResponse = new PaymentMethodsResponse();
+    PaymentMethodsModel paymentMethodsResponse = new PaymentMethodsModel();
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     BigDecimal value;
@@ -112,8 +112,7 @@ public class AdyenMapper {
           paymentMethodsApiResponse = paymentJSONObject.toString();
         }
         paymentMethodsResponse =
-            new PaymentMethodsResponse(value, currency, paymentMethodsApiResponse,
-                !isSuccess(code));
+            new PaymentMethodsModel(value, currency, paymentMethodsApiResponse, !isSuccess(code));
       } catch (JSONException e) {
         e.printStackTrace();
       }

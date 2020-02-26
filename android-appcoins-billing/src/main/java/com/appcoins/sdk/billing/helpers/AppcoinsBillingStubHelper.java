@@ -14,6 +14,7 @@ import android.util.Log;
 import com.appcoins.billing.AppcoinsBilling;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.DeveloperPayload;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
@@ -114,7 +115,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       }
     } else {
       final BuyItemProperties buyItemProperties =
-          new BuyItemProperties(apiVersion, packageName, sku, type, developerPayload);
+          new BuyItemProperties(apiVersion, packageName, sku, type,
+              new DeveloperPayload(developerPayload, PayloadHelper.getPayload(developerPayload),
+                  PayloadHelper.getOrderReference(developerPayload),
+                  PayloadHelper.getOrigin(developerPayload)));
 
       final Context context = WalletUtils.getContext();
 

@@ -1,8 +1,8 @@
 package com.appcoins.sdk.billing.listeners;
 
-import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
+import com.appcoins.sdk.billing.models.AdyenTransactionModel;
 
 public interface MakePaymentListener {
 
-  void onResponse(AdyenTransactionResponse adyenTransactionResponse);
+  void onResponse(AdyenTransactionModel adyenTransactionModel);
 }

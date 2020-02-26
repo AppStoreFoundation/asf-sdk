@@ -66,6 +66,7 @@ public class AdyenPaymentFragmentLayout {
   private TextView morePaymentsText;
   private TextView changeCard;
   private RelativeLayout paypalLoading;
+  private PaymentErrorViewLayout paymentErrorViewLayout;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -81,8 +82,7 @@ public class AdyenPaymentFragmentLayout {
     densityPath = mapDisplayMetrics(displayMetrics);
 
     RelativeLayout mainLayout = buildMainLayout();
-    PaymentErrorViewLayout paymentErrorViewLayout =
-        new PaymentErrorViewLayout(activity, orientation);
+    paymentErrorViewLayout = new PaymentErrorViewLayout(activity, orientation);
     errorView = paymentErrorViewLayout.buildErrorView();
     errorView.setVisibility(View.INVISIBLE);
 
@@ -743,5 +743,9 @@ public class AdyenPaymentFragmentLayout {
 
   public RelativeLayout getPaypalLoading() {
     return paypalLoading;
+  }
+
+  public PaymentErrorViewLayout getPaymentErrorViewLayout() {
+    return paymentErrorViewLayout;
   }
 }

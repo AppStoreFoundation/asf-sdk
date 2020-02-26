@@ -3,8 +3,8 @@ package com.sdk.appcoins_adyen;
 import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.models.AdyenPaymentParams;
-import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
-import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
+import com.appcoins.sdk.billing.models.AdyenTransactionModel;
+import com.appcoins.sdk.billing.models.PaymentMethodsModel;
 import com.appcoins.sdk.billing.models.TransactionInformation;
 import com.appcoins.sdk.billing.models.TransactionWallets;
 import com.appcoins.sdk.billing.service.BdsService;
@@ -41,7 +41,7 @@ public class AdyenRepositoryTest {
     queries.put("price.currency", "EUR");
     queries.put("method", "credit_card");
     LoadPaymentInfoListener loadPaymentInfoListener = new LoadPaymentInfoListener() {
-      @Override public void onResponse(PaymentMethodsResponse paymentMethodsResponse) {
+      @Override public void onResponse(PaymentMethodsModel paymentMethodsResponse) {
 
       }
     };
@@ -79,7 +79,7 @@ public class AdyenRepositoryTest {
     body.put("wallets.developer", "");
     body.put("callback_url", "");
     MakePaymentListener makePaymentListener = new MakePaymentListener() {
-      @Override public void onResponse(AdyenTransactionResponse adyenTransactionResponse) {
+      @Override public void onResponse(AdyenTransactionModel adyenTransactionResponse) {
 
       }
     };

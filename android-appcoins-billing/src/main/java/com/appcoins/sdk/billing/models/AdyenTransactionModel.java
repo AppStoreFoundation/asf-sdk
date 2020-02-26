@@ -1,6 +1,6 @@
 package com.appcoins.sdk.billing.models;
 
-public class AdyenTransactionResponse {
+public class AdyenTransactionModel {
 
   private final String uid;
   private final String hash;
@@ -14,7 +14,7 @@ public class AdyenTransactionResponse {
   private final String refusalReasonCode;
   private final boolean error;
 
-  public AdyenTransactionResponse(String uid, String hash, String orderReference, String status,
+  public AdyenTransactionModel(String uid, String hash, String orderReference, String status,
       String pspReference, String resultCode, String url, String paymentData, String refusalReason,
       String refusalReasonCode, boolean error) {
 
@@ -31,7 +31,7 @@ public class AdyenTransactionResponse {
     this.error = error;
   }
 
-  public AdyenTransactionResponse() {
+  public AdyenTransactionModel() {
     this.uid = "";
     this.hash = "";
     this.orderReference = "";

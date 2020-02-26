@@ -2,14 +2,14 @@ package com.appcoins.sdk.billing.models;
 
 import java.math.BigDecimal;
 
-public class PaymentMethodsResponse {
+public class PaymentMethodsModel {
 
   private final BigDecimal value;
   private final String currency;
   private final String paymentMethod;
   private final boolean error;
 
-  public PaymentMethodsResponse(BigDecimal value, String currency, String paymentMethod,
+  public PaymentMethodsModel(BigDecimal value, String currency, String paymentMethod,
       boolean error) {
     this.value = value;
     this.currency = currency;
@@ -17,7 +17,7 @@ public class PaymentMethodsResponse {
     this.error = error;
   }
 
-  public PaymentMethodsResponse() {
+  public PaymentMethodsModel() {
     this.value = null;
     this.currency = "";
     this.paymentMethod = "";

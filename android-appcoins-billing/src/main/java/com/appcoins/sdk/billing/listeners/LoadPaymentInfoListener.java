@@ -1,8 +1,8 @@
 package com.appcoins.sdk.billing.listeners;
 
-import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
+import com.appcoins.sdk.billing.models.PaymentMethodsModel;
 
 public interface LoadPaymentInfoListener {
 
-  void onResponse(PaymentMethodsResponse paymentMethodsResponse);
+  void onResponse(PaymentMethodsModel paymentMethodsModel);
 }
