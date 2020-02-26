@@ -65,11 +65,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     BdsService bdsService = new BdsService(BuildConfig.BACKEND_BASE);
 
     SharedPreferencesRepository sharedPreferencesRepository =
-        new SharedPreferencesRepository(getActivity());
+        new SharedPreferencesRepository(getActivity(), 86400 * 30); //86400 = 24h
     WalletRepository walletRepository =
         new WalletRepository(bdsService, new WalletGenerationMapper());
     WalletInteract walletInteract =
-        new WalletInteract(new SharedPreferencesRepository(getActivity()), walletRepository);
+        new WalletInteract(sharedPreferencesRepository, walletRepository);
     GamificationInteract gamificationInteract =
         new GamificationInteract(sharedPreferencesRepository, new GamificationMapper(), bdsService);
     PaymentMethodsRepository paymentMethodsRepository =
