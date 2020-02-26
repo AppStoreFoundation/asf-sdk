@@ -7,8 +7,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-public class CafeBazaarResponseAsync extends AsyncTask {
+public class CafeBazaarResponseAsync extends AsyncTask<Object, Object, Integer> {
 
+  private static final int UNKNOWN_ERROR_CODE = 600;
   private ResponseListener responseListener;
 
   public CafeBazaarResponseAsync(ResponseListener responseListener) {
@@ -45,14 +46,18 @@ public class CafeBazaarResponseAsync extends AsyncTask {
     return responseCode;
   }
 
-  @Override protected Object doInBackground(Object[] objects) {
-    int responseCode = 404;
+  @Override protected Integer doInBackground(Object[] objects) {
+    int responseCode = UNKNOWN_ERROR_CODE;
     try {
       responseCode = getResponseCode();
     } catch (IOException e) {
       e.printStackTrace();
     }
+    return responseCode;
+  }
+
+  @Override protected void onPostExecute(Integer responseCode) {
+    super.onPostExecute(responseCode);
     responseListener.onResponseCode(responseCode);
-    return null;
   }
 }
