@@ -19,10 +19,6 @@ import com.appcoins.sdk.billing.service.Service;
 import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
 import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
-import com.aptoide.apk.injector.extractor.data.Extractor;
-import com.aptoide.apk.injector.extractor.data.ExtractorV1;
-import com.aptoide.apk.injector.extractor.data.ExtractorV2;
-import com.aptoide.apk.injector.extractor.domain.IExtract;
 import com.sdk.appcoins_adyen.utils.RedirectUtils;
 import java.math.BigDecimal;
 import java.util.Formatter;
@@ -54,14 +50,11 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         new AdyenListenerProvider(new AdyenMapper()));
     Service apiService = new BdsService(BuildConfig.HOST_WS);
     Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST);
-    IExtract extractor = new Extractor(new ExtractorV1(), new ExtractorV2());
     IExtractOemId extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
-    IExtractOemId extractorV2 =
-        new OemIdExtractorV2(getActivity().getApplicationContext(), extractor);
 
     AddressService addressService = new AddressService(getActivity().getApplicationContext(),
         new WalletAddressService(apiService), new DeveloperAddressService(ws75Service),
-        Build.MANUFACTURER, Build.MODEL, new OemIdExtractorService(extractorV1, extractorV2));
+        Build.MANUFACTURER, Build.MODEL, new OemIdExtractorService(extractorV1));
     presenter = new AdyenPaymentPresenter(this, adyenPaymentInfo,
         new AdyenPaymentInteract(adyenRepository, addressService),
         RedirectUtils.getReturnUrl(getActivity().getApplicationContext()));
