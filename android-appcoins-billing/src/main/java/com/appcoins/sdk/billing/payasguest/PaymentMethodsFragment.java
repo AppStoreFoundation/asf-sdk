@@ -240,9 +240,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void navigateToAdyen(String selectedRadioButton) {
     if (walletGenerationModel.getWalletAddress() != null && skuDetailsModel != null) {
       iabView.navigateToAdyen(selectedRadioButton, walletGenerationModel.getWalletAddress(),
-          walletGenerationModel.getEwt(), skuDetailsModel.getFiatPrice(),
-          skuDetailsModel.getFiatPriceCurrencyCode(), skuDetailsModel.getAppcPrice(),
-          skuDetailsModel.getSku());
+          walletGenerationModel.getEwt(), walletGenerationModel.getSignature(),
+          skuDetailsModel.getFiatPrice(), skuDetailsModel.getFiatPriceCurrencyCode(),
+          skuDetailsModel.getAppcPrice(), skuDetailsModel.getSku());
     } else {
       showError();
     }
@@ -304,23 +304,20 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   private void setInitialRadioButtonSelected() {
-    RadioButton creditCardButton = layout.getCreditCardRadioButton();
-    RadioButton paypalButton = layout.getPaypalRadioButton();
-    RadioButton installButton = layout.getInstallRadioButton();
     if (layout.getCreditCardWrapperLayout()
         .getVisibility() == View.VISIBLE) {
-      creditCardButton.setChecked(true);
       selectedRadioButton = CREDIT_CARD_RADIO;
+      layout.selectRadioButton(selectedRadioButton);
     } else if (layout.getPaypalWrapperLayout()
         .getVisibility() == View.VISIBLE) {
-      paypalButton.setChecked(true);
       selectedRadioButton = PAYPAL_RADIO;
+      layout.selectRadioButton(selectedRadioButton);
     } else if (layout.getInstallWrapperLayout()
         .getVisibility() == View.VISIBLE) {
-      installButton.setChecked(true);
+      selectedRadioButton = INSTALL_RADIO;
       layout.getPositiveButton()
           .setText("INSTALL");
-      selectedRadioButton = INSTALL_RADIO;
+      layout.selectRadioButton(selectedRadioButton);
     }
   }
 

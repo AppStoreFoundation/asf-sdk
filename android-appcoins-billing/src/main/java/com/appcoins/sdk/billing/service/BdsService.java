@@ -24,7 +24,8 @@ public class BdsService implements Service {
   }
 
   RequestResponse createRequest(String baseUrl, String endPoint, String httpMethod,
-      List<String> paths, Map<String, String> queries, Map<String, Object> body) {
+      List<String> paths, Map<String, String> queries, Map<String, String> header,
+      Map<String, Object> body) {
     HttpURLConnection urlConnection = null;
     try {
       String urlBuilder = RequestBuilderUtils.buildUrl(baseUrl, endPoint, paths, queries);
@@ -32,6 +33,9 @@ public class BdsService implements Service {
       urlConnection = openUrlConnection(url, httpMethod);
 
       urlConnection.setReadTimeout(300000);
+      if (header != null) {
+        setHeaders(urlConnection, header);
+      }
       if ((httpMethod.equals("POST") || httpMethod.equals("PATCH")) && body != null) {
         if (httpMethod.equals("PATCH")) {
           urlConnection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
@@ -48,11 +52,18 @@ public class BdsService implements Service {
       }
       return readResponse(inputStream, responseCode);
     } catch (Exception firstException) {
+      firstException.printStackTrace();
       return handleException(urlConnection, firstException);
     } finally {
       if (urlConnection != null) {
         urlConnection.disconnect();
       }
+    }
+  }
+
+  private void setHeaders(HttpURLConnection urlConnection, Map<String, String> header) {
+    for (Map.Entry<String, String> entry : header.entrySet()) {
+      urlConnection.setRequestProperty(entry.getKey(), entry.getValue());
     }
   }
 
@@ -101,7 +112,7 @@ public class BdsService implements Service {
   }
 
   public void makeRequest(String endPoint, String httpMethod, List<String> paths,
-      Map<String, String> queries, Map<String, Object> body,
+      Map<String, String> queries, Map<String, String> header, Map<String, Object> body,
       ServiceResponseListener serviceResponseListener) {
     if (paths == null) {
       paths = new ArrayList<>();
@@ -110,7 +121,7 @@ public class BdsService implements Service {
       queries = new HashMap<>();
     }
     ServiceAsyncTask asyncTask =
-        new ServiceAsyncTask(this, baseUrl, endPoint, httpMethod, paths, queries, body,
+        new ServiceAsyncTask(this, baseUrl, endPoint, httpMethod, paths, queries, header, body,
             serviceResponseListener);
     asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
   }

@@ -45,9 +45,9 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     super.onCreate(savedInstanceState);
 
     adyenPaymentInfo = extractBundleInfo();
-    AdyenRepository adyenRepository = new AdyenRepository(
-        new BdsService(BuildConfig.HOST_WS + "/broker/8.20191202/gateways/adyen_v2/"),
-        new AdyenListenerProvider(new AdyenMapper()));
+    AdyenRepository adyenRepository =
+        new AdyenRepository(new BdsService(BuildConfig.HOST_WS + "/broker/"),
+            new AdyenListenerProvider(new AdyenMapper()));
     Service apiService = new BdsService(BuildConfig.HOST_WS);
     Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST);
     IExtractOemId extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
@@ -73,7 +73,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   @Override public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     if (savedInstanceState != null) {
-      presenter.onSavedInstace(savedInstanceState);
+      presenter.onSavedInstance(savedInstanceState);
     }
     handleLayoutVisibility(adyenPaymentInfo.getPaymentMethod());
     Button positiveButton = layout.getPositiveButton();
@@ -109,8 +109,19 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   @Override public void showError() {
     layout.getDialogLayout()
         .setVisibility(View.INVISIBLE);
+    layout.getPaypalLoading()
+        .setVisibility(View.INVISIBLE);
     layout.getErrorView()
         .setVisibility(View.VISIBLE);
+  }
+
+  @Override public void showLoading() {
+    layout.getPaypalLoading()
+        .setVisibility(View.VISIBLE);
+    layout.getErrorView()
+        .setVisibility(View.INVISIBLE);
+    layout.getDialogLayout()
+        .setVisibility(View.INVISIBLE);
   }
 
   @Override public void updateFiatPrice(BigDecimal value, String currency) {
@@ -121,25 +132,38 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   }
 
   @Override public void showCreditCardView() {
-    layout.getProgressBar()
-        .setVisibility(View.INVISIBLE);
     layout.getPaypalLoading()
+        .setVisibility(View.INVISIBLE);
+    layout.getErrorView()
         .setVisibility(View.INVISIBLE);
     layout.getDialogLayout()
         .setVisibility(View.VISIBLE);
+  }
+
+  @Override public void lockRotation() {
+    iabView.lockRotation();
+  }
+
+  @Override public void unlockRotation() {
+    iabView.unlockRotation();
+  }
+
+  @Override public void navigateToUri(String url, ActivityResultListener activityResultListener) {
+    iabView.navigateToUri(url, activityResultListener);
   }
 
   private AdyenPaymentInfo extractBundleInfo() {
     String paymentMethod = getBundleString(IabActivity.PAYMENT_METHOD_KEY);
     String walletAddress = getBundleString(IabActivity.WALLET_ADDRESS_KEY);
     String ewt = getBundleString(IabActivity.EWT_KEY);
+    String signature = getBundleString(IabActivity.SIGNATURE_KEY);
     String fiatPrice = getBundleString(IabActivity.FIAT_VALUE_KEY);
     String fiatCurrency = getBundleString(IabActivity.FIAT_CURRENCY_KEY);
     String appcPrice = getBundleString(IabActivity.APPC_VALUE_KEY);
     BuyItemProperties buyItemProperties =
         getBundleBuyItemProperties(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
 
-    return new AdyenPaymentInfo(paymentMethod, walletAddress, ewt, fiatPrice, fiatCurrency,
+    return new AdyenPaymentInfo(paymentMethod, walletAddress, ewt, signature, fiatPrice, fiatCurrency,
         appcPrice, buyItemProperties);
   }
 

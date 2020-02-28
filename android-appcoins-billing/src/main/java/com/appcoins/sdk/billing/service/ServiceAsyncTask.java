@@ -9,6 +9,7 @@ public class ServiceAsyncTask extends AsyncTask<Object, Object, RequestResponse>
   private final String httpMethod;
   private final List<String> paths;
   private final Map<String, String> queries;
+  private Map<String, String> header;
   private final Map<String, Object> body;
   private BdsService bdsService;
   private String baseUrl;
@@ -16,20 +17,21 @@ public class ServiceAsyncTask extends AsyncTask<Object, Object, RequestResponse>
   private ServiceResponseListener serviceResponseListener;
 
   ServiceAsyncTask(BdsService bdsService, String baseUrl, String endPoint, String httpMethod,
-      List<String> paths, Map<String, String> queries, Map<String, Object> body,
-      ServiceResponseListener serviceResponseListener) {
+      List<String> paths, Map<String, String> queries, Map<String, String> header,
+      Map<String, Object> body, ServiceResponseListener serviceResponseListener) {
     this.bdsService = bdsService;
     this.baseUrl = baseUrl;
     this.endPoint = endPoint;
     this.httpMethod = httpMethod;
     this.paths = paths;
     this.queries = queries;
+    this.header = header;
     this.body = body;
     this.serviceResponseListener = serviceResponseListener;
   }
 
   @Override protected RequestResponse doInBackground(Object[] objects) {
-    return bdsService.createRequest(baseUrl, endPoint, httpMethod, paths, queries, body);
+    return bdsService.createRequest(baseUrl, endPoint, httpMethod, paths, queries, header, body);
   }
 
   @Override protected void onPostExecute(RequestResponse requestResponse) {

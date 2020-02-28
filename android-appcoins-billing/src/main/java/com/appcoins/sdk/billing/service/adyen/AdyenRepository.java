@@ -36,8 +36,8 @@ public class AdyenRepository {
     ServiceResponseListener serviceResponseListener =
         adyenListenerProvider.createLoadPaymentInfoListener(listener);
 
-    bdsService.makeRequest("payment-methods", "GET", new ArrayList<String>(), queries, null,
-        serviceResponseListener);
+    bdsService.makeRequest("8.20191202/gateways/adyen_v2/payment-methods", "GET",
+        new ArrayList<String>(), queries, null, null, serviceResponseListener);
   }
 
   public void makePayment(AdyenPaymentParams adyenPaymentParams,
@@ -51,11 +51,11 @@ public class AdyenRepository {
     ServiceResponseListener serviceResponseListener =
         adyenListenerProvider.createMakePaymentListener(makePaymentListener);
 
-    bdsService.makeRequest("transactions", "POST", new ArrayList<String>(), queries, body,
-        serviceResponseListener);
+    bdsService.makeRequest("8.20191202/gateways/adyen_v2/transactions", "POST",
+        new ArrayList<String>(), queries, null, body, serviceResponseListener);
   }
 
-  public void getTransaction(String uid, String walletAddress, String walletSignature,
+  public void getTransaction(String uid, String walletAddress, String signature,
       GetTransactionListener getTransactionListener) {
 
     ServiceResponseListener serviceResponseListener =
@@ -66,9 +66,10 @@ public class AdyenRepository {
 
     Map<String, String> queries = new HashMap<>();
     queries.put("wallet.address", walletAddress);
-    queries.put("wallet.signature", walletSignature);
+    queries.put("wallet.signature", signature);
 
-    bdsService.makeRequest("transactions", "GET", path, queries, null, serviceResponseListener);
+    bdsService.makeRequest("8.20191202/gateways/adyen_v2/transactions", "GET", path, queries, null,
+        null, serviceResponseListener);
   }
 
   public void submitRedirect(String uid, String walletAddress, Object details, String data,
@@ -86,7 +87,8 @@ public class AdyenRepository {
     putIfNotNull(body, "payment.details", details.toString());
     putIfNotNull(body, "payment.data", data);
 
-    bdsService.makeRequest("transactions", "PATCH", path, queries, body, serviceResponseListener);
+    bdsService.makeRequest("8.20191202/gateways/adyen_v2/transactions", "PATCH", path, queries,
+        null, body, serviceResponseListener);
   }
 
   public void disablePayments(String walletAddress,
@@ -97,7 +99,8 @@ public class AdyenRepository {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("wallet.address", walletAddress);
 
-    bdsService.makeRequest("disable-recurring", "POST", null, null, body, serviceResponseListener);
+    bdsService.makeRequest("8.20191202/gateways/adyen_v2/disable-recurring", "POST", null, null,
+        null, body, serviceResponseListener);
   }
 
   private Map<String, Object> buildMakePaymentBody(AdyenPaymentParams adyenPaymentParams,

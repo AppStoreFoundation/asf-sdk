@@ -1,12 +1,14 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.os.AsyncTask;
+import com.appcoins.sdk.billing.listeners.GetTransactionListener;
 import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.models.AdyenPaymentParams;
 import com.appcoins.sdk.billing.models.TransactionInformation;
 import com.appcoins.sdk.billing.models.TransactionWallets;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
+import org.json.JSONObject;
 
 public class AdyenPaymentInteract {
 
@@ -20,8 +22,8 @@ public class AdyenPaymentInteract {
 
   public void loadPaymentInfo(AdyenRepository.Methods method, String fiatPrice, String fiatCurrency,
       String walletAddress, LoadPaymentInfoListener loadPaymentInfoListener) {
-    adyenRepository.loadPaymentInfo(method.getAdyenType(), fiatPrice, fiatCurrency, walletAddress,
-        loadPaymentInfoListener);
+    adyenRepository.loadPaymentInfo(method.getTransactionType(), fiatPrice, fiatCurrency,
+        walletAddress, loadPaymentInfoListener);
   }
 
   void makePayment(final String paymentMethod, final boolean shouldStoreCard,
@@ -45,6 +47,16 @@ public class AdyenPaymentInteract {
     AddressAsyncTask addressAsyncTask =
         new AddressAsyncTask(addressService, addressRetrievedListener, packageName);
     addressAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+  }
+
+  void submitRedirect(String uid, String walletAddress, JSONObject details, String paymentData,
+      MakePaymentListener makePaymentListener) {
+    adyenRepository.submitRedirect(uid, walletAddress, details, paymentData, makePaymentListener);
+  }
+
+  void getTransaction(String uid, String walletAddress, String signature,
+      GetTransactionListener getTransactionListener) {
+    adyenRepository.getTransaction(uid, walletAddress, signature, getTransactionListener);
   }
 
   public interface AddressListener {

@@ -27,6 +27,6 @@ public class DeveloperAddressService {
       }
     };
     service.makeRequest("/7/bds/apks/package/getOwnerWallet", "GET", new ArrayList<String>(),
-        queries, new HashMap<String, Object>(), serviceResponseListener);
+        queries, null, new HashMap<String, Object>(), serviceResponseListener);
   }
 }

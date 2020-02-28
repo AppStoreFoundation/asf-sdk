@@ -29,11 +29,12 @@ public class WalletRepository {
             walletGenerationMapper.mapWalletGenerationResponse(requestResponse);
         WalletGenerationModel walletGenerationModel =
             new WalletGenerationModel(walletGenerationResponse.getAddress(),
-                walletGenerationResponse.getEwt(), walletGenerationResponse.hasError());
+                walletGenerationResponse.getEwt(), walletGenerationResponse.getSignature(),
+                walletGenerationResponse.hasError());
         walletInteractListener.walletIdRetrieved(walletGenerationModel);
       }
     };
-    service.makeRequest("/appc/guest_wallet", "GET", new ArrayList<String>(), queries, null,
+    service.makeRequest("/appc/guest_wallet", "GET", new ArrayList<String>(), queries, null, null,
         serviceResponseListener);
   }
 }

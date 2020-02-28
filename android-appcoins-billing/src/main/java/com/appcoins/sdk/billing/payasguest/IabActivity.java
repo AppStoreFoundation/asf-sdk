@@ -7,11 +7,14 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.FrameLayout;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.WebViewActivity;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
@@ -27,14 +30,17 @@ public class IabActivity extends Activity implements IabView {
   public final static String PAYMENT_METHOD_KEY = "payment_method";
   public final static String WALLET_ADDRESS_KEY = "wallet_address_key";
   public final static String EWT_KEY = "ewt_key";
+  public final static String SIGNATURE_KEY = "signature_key";
   public final static String FIAT_VALUE_KEY = "fiat_value";
   public final static String FIAT_CURRENCY_KEY = "fiat_currency";
   public final static String APPC_VALUE_KEY = "appc_value";
   public final static String SKU_KEY = "sku_key";
   private final static String TRANSLATIONS = "translations";
+  private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private TranslationsModel translationsModel;
   private FrameLayout frameLayout;
   private BuyItemProperties buyItemProperties;
+  private ActivityResultListener activityResultListener;
 
   @SuppressLint("ResourceType") @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -64,6 +70,17 @@ public class IabActivity extends Activity implements IabView {
     if (requestCode == LAUNCH_BILLING_FLOW_REQUEST_CODE) {
       setResult(resultCode, data);
       finish();
+    } else if (requestCode == WEB_VIEW_REQUEST_CODE) {
+      if (resultCode == WebViewActivity.SUCCESS) {
+        if (activityResultListener != null) {
+          activityResultListener.onActivityResult(data.getData());
+        } else {
+          Log.w("IabActivity", "ActivityResultListener was not set");
+          close();
+        }
+      } else {
+        close();
+      }
     }
   }
 
@@ -114,12 +131,14 @@ public class IabActivity extends Activity implements IabView {
 
   @Override
   public void navigateToAdyen(String selectedRadioButton, String walletAddress, String ewt,
-      String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku) {
+      String signature, String fiatPrice, String fiatPriceCurrencyCode, String appcPrice,
+      String sku) {
     AdyenPaymentFragment adyenPaymentFragment = new AdyenPaymentFragment();
     Bundle bundle = new Bundle();
     bundle.putString(PAYMENT_METHOD_KEY, selectedRadioButton);
     bundle.putString(WALLET_ADDRESS_KEY, walletAddress);
     bundle.putString(EWT_KEY, ewt);
+    bundle.putString(SIGNATURE_KEY, signature);
     bundle.putString(FIAT_VALUE_KEY, fiatPrice);
     bundle.putString(FIAT_CURRENCY_KEY, fiatPriceCurrencyCode);
     bundle.putString(APPC_VALUE_KEY, appcPrice);
@@ -135,6 +154,21 @@ public class IabActivity extends Activity implements IabView {
     } catch (IntentSender.SendIntentException e) {
       finishWithError();
     }
+  }
+
+  @Override public void lockRotation() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+    }
+  }
+
+  @Override public void unlockRotation() {
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+  }
+
+  @Override public void navigateToUri(String url, ActivityResultListener activityResultListener) {
+    this.activityResultListener = activityResultListener;
+    startActivityForResult(WebViewActivity.newIntent(this, url), WEB_VIEW_REQUEST_CODE);
   }
 
   private void buildAlertNoBrowserAndStores() {

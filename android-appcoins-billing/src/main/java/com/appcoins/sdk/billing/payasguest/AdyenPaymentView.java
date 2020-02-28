@@ -7,7 +7,15 @@ interface AdyenPaymentView {
 
   void showError();
 
+  void showLoading();
+
   void updateFiatPrice(BigDecimal value, String currency);
 
   void showCreditCardView();
+
+  void lockRotation();
+
+  void unlockRotation();
+
+  void navigateToUri(String url, ActivityResultListener activityResultListener);
 }

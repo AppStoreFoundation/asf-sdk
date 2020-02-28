@@ -18,13 +18,16 @@ public class WalletGenerationMapper {
     String response = requestResponse.getResponse();
     String walletAddress;
     String ewt;
+    String signature;
     int code = requestResponse.getResponseCode();
     if (isSuccess(code) && response != null) {
       try {
         jsonObject = new JSONObject(response);
         walletAddress = jsonObject.getString("address");
         ewt = jsonObject.getString("ewt");
-        walletGenerationResponse = new WalletGenerationResponse(walletAddress, ewt, false);
+        signature = jsonObject.getString("signature");
+        walletGenerationResponse =
+            new WalletGenerationResponse(walletAddress, ewt, signature, false);
       } catch (JSONException e) {
         e.printStackTrace();
       }

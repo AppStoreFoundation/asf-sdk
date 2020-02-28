@@ -82,7 +82,7 @@ public class InstallDialogActivity extends Activity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     adyenRepository = new AdyenRepository(
-        new BdsService(BuildConfig.HOST_WS + "/broker/8.20191202/gateways/adyen_v2/"),
+        new BdsService(BuildConfig.HOST_WS + "/broker/"),
         new AdyenListenerProvider(new AdyenMapper()));
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(

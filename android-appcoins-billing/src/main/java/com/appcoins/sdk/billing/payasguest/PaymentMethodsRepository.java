@@ -30,6 +30,6 @@ class PaymentMethodsRepository {
       }
     };
     bdsService.makeRequest("/broker/8.20191014/methods", "GET", new ArrayList<String>(), queries,
-        new HashMap<String, Object>(), serviceResponseListener);
+        new HashMap<String, String>(), new HashMap<String, Object>(), serviceResponseListener);
   }
 }

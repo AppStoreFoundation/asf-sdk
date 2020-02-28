@@ -31,6 +31,8 @@ import com.appcoins.sdk.billing.utils.PaymentErrorViewLayout;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 import static com.appcoins.sdk.billing.utils.LayoutUtils.IMAGES_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
@@ -90,9 +92,10 @@ public class AdyenPaymentFragmentLayout {
     paypalLoading.setVisibility(View.INVISIBLE);
 
     dialogLayout = buildDialogLayout(fiatPrice, fiatCurrency, appcPrice, sku, packageName);
-
+    dialogLayout.setVisibility(View.INVISIBLE);
     mainLayout.addView(dialogLayout);
     mainLayout.addView(errorView);
+    mainLayout.addView(paypalLoading);
     return mainLayout;
   }
 
@@ -585,7 +588,9 @@ public class AdyenPaymentFragmentLayout {
     setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
     setMargins(layoutParams, 0, 0, 16, 0);
     textView.setTextColor(Color.parseColor("#828282"));
-    textView.setText(String.format("%s APPC", appcPrice));
+    DecimalFormat df = new DecimalFormat("0.00");
+    String appcText = df.format(new BigDecimal(appcPrice));
+    textView.setText(String.format("%s APPC", appcText));
     textView.setTextSize(12);
     textView.setLayoutParams(layoutParams);
     return textView;

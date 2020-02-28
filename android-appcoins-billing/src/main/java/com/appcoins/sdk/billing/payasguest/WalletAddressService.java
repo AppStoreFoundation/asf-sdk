@@ -45,7 +45,7 @@ public class WalletAddressService {
       }
     };
     service.makeRequest("/roles/8.20180518/stores", "GET", new ArrayList<String>(), queries,
-        new HashMap<String, Object>(), serviceResponseListener);
+        new HashMap<String, String>(), new HashMap<String, Object>(), serviceResponseListener);
   }
 
   void getOemAddressForPackage(String packageName, String manufacturer, String model,
@@ -63,6 +63,6 @@ public class WalletAddressService {
       }
     };
     service.makeRequest("/roles/8.20180518/oems", "GET", new ArrayList<String>(), queries,
-        new HashMap<String, Object>(), serviceResponseListener);
+        new HashMap<String, String>(), new HashMap<String, Object>(), serviceResponseListener);
   }
 }

@@ -31,7 +31,8 @@ class GamificationInteract {
         }
       };
       bdsService.makeRequest("/gamification/levels", "GET", new ArrayList<String>(),
-          new HashMap<String, String>(), new HashMap<String, Object>(), serviceResponseListener);
+          new HashMap<String, String>(), new HashMap<String, String>(),
+          new HashMap<String, Object>(), serviceResponseListener);
     }
   }
 }
