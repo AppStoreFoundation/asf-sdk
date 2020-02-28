@@ -32,6 +32,8 @@ android {
           project.CAFE_BAZAAR_WALLET_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+      buildConfigField 'String', 'BACKEND_BASE',
+          "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
       buildConfigField 'String', 'SERVICE_BIND_LIST',
           "\"" + project.APTOIDE_PACKAGE_NAME_DEV.replace('\"', '') +
               "," +
@@ -61,6 +63,8 @@ android {
           project.CAFE_BAZAAR_WALLET_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+      buildConfigField 'String', 'BACKEND_BASE',
+          "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST + "\""
       buildConfigField 'String', 'SERVICE_BIND_LIST',
           "\"" + project.APTOIDE_PACKAGE_NAME.replace('\"', '') +
               "," +

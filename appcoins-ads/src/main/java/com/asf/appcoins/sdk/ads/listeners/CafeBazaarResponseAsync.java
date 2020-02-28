@@ -1,15 +1,15 @@
 package com.asf.appcoins.sdk.ads.listeners;
 
 import android.os.AsyncTask;
-import android.os.Build;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
-public class CafeBazaarResponseAsync extends AsyncTask {
+public class CafeBazaarResponseAsync extends AsyncTask<Object, Object, Integer> {
 
+  private static final int UNKNOWN_ERROR_CODE = 600;
   private ResponseListener responseListener;
 
   public CafeBazaarResponseAsync(ResponseListener responseListener) {
@@ -37,27 +37,27 @@ public class CafeBazaarResponseAsync extends AsyncTask {
         + "\t\t}\n"
         + "\t}\n"
         + "}";
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      OutputStream os = huc.getOutputStream();
-      byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
-      os.write(input, 0, input.length);
-    } else {
-      return 404;
-    }
+    OutputStream os = huc.getOutputStream();
+    byte[] input = jsonInputString.getBytes(Charset.forName("UTF-8"));
+    os.write(input, 0, input.length);
     huc.connect();
     int responseCode = huc.getResponseCode();
     huc.disconnect();
     return responseCode;
   }
 
-  @Override protected Object doInBackground(Object[] objects) {
-    int responseCode = 404;
+  @Override protected Integer doInBackground(Object[] objects) {
+    int responseCode = UNKNOWN_ERROR_CODE;
     try {
       responseCode = getResponseCode();
     } catch (IOException e) {
       e.printStackTrace();
     }
+    return responseCode;
+  }
+
+  @Override protected void onPostExecute(Integer responseCode) {
+    super.onPostExecute(responseCode);
     responseListener.onResponseCode(responseCode);
-    return null;
   }
 }

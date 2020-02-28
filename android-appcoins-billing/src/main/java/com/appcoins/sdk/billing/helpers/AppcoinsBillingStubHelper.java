@@ -19,6 +19,7 @@ import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.WSServiceController;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
+import com.appcoins.sdk.billing.payasguest.IabActivity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,7 @@ import java.util.concurrent.CountDownLatch;
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
-  private final static String APPCOINS_BILLING_STUB_HELPER_INSTANCE =
-      "appcoins_billing_stub_helper";
+
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
@@ -37,7 +37,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     appcoinsBillingStubHelper = this;
   }
 
-  static AppcoinsBillingStubHelper getInstance() {
+  public static AppcoinsBillingStubHelper getInstance() {
     if (appcoinsBillingStubHelper == null) {
       appcoinsBillingStubHelper = new AppcoinsBillingStubHelper();
     }
@@ -113,15 +113,13 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         return response;
       }
     } else {
-      BuyItemProperties buyItemProperties =
+      final BuyItemProperties buyItemProperties =
           new BuyItemProperties(apiVersion, packageName, sku, type, developerPayload);
 
-      Context context = WalletUtils.getContext();
+      final Context context = WalletUtils.getContext();
 
-      Intent intent = new Intent(context, InstallDialogActivity.class);
-      intent.putExtra(APPCOINS_BILLING_STUB_HELPER_INSTANCE, this);
+      Intent intent = new Intent(context, IabActivity.class);
       intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
-
       PendingIntent pendingIntent =
           PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
       Bundle response = new Bundle();

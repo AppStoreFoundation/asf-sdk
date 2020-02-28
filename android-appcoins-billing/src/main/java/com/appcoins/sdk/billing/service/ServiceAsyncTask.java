@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import java.util.List;
 import java.util.Map;
 
-public class ServiceAsyncTask extends AsyncTask {
+public class ServiceAsyncTask extends AsyncTask<Object, Object, RequestResponse> {
 
   private final String httpMethod;
   private final List<String> paths;
@@ -28,10 +28,12 @@ public class ServiceAsyncTask extends AsyncTask {
     this.serviceResponseListener = serviceResponseListener;
   }
 
-  @Override protected Object doInBackground(Object[] objects) {
-    RequestResponse requestResponse =
-        bdsService.createRequest(baseUrl, endPoint, httpMethod, paths, queries, body);
+  @Override protected RequestResponse doInBackground(Object[] objects) {
+    return bdsService.createRequest(baseUrl, endPoint, httpMethod, paths, queries, body);
+  }
+
+  @Override protected void onPostExecute(RequestResponse requestResponse) {
+    super.onPostExecute(requestResponse);
     serviceResponseListener.onResponseReceived(requestResponse);
-    return null;
   }
 }
