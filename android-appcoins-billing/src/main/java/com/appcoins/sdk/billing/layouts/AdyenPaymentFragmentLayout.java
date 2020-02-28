@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.appcoins.sdk.billing.listeners.CardNumberFocusChangeListener;
 import com.appcoins.sdk.billing.listeners.CardNumberTextWatcher;
 import com.appcoins.sdk.billing.listeners.CvvTextWatcher;
 import com.appcoins.sdk.billing.listeners.ExpiryDateTextWatcher;
@@ -69,6 +70,9 @@ public class AdyenPaymentFragmentLayout {
   private TextView changeCard;
   private RelativeLayout paypalLoading;
   private PaymentErrorViewLayout paymentErrorViewLayout;
+  private EditText cardNumberEditText;
+  private EditText expiryDateEditText;
+  private EditText cvvEditText;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -146,7 +150,6 @@ public class AdyenPaymentFragmentLayout {
         buildPaymentMethodsHeaderLayout(packageName, sku, fiatPrice, fiatCurrency, appcPrice);
     View headerSeparator = buildHeaderSeparatorLayout();
     creditCardLayout = buildCreditCardLayout();
-    //creditCardLayout.setVisibility(View.INVISIBLE);
     buttonsView = buildButtonsView();
     buttonsView.setVisibility(View.INVISIBLE);
 
@@ -358,15 +361,20 @@ public class AdyenPaymentFragmentLayout {
     linearLayout.setBackground(background);
 
     ImageView genericCardView = buildGenericCardView();
-    EditText cardNumberEditText = buildCardNumberEditText();
-    EditText expiryDateEditText = buildExpiryDateEditText();
-    EditText cvvEditText = buildCvvEditText();
+    cardNumberEditText = buildCardNumberEditText();
+    expiryDateEditText = buildExpiryDateEditText();
+    cvvEditText = buildCvvEditText();
 
+    CardNumberFocusChangeListener cardNumberFocusChangeListener =
+        new CardNumberFocusChangeListener(cardNumberEditText);
     cardNumberEditText.addTextChangedListener(
-        new CardNumberTextWatcher(cardNumberEditText, expiryDateEditText));
+        new CardNumberTextWatcher(cardNumberEditText, expiryDateEditText, cvvEditText,
+            cardNumberFocusChangeListener));
+    cardNumberEditText.setOnFocusChangeListener(cardNumberFocusChangeListener);
     expiryDateEditText.addTextChangedListener(
         new ExpiryDateTextWatcher(expiryDateEditText, cvvEditText, cardNumberEditText));
     cvvEditText.addTextChangedListener(new CvvTextWatcher(expiryDateEditText));
+
     linearLayout.addView(genericCardView);
     linearLayout.addView(cardNumberEditText);
     linearLayout.addView(expiryDateEditText);
@@ -724,6 +732,18 @@ public class AdyenPaymentFragmentLayout {
 
   public RelativeLayout getCreditCardLayout() {
     return creditCardLayout;
+  }
+
+  public EditText getCardNumberEditText() {
+    return cardNumberEditText;
+  }
+
+  public EditText getExpiryDateEditText() {
+    return expiryDateEditText;
+  }
+
+  public EditText getCvvEditText() {
+    return cvvEditText;
   }
 
   public Button getCancelButton() {

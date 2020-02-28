@@ -2,6 +2,7 @@ package com.appcoins.sdk.billing.listeners;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 import com.sdk.appcoins_adyen.card.CardType;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
@@ -11,21 +12,36 @@ public class CardNumberTextWatcher implements TextWatcher {
   private static final char DIGIT_SEPARATOR = ' ';
   private EditText editText;
   private EditText nextViewToFocus;
+  private EditText cvvEditText;
+  private CardNumberFocusChangeListener cardNumberFocusChangeListener;
+  private boolean ignore;
 
-  public CardNumberTextWatcher(EditText editText, EditText nextViewToFocus) {
+  public CardNumberTextWatcher(EditText editText, EditText nextViewToFocus, EditText cvvEditText,
+      CardNumberFocusChangeListener cardNumberFocusChangeListener) {
     this.editText = editText;
     this.nextViewToFocus = nextViewToFocus;
+    this.cvvEditText = cvvEditText;
+    this.cardNumberFocusChangeListener = cardNumberFocusChangeListener;
   }
 
   @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+    if (charSequence.toString()
+        .contains("•")) {
+      ignore = true;
+    }
   }
 
   @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-    if (charSequence.length() > 0) {
-      String rawCardNumber = CardValidationUtils.getCardNumberRawValue(charSequence.toString());
-      if (CardValidationUtils.isValidCardNumber(
-          CardValidationUtils.getCardNumberRawValue(rawCardNumber))) {
-        changeFocusOfInput(rawCardNumber);
+    if (ignore) {
+      ignore = false;
+      editText.setSelection(charSequence.length());
+    } else {
+      if (charSequence.length() > 0) {
+        String rawCardNumber = CardValidationUtils.getCardNumberRawValue(charSequence.toString());
+        if (CardValidationUtils.isValidCardNumber(
+            CardValidationUtils.getCardNumberRawValue(rawCardNumber))) {
+          changeFocusOfInput(rawCardNumber);
+        }
       }
     }
   }
@@ -51,6 +67,13 @@ public class CardNumberTextWatcher implements TextWatcher {
   }
 
   private void goToNextInputFocus() {
+    Editable text = editText.getText();
+    cardNumberFocusChangeListener.setCacheCardNumber(text.toString());
+    editText.setText(String.format("••••%s", text.subSequence(text.length() - 4, text.length())));
+    editText.setSelection(editText.getText()
+        .length());
+    nextViewToFocus.setVisibility(View.VISIBLE);
+    cvvEditText.setVisibility(View.VISIBLE);
     nextViewToFocus.requestFocus();
   }
 }

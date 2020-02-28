@@ -132,6 +132,11 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   }
 
   @Override public void showCreditCardView() {
+    layout.getExpiryDateEditText()
+        .setVisibility(View.INVISIBLE);
+    layout.getCvvEditText()
+        .setVisibility(View.INVISIBLE);
+
     layout.getPaypalLoading()
         .setVisibility(View.INVISIBLE);
     layout.getErrorView()
@@ -163,8 +168,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     BuyItemProperties buyItemProperties =
         getBundleBuyItemProperties(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
 
-    return new AdyenPaymentInfo(paymentMethod, walletAddress, ewt, signature, fiatPrice, fiatCurrency,
-        appcPrice, buyItemProperties);
+    return new AdyenPaymentInfo(paymentMethod, walletAddress, ewt, signature, fiatPrice,
+        fiatCurrency, appcPrice, buyItemProperties);
   }
 
   private void attach(Context context) {
