@@ -5,19 +5,22 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import com.appcoins.sdk.billing.layouts.CardNumberEditText;
+import com.appcoins.sdk.billing.layouts.CreditCardLayout;
 import com.sdk.appcoins_adyen.card.CardType;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 
 public class CardNumberTextWatcher implements TextWatcher {
 
   private static final char DIGIT_SEPARATOR = ' ';
+  private CreditCardLayout creditCardLayout;
   private CardNumberEditText editText;
   private EditText nextViewToFocus;
   private EditText cvvEditText;
   private boolean ignore;
 
-  public CardNumberTextWatcher(CardNumberEditText editText, EditText nextViewToFocus,
-      EditText cvvEditText) {
+  public CardNumberTextWatcher(CreditCardLayout creditCardLayout, CardNumberEditText editText,
+      EditText nextViewToFocus, EditText cvvEditText) {
+    this.creditCardLayout = creditCardLayout;
     this.editText = editText;
     this.nextViewToFocus = nextViewToFocus;
     this.cvvEditText = cvvEditText;
@@ -37,9 +40,17 @@ public class CardNumberTextWatcher implements TextWatcher {
     } else {
       if (charSequence.length() > 0) {
         String rawCardNumber = CardValidationUtils.getCardNumberRawValue(charSequence.toString());
-        if (CardValidationUtils.isValidCardNumber(
-            CardValidationUtils.getCardNumberRawValue(rawCardNumber))) {
+        if (isValidCardNumber(rawCardNumber)) {
+          creditCardLayout.setCardNumberValid(true);
           changeFocusOfInput(rawCardNumber);
+        } else {
+          if (charSequence.toString()
+              .contains("•") && isValidCardNumber(
+              CardValidationUtils.getCardNumberRawValue(editText.getCacheSavedNumber()))) {
+            creditCardLayout.setCardNumberValid(true);
+          } else {
+            creditCardLayout.setCardNumberValid(false);
+          }
         }
       }
     }
@@ -74,5 +85,10 @@ public class CardNumberTextWatcher implements TextWatcher {
     nextViewToFocus.setVisibility(View.VISIBLE);
     cvvEditText.setVisibility(View.VISIBLE);
     nextViewToFocus.requestFocus();
+  }
+
+  private boolean isValidCardNumber(String cardNumber) {
+    return CardValidationUtils.isValidCardNumber(
+        CardValidationUtils.getCardNumberRawValue(cardNumber));
   }
 }

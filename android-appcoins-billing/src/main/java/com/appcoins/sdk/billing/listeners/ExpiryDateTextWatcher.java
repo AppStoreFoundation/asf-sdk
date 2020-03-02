@@ -1,8 +1,10 @@
 package com.appcoins.sdk.billing.listeners;
 
+import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
+import com.appcoins.sdk.billing.layouts.CreditCardLayout;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 
 public class ExpiryDateTextWatcher implements TextWatcher {
@@ -10,13 +12,15 @@ public class ExpiryDateTextWatcher implements TextWatcher {
   private static final String SEPARATOR = "/";
 
   private static final int MAX_SECOND_DIGIT_MONTH = 1;
+  private CreditCardLayout creditCardLayout;
   private EditText editText;
   private EditText nextViewToFocus;
   private EditText previousViewToFocus;
   private String beforeTextChanged = "";
 
-  public ExpiryDateTextWatcher(EditText editText, EditText nextViewToFocus,
-      EditText previousViewToFocus) {
+  public ExpiryDateTextWatcher(CreditCardLayout creditCardLayout, EditText editText,
+      EditText nextViewToFocus, EditText previousViewToFocus) {
+    this.creditCardLayout = creditCardLayout;
     this.editText = editText;
     this.nextViewToFocus = nextViewToFocus;
     this.previousViewToFocus = previousViewToFocus;
@@ -29,9 +33,18 @@ public class ExpiryDateTextWatcher implements TextWatcher {
   @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
     if (CardValidationUtils.isValidExpiryDate(
         CardValidationUtils.getDate(charSequence.toString()))) {
+      creditCardLayout.setExpiryDateValid(true);
+      editText.setTextColor(Color.parseColor("#292929"));
       goToNextInputFocus();
-    } else if (charSequence.length() == 0 && beforeTextChanged.length() > 0) {
-      goToPreviousInputFocus();
+    } else {
+      creditCardLayout.setExpiryDateValid(false);
+      if (charSequence.length() == 0 && beforeTextChanged.length() > 0) {
+        goToPreviousInputFocus();
+      } else if (charSequence.length() == CardValidationUtils.DATE_MAX_LENGTH) {
+        editText.setTextColor(Color.RED);
+      } else {
+        editText.setTextColor(Color.parseColor("#292929"));
+      }
     }
   }
 

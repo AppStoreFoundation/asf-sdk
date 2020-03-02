@@ -73,6 +73,7 @@ public class AdyenPaymentFragmentLayout {
   private CardNumberEditText cardNumberEditText;
   private EditText expiryDateEditText;
   private EditText cvvEditText;
+  private CreditCardLayout creditCardEditTextLayout;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -268,7 +269,7 @@ public class AdyenPaymentFragmentLayout {
     parentLayout.setLayoutParams(layoutParams);
 
     RelativeLayout creditCardHeader = buildCreditCardHeader();
-    LinearLayout creditCardEditTextLayout = buildCreditCardEditTextLayout();
+    creditCardEditTextLayout = buildCreditCardEditTextLayout();
     changeCard = buildChangeCardTextLayout();
     morePaymentsText = buildMorePaymentsView();
 
@@ -342,14 +343,14 @@ public class AdyenPaymentFragmentLayout {
     return textView;
   }
 
-  @SuppressLint("InlinedApi") private LinearLayout buildCreditCardEditTextLayout() {
-    LinearLayout linearLayout = new LinearLayout(activity);
+  @SuppressLint("InlinedApi") private CreditCardLayout buildCreditCardEditTextLayout() {
+    CreditCardLayout creditCardLayout = new CreditCardLayout(activity);
 
     CREDIT_CARD_INPUT_ID = generateRandomId(CREDIT_CARD_INPUT_ID);
-    linearLayout.setId(CREDIT_CARD_INPUT_ID);
+    creditCardLayout.setId(CREDIT_CARD_INPUT_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(44));
-    linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+    creditCardLayout.setOrientation(LinearLayout.HORIZONTAL);
     layoutParams.addRule(RelativeLayout.BELOW, CREDIT_CARD_HEADER_ID);
     setConstraint(layoutParams, RelativeLayout.ALIGN_START, CREDIT_CARD_HEADER_ID);
     setConstraint(layoutParams, RelativeLayout.ALIGN_END, CREDIT_CARD_HEADER_ID);
@@ -359,7 +360,7 @@ public class AdyenPaymentFragmentLayout {
     background.setShape(GradientDrawable.RECTANGLE);
     background.setStroke(dpToPx(1), Color.parseColor("#fd7a6a"));
     background.setCornerRadius(dpToPx(6));
-    linearLayout.setBackground(background);
+    creditCardLayout.setBackground(background);
 
     ImageView genericCardView = buildGenericCardView();
     cardNumberEditText = buildCardNumberEditText();
@@ -369,19 +370,22 @@ public class AdyenPaymentFragmentLayout {
     CardNumberFocusChangeListener cardNumberFocusChangeListener =
         new CardNumberFocusChangeListener(cardNumberEditText);
     cardNumberEditText.addTextChangedListener(
-        new CardNumberTextWatcher(cardNumberEditText, expiryDateEditText, cvvEditText));
+        new CardNumberTextWatcher(creditCardLayout, cardNumberEditText, expiryDateEditText,
+            cvvEditText));
     cardNumberEditText.setOnFocusChangeListener(cardNumberFocusChangeListener);
     expiryDateEditText.addTextChangedListener(
-        new ExpiryDateTextWatcher(expiryDateEditText, cvvEditText, cardNumberEditText));
-    cvvEditText.addTextChangedListener(new CvvTextWatcher(expiryDateEditText));
+        new ExpiryDateTextWatcher(creditCardLayout, expiryDateEditText, cvvEditText,
+            cardNumberEditText));
+    cvvEditText.addTextChangedListener(
+        new CvvTextWatcher(creditCardLayout, cvvEditText, expiryDateEditText));
 
-    linearLayout.addView(genericCardView);
-    linearLayout.addView(cardNumberEditText);
-    linearLayout.addView(expiryDateEditText);
-    linearLayout.addView(cvvEditText);
+    creditCardLayout.addView(genericCardView);
+    creditCardLayout.addView(cardNumberEditText);
+    creditCardLayout.addView(expiryDateEditText);
+    creditCardLayout.addView(cvvEditText);
 
-    linearLayout.setLayoutParams(layoutParams);
-    return linearLayout;
+    creditCardLayout.setLayoutParams(layoutParams);
+    return creditCardLayout;
   }
 
   private ImageView buildGenericCardView() {
@@ -772,5 +776,9 @@ public class AdyenPaymentFragmentLayout {
 
   public PaymentErrorViewLayout getPaymentErrorViewLayout() {
     return paymentErrorViewLayout;
+  }
+
+  public CreditCardLayout getCreditCardEditTextLayout() {
+    return creditCardEditTextLayout;
   }
 }

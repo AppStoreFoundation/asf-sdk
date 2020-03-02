@@ -14,6 +14,7 @@ import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.layouts.AdyenPaymentFragmentLayout;
+import com.appcoins.sdk.billing.layouts.FieldValidationListener;
 import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.Service;
 import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
@@ -57,6 +58,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     AddressService addressService = new AddressService(getActivity().getApplicationContext(),
         new WalletAddressService(apiService), new DeveloperAddressService(ws75Service),
         Build.MANUFACTURER, Build.MODEL, new OemIdExtractorService(extractorV1));
+
     presenter = new AdyenPaymentPresenter(this, adyenPaymentInfo,
         new AdyenPaymentInteract(adyenRepository, billingRepository, addressService),
         RedirectUtils.getReturnUrl(getActivity().getApplicationContext()));
@@ -84,7 +86,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         .getErrorPositiveButton();
     TextView changeCardView = layout.getChangeCard();
     TextView morePaymentsText = layout.getMorePaymentsText();
-
+    setFieldChangeListener(positiveButton);
     onPositiveButtonClick(positiveButton);
     onCancelButtonClick(cancelButton);
     onErrorButtonClick(errorButton);
@@ -108,6 +110,20 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     presenter.onDestroy();
     presenter = null;
     super.onDestroy();
+  }
+
+  private void setFieldChangeListener(final Button positiveButton) {
+    layout.getCreditCardEditTextLayout()
+        .setFieldValidationListener(new FieldValidationListener() {
+          @Override public void onFieldChanged(boolean isCardNumberValid, boolean isExpiryDateValid,
+              boolean isCvvValid) {
+            if (isCardNumberValid && isExpiryDateValid && isCvvValid) {
+              positiveButton.setEnabled(true);
+            } else {
+              positiveButton.setEnabled(false);
+            }
+          }
+        });
   }
 
   @Override public void close() {
