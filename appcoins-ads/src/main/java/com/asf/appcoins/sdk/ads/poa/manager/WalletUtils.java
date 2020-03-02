@@ -45,6 +45,7 @@ public class WalletUtils {
   private static boolean hasPopup;
   private static String IDENTIFIER_KEY = "identifier";
   private static String billingPackageName;
+  private static String iabAction;
 
   public static void setContext(Context cont) {
     context = cont;
@@ -60,11 +61,13 @@ public class WalletUtils {
   private static void getPackageToBind() {
     List<String> intentServicesResponse = new ArrayList<>();
 
-    String iabAction = com.appcoins.billing.sdk.BuildConfig.IAB_BIND_ACTION;
     if (isAppInstalled(com.appcoins.billing.sdk.BuildConfig.CAFE_BAZAAR_PACKAGE_NAME,
         context.getPackageManager()) || userFromIran(getUserCountry(context))) {
-      iabAction = com.appcoins.billing.sdk.BuildConfig.CB_IAB_BIND_ACTION;
+      iabAction = com.appcoins.billing.sdk.BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION;
+    } else {
+      iabAction = com.appcoins.billing.sdk.BuildConfig.IAB_BIND_ACTION;
     }
+
     Intent serviceIntent = new Intent(iabAction);
 
     List<ResolveInfo> intentServices = context.getPackageManager()
@@ -79,7 +82,7 @@ public class WalletUtils {
   }
 
   private static String chooseServiceToBind(List<String> packageNameServices, String iabAction) {
-    if (iabAction.equals(com.appcoins.billing.sdk.BuildConfig.CB_IAB_BIND_ACTION)) {
+    if (iabAction.equals(com.appcoins.billing.sdk.BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
       if (packageNameServices.contains(BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME)) {
         return BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
       }
@@ -262,8 +265,7 @@ public class WalletUtils {
   private static TranslationsModel fetchTranslations() {
     Locale locale = Locale.getDefault();
     TranslationsXmlParser translationsParser = new TranslationsXmlParser(context);
-    if (com.appcoins.sdk.billing.helpers.WalletUtils.getIabAction()
-        .equals(com.appcoins.billing.sdk.BuildConfig.CB_IAB_BIND_ACTION)) {
+    if (iabAction.equals(com.appcoins.billing.sdk.BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
       return translationsParser.parseTranslationXml("fa", "IR");
     }
     return translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());

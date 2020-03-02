@@ -30,10 +30,11 @@ public class WalletUtils {
 
   private static void getPackageToBind() {
     List<String> intentServicesResponse = new ArrayList<>();
-    iabAction = BuildConfig.IAB_BIND_ACTION;
     if ((isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, context.getPackageManager())
         || userFromIran(getUserCountry(context)))) {
-      iabAction = BuildConfig.CB_IAB_BIND_ACTION;
+      iabAction = BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION;
+    } else {
+      iabAction = BuildConfig.IAB_BIND_ACTION;
     }
     Intent serviceIntent = new Intent(iabAction);
 
@@ -49,7 +50,7 @@ public class WalletUtils {
   }
 
   private static String chooseServiceToBind(List<String> packageNameServices, String action) {
-    if (action.equals(BuildConfig.CB_IAB_BIND_ACTION)) {
+    if (action.equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
       if (packageNameServices.contains(BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME)) {
         return BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
       }
@@ -113,7 +114,12 @@ public class WalletUtils {
 
   public static String getIabAction() {
     if (iabAction == null) {
-      iabAction = BuildConfig.IAB_BIND_ACTION;
+      if ((isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, context.getPackageManager())
+          || userFromIran(getUserCountry(context)))) {
+        iabAction = BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION;
+      } else {
+        iabAction = BuildConfig.IAB_BIND_ACTION;
+      }
     }
     return iabAction;
   }

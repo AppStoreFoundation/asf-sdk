@@ -345,7 +345,7 @@ public class InstallDialogActivity extends Activity {
 
   private void fetchTranslations() {
     if (WalletUtils.getIabAction()
-        .equals(BuildConfig.CB_IAB_BIND_ACTION)) {
+        .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
       if (translationsModel == null) {
         TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
         translationsModel = translationsParser.parseTranslationXml("fa", "IR");
