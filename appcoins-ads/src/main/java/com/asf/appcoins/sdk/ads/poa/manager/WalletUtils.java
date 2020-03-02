@@ -303,6 +303,10 @@ public class WalletUtils {
   private static TranslationsModel fetchTranslations() {
     Locale locale = Locale.getDefault();
     TranslationsXmlParser translationsParser = new TranslationsXmlParser(context);
+    if (com.appcoins.sdk.billing.helpers.WalletUtils.getIabAction()
+        .equals(com.appcoins.billing.sdk.BuildConfig.CB_IAB_BIND_ACTION)) {
+      return translationsParser.parseTranslationXml("fa", "IR");
+    }
     return translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
   }
 

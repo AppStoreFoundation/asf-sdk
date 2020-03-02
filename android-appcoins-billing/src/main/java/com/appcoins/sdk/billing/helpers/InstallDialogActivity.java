@@ -352,13 +352,21 @@ public class InstallDialogActivity extends Activity {
   }
 
   private void fetchTranslations() {
-    Locale locale = Locale.getDefault();
-    if (translationsModel == null || !translationsModel.getLanguageCode()
-        .equalsIgnoreCase(locale.getLanguage()) || !translationsModel.getCountryCode()
-        .equalsIgnoreCase(locale.getCountry())) {
-      TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
-      translationsModel =
-          translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
+    if (WalletUtils.getIabAction()
+        .equals(BuildConfig.CB_IAB_BIND_ACTION)) {
+      if (translationsModel == null) {
+        TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
+        translationsModel = translationsParser.parseTranslationXml("fa", "IR");
+      }
+    } else {
+      Locale locale = Locale.getDefault();
+      if (translationsModel == null || !translationsModel.getLanguageCode()
+          .equalsIgnoreCase(locale.getLanguage()) || !translationsModel.getCountryCode()
+          .equalsIgnoreCase(locale.getCountry())) {
+        TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
+        translationsModel =
+            translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
+      }
     }
   }
 
