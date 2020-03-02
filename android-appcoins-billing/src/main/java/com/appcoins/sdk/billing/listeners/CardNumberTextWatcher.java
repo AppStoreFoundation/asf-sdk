@@ -27,8 +27,7 @@ public class CardNumberTextWatcher implements TextWatcher {
   }
 
   @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-    if (charSequence.toString()
-        .contains("•")) {
+    if (CardValidationUtils.isShortenCardNumber(charSequence.toString())) {
       ignore = true;
     }
   }
@@ -44,8 +43,7 @@ public class CardNumberTextWatcher implements TextWatcher {
           creditCardLayout.setCardNumberValid(true);
           changeFocusOfInput(rawCardNumber);
         } else {
-          if (charSequence.toString()
-              .contains("•") && isValidCardNumber(
+          if (CardValidationUtils.isShortenCardNumber(charSequence.toString()) && isValidCardNumber(
               CardValidationUtils.getCardNumberRawValue(editText.getCacheSavedNumber()))) {
             creditCardLayout.setCardNumberValid(true);
           } else {

@@ -181,5 +181,9 @@ public final class CardValidationUtils {
       return "";
     }
   }
+
+  public static boolean isShortenCardNumber(String cardNumber) {
+    return cardNumber.contains("•");
+  }
 }
 

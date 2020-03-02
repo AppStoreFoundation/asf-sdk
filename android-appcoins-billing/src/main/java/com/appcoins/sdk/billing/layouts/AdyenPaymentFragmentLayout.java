@@ -105,6 +105,12 @@ public class AdyenPaymentFragmentLayout {
     return mainLayout;
   }
 
+  public void onDestroyView() {
+    cardNumberEditText = null;
+    expiryDateEditText = null;
+    cvvEditText = null;
+  }
+
   private RelativeLayout buildPaypalLoading() {
     RelativeLayout relativeLayout = new RelativeLayout(activity);
 
@@ -380,6 +386,8 @@ public class AdyenPaymentFragmentLayout {
     cvvEditText.addTextChangedListener(
         new CvvTextWatcher(creditCardLayout, cvvEditText, expiryDateEditText));
 
+    expiryDateEditText.setVisibility(View.INVISIBLE);
+    cvvEditText.setVisibility(View.INVISIBLE);
     creditCardLayout.addView(genericCardView);
     creditCardLayout.addView(cardNumberEditText);
     creditCardLayout.addView(expiryDateEditText);

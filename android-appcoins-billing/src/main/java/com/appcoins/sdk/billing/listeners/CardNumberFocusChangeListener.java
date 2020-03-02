@@ -2,6 +2,7 @@ package com.appcoins.sdk.billing.listeners;
 
 import android.view.View;
 import com.appcoins.sdk.billing.layouts.CardNumberEditText;
+import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 
 public class CardNumberFocusChangeListener implements View.OnFocusChangeListener {
 
@@ -13,12 +14,9 @@ public class CardNumberFocusChangeListener implements View.OnFocusChangeListener
   }
 
   @Override public void onFocusChange(View view, boolean hasFocus) {
-    if (hasFocus) {
-      if (cardNumber.getText()
-          .toString()
-          .contains("•")) {
-        cardNumber.setText(cardNumber.getCacheSavedNumber());
-      }
+    if (hasFocus && CardValidationUtils.isShortenCardNumber(cardNumber.getText()
+        .toString())) {
+      cardNumber.setText(cardNumber.getCacheSavedNumber());
     }
   }
 }
