@@ -4,24 +4,23 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+import com.appcoins.sdk.billing.layouts.CardNumberEditText;
 import com.sdk.appcoins_adyen.card.CardType;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 
 public class CardNumberTextWatcher implements TextWatcher {
 
   private static final char DIGIT_SEPARATOR = ' ';
-  private EditText editText;
+  private CardNumberEditText editText;
   private EditText nextViewToFocus;
   private EditText cvvEditText;
-  private CardNumberFocusChangeListener cardNumberFocusChangeListener;
   private boolean ignore;
 
-  public CardNumberTextWatcher(EditText editText, EditText nextViewToFocus, EditText cvvEditText,
-      CardNumberFocusChangeListener cardNumberFocusChangeListener) {
+  public CardNumberTextWatcher(CardNumberEditText editText, EditText nextViewToFocus,
+      EditText cvvEditText) {
     this.editText = editText;
     this.nextViewToFocus = nextViewToFocus;
     this.cvvEditText = cvvEditText;
-    this.cardNumberFocusChangeListener = cardNumberFocusChangeListener;
   }
 
   @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -68,7 +67,7 @@ public class CardNumberTextWatcher implements TextWatcher {
 
   private void goToNextInputFocus() {
     Editable text = editText.getText();
-    cardNumberFocusChangeListener.setCacheCardNumber(text.toString());
+    editText.setCacheSavedNumber(text.toString());
     editText.setText(String.format("••••%s", text.subSequence(text.length() - 4, text.length())));
     editText.setSelection(editText.getText()
         .length());

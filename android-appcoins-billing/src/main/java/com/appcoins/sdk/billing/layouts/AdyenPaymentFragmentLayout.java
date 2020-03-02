@@ -70,7 +70,7 @@ public class AdyenPaymentFragmentLayout {
   private TextView changeCard;
   private RelativeLayout paypalLoading;
   private PaymentErrorViewLayout paymentErrorViewLayout;
-  private EditText cardNumberEditText;
+  private CardNumberEditText cardNumberEditText;
   private EditText expiryDateEditText;
   private EditText cvvEditText;
 
@@ -272,6 +272,7 @@ public class AdyenPaymentFragmentLayout {
     changeCard = buildChangeCardTextLayout();
     morePaymentsText = buildMorePaymentsView();
 
+    changeCard.setVisibility(View.GONE);
     parentLayout.addView(creditCardHeader);
     parentLayout.addView(creditCardEditTextLayout);
     parentLayout.addView(changeCard);
@@ -368,8 +369,7 @@ public class AdyenPaymentFragmentLayout {
     CardNumberFocusChangeListener cardNumberFocusChangeListener =
         new CardNumberFocusChangeListener(cardNumberEditText);
     cardNumberEditText.addTextChangedListener(
-        new CardNumberTextWatcher(cardNumberEditText, expiryDateEditText, cvvEditText,
-            cardNumberFocusChangeListener));
+        new CardNumberTextWatcher(cardNumberEditText, expiryDateEditText, cvvEditText));
     cardNumberEditText.setOnFocusChangeListener(cardNumberFocusChangeListener);
     expiryDateEditText.addTextChangedListener(
         new ExpiryDateTextWatcher(expiryDateEditText, cvvEditText, cardNumberEditText));
@@ -436,9 +436,9 @@ public class AdyenPaymentFragmentLayout {
     return editText;
   }
 
-  private EditText buildCardNumberEditText() {
-    EditText editText = new EditText(activity);
-    editText.setFilters(new InputFilter[] {
+  private CardNumberEditText buildCardNumberEditText() {
+    CardNumberEditText cardNumberEditText = new CardNumberEditText(activity);
+    cardNumberEditText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.MAXIMUM_CARD_NUMBER_LENGTH
             + CardValidationUtils.MAX_DIGIT_SEPARATOR_COUNT)
     });
@@ -447,16 +447,16 @@ public class AdyenPaymentFragmentLayout {
 
     layoutParams.gravity = Gravity.CENTER_VERTICAL;
 
-    editText.setTextSize(14);
-    editText.setTextColor(Color.parseColor("#292929"));
-    editText.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
-    editText.setHint("Card Number");
-    editText.setHintTextColor(Color.parseColor("#9d9d9d"));
-    editText.setLayoutParams(layoutParams);
-    editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-    editText.setBackgroundColor(Color.parseColor("#00000000"));
+    cardNumberEditText.setTextSize(14);
+    cardNumberEditText.setTextColor(Color.parseColor("#292929"));
+    cardNumberEditText.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+    cardNumberEditText.setHint("Card Number");
+    cardNumberEditText.setHintTextColor(Color.parseColor("#9d9d9d"));
+    cardNumberEditText.setLayoutParams(layoutParams);
+    cardNumberEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+    cardNumberEditText.setBackgroundColor(Color.parseColor("#00000000"));
 
-    return editText;
+    return cardNumberEditText;
   }
 
   private RelativeLayout buildCreditCardHeader() {
@@ -734,7 +734,7 @@ public class AdyenPaymentFragmentLayout {
     return creditCardLayout;
   }
 
-  public EditText getCardNumberEditText() {
+  public CardNumberEditText getCardNumberEditText() {
     return cardNumberEditText;
   }
 

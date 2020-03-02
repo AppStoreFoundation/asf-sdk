@@ -1,14 +1,13 @@
 package com.appcoins.sdk.billing.listeners;
 
 import android.view.View;
-import android.widget.EditText;
+import com.appcoins.sdk.billing.layouts.CardNumberEditText;
 
 public class CardNumberFocusChangeListener implements View.OnFocusChangeListener {
 
-  private String cacheCardNumber = "";
-  private EditText cardNumber;
+  private CardNumberEditText cardNumber;
 
-  public CardNumberFocusChangeListener(EditText cardNumber) {
+  public CardNumberFocusChangeListener(CardNumberEditText cardNumber) {
 
     this.cardNumber = cardNumber;
   }
@@ -18,12 +17,8 @@ public class CardNumberFocusChangeListener implements View.OnFocusChangeListener
       if (cardNumber.getText()
           .toString()
           .contains("•")) {
-        cardNumber.setText(cacheCardNumber);
+        cardNumber.setText(cardNumber.getCacheSavedNumber());
       }
     }
-  }
-
-  void setCacheCardNumber(String cacheCardNumber) {
-    this.cacheCardNumber = cacheCardNumber;
   }
 }
