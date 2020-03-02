@@ -277,14 +277,6 @@ public class InstallDialogActivity extends Activity {
 
   private void redirectToWalletInstallation(final String storeUrl) {
     final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_APP_URL);
-    if (WalletUtils.isCafeBazaarWalletAvailable()) {
-      cafeBazaarFlow(cafeBazaarIntent, storeUrl);
-    } else {
-      redirectToRemainingStores(storeUrl);
-    }
-  }
-
-  private void cafeBazaarFlow(Intent cafeBazaarIntent, String storeUrl) {
     if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, getPackageManager())
         && isAbleToRedirect(cafeBazaarIntent)) {
       cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);

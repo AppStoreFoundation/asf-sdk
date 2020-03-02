@@ -14,20 +14,15 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import com.appcoins.sdk.billing.helpers.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
 import com.asf.appcoins.sdk.ads.BuildConfig;
-import com.asf.appcoins.sdk.ads.listeners.CafeBazaarResponseAsync;
-import com.asf.appcoins.sdk.ads.listeners.ResponseListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class WalletUtils {
 
@@ -41,7 +36,6 @@ public class WalletUtils {
   private static int POA_NOTIFICATION_ID = 0;
   private static int MINIMUM_APTOIDE_VERSION = 9908;
   private static int UNINSTALLED_APTOIDE_VERSION_CODE = 0;
-  private static int UNKNOWN_ERROR_CODE = 600;
   private static String URL_INTENT_INSTALL = "market://details?id="
       + BuildConfig.BDS_WALLET_PACKAGE_NAME
       + "&utm_source=appcoinssdk&app_source=";
@@ -51,7 +45,6 @@ public class WalletUtils {
   private static boolean hasPopup;
   private static String IDENTIFIER_KEY = "identifier";
   private static String billingPackageName;
-  private static boolean cafeBazaarWalletAvailable = true;
 
   public static void setContext(Context cont) {
     context = cont;
@@ -70,7 +63,7 @@ public class WalletUtils {
     String iabAction = com.appcoins.billing.sdk.BuildConfig.IAB_BIND_ACTION;
     if (isAppInstalled(com.appcoins.billing.sdk.BuildConfig.CAFE_BAZAAR_PACKAGE_NAME,
         context.getPackageManager()) || userFromIran(getUserCountry(context))) {
-      iabAction = getIabAction();
+      iabAction = com.appcoins.billing.sdk.BuildConfig.CB_IAB_BIND_ACTION;
     }
     Intent serviceIntent = new Intent(iabAction);
 
@@ -141,17 +134,6 @@ public class WalletUtils {
   static void createInstallWalletNotification() {
     PackageManager packageManager = context.getPackageManager();
     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(CAFE_BAZAAR_APP_URL));
-    if (cafeBazaarWalletAvailable) {
-      intent = cafeBazaarFlow(intent, packageManager);
-    } else {
-      intent = redirectToRemainingStores(packageManager);
-    }
-    if (intent != null) {
-      createNotification(intent);
-    }
-  }
-
-  private static Intent cafeBazaarFlow(Intent intent, PackageManager packageManager) {
     if (isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager) && isAbleToRedirect(
         intent, packageManager)) {
       intent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
@@ -162,7 +144,9 @@ public class WalletUtils {
     } else {
       intent = redirectToRemainingStores(packageManager);
     }
-    return intent;
+    if (intent != null) {
+      createNotification(intent);
+    }
   }
 
   private static Intent redirectToRemainingStores(PackageManager packageManager) {
@@ -195,31 +179,6 @@ public class WalletUtils {
     }
     return Locale.getDefault()
         .getCountry();
-  }
-
-  private static String getIabAction() {
-    final CountDownLatch latch = new CountDownLatch(1);
-    ResponseListener responseListener = new ResponseListener() {
-      @Override public void onResponseCode(int code) {
-        cafeBazaarWalletAvailable = code < 300 || code == UNKNOWN_ERROR_CODE;
-        latch.countDown();
-      }
-    };
-    AsyncTask asyncTask = new CafeBazaarResponseAsync(responseListener);
-    asyncTask.execute();
-    try {
-      latch.await(5, TimeUnit.SECONDS);
-    } catch (InterruptedException e) {
-      cafeBazaarWalletAvailable = false;
-      e.printStackTrace();
-    }
-    String iabAction;
-    if (cafeBazaarWalletAvailable) {
-      iabAction = com.appcoins.billing.sdk.BuildConfig.CB_IAB_BIND_ACTION;
-    } else {
-      iabAction = com.appcoins.billing.sdk.BuildConfig.IAB_BIND_ACTION;
-    }
-    return iabAction;
   }
 
   private static Intent getNotificationIntentForBrowser(String url, PackageManager packageManager) {
