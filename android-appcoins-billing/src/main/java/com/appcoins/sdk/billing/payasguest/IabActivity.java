@@ -66,6 +66,11 @@ public class IabActivity extends Activity implements IabView {
     }
   }
 
+  @Override protected void onDestroy() {
+    unlockRotation();
+    super.onDestroy();
+  }
+
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == LAUNCH_INSTALL_BILLING_FLOW_REQUEST_CODE) {
       setResult(resultCode, data);

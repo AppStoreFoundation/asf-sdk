@@ -32,8 +32,8 @@ public class AdyenPaymentInteract {
 
   void makePayment(final String paymentMethod, final boolean shouldStoreCard,
       final String returnUrl, final String fiatPrice, final String currency,
-      final String orderReference, final String paymentType, final String origin,
-      final String packageName, final String metadata, final String sku, final String callBackUrl,
+      final String orderReference, final String paymentType, final String packageName,
+      final String metadata, final String sku, final String callBackUrl,
       final String transactionType, final String userWalletAddress,
       final MakePaymentListener makePaymentListener) {
 
@@ -42,7 +42,7 @@ public class AdyenPaymentInteract {
           String developerAddress) {
         adyenRepository.makePayment(
             new AdyenPaymentParams(paymentMethod, shouldStoreCard, returnUrl),
-            new TransactionInformation(fiatPrice, currency, orderReference, paymentType, origin,
+            new TransactionInformation(fiatPrice, currency, orderReference, paymentType, "BDS",
                 packageName, metadata, sku, callBackUrl, transactionType),
             new TransactionWallets(userWalletAddress, developerAddress, oemAddress, storeAddress,
                 userWalletAddress), makePaymentListener);

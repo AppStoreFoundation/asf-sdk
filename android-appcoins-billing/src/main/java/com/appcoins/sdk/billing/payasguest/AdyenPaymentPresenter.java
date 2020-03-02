@@ -3,6 +3,7 @@ package com.appcoins.sdk.billing.payasguest;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.DeveloperPayload;
 import com.appcoins.sdk.billing.listeners.GetTransactionListener;
@@ -13,7 +14,11 @@ import com.appcoins.sdk.billing.models.PaymentMethodsModel;
 import com.appcoins.sdk.billing.models.Transaction.Status;
 import com.appcoins.sdk.billing.models.TransactionResponse;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
+import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
+import com.sdk.appcoins_adyen.models.ExpiryDate;
+import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 import com.sdk.appcoins_adyen.utils.RedirectUtils;
+import java.math.BigDecimal;
 import org.json.JSONObject;
 
 class AdyenPaymentPresenter {
@@ -62,8 +67,38 @@ class AdyenPaymentPresenter {
     waitingResult = savedInstance.getBoolean(WAITING_RESULT_KEY);
   }
 
-  public void onPositiveClick() {
+  public void onPositiveClick(String cardNumber, String expiryDate, String cvv,
+      BigDecimal serverFiatPrice, String serverCurrency) {
+    fragmentView.showLoading();
+    CardEncryptorImpl cardEncryptor = new CardEncryptorImpl();
+    ExpiryDate mExpiryDate = CardValidationUtils.getDate(expiryDate);
+    String encryptedCard = cardEncryptor.encryptFields(cardNumber, mExpiryDate.getExpiryMonth(),
+        mExpiryDate.getExpiryYear(), cvv, BuildConfig.ADYEN_PUBLIC_KEY);
 
+    makePayment(encryptedCard, serverFiatPrice, serverCurrency);
+  }
+
+  private void makePayment(String encryptedCard, BigDecimal serverFiatPrice,
+      String serverCurrency) {
+    BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
+    DeveloperPayload developerPayload = buyItemProperties.getDeveloperPayload();
+    MakePaymentListener makePaymentListener = new MakePaymentListener() {
+      @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
+        if (adyenTransactionModel.hasError()) {
+          fragmentView.showError();
+        } else {
+          handlePaymentResult(adyenTransactionModel.getUid(), adyenTransactionModel.getResultCode(),
+              adyenTransactionModel.getRefusalReasonCode(),
+              adyenTransactionModel.getRefusalReason(), adyenTransactionModel.getStatus());
+        }
+      }
+    };
+    adyenPaymentInteract.makePayment(encryptedCard, true, returnUrl, serverFiatPrice.toString(),
+        serverCurrency, developerPayload.getOrderReference(),
+        mapPaymentToService(adyenPaymentInfo.getPaymentMethod()).getTransactionType(),
+        buyItemProperties.getPackageName(), developerPayload.getDeveloperPayload(),
+        buyItemProperties.getSku(), null, buyItemProperties.getType()
+            .toUpperCase(), adyenPaymentInfo.getWalletAddress(), makePaymentListener);
   }
 
   public void onCancelClick() {
@@ -98,7 +133,7 @@ class AdyenPaymentPresenter {
     MakePaymentListener makePaymentListener = new MakePaymentListener() {
       @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
         if (!waitingResult) {
-          handleModel(adyenTransactionModel);
+          handlePaypalModel(adyenTransactionModel);
         }
       }
     };
@@ -106,13 +141,12 @@ class AdyenPaymentPresenter {
         paymentMethod.getValue()
             .toString(), paymentMethod.getCurrency(), developerPayload.getOrderReference(),
         mapPaymentToService(adyenPaymentInfo.getPaymentMethod()).getTransactionType(),
-        developerPayload.getOrigin(), buyItemProperties.getPackageName(),
-        developerPayload.getDeveloperPayload(), buyItemProperties.getSku(), null,
-        buyItemProperties.getType()
+        buyItemProperties.getPackageName(), developerPayload.getDeveloperPayload(),
+        buyItemProperties.getSku(), null, buyItemProperties.getType()
             .toUpperCase(), adyenPaymentInfo.getWalletAddress(), makePaymentListener);
   }
 
-  private void handleModel(final AdyenTransactionModel adyenTransactionModel) {
+  private void handlePaypalModel(final AdyenTransactionModel adyenTransactionModel) {
     if (adyenTransactionModel.hasError()) {
       fragmentView.showError();
     } else {
@@ -158,8 +192,6 @@ class AdyenPaymentPresenter {
   }
 
   private void handleSuccessAdyenTransaction(final String uid) {
-    //requestWallet
-    //requestWalletListener{
     GetTransactionListener getTransactionListener = new GetTransactionListener() {
       @Override public void onResponse(TransactionResponse transactionResponse) {
         if (transactionResponse.hasError()) {

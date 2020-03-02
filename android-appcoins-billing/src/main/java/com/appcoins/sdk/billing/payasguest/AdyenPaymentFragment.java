@@ -31,6 +31,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private AdyenPaymentInfo adyenPaymentInfo;
   private AdyenPaymentPresenter presenter;
   private AdyenPaymentFragmentLayout layout;
+  private String serverCurrency;
+  private BigDecimal serverFiatPrice;
 
   @Override public void onAttach(Context context) {
     super.onAttach(context);
@@ -149,6 +151,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   }
 
   @Override public void updateFiatPrice(BigDecimal value, String currency) {
+    serverFiatPrice = value;
+    serverCurrency = currency;
     String fiatPrice = new Formatter().format(Locale.getDefault(), "%(,.2f", value.doubleValue())
         .toString();
     layout.getFiatPriceView()
@@ -246,7 +250,15 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private void onPositiveButtonClick(Button positiveButton) {
     positiveButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        presenter.onPositiveClick();
+        String cardNumber = layout.getCardNumberEditText()
+            .getCacheSavedNumber();
+        String expiryDate = layout.getExpiryDateEditText()
+            .getText()
+            .toString();
+        String cvv = layout.getCvvEditText()
+            .getText()
+            .toString();
+        presenter.onPositiveClick(cardNumber, expiryDate, cvv, serverFiatPrice, serverCurrency);
       }
     });
   }

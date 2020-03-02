@@ -449,6 +449,7 @@ public class AdyenPaymentFragmentLayout {
     LinearLayout.LayoutParams layoutParams =
         new LinearLayout.LayoutParams(dpToPx(150), ViewGroup.LayoutParams.MATCH_PARENT);
 
+    setMargins(layoutParams, 0, 0, 8, 0);
     layoutParams.gravity = Gravity.CENTER_VERTICAL;
 
     cardNumberEditText.setTextSize(14);
