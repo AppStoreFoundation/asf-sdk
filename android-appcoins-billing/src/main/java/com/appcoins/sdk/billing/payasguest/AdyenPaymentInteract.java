@@ -1,6 +1,7 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import com.appcoins.sdk.billing.listeners.GetTransactionListener;
 import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.MakePaymentListener;
@@ -13,10 +14,13 @@ import org.json.JSONObject;
 public class AdyenPaymentInteract {
 
   private AdyenRepository adyenRepository;
+  private BillingRepository billingRepository;
   private AddressService addressService;
 
-  public AdyenPaymentInteract(AdyenRepository adyenRepository, AddressService addressService) {
+  public AdyenPaymentInteract(AdyenRepository adyenRepository, BillingRepository billingRepository,
+      AddressService addressService) {
     this.adyenRepository = adyenRepository;
+    this.billingRepository = billingRepository;
     this.addressService = addressService;
   }
 
@@ -57,6 +61,17 @@ public class AdyenPaymentInteract {
   void getTransaction(String uid, String walletAddress, String signature,
       GetTransactionListener getTransactionListener) {
     adyenRepository.getTransaction(uid, walletAddress, signature, getTransactionListener);
+  }
+
+  void getCompletedPurchaseBundle(String transactionType, String packageName, String sku,
+      String walletAddress, String walletSignature, PurchaseListener purchaseListener) {
+    if (transactionType.equalsIgnoreCase("inapp")) {
+      billingRepository.getSkuPurchase(packageName, sku, walletAddress, walletSignature,
+          purchaseListener);
+    } else {
+      Log.w("TAG", "Unknown transaction type"); //This shouldn't happen as we are verifying before
+      purchaseListener.onResponse(new PurchaseModel());
+    }
   }
 
   public interface AddressListener {

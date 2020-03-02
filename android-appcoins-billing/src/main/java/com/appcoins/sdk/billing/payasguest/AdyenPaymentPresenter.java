@@ -2,7 +2,7 @@ package com.appcoins.sdk.billing.payasguest;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.DeveloperPayload;
 import com.appcoins.sdk.billing.listeners.GetTransactionListener;
@@ -14,8 +14,6 @@ import com.appcoins.sdk.billing.models.Transaction.Status;
 import com.appcoins.sdk.billing.models.TransactionResponse;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
 import com.sdk.appcoins_adyen.utils.RedirectUtils;
-import java.util.Timer;
-import java.util.TimerTask;
 import org.json.JSONObject;
 
 class AdyenPaymentPresenter {
@@ -26,6 +24,7 @@ class AdyenPaymentPresenter {
   private final AdyenPaymentInteract adyenPaymentInteract;
   private String returnUrl;
   private boolean waitingResult;
+  private boolean destroyed;
 
   public AdyenPaymentPresenter(AdyenPaymentView fragmentView, AdyenPaymentInfo adyenPaymentInfo,
       AdyenPaymentInteract adyenPaymentInteract, String returnUrl) {
@@ -108,8 +107,9 @@ class AdyenPaymentPresenter {
             .toString(), paymentMethod.getCurrency(), developerPayload.getOrderReference(),
         mapPaymentToService(adyenPaymentInfo.getPaymentMethod()).getTransactionType(),
         developerPayload.getOrigin(), buyItemProperties.getPackageName(),
-        developerPayload.getDeveloperPayload(), buyItemProperties.getSku(), null, "INAPP",
-        adyenPaymentInfo.getWalletAddress(), makePaymentListener);
+        developerPayload.getDeveloperPayload(), buyItemProperties.getSku(), null,
+        buyItemProperties.getType()
+            .toUpperCase(), adyenPaymentInfo.getWalletAddress(), makePaymentListener);
   }
 
   private void handleModel(final AdyenTransactionModel adyenTransactionModel) {
@@ -120,7 +120,6 @@ class AdyenPaymentPresenter {
         @Override public void onActivityResult(Uri data) {
           String uid = adyenTransactionModel.getUid();
           JSONObject details = RedirectUtils.parseRedirectResult(data);
-          String paymentData = null;
           MakePaymentListener makePaymentListener = new MakePaymentListener() {
             @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
               if (adyenTransactionModel.hasError()) {
@@ -134,7 +133,7 @@ class AdyenPaymentPresenter {
             }
           };
           adyenPaymentInteract.submitRedirect(uid, adyenPaymentInfo.getWalletAddress(), details,
-              paymentData, makePaymentListener);
+              null, makePaymentListener);
         }
       };
       fragmentView.lockRotation();
@@ -161,29 +160,40 @@ class AdyenPaymentPresenter {
   private void handleSuccessAdyenTransaction(final String uid) {
     //requestWallet
     //requestWalletListener{
-    final GetTransactionListener getTransactionListener = new GetTransactionListener() {
+    GetTransactionListener getTransactionListener = new GetTransactionListener() {
       @Override public void onResponse(TransactionResponse transactionResponse) {
         if (transactionResponse.hasError()) {
           fragmentView.showError();
         } else {
           if (transactionResponse.getStatus()
               .equalsIgnoreCase(String.valueOf(Status.COMPLETED))) {
-            Log.d("TAG123", "COMPLETED");
+            createBundle(transactionResponse);
           } else if (paymentFailed(transactionResponse.getStatus())) {
-            Log.d("TAG123", "FAILED");
+            fragmentView.showError();
           } else {
-            Log.d("TAG123", "REPEAT");
-            new Timer().schedule(new TimerTask() {
-              @Override public void run() {
-                handleSuccessAdyenTransaction(uid);
-              }
-            }, 3000);
+            if (!destroyed) {
+              requestTransaction(uid, 10000, this);
+            }
           }
         }
       }
     };
     adyenPaymentInteract.getTransaction(uid, adyenPaymentInfo.getWalletAddress(),
         adyenPaymentInfo.getSignature(), getTransactionListener);
+  }
+
+  private void createBundle(final TransactionResponse transactionResponse) {
+    PurchaseListener purchaseListener = new PurchaseListener() {
+      @Override public void onResponse(PurchaseModel purchaseModel) {
+        BillingMapper billingMapper = new BillingMapper();
+        Bundle bundle = billingMapper.map(purchaseModel, transactionResponse.getOrderReference());
+        fragmentView.finish(bundle);
+      }
+    };
+    BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
+    adyenPaymentInteract.getCompletedPurchaseBundle(buyItemProperties.getType(),
+        buyItemProperties.getPackageName(), buyItemProperties.getSku(),
+        adyenPaymentInfo.getWalletAddress(), adyenPaymentInfo.getSignature(), purchaseListener);
   }
 
   private boolean paymentFailed(String status) {
@@ -198,5 +208,22 @@ class AdyenPaymentPresenter {
     } else {
       return AdyenRepository.Methods.PAYPAL;
     }
+  }
+
+  private void requestTransaction(final String uid, long delayInMillis,
+      final GetTransactionListener getTransactionListener) {
+    final Handler handler = new Handler();
+    Runnable runnable = new Runnable() {
+      @Override public void run() {
+        adyenPaymentInteract.getTransaction(uid, adyenPaymentInfo.getWalletAddress(),
+            adyenPaymentInfo.getSignature(), getTransactionListener);
+        handler.removeCallbacks(this);
+      }
+    };
+    handler.postDelayed(runnable, delayInMillis);
+  }
+
+  void onDestroy() {
+    destroyed = true;
   }
 }

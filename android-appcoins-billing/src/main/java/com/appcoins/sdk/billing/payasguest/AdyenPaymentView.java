@@ -1,5 +1,6 @@
 package com.appcoins.sdk.billing.payasguest;
 
+import android.os.Bundle;
 import java.math.BigDecimal;
 
 interface AdyenPaymentView {
@@ -18,4 +19,6 @@ interface AdyenPaymentView {
   void unlockRotation();
 
   void navigateToUri(String url, ActivityResultListener activityResultListener);
+
+  void finish(Bundle bundle);
 }

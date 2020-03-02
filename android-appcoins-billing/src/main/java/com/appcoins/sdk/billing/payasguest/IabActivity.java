@@ -26,7 +26,7 @@ import static com.appcoins.sdk.billing.helpers.Utils.RESPONSE_CODE;
 
 public class IabActivity extends Activity implements IabView {
 
-  public final static int LAUNCH_BILLING_FLOW_REQUEST_CODE = 10001;
+  public final static int LAUNCH_INSTALL_BILLING_FLOW_REQUEST_CODE = 10001;
   public final static String PAYMENT_METHOD_KEY = "payment_method";
   public final static String WALLET_ADDRESS_KEY = "wallet_address_key";
   public final static String EWT_KEY = "ewt_key";
@@ -67,7 +67,7 @@ public class IabActivity extends Activity implements IabView {
   }
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (requestCode == LAUNCH_BILLING_FLOW_REQUEST_CODE) {
+    if (requestCode == LAUNCH_INSTALL_BILLING_FLOW_REQUEST_CODE) {
       setResult(resultCode, data);
       finish();
     } else if (requestCode == WEB_VIEW_REQUEST_CODE) {
@@ -169,6 +169,11 @@ public class IabActivity extends Activity implements IabView {
   @Override public void navigateToUri(String url, ActivityResultListener activityResultListener) {
     this.activityResultListener = activityResultListener;
     startActivityForResult(WebViewActivity.newIntent(this, url), WEB_VIEW_REQUEST_CODE);
+  }
+
+  @Override public void finish(Bundle bundle) {
+    setResult(Activity.RESULT_OK, new Intent().putExtras(bundle));
+    finish();
   }
 
   private void buildAlertNoBrowserAndStores() {

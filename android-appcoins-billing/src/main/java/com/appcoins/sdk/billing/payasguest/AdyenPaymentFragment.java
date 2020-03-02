@@ -52,11 +52,13 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST);
     IExtractOemId extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
 
+    BillingRepository billingRepository = new BillingRepository(apiService);
+
     AddressService addressService = new AddressService(getActivity().getApplicationContext(),
         new WalletAddressService(apiService), new DeveloperAddressService(ws75Service),
         Build.MANUFACTURER, Build.MODEL, new OemIdExtractorService(extractorV1));
     presenter = new AdyenPaymentPresenter(this, adyenPaymentInfo,
-        new AdyenPaymentInteract(adyenRepository, addressService),
+        new AdyenPaymentInteract(adyenRepository, billingRepository, addressService),
         RedirectUtils.getReturnUrl(getActivity().getApplicationContext()));
   }
 
@@ -100,6 +102,12 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   @Override public void onDestroyView() {
     layout = null;
     super.onDestroyView();
+  }
+
+  @Override public void onDestroy() {
+    presenter.onDestroy();
+    presenter = null;
+    super.onDestroy();
   }
 
   @Override public void close() {
@@ -155,6 +163,10 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void navigateToUri(String url, ActivityResultListener activityResultListener) {
     iabView.navigateToUri(url, activityResultListener);
+  }
+
+  @Override public void finish(Bundle bundle) {
+    iabView.finish(bundle);
   }
 
   private AdyenPaymentInfo extractBundleInfo() {

@@ -12,7 +12,9 @@ public class RequestBuilderUtils {
     boolean hasQueries = !queries.isEmpty();
     StringBuilder urlBuilder = new StringBuilder(baseUrl + endPoint);
     for (String path : paths) {
-      buildPath(path, urlBuilder);
+      if (path != null) {
+        buildPath(path, urlBuilder);
+      }
     }
     if (hasQueries) {
       urlBuilder.append("?");

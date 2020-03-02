@@ -2,6 +2,7 @@ package com.appcoins.sdk.billing.payasguest;
 
 import android.content.Intent;
 import android.content.IntentSender;
+import android.os.Bundle;
 import com.appcoins.sdk.billing.helpers.TranslationsModel;
 
 interface IabView {
@@ -27,4 +28,6 @@ interface IabView {
   void unlockRotation();
 
   void navigateToUri(String url, ActivityResultListener activityResultListener);
+
+  void finish(Bundle bundle);
 }

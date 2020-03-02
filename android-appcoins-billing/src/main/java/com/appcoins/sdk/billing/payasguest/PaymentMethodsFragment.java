@@ -339,7 +339,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         .setVisibility(View.INVISIBLE);
     if (pendingIntent != null) {
       iabView.startIntentSenderForResult(pendingIntent.getIntentSender(),
-          IabActivity.LAUNCH_BILLING_FLOW_REQUEST_CODE);
+          IabActivity.LAUNCH_INSTALL_BILLING_FLOW_REQUEST_CODE);
     } else {
       iabView.finishWithError();
     }

@@ -121,8 +121,12 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
                   PayloadHelper.getOrigin(developerPayload)));
 
       final Context context = WalletUtils.getContext();
-
-      Intent intent = new Intent(context, IabActivity.class);
+      Intent intent;
+      if (type.equalsIgnoreCase("inapp") && sku != null && !sku.isEmpty()) {
+        intent = new Intent(context, IabActivity.class);
+      } else {
+        intent = new Intent(context, InstallDialogActivity.class);
+      }
       intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
       PendingIntent pendingIntent =
           PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
