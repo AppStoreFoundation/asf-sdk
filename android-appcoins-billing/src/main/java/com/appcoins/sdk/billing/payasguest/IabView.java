@@ -30,4 +30,6 @@ interface IabView {
   void navigateToUri(String url, ActivityResultListener activityResultListener);
 
   void finish(Bundle bundle);
+
+  void navigateToPaymentSelection();
 }

@@ -17,6 +17,7 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -409,6 +410,7 @@ public class AdyenPaymentFragmentLayout {
     });
     layoutParams.gravity = Gravity.CENTER_VERTICAL;
     editText.setHint("CVV");
+    editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
     editText.setLayoutParams(layoutParams);
     editText.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -428,6 +430,7 @@ public class AdyenPaymentFragmentLayout {
         new InputFilter.LengthFilter(CardValidationUtils.DATE_MAX_LENGTH)
     });
     editText.setHint("MM/YY");
+    editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
     layoutParams.gravity = Gravity.CENTER_VERTICAL;
     editText.setLayoutParams(layoutParams);
@@ -447,12 +450,13 @@ public class AdyenPaymentFragmentLayout {
             + CardValidationUtils.MAX_DIGIT_SEPARATOR_COUNT)
     });
     LinearLayout.LayoutParams layoutParams =
-        new LinearLayout.LayoutParams(dpToPx(150), ViewGroup.LayoutParams.MATCH_PARENT);
+        new LinearLayout.LayoutParams(dpToPx(140), ViewGroup.LayoutParams.MATCH_PARENT);
 
     setMargins(layoutParams, 0, 0, 8, 0);
     layoutParams.gravity = Gravity.CENTER_VERTICAL;
 
     cardNumberEditText.setTextSize(14);
+    cardNumberEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     cardNumberEditText.setTextColor(Color.parseColor("#292929"));
     cardNumberEditText.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
     cardNumberEditText.setHint("Card Number");

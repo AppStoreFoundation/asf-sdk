@@ -114,7 +114,7 @@ class AdyenPaymentPresenter {
   }
 
   public void onMorePaymentsClick() {
-
+    fragmentView.navigateToPaymentSelection();
   }
 
   private void launchPayment(PaymentMethodsModel paymentMethodsModel) {

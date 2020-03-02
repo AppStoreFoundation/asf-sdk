@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
@@ -120,6 +121,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
           @Override public void onFieldChanged(boolean isCardNumberValid, boolean isExpiryDateValid,
               boolean isCvvValid) {
             if (isCardNumberValid && isExpiryDateValid && isCvvValid) {
+              hideKeyboard();
               positiveButton.setEnabled(true);
             } else {
               positiveButton.setEnabled(false);
@@ -187,6 +189,10 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void finish(Bundle bundle) {
     iabView.finish(bundle);
+  }
+
+  @Override public void navigateToPaymentSelection() {
+    iabView.navigateToPaymentSelection();
   }
 
   private AdyenPaymentInfo extractBundleInfo() {
@@ -283,5 +289,17 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
       return (BuyItemProperties) getArguments().getSerializable(key);
     }
     throw new IllegalArgumentException(key + "data not found");
+  }
+
+  private void hideKeyboard() {
+    InputMethodManager inputMethodManager =
+        (InputMethodManager) getActivity().getApplicationContext()
+            .getSystemService(Context.INPUT_METHOD_SERVICE);
+    if (inputMethodManager != null) {
+      View view = getView();
+      if (view != null) {
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+      }
+    }
   }
 }

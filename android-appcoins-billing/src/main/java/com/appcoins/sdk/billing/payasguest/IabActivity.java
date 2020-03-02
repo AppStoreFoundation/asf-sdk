@@ -62,7 +62,7 @@ public class IabActivity extends Activity implements IabView {
       translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
     } else {
       fetchTranslations();
-      navigateTo(PaymentMethodsFragment.newInstance(buyItemProperties));
+      navigateToPaymentSelection();
     }
   }
 
@@ -179,6 +179,10 @@ public class IabActivity extends Activity implements IabView {
   @Override public void finish(Bundle bundle) {
     setResult(Activity.RESULT_OK, new Intent().putExtras(bundle));
     finish();
+  }
+
+  @Override public void navigateToPaymentSelection() {
+    navigateTo(PaymentMethodsFragment.newInstance(buyItemProperties));
   }
 
   private void buildAlertNoBrowserAndStores() {
