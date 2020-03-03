@@ -224,13 +224,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     iabView.showAlertNoBrowserAndStores();
   }
 
-  @Override public void redirectToWalletInstallation(Intent intent, boolean shouldHide) {
-    if (shouldHide) {
-      layout.getDialogLayout()
-          .setVisibility(View.INVISIBLE);
-      layout.getIntentLoadingView()
-          .setVisibility(View.VISIBLE);
-    }
+  @Override public void hideDialog() {
+    layout.getDialogLayout()
+        .setVisibility(View.INVISIBLE);
+    layout.getIntentLoadingView()
+        .setVisibility(View.VISIBLE);
+  }
+
+  @Override public void redirectToWalletInstallation(Intent intent) {
     iabView.redirectToWalletInstallation(intent);
   }
 

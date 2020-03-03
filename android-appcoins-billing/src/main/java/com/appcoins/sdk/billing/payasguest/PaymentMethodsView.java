@@ -12,7 +12,7 @@ interface PaymentMethodsView {
 
   void showAlertNoBrowserAndStores();
 
-  void redirectToWalletInstallation(Intent intent, boolean shouldHide);
+  void redirectToWalletInstallation(Intent intent);
 
   void navigateToAdyen(String selectedRadioButton);
 
@@ -27,4 +27,6 @@ interface PaymentMethodsView {
   void showPaymentView();
 
   void showBonus(int bonus);
+
+  void hideDialog();
 }
