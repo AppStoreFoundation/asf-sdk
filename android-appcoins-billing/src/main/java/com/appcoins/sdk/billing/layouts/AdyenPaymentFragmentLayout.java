@@ -779,7 +779,7 @@ public class AdyenPaymentFragmentLayout {
     return morePaymentsText;
   }
 
-  public TextView getChangeCard() {
+  public TextView getChangeCardView() {
     return changeCard;
   }
 

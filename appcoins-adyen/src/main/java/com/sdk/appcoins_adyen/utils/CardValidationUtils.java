@@ -19,7 +19,7 @@ public final class CardValidationUtils {
   public static final int AMEX_CARD_NUMBER_LENGTH = 15;
   public static final int CVV_MAX_LENGTH = 4;
   public static final int DATE_MAX_LENGTH = 5;
-  private static final String DATE_FORMAT = "MM/yy";
+  public static final String DATE_FORMAT = "MM/yy";
   private static final String PUBLIC_KEY_PATTERN = "([0-9]){5}\\|([A-Z]|[0-9]){512}";
   private static final char DIGIT_SEPARATOR = ' ';
   // Luhn Check

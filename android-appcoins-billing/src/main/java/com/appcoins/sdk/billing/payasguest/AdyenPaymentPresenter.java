@@ -68,12 +68,17 @@ class AdyenPaymentPresenter {
   }
 
   public void onPositiveClick(String cardNumber, String expiryDate, String cvv,
-      BigDecimal serverFiatPrice, String serverCurrency) {
+      String storedPaymentId, BigDecimal serverFiatPrice, String serverCurrency) {
     fragmentView.showLoading();
-    CardEncryptorImpl cardEncryptor = new CardEncryptorImpl();
+    CardEncryptorImpl cardEncryptor = new CardEncryptorImpl(BuildConfig.ADYEN_PUBLIC_KEY);
     ExpiryDate mExpiryDate = CardValidationUtils.getDate(expiryDate);
-    String encryptedCard = cardEncryptor.encryptFields(cardNumber, mExpiryDate.getExpiryMonth(),
-        mExpiryDate.getExpiryYear(), cvv, BuildConfig.ADYEN_PUBLIC_KEY);
+    String encryptedCard;
+    if (storedPaymentId.equals("")) {
+      encryptedCard = cardEncryptor.encryptFields(cardNumber, mExpiryDate.getExpiryMonth(),
+          mExpiryDate.getExpiryYear(), cvv);
+    } else {
+      encryptedCard = cardEncryptor.encryptStoredPaymentFields(cvv, storedPaymentId, "scheme");
+    }
 
     makePayment(encryptedCard, serverFiatPrice, serverCurrency);
   }
@@ -120,7 +125,7 @@ class AdyenPaymentPresenter {
   private void launchPayment(PaymentMethodsModel paymentMethodsModel) {
     if (adyenPaymentInfo.getPaymentMethod()
         .equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
-      fragmentView.showCreditCardView();
+      fragmentView.showCreditCardView(paymentMethodsModel.getStoredMethodDetails());
     } else {
       fragmentView.showLoading();
       launchPaypal(paymentMethodsModel);

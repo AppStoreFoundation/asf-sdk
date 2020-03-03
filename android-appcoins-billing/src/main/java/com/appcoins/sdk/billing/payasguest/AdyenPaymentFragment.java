@@ -18,15 +18,20 @@ import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.layouts.AdyenPaymentFragmentLayout;
 import com.appcoins.sdk.billing.layouts.CardNumberEditText;
 import com.appcoins.sdk.billing.layouts.FieldValidationListener;
+import com.appcoins.sdk.billing.models.StoredMethodDetails;
 import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.Service;
 import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
 import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
+import com.sdk.appcoins_adyen.models.ExpiryDate;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 import com.sdk.appcoins_adyen.utils.RedirectUtils;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Formatter;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
@@ -39,6 +44,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private AdyenPaymentPresenter presenter;
   private AdyenPaymentFragmentLayout layout;
   private String serverCurrency;
+  private String storedPaymentId = "";
   private BigDecimal serverFiatPrice;
 
   @Override public void onAttach(Context context) {
@@ -88,27 +94,15 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     Button positiveButton = layout.getPositiveButton();
     setFieldChangeListener(positiveButton);
     if (savedInstanceState != null) {
-      layout.getCardNumberEditText()
-          .setText(savedInstanceState.getString(CARD_NUMBER_KEY, ""));
-      String expiryDate = savedInstanceState.getString(EXPIRY_DATE_KEY, "");
-      if (!expiryDate.equals("")) {
-        EditText expiryEditText = layout.getExpiryDateEditText();
-        expiryEditText.setVisibility(View.VISIBLE);
-        expiryEditText.setText(expiryDate);
-      }
-      String cvv = savedInstanceState.getString(CVV_KEY, "");
-      if (!cvv.equals("")) {
-        EditText cvvEditText = layout.getCvvEditText();
-        cvvEditText.setVisibility(View.VISIBLE);
-        cvvEditText.setText(savedInstanceState.getString(CVV_KEY, ""));
-      }
+      onSavedInstance(savedInstanceState);
+
       presenter.onSavedInstance(savedInstanceState);
     }
     handleLayoutVisibility(adyenPaymentInfo.getPaymentMethod());
     Button cancelButton = layout.getCancelButton();
     Button errorButton = layout.getPaymentErrorViewLayout()
         .getErrorPositiveButton();
-    TextView changeCardView = layout.getChangeCard();
+    TextView changeCardView = layout.getChangeCardView();
     TextView morePaymentsText = layout.getMorePaymentsText();
     onPositiveButtonClick(positiveButton);
     onCancelButtonClick(cancelButton);
@@ -121,20 +115,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    CardNumberEditText cardNumberEditText = layout.getCardNumberEditText();
-    if (CardValidationUtils.isShortenCardNumber(cardNumberEditText.getText()
-        .toString())) {
-      outState.putString(CARD_NUMBER_KEY, cardNumberEditText.getCacheSavedNumber());
-    } else {
-      outState.putString(CARD_NUMBER_KEY, cardNumberEditText.getText()
-          .toString());
-    }
-    outState.putString(EXPIRY_DATE_KEY, layout.getExpiryDateEditText()
-        .getText()
-        .toString());
-    outState.putString(CVV_KEY, layout.getCvvEditText()
-        .getText()
-        .toString());
+    setRotationSavedCardValues(outState);
     presenter.onSaveInstanceState(outState);
   }
 
@@ -150,12 +131,47 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     super.onDestroy();
   }
 
+  private void onSavedInstance(Bundle savedInstanceState) {
+    layout.getCardNumberEditText()
+        .setText(savedInstanceState.getString(CARD_NUMBER_KEY, ""));
+    String expiryDate = savedInstanceState.getString(EXPIRY_DATE_KEY, "");
+    if (!expiryDate.equals("")) {
+      EditText expiryEditText = layout.getExpiryDateEditText();
+      expiryEditText.setVisibility(View.VISIBLE);
+      expiryEditText.setText(expiryDate);
+    }
+    String cvv = savedInstanceState.getString(CVV_KEY, "");
+    if (!cvv.equals("")) {
+      EditText cvvEditText = layout.getCvvEditText();
+      cvvEditText.setVisibility(View.VISIBLE);
+      cvvEditText.setText(savedInstanceState.getString(CVV_KEY, ""));
+    }
+  }
+
+  private void setRotationSavedCardValues(Bundle outState) {
+    CardNumberEditText cardNumberEditText = layout.getCardNumberEditText();
+    if (CardValidationUtils.isShortenCardNumber(cardNumberEditText.getText()
+        .toString())) {
+      outState.putString(CARD_NUMBER_KEY, cardNumberEditText.getCacheSavedNumber());
+    } else {
+      outState.putString(CARD_NUMBER_KEY, cardNumberEditText.getText()
+          .toString());
+    }
+    outState.putString(EXPIRY_DATE_KEY, layout.getExpiryDateEditText()
+        .getText()
+        .toString());
+    outState.putString(CVV_KEY, layout.getCvvEditText()
+        .getText()
+        .toString());
+  }
+
   private void setFieldChangeListener(final Button positiveButton) {
     layout.getCreditCardEditTextLayout()
         .setFieldValidationListener(new FieldValidationListener() {
           @Override public void onFieldChanged(boolean isCardNumberValid, boolean isExpiryDateValid,
-              boolean isCvvValid) {
-            if (isCardNumberValid && isExpiryDateValid && isCvvValid) {
+              boolean isCvvValid, String paymentId) {
+            if ((isCardNumberValid && isExpiryDateValid && isCvvValid)
+                || !paymentId.equals("") && isCvvValid) {
               hideKeyboard();
               positiveButton.setEnabled(true);
             } else {
@@ -196,14 +212,16 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         .setText(String.format("%s %s", fiatPrice, currency));
   }
 
-  @Override public void showCreditCardView() {
-
+  @Override public void showCreditCardView(StoredMethodDetails storedMethodDetails) {
     layout.getPaypalLoading()
         .setVisibility(View.INVISIBLE);
     layout.getErrorView()
         .setVisibility(View.INVISIBLE);
     layout.getDialogLayout()
         .setVisibility(View.VISIBLE);
+    if (storedMethodDetails != null) {
+      setStoredPaymentMethodDetails(storedMethodDetails);
+    }
   }
 
   @Override public void lockRotation() {
@@ -224,6 +242,26 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void navigateToPaymentSelection() {
     iabView.navigateToPaymentSelection();
+  }
+
+  private void setStoredPaymentMethodDetails(StoredMethodDetails storedMethodDetails) {
+    layout.getChangeCardView()
+        .setVisibility(View.VISIBLE);
+    CardNumberEditText cardNumberEditText = layout.getCardNumberEditText();
+    cardNumberEditText.setText(String.format("••••%s", storedMethodDetails.getCardNumber()));
+    cardNumberEditText.setStoredCard(true);
+    cardNumberEditText.setEnabled(false);
+    EditText expiryText = layout.getExpiryDateEditText();
+    ExpiryDate expiryDate =
+        new ExpiryDate(storedMethodDetails.getExpiryMonth(), storedMethodDetails.getExpiryYear());
+    setDate(expiryDate, expiryText);
+    expiryText.setVisibility(View.VISIBLE);
+    expiryText.setEnabled(false);
+    EditText editText = layout.getCvvEditText();
+    editText.setVisibility(View.VISIBLE);
+    editText.requestFocus();
+    layout.getCreditCardEditTextLayout()
+        .setStoredPaymentId(storedMethodDetails.getPaymentId());
   }
 
   private AdyenPaymentInfo extractBundleInfo() {
@@ -295,7 +333,10 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         String cvv = layout.getCvvEditText()
             .getText()
             .toString();
-        presenter.onPositiveClick(cardNumber, expiryDate, cvv, serverFiatPrice, serverCurrency);
+        String paymentId = layout.getCreditCardEditTextLayout()
+            .getStoredPaymentId();
+        presenter.onPositiveClick(cardNumber, expiryDate, cvv, paymentId, serverFiatPrice,
+            serverCurrency);
       }
     });
   }
@@ -331,6 +372,20 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
       if (view != null) {
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
       }
+    }
+  }
+
+  private void setDate(ExpiryDate expiryDate, EditText editText) {
+    SimpleDateFormat simpleDateFormat =
+        new SimpleDateFormat(CardValidationUtils.DATE_FORMAT, Locale.ROOT);
+    if (expiryDate != null && expiryDate != ExpiryDate.EMPTY_DATE) {
+      final Calendar calendar = GregorianCalendar.getInstance();
+      calendar.clear();
+      // first day of month, GregorianCalendar month is 0 based.
+      calendar.set(expiryDate.getExpiryYear(), expiryDate.getExpiryMonth() - 1, 1);
+      editText.setText(simpleDateFormat.format(calendar.getTime()));
+    } else {
+      editText.setText("");
     }
   }
 }

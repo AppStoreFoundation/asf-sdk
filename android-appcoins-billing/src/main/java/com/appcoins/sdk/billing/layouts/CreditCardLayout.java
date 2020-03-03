@@ -8,6 +8,7 @@ public class CreditCardLayout extends LinearLayout {
   private boolean isCardNumberValid = false;
   private boolean isExpiryDateValid = false;
   private boolean isCvvValid = false;
+  private String storedPaymentId = "";
   private FieldValidationListener fieldValidationListener;
 
   public CreditCardLayout(Context context) {
@@ -29,13 +30,23 @@ public class CreditCardLayout extends LinearLayout {
     onFieldChanged();
   }
 
+  public String getStoredPaymentId() {
+    return storedPaymentId;
+  }
+
+  public void setStoredPaymentId(String storedPaymentId) {
+    this.storedPaymentId = storedPaymentId;
+    onFieldChanged();
+  }
+
   public void setFieldValidationListener(FieldValidationListener fieldValidationListener) {
     this.fieldValidationListener = fieldValidationListener;
   }
 
   private void onFieldChanged() {
     if (fieldValidationListener != null) {
-      fieldValidationListener.onFieldChanged(isCardNumberValid, isExpiryDateValid, isCvvValid);
+      fieldValidationListener.onFieldChanged(isCardNumberValid, isExpiryDateValid, isCvvValid,
+          storedPaymentId);
     }
   }
 }

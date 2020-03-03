@@ -30,20 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
-import com.appcoins.sdk.billing.WebViewActivity;
-import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
-import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
-import com.appcoins.sdk.billing.models.AdyenPaymentParams;
-import com.appcoins.sdk.billing.models.AdyenTransactionModel;
-import com.appcoins.sdk.billing.models.PaymentMethodsModel;
-import com.appcoins.sdk.billing.models.TransactionInformation;
-import com.appcoins.sdk.billing.models.TransactionWallets;
-import com.appcoins.sdk.billing.service.BdsService;
-import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
-import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
-import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
-import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -76,14 +63,10 @@ public class InstallDialogActivity extends Activity {
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
   private TranslationsModel translationsModel;
-  private AdyenRepository adyenRepository;
   private RelativeLayout installationDialog;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    adyenRepository = new AdyenRepository(
-        new BdsService(BuildConfig.HOST_WS + "/broker/"),
-        new AdyenListenerProvider(new AdyenMapper()));
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
@@ -288,80 +271,10 @@ public class InstallDialogActivity extends Activity {
     installButton.setLayoutParams(installButtonParams);
     installButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        //loadPaymentFlow("credit_card");
         redirectToWalletInstallation(storeUrl);
       }
     });
     return installButton;
-  }
-
-  private void loadPaymentFlow(final String method) { //Test method only
-    LoadPaymentInfoListener loadPaymentInfoListener = new LoadPaymentInfoListener() {
-      @Override public void onResponse(PaymentMethodsModel paymentMethodsResponse) {
-        Log.d("TAG123", "Payment Info: "
-            + paymentMethodsResponse.getValue()
-            + paymentMethodsResponse.getCurrency());
-        if (method.equals("paypal")) {
-          launchPaypal(paymentMethodsResponse);
-        } else {
-          showCreditCardLayout(paymentMethodsResponse);
-        }
-      }
-    };
-    adyenRepository.loadPaymentInfo(method, "9.06", "EUR", "walletAddress",
-        loadPaymentInfoListener);
-  }
-
-  private void makeCreditCardPayment() {
-    MakePaymentListener makePaymentListener = new MakePaymentListener() {
-      @Override public void onResponse(AdyenTransactionModel adyenTransactionResponse) {
-        if (adyenTransactionResponse != null) {
-          Log.d("TAG123", "Payment Made -> uid: " + adyenTransactionResponse.getUid());
-        }
-        handleTransaction(adyenTransactionResponse);
-      }
-    };
-    CardEncryptorImpl cardEncryptor = new CardEncryptorImpl();
-    String cardPaymentMethod = cardEncryptor.encryptFields("", 0, 0, "",
-        BuildConfig.ADYEN_PUBLIC_KEY); // Use test cards values
-    makePayment(cardPaymentMethod, makePaymentListener);
-  }
-
-  private void launchPaypal(PaymentMethodsModel paymentMethodsResponse) {
-    final Activity activity = this;
-    MakePaymentListener makePaymentListener = new MakePaymentListener() {
-      @Override public void onResponse(AdyenTransactionModel adyenTransactionResponse) {
-        if (adyenTransactionResponse == null) {
-          Log.d("TAG123", "NULL");
-        }
-        Log.d("TAG123", "Transaction created: uid -> " + adyenTransactionResponse.getUid());
-        startActivityForResult(WebViewActivity.newIntent(activity, "https://www.google.com"),
-            WEB_VIEW_REQUEST_CODE);
-      }
-    };
-    Log.d("TAG123", "launching webview: " + paymentMethodsResponse);
-    makePayment(paymentMethodsResponse.getPaymentMethod(), makePaymentListener);
-  }
-
-  private void makePayment(String cardPaymentMethod, MakePaymentListener makePaymentListener) {
-    TransactionWallets transactionWallets =
-        new TransactionWallets("walletAddress", "walletAddress", "walletAddress", "walletAddress",
-            "walletAddress"); //Change walletAddress for a correct wallet
-    AdyenPaymentParams adyenPaymentParams =
-        new AdyenPaymentParams(cardPaymentMethod, false, "adyencheckout://com.appcoins.wallet.dev");
-    TransactionInformation transactionInformation =
-        new TransactionInformation("9.06", "EUR", "orderId=1580121791311", "paypal", "BDS",
-            "com.appcoins.trivialdrivesample.test", "developer payload: gas", "gas", null, "INAPP");
-    adyenRepository.makePayment(adyenPaymentParams, transactionInformation, transactionWallets,
-        makePaymentListener); //Change walletAddress for a correct wallet
-  }
-
-  private void handleTransaction(AdyenTransactionModel adyenTransactionModel) {
-  }
-
-  private void showCreditCardLayout(PaymentMethodsModel paymentMethodsResponse) {
-    Log.d("TAG123", "INSERTING USER CARD");
-    makeCreditCardPayment();
   }
 
   private void redirectToWalletInstallation(final String storeUrl) {

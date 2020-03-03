@@ -1,6 +1,7 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.os.Bundle;
+import com.appcoins.sdk.billing.models.StoredMethodDetails;
 import java.math.BigDecimal;
 
 interface AdyenPaymentView {
@@ -12,7 +13,7 @@ interface AdyenPaymentView {
 
   void updateFiatPrice(BigDecimal value, String currency);
 
-  void showCreditCardView();
+  void showCreditCardView(StoredMethodDetails storedMethodDetails);
 
   void lockRotation();
 

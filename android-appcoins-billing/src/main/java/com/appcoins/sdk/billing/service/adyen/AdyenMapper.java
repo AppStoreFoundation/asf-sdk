@@ -2,6 +2,7 @@ package com.appcoins.sdk.billing.service.adyen;
 
 import com.appcoins.sdk.billing.models.AdyenTransactionModel;
 import com.appcoins.sdk.billing.models.PaymentMethodsModel;
+import com.appcoins.sdk.billing.models.StoredMethodDetails;
 import com.appcoins.sdk.billing.models.TransactionResponse;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import java.math.BigDecimal;
@@ -98,6 +99,7 @@ public class AdyenMapper {
     BigDecimal value;
     String currency;
     String paymentMethodsApiResponse = "";
+    StoredMethodDetails storedMethodDetails = null;
     if (isSuccess(code) && response != null) {
       try {
         jsonObject = new JSONObject(response);
@@ -106,13 +108,27 @@ public class AdyenMapper {
         currency = priceJsonObject.getString("currency");
 
         jsonObject = jsonObject.getJSONObject("payment");
-        JSONArray array = jsonObject.optJSONArray("paymentMethods");
-        JSONObject paymentJSONObject = array.optJSONObject(0);
+        JSONArray paymentsArray = jsonObject.optJSONArray("paymentMethods");
+        JSONArray storedArray = jsonObject.optJSONArray("storedPaymentMethods");
+
+        JSONObject paymentJSONObject = paymentsArray.optJSONObject(0);
         if (paymentJSONObject != null) {
           paymentMethodsApiResponse = paymentJSONObject.toString();
         }
+
+        JSONObject storedJSONObject = storedArray.optJSONObject(0);
+        if (storedJSONObject != null) {
+          String cardNumber = storedJSONObject.getString("lastFour");
+          int expiryMonth = storedJSONObject.getInt("expiryMonth");
+          int expiryYear = storedJSONObject.getInt("expiryYear");
+          String paymentId = storedJSONObject.getString("id");
+          String type = storedJSONObject.getString("type");
+          storedMethodDetails =
+              new StoredMethodDetails(cardNumber, expiryMonth, expiryYear, paymentId, type);
+        }
         paymentMethodsResponse =
-            new PaymentMethodsModel(value, currency, paymentMethodsApiResponse, !isSuccess(code));
+            new PaymentMethodsModel(value, currency, paymentMethodsApiResponse, storedMethodDetails,
+                !isSuccess(code));
       } catch (JSONException e) {
         e.printStackTrace();
       }

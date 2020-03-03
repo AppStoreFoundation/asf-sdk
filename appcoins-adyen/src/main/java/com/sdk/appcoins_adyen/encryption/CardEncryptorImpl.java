@@ -1,16 +1,20 @@
 package com.sdk.appcoins_adyen.encryption;
 
 import com.sdk.appcoins_adyen.card.Card;
+import com.sdk.appcoins_adyen.exceptions.EncrypterException;
 import com.sdk.appcoins_adyen.exceptions.EncryptionException;
 import java.util.Date;
 
 public final class CardEncryptorImpl {
 
-  public CardEncryptorImpl() {
+  private String publicKey;
+
+  public CardEncryptorImpl(String publicKey) {
+    this.publicKey = publicKey;
   }
 
-  public String encryptFields(String number, Integer month, Integer year, String code,
-      String publicKey) throws EncryptionException {
+  public String encryptFields(String number, Integer month, Integer year, String code)
+      throws EncryptionException {
     String encryptedExpiryMonth = "";
     String encryptedExpiryYear = "";
     String encryptedNumber = "";
@@ -74,6 +78,36 @@ public final class CardEncryptorImpl {
         + encryptedSecurityCode
         + "\""
         + ",\n\t\t\"type\":\"scheme\"\n\t}";
+    return json;
+  }
+
+  public String encryptStoredPaymentFields(String securityCode, String paymentId, String type) {
+    Date generationTime = new Date();
+    String encryptedSecurityCode = "";
+    try {
+      encryptedSecurityCode = (new Card.Builder()).setCvc(securityCode)
+          .setGenerationTime(generationTime)
+          .build()
+          .serialize(publicKey);
+    } catch (EncrypterException e) {
+      e.printStackTrace();
+    }
+    String json = " {\n\t\t\"encryptedSecurityCode\":"
+        + "\""
+        + encryptedSecurityCode
+        + "\""
+        + ","
+        + "\n\t\t\"storedPaymentMethodId"
+        + "\":"
+        + "\""
+        + paymentId
+        + "\""
+        + ","
+        + "\n\t\t\"type\":"
+        + "\""
+        + type
+        + "\""
+        + "\n\t}";
     return json;
   }
 }

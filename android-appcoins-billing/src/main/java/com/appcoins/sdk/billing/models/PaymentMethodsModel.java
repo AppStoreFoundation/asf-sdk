@@ -7,13 +7,15 @@ public class PaymentMethodsModel {
   private final BigDecimal value;
   private final String currency;
   private final String paymentMethod;
+  private final StoredMethodDetails storedMethodDetails;
   private final boolean error;
 
   public PaymentMethodsModel(BigDecimal value, String currency, String paymentMethod,
-      boolean error) {
+      StoredMethodDetails storedMethodDetails, boolean error) {
     this.value = value;
     this.currency = currency;
     this.paymentMethod = paymentMethod;
+    this.storedMethodDetails = storedMethodDetails;
     this.error = error;
   }
 
@@ -21,6 +23,7 @@ public class PaymentMethodsModel {
     this.value = null;
     this.currency = "";
     this.paymentMethod = "";
+    this.storedMethodDetails = null;
     this.error = true;
   }
 
@@ -38,5 +41,9 @@ public class PaymentMethodsModel {
 
   public boolean hasError() {
     return error;
+  }
+
+  public StoredMethodDetails getStoredMethodDetails() {
+    return storedMethodDetails;
   }
 }
