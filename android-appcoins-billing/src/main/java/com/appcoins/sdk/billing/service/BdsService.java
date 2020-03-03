@@ -1,7 +1,6 @@
 package com.appcoins.sdk.billing.service;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import com.appcoins.sdk.billing.utils.RequestBuilderUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,7 +29,6 @@ public class BdsService implements Service {
     HttpURLConnection urlConnection = null;
     try {
       String urlBuilder = RequestBuilderUtils.buildUrl(baseUrl, endPoint, paths, queries);
-      Log.d("TAG123", "Calling: " + urlBuilder);
       URL url = new URL(urlBuilder);
       urlConnection = openUrlConnection(url, httpMethod);
 

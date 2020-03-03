@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.service.adyen;
 
-import android.util.Log;
 import com.appcoins.sdk.billing.listeners.GetTransactionListener;
 import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.MakePaymentListener;
@@ -23,7 +22,6 @@ public class AdyenListenerProvider {
       final LoadPaymentInfoListener listener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        Log.d("TAG123", "PaymentMethodsModel: " + requestResponse);
         listener.onResponse(adyenMapper.mapPaymentMethodsResponse(requestResponse));
       }
     };
@@ -32,7 +30,6 @@ public class AdyenListenerProvider {
   public ServiceResponseListener createMakePaymentListener(final MakePaymentListener listener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        Log.d("TAG123", "AdyenTransactionModel: " + requestResponse);
         listener.onResponse(adyenMapper.mapAdyenTransactionResponse(requestResponse));
       }
     };
@@ -42,7 +39,6 @@ public class AdyenListenerProvider {
       final GetTransactionListener getTransactionListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        Log.d("TAG123", "TransactionResponse: ");
         getTransactionListener.onResponse(adyenMapper.mapTransactionResponse(requestResponse));
       }
     };
@@ -52,7 +48,6 @@ public class AdyenListenerProvider {
       final MakePaymentListener makePaymentListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        Log.d("TAG123", "AdyenTransactionModel: " + requestResponse);
         makePaymentListener.onResponse(adyenMapper.mapAdyenTransactionResponse(requestResponse));
       }
     };

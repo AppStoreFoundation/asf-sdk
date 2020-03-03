@@ -138,12 +138,16 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
       EditText expiryEditText = layout.getExpiryDateEditText();
       expiryEditText.setVisibility(View.VISIBLE);
       expiryEditText.setText(expiryDate);
+      expiryEditText.setSelection(expiryEditText.getText()
+          .length());
     }
     String cvv = savedInstanceState.getString(CVV_KEY, "");
     if (!cvv.equals("")) {
       EditText cvvEditText = layout.getCvvEditText();
       cvvEditText.setVisibility(View.VISIBLE);
       cvvEditText.setText(savedInstanceState.getString(CVV_KEY, ""));
+      cvvEditText.setSelection(cvvEditText.getText()
+          .length());
     }
   }
 
