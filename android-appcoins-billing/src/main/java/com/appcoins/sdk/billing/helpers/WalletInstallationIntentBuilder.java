@@ -33,14 +33,6 @@ public class WalletInstallationIntentBuilder {
 
   public Intent getWalletInstallationIntent() {
     final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_APP_URL);
-    if (WalletUtils.isCafeBazaarWalletAvailable()) {
-      return cafeBazaarFlow(cafeBazaarIntent, storeUrl);
-    } else {
-      return redirectToRemainingStores(storeUrl);
-    }
-  }
-
-  private Intent cafeBazaarFlow(Intent cafeBazaarIntent, String storeUrl) {
     if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager)
         && isAbleToRedirect(cafeBazaarIntent)) {
       cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
