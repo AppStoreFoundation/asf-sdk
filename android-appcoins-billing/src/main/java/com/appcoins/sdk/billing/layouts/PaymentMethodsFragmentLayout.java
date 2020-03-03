@@ -73,7 +73,6 @@ public class PaymentMethodsFragmentLayout {
   private RelativeLayout installWrapperLayout;
   private GradientDrawable selectedBackground;
   private GradientDrawable defaultBackground;
-  private ProgressBar progressBar;
   private RelativeLayout paymentMethodsLayout;
   private RelativeLayout errorView;
   private RelativeLayout dialogLayout;
@@ -102,9 +101,9 @@ public class PaymentMethodsFragmentLayout {
     errorView.setVisibility(View.INVISIBLE);
 
     intentLoadingView = buildIntentLoadingView();
-    intentLoadingView.setVisibility(View.GONE);
 
     dialogLayout = buildDialogLayout();
+    dialogLayout.setVisibility(View.GONE);
 
     mainLayout.addView(dialogLayout);
     mainLayout.addView(errorView);
@@ -283,15 +282,12 @@ public class PaymentMethodsFragmentLayout {
     dialogLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
     dialogLayout.setLayoutParams(dialogLayoutParams);
 
-    progressBar = buildProgressBar();
-
     RelativeLayout paymentMethodsHeaderLayout = buildPaymentMethodsHeaderLayout();
     View headerSeparator = buildHeaderSeparatorLayout();
     paymentMethodsLayout = buildPaymentMethodsLayout();
     paymentMethodsLayout.setVisibility(View.INVISIBLE);
     LinearLayout buttonsView = buildButtonsView();
 
-    dialogLayout.addView(progressBar);
     dialogLayout.addView(paymentMethodsHeaderLayout);
     dialogLayout.addView(headerSeparator);
     dialogLayout.addView(paymentMethodsLayout);
@@ -1015,10 +1011,6 @@ public class PaymentMethodsFragmentLayout {
 
   public RelativeLayout getInstallWrapperLayout() {
     return installWrapperLayout;
-  }
-
-  public ProgressBar getProgressBar() {
-    return progressBar;
   }
 
   public RelativeLayout getPaymentMethodsLayout() {

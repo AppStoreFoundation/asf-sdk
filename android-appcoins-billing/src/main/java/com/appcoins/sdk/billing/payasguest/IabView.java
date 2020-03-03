@@ -32,4 +32,6 @@ interface IabView {
   void finish(Bundle bundle);
 
   void navigateToPaymentSelection();
+
+  void navigateToInstallDialog();
 }

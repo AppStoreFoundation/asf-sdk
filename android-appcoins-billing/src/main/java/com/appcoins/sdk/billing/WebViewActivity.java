@@ -16,6 +16,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
+import com.appcoins.sdk.billing.utils.LayoutUtils;
 
 public class WebViewActivity extends Activity {
 
@@ -43,6 +44,7 @@ public class WebViewActivity extends Activity {
     mainLayout.setLayoutParams(layoutParams);
     WebView webView = new WebView(this);
     webView.setId(2);
+    LayoutUtils.setMargins(layoutParams, 8, 8, 8, 8);
     webView.setLayoutParams(layoutParams);
     mainLayout.addView(webView);
 

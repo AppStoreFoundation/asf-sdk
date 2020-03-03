@@ -60,10 +60,7 @@ public class AdyenPaymentFragmentLayout {
   private String densityPath;
   private RelativeLayout errorView;
   private RelativeLayout dialogLayout;
-  private ProgressBar progressBar;
   private TextView fiatPriceView;
-  private TextView appcPriceView;
-  private RelativeLayout creditCardLayout;
   private Button cancelButton;
   private Button positiveButton;
   private LinearLayout buttonsView;
@@ -151,13 +148,13 @@ public class AdyenPaymentFragmentLayout {
     dialogLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
     dialogLayout.setLayoutParams(dialogLayoutParams);
 
-    progressBar = buildProgressBar();
+    ProgressBar progressBar = buildProgressBar();
     progressBar.setVisibility(View.INVISIBLE);
 
     RelativeLayout paymentMethodsHeaderLayout =
         buildPaymentMethodsHeaderLayout(packageName, sku, fiatPrice, fiatCurrency, appcPrice);
     View headerSeparator = buildHeaderSeparatorLayout();
-    creditCardLayout = buildCreditCardLayout();
+    RelativeLayout creditCardLayout = buildCreditCardLayout();
     buttonsView = buildButtonsView();
     buttonsView.setVisibility(View.INVISIBLE);
 
@@ -592,7 +589,7 @@ public class AdyenPaymentFragmentLayout {
     TextView appNameView = createAppNameLayout(appName);
     TextView skuView = createSkuLayout(sku);
     fiatPriceView = createFiatPriceView(fiatPrice, fiatCurrency);
-    appcPriceView = createAppcPriceView(appcPrice);
+    TextView appcPriceView = createAppcPriceView(appcPrice);
 
     paymentMethodHeaderLayout.addView(iconImageView);
     paymentMethodHeaderLayout.addView(appNameView);
@@ -735,20 +732,8 @@ public class AdyenPaymentFragmentLayout {
     return dialogLayout;
   }
 
-  public ProgressBar getProgressBar() {
-    return progressBar;
-  }
-
   public TextView getFiatPriceView() {
     return fiatPriceView;
-  }
-
-  public TextView getAppcPriceView() {
-    return appcPriceView;
-  }
-
-  public RelativeLayout getCreditCardLayout() {
-    return creditCardLayout;
   }
 
   public CardNumberEditText getCardNumberEditText() {

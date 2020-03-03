@@ -15,12 +15,13 @@ import android.util.Log;
 import android.widget.FrameLayout;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WebViewActivity;
-import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
+import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
 import com.appcoins.sdk.billing.helpers.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
 import com.appcoins.sdk.billing.helpers.Utils;
 import java.util.Locale;
 
+import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES;
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.ERROR_RESULT_CODE;
 import static com.appcoins.sdk.billing.helpers.Utils.RESPONSE_CODE;
 
@@ -55,8 +56,7 @@ public class IabActivity extends Activity implements IabView {
 
     setContentView(frameLayout);
 
-    buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
-        AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
+    buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(BUY_ITEM_PROPERTIES);
 
     if (savedInstanceState != null) {
       translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
@@ -148,7 +148,7 @@ public class IabActivity extends Activity implements IabView {
     bundle.putString(FIAT_CURRENCY_KEY, fiatPriceCurrencyCode);
     bundle.putString(APPC_VALUE_KEY, appcPrice);
     bundle.putString(SKU_KEY, sku);
-    bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
+    bundle.putSerializable(BUY_ITEM_PROPERTIES, buyItemProperties);
     adyenPaymentFragment.setArguments(bundle);
     navigateTo(adyenPaymentFragment);
   }
@@ -183,6 +183,13 @@ public class IabActivity extends Activity implements IabView {
 
   @Override public void navigateToPaymentSelection() {
     navigateTo(PaymentMethodsFragment.newInstance(buyItemProperties));
+  }
+
+  @Override public void navigateToInstallDialog() {
+    Intent intent = new Intent(this.getApplicationContext(), InstallDialogActivity.class);
+    intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
+    finish();
+    startActivity(intent);
   }
 
   private void buildAlertNoBrowserAndStores() {

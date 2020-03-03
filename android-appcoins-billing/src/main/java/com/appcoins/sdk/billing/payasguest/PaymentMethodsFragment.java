@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -115,7 +114,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     onErrorButtonClicked(errorButton);
     onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton, creditWrapper,
         paypalWrapper, installWrapper);
-    paymentMethodsPresenter.prepareUi(buyItemProperties);
   }
 
   @Override public void onResume() {
@@ -131,10 +129,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         }
       });
     } else {
-      layout.getDialogLayout()
-          .setVisibility(View.VISIBLE);
-      layout.getIntentLoadingView()
-          .setVisibility(View.GONE);
+      paymentMethodsPresenter.prepareUi(buyItemProperties);
     }
   }
 
@@ -209,11 +204,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   @Override public void showError() {
-    ProgressBar progressBar = layout.getProgressBar();
     RelativeLayout intentProgressBar = layout.getIntentLoadingView();
     RelativeLayout dialogLayout = layout.getDialogLayout();
     RelativeLayout errorLayout = layout.getErrorView();
-    progressBar.setVisibility(View.INVISIBLE);
     intentProgressBar.setVisibility(View.INVISIBLE);
     dialogLayout.setVisibility(View.GONE);
     errorLayout.setVisibility(View.VISIBLE);
@@ -284,9 +277,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     } else {
       setRadioButtonSelected(selectedRadioButton);
     }
-    layout.getProgressBar()
+    layout.getIntentLoadingView()
         .setVisibility(View.INVISIBLE);
     layout.getPaymentMethodsLayout()
+        .setVisibility(View.VISIBLE);
+    layout.getDialogLayout()
         .setVisibility(View.VISIBLE);
     layout.getPositiveButton()
         .setEnabled(true);
@@ -301,6 +296,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
       bonusText.setText("Earn bonus with the purchase");
       bonusText.setVisibility(View.VISIBLE);
     }
+  }
+
+  @Override public void showInstallDialog() {
+    iabView.navigateToInstallDialog();
   }
 
   private void setInitialRadioButtonSelected() {

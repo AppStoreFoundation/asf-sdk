@@ -78,27 +78,30 @@ class PaymentMethodsPresenter {
                 skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
                 skuDetails.getSku()));
           } else {
-            fragmentView.showPaymentView();
+            fragmentView.showInstallDialog();
           }
         }
       };
       paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
     } else {
-      fragmentView.showPaymentView();
+      fragmentView.showInstallDialog();
     }
   }
 
   private void loadPaymentsAvailable(String fiatPrice, String fiatCurrency) {
     PaymentMethodsListener paymentMethodsListener = new PaymentMethodsListener() {
       @Override public void onResponse(PaymentMethodsModel paymentMethodsModel) {
-        if (!paymentMethodsModel.hasError()) {
+        if (paymentMethodsModel.hasError() || paymentMethodsModel.getPaymentMethods()
+            .isEmpty()) {
+          fragmentView.showInstallDialog();
+        } else {
           for (PaymentMethod paymentMethod : paymentMethodsModel.getPaymentMethods()) {
             if (paymentMethod.isAvailable()) {
               fragmentView.addPayment(paymentMethod.getName());
             }
           }
+          fragmentView.showPaymentView();
         }
-        fragmentView.showPaymentView();
       }
     };
     paymentMethodsInteract.loadPaymentsAvailable(fiatPrice, fiatCurrency, paymentMethodsListener);
