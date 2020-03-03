@@ -4,6 +4,6 @@ cd ..
 export BUILD_NAME_SUFFIX=".dev"
 export BUILD_TYPE_NAME="debug"
 
-./gradlew :appcoins:clean :android-appcoins-billing:clean :appcoins-billing:clean :appcoins-ads:clean :appcoins-adyen:clean
-./gradlew :appcoins:assembleDebug :android-appcoins-billing:assembleDebug :appcoins-billing:assembleDebug :appcoins-ads:assembleDebug :appcoins-adyen:assembleDebug
+./gradlew :appcoins:clean :android-appcoins-billing:clean :appcoins-billing:clean :appcoins-ads:clean :appcoins-adyen:clean :communication:clean
+./gradlew :appcoins:assembleDebug :android-appcoins-billing:assembleDebug :appcoins-billing:assembleDebug :appcoins-ads:assembleDebug :appcoins-adyen:assembleDebug :communication:assembleDebug
 ./gradlew publish bintrayUpload
