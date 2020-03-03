@@ -81,6 +81,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     PaymentMethodsRepository paymentMethodsRepository =
         new PaymentMethodsRepository(new BdsService(BuildConfig.HOST_WS));
 
+    appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
     paymentMethodsPresenter = new PaymentMethodsPresenter(this,
