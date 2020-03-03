@@ -27,7 +27,8 @@ class SingleSkuDetailsAsync extends AsyncTask<Object, Object, SkuDetails> {
   }
 
   @Override protected void onPostExecute(SkuDetails skuDetails) {
-    if (skuDetails == null) {
+    if (skuDetails == null || !skuDetails.getFiatPrice()
+        .equals("")) {
       listener.onResponse(true, null);
     } else {
       listener.onResponse(false, skuDetails);

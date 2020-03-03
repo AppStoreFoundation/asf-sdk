@@ -24,4 +24,6 @@ interface AdyenPaymentView {
   void finish(Bundle bundle);
 
   void navigateToPaymentSelection();
+
+  void clearCreditCardInput();
 }

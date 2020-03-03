@@ -116,15 +116,17 @@ public class AdyenMapper {
           paymentMethodsApiResponse = paymentJSONObject.toString();
         }
 
-        JSONObject storedJSONObject = storedArray.optJSONObject(0);
-        if (storedJSONObject != null) {
-          String cardNumber = storedJSONObject.getString("lastFour");
-          int expiryMonth = storedJSONObject.getInt("expiryMonth");
-          int expiryYear = storedJSONObject.getInt("expiryYear");
-          String paymentId = storedJSONObject.getString("id");
-          String type = storedJSONObject.getString("type");
-          storedMethodDetails =
-              new StoredMethodDetails(cardNumber, expiryMonth, expiryYear, paymentId, type);
+        if (storedArray != null) {
+          JSONObject storedJSONObject = storedArray.optJSONObject(0);
+          if (storedJSONObject != null) {
+            String cardNumber = storedJSONObject.getString("lastFour");
+            int expiryMonth = storedJSONObject.getInt("expiryMonth");
+            int expiryYear = storedJSONObject.getInt("expiryYear");
+            String paymentId = storedJSONObject.getString("id");
+            String type = storedJSONObject.getString("type");
+            storedMethodDetails =
+                new StoredMethodDetails(cardNumber, expiryMonth, expiryYear, paymentId, type);
+          }
         }
         paymentMethodsResponse =
             new PaymentMethodsModel(value, currency, paymentMethodsApiResponse, storedMethodDetails,

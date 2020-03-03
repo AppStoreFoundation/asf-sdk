@@ -44,7 +44,6 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private AdyenPaymentPresenter presenter;
   private AdyenPaymentFragmentLayout layout;
   private String serverCurrency;
-  private String storedPaymentId = "";
   private BigDecimal serverFiatPrice;
 
   @Override public void onAttach(Context context) {
@@ -242,6 +241,25 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void navigateToPaymentSelection() {
     iabView.navigateToPaymentSelection();
+  }
+
+  @Override public void clearCreditCardInput() {
+    layout.getCreditCardEditTextLayout()
+        .setStoredPaymentId("");
+    CardNumberEditText cardNumberEditText = layout.getCardNumberEditText();
+    cardNumberEditText.setStoredCard(false);
+    cardNumberEditText.setText("");
+    cardNumberEditText.setCacheSavedNumber("");
+    cardNumberEditText.setEnabled(true);
+    EditText expiryEditText = layout.getExpiryDateEditText();
+    expiryEditText.setText("");
+    expiryEditText.setEnabled(true);
+    expiryEditText.setVisibility(View.INVISIBLE);
+    EditText cvvEditText = layout.getCvvEditText();
+    cvvEditText.setText("");
+    cvvEditText.setVisibility(View.INVISIBLE);
+    layout.getChangeCardView()
+        .setVisibility(View.GONE);
   }
 
   private void setStoredPaymentMethodDetails(StoredMethodDetails storedMethodDetails) {

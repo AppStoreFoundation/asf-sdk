@@ -5,6 +5,7 @@ import android.util.Log;
 import com.appcoins.sdk.billing.listeners.GetTransactionListener;
 import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.MakePaymentListener;
+import com.appcoins.sdk.billing.listeners.NoInfoResponseListener;
 import com.appcoins.sdk.billing.models.AdyenPaymentParams;
 import com.appcoins.sdk.billing.models.TransactionInformation;
 import com.appcoins.sdk.billing.models.TransactionWallets;
@@ -72,6 +73,10 @@ public class AdyenPaymentInteract {
       Log.w("TAG", "Unknown transaction type"); //This shouldn't happen as we are verifying before
       purchaseListener.onResponse(new PurchaseModel());
     }
+  }
+
+  public void forgetCard(String walletAddress, NoInfoResponseListener noInfoResponseListener) {
+    adyenRepository.disablePayments(walletAddress, noInfoResponseListener);
   }
 
   public interface AddressListener {

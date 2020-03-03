@@ -9,6 +9,7 @@ import com.appcoins.sdk.billing.DeveloperPayload;
 import com.appcoins.sdk.billing.listeners.GetTransactionListener;
 import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.MakePaymentListener;
+import com.appcoins.sdk.billing.listeners.NoInfoResponseListener;
 import com.appcoins.sdk.billing.models.AdyenTransactionModel;
 import com.appcoins.sdk.billing.models.PaymentMethodsModel;
 import com.appcoins.sdk.billing.models.Transaction.Status;
@@ -115,7 +116,18 @@ class AdyenPaymentPresenter {
   }
 
   public void onChangeCardClick() {
-
+    fragmentView.showLoading();
+    NoInfoResponseListener noInfoResponseListener = new NoInfoResponseListener() {
+      @Override public void onResponse(boolean error) {
+        if (error) {
+          fragmentView.showError();
+        } else {
+          fragmentView.clearCreditCardInput();
+          fragmentView.showCreditCardView(null);
+        }
+      }
+    };
+    adyenPaymentInteract.forgetCard(adyenPaymentInfo.getWalletAddress(), noInfoResponseListener);
   }
 
   public void onMorePaymentsClick() {
