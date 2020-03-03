@@ -117,7 +117,7 @@ public class MainActivity extends Activity {
   public void onSkuDetailsButtonClicked(View view) {
     SkuDetailsParams skuDetailsParams = new SkuDetailsParams();
     skuDetailsParams.setItemType(SkuType.inapp.toString());
-    ArrayList<String> skusList = new ArrayList<String>();
+    ArrayList<String> skusList = new ArrayList<>();
 
     skusList.add("gas");
 
