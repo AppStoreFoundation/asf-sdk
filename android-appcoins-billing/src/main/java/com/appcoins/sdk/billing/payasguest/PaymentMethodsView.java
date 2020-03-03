@@ -27,4 +27,6 @@ interface PaymentMethodsView {
   void showPaymentView();
 
   void showBonus(int bonus);
+
+  void hideDialog();
 }

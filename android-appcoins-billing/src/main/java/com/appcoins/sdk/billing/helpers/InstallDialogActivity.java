@@ -155,7 +155,7 @@ public class InstallDialogActivity extends Activity {
     showInstallationDialog(backgroundLayout);
   }
 
-  public void makeTheStoredPurchase() {
+  private void makeTheStoredPurchase() {
     Bundle intent = appcoinsBillingStubHelper.getBuyIntent(buyItemProperties.getApiVersion(),
         buyItemProperties.getPackageName(), buyItemProperties.getSku(), buyItemProperties.getType(),
         buyItemProperties.getDeveloperPayload());

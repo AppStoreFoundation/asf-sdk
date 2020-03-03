@@ -1,10 +1,14 @@
 package com.appcoins.sdk.billing.helpers;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import com.appcoins.billing.sdk.BuildConfig;
+
+import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.getUserCountry;
+import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.userFromIran;
 
 public class WalletInstallationIntentBuilder {
 
@@ -14,10 +18,13 @@ public class WalletInstallationIntentBuilder {
   private final String CAFE_BAZAAR_APP_URL = "bazaar://details?id=com.hezardastan.wallet";
   private final String CAFE_BAZAAR_WEB_URL = "https://cafebazaar.ir/app/com.hezardastaan.wallet";
   private final String storeUrl;
+  private Context context;
   private PackageManager packageManager;
 
-  public WalletInstallationIntentBuilder(PackageManager packageManager, String packageName) {
+  public WalletInstallationIntentBuilder(PackageManager packageManager, String packageName,
+      Context context) {
     this.packageManager = packageManager;
+    this.context = context;
     storeUrl = "market://details?id="
         + BuildConfig.BDS_WALLET_PACKAGE_NAME
         + "&utm_source=appcoinssdk&app_source="
@@ -26,19 +33,11 @@ public class WalletInstallationIntentBuilder {
 
   public Intent getWalletInstallationIntent() {
     final Intent cafeBazaarIntent = buildBrowserIntent(CAFE_BAZAAR_APP_URL);
-    if (WalletUtils.isCafeBazaarWalletAvailable()) {
-      return cafeBazaarFlow(cafeBazaarIntent, storeUrl);
-    } else {
-      return redirectToRemainingStores(storeUrl);
-    }
-  }
-
-  private Intent cafeBazaarFlow(Intent cafeBazaarIntent, String storeUrl) {
     if (WalletUtils.isAppInstalled(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME, packageManager)
         && isAbleToRedirect(cafeBazaarIntent)) {
       cafeBazaarIntent.setPackage(BuildConfig.CAFE_BAZAAR_PACKAGE_NAME);
       return cafeBazaarIntent;
-    } else if (WalletUtils.isCafeBazaarWalletAvailable()) {
+    } else if (userFromIran(getUserCountry(context))) {
       return startActivityForBrowser(CAFE_BAZAAR_WEB_URL);
     } else {
       return redirectToRemainingStores(storeUrl);

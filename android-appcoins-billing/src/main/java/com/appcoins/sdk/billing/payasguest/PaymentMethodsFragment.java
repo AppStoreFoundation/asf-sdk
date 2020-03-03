@@ -2,6 +2,7 @@ package com.appcoins.sdk.billing.payasguest;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,13 +20,17 @@ import com.appcoins.sdk.billing.SharedPreferencesRepository;
 import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.layouts.PaymentMethodsFragmentLayout;
+import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.models.WalletGenerationModel;
 import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.wallet.WalletGenerationMapper;
 import com.appcoins.sdk.billing.service.wallet.WalletRepository;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+
+import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.KEY_BUY_INTENT;
 
 public class PaymentMethodsFragment extends Fragment implements PaymentMethodsView {
 
@@ -40,6 +45,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private String selectedRadioButton;
   private SkuDetailsModel skuDetailsModel;
   private WalletGenerationModel walletGenerationModel;
+  private AppcoinsBillingStubHelper appcoinsBillingStubHelper;
 
   public static PaymentMethodsFragment newInstance(BuyItemProperties buyItemProperties) {
     PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
@@ -75,12 +81,13 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     PaymentMethodsRepository paymentMethodsRepository =
         new PaymentMethodsRepository(new BdsService(BuildConfig.HOST_WS));
 
+    appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
     paymentMethodsPresenter = new PaymentMethodsPresenter(this,
         new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository),
         new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
-            getActivity().getPackageName()));
+            getActivity().getPackageName(), getActivity().getApplicationContext()));
   }
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,6 +116,26 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton, creditWrapper,
         paypalWrapper, installWrapper);
     paymentMethodsPresenter.prepareUi(buyItemProperties);
+  }
+
+  @Override public void onResume() {
+    super.onResume();
+    if (WalletUtils.hasWalletInstalled()) {
+      layout.getDialogLayout()
+          .setVisibility(View.GONE);
+      layout.getIntentLoadingView()
+          .setVisibility(View.VISIBLE);
+      appcoinsBillingStubHelper.createRepository(new StartPurchaseAfterBindListener() {
+        @Override public void startPurchaseAfterBind() {
+          makeTheStoredPurchase();
+        }
+      });
+    } else {
+      layout.getDialogLayout()
+          .setVisibility(View.VISIBLE);
+      layout.getIntentLoadingView()
+          .setVisibility(View.GONE);
+    }
   }
 
   @Override public void onSaveInstanceState(Bundle outState) {
@@ -181,9 +208,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void showError() {
     ProgressBar progressBar = layout.getProgressBar();
+    RelativeLayout intentProgressBar = layout.getIntentLoadingView();
     RelativeLayout dialogLayout = layout.getDialogLayout();
     RelativeLayout errorLayout = layout.getErrorView();
     progressBar.setVisibility(View.INVISIBLE);
+    intentProgressBar.setVisibility(View.INVISIBLE);
     dialogLayout.setVisibility(View.GONE);
     errorLayout.setVisibility(View.VISIBLE);
   }
@@ -194,6 +223,13 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void showAlertNoBrowserAndStores() {
     iabView.showAlertNoBrowserAndStores();
+  }
+
+  @Override public void hideDialog() {
+    layout.getDialogLayout()
+        .setVisibility(View.INVISIBLE);
+    layout.getIntentLoadingView()
+        .setVisibility(View.VISIBLE);
   }
 
   @Override public void redirectToWalletInstallation(Intent intent) {
@@ -283,6 +319,22 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
       throw new IllegalStateException("PaymentMethodsFragment must be attached to IabActivity");
     }
     iabView = (IabView) context;
+  }
+
+  private void makeTheStoredPurchase() {
+    Bundle intent = appcoinsBillingStubHelper.getBuyIntent(buyItemProperties.getApiVersion(),
+        buyItemProperties.getPackageName(), buyItemProperties.getSku(), buyItemProperties.getType(),
+        buyItemProperties.getDeveloperPayload());
+
+    PendingIntent pendingIntent = intent.getParcelable(KEY_BUY_INTENT);
+    layout.getIntentLoadingView()
+        .setVisibility(View.INVISIBLE);
+    if (pendingIntent != null) {
+      iabView.startIntentSenderForResult(pendingIntent.getIntentSender(),
+          IabActivity.LAUNCH_BILLING_FLOW_REQUEST_CODE);
+    } else {
+      iabView.finishWithError();
+    }
   }
 
   public class RadioButtonClickListener implements View.OnClickListener {

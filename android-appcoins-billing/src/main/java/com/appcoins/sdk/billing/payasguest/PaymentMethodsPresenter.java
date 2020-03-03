@@ -1,6 +1,7 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.content.Intent;
+import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
@@ -48,6 +49,10 @@ class PaymentMethodsPresenter {
     } else {
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
       if (intent != null) {
+        if (intent.getPackage() != null && intent.getPackage()
+            .equals(BuildConfig.APTOIDE_PACKAGE_NAME)) {
+          fragmentView.hideDialog();
+        }
         fragmentView.redirectToWalletInstallation(intent);
       } else {
         fragmentView.showAlertNoBrowserAndStores();
