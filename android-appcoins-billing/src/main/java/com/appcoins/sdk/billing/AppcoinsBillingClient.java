@@ -14,6 +14,9 @@ public interface AppcoinsBillingClient {
 
   void consumeAsync(String token, ConsumeResponseListener consumeResponseListener);
 
+  /**
+   * This method can't run on the main thread
+   */
   int launchBillingFlow(Activity activity, BillingFlowParams billingFlowParams);
 
   void startConnection(AppCoinsBillingStateListener listener);
