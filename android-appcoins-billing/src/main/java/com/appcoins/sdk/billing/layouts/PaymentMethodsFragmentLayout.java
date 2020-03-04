@@ -206,7 +206,7 @@ public class PaymentMethodsFragmentLayout {
     setConstraint(layoutParams, RelativeLayout.END_OF, APP_ICON_ID);
     setMargins(layoutParams, 10, 0, 12, 0);
     textView.setEllipsize(TextUtils.TruncateAt.END);
-    textView.setLines(1);
+    textView.setMaxLines(1);
     textView.setTextColor(Color.parseColor("#8a000000"));
     textView.setTextSize(12);
     textView.setText(sku);
@@ -225,7 +225,7 @@ public class PaymentMethodsFragmentLayout {
     setConstraint(layoutParams, RelativeLayout.END_OF, APP_ICON_ID);
     setMargins(layoutParams, 10, 15, 12, 0);
     textView.setEllipsize(TextUtils.TruncateAt.END);
-    textView.setLines(1);
+    textView.setMaxLines(1);
     textView.setTextColor(Color.parseColor("#de000000"));
     textView.setTextSize(16);
     textView.setText(appName);
@@ -533,7 +533,7 @@ public class PaymentMethodsFragmentLayout {
     setMargins(layoutParams, start, top, end, 0);
 
     textView.setEllipsize(TextUtils.TruncateAt.END);
-    textView.setLines(1);
+    textView.setMaxLines(1);
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.BLACK);
     textView.setTextSize(textSize);
@@ -560,7 +560,7 @@ public class PaymentMethodsFragmentLayout {
     layoutParams.addRule(rule);
     layoutParams.addRule(RelativeLayout.BELOW, INSTALL_MAIN_TEXT_ID);
     textView.setEllipsize(TextUtils.TruncateAt.END);
-    textView.setLines(1);
+    textView.setMaxLines(1);
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#FA6249"));
     textView.setTextSize(10);
@@ -683,7 +683,7 @@ public class PaymentMethodsFragmentLayout {
     layoutParams.addRule(rule);
     setMargins(layoutParams, start, top, 0, 0);
     textView.setEllipsize(TextUtils.TruncateAt.END);
-    textView.setLines(1);
+    textView.setMaxLines(1);
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.BLACK);
     textView.setTextSize(textSize);
@@ -855,7 +855,7 @@ public class PaymentMethodsFragmentLayout {
     layoutParams.addRule(rule);
     setMargins(layoutParams, start, top, 0, 0);
     textView.setEllipsize(TextUtils.TruncateAt.END);
-    textView.setLines(1);
+    textView.setMaxLines(1);
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.BLACK);
     textView.setTextSize(textSize);

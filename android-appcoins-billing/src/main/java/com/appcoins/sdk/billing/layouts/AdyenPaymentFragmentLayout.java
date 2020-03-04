@@ -646,7 +646,7 @@ public class AdyenPaymentFragmentLayout {
     setConstraint(layoutParams, RelativeLayout.END_OF, APP_ICON_ID);
     setMargins(layoutParams, 10, 0, 12, 0);
     textView.setEllipsize(TextUtils.TruncateAt.END);
-    textView.setLines(1);
+    textView.setMaxLines(1);
     textView.setTextColor(Color.parseColor("#8a000000"));
     textView.setTextSize(12);
     textView.setText(sku);
@@ -665,7 +665,7 @@ public class AdyenPaymentFragmentLayout {
     setConstraint(layoutParams, RelativeLayout.END_OF, APP_ICON_ID);
     setMargins(layoutParams, 10, 15, 12, 0);
     textView.setEllipsize(TextUtils.TruncateAt.END);
-    textView.setLines(1);
+    textView.setMaxLines(1);
     textView.setTextColor(Color.parseColor("#de000000"));
     textView.setTextSize(16);
     textView.setText(appName);
