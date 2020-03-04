@@ -1,33 +1,51 @@
 package com.appcoins.sdk.billing.helpers;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
+import com.appcoins.billing.AppcoinsBilling;
+import com.appcoins.billing.sdk.BuildConfig;
+import com.appcoins.communication.SyncIpcMessageRequester;
+import com.appcoins.communication.requester.MessageRequesterFactory;
 import com.appcoins.sdk.billing.ConnectionLifeCycle;
 import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.Repository;
 import com.appcoins.sdk.billing.ResponseCode;
-import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetailsResult;
+import com.appcoins.sdk.billing.UriCommunicationAppcoinsBilling;
+import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
+import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.service.WalletBillingService;
-
 import java.util.List;
 
 class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycle {
+  private final Context context;
   private final int apiVersion;
   private final String packageName;
-  private WalletBillingService service;
+  private AppcoinsBilling service;
   private boolean isServiceReady;
 
-  public AppCoinsAndroidBillingRepository(int apiVersion, String packageName) {
+  public AppCoinsAndroidBillingRepository(Context context, int apiVersion, String packageName) {
+    this.context = context;
     this.apiVersion = apiVersion;
     this.packageName = packageName;
   }
 
-  @Override public void onConnect(IBinder service, final AppCoinsBillingStateListener listener) {
-    this.service = new WalletBillingService(service);
+  @Override public void onConnect(ComponentName name, IBinder service,
+      final AppCoinsBillingStateListener listener) {
+    if (name.getClassName()
+        .equals(UriCommunicationAppcoinsBilling.class.getSimpleName())) {
+      SyncIpcMessageRequester messageRequester =
+          MessageRequesterFactory.create(context, BuildConfig.BDS_WALLET_PACKAGE_NAME,
+              "appcoins://billing/communication/processor/1",
+              "appcoins://billing/communication/requester/1");
+      this.service = new UriCommunicationAppcoinsBilling(messageRequester);
+    } else {
+      this.service = new WalletBillingService(service);
+    }
     isServiceReady = true;
     listener.onBillingSetupFinished(ResponseCode.OK.getValue());
   }
