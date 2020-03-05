@@ -488,12 +488,13 @@ public class PaymentMethodsFragmentLayout {
     setMargins(layoutParams, start, top, 0, 0);
     relativeLayout.setLayoutParams(layoutParams);
 
+    INSTALL_RADIO_BUTTON_ID = generateRandomId(INSTALL_RADIO_BUTTON_ID);
+    installRadioButton = buildRadioButton(INSTALL_RADIO_BUTTON_ID);
+
     ImageView installCreditCardImage = buildInstallCreditCardImage();
     ImageView installPaypalImage = buildInstallPaypalImage();
     TextView installMainText = buildInstallMainText();
     installSecondaryText = buildInstallSecondaryText();
-    INSTALL_RADIO_BUTTON_ID = generateRandomId(INSTALL_RADIO_BUTTON_ID);
-    installRadioButton = buildRadioButton(INSTALL_RADIO_BUTTON_ID);
 
     installSecondaryText.setVisibility(View.GONE);
 
