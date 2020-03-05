@@ -141,6 +141,7 @@ class AdyenPaymentPresenter {
       fragmentView.showCreditCardView(paymentMethodsModel.getStoredMethodDetails());
     } else {
       fragmentView.showLoading();
+      fragmentView.lockRotation();
       launchPaypal(paymentMethodsModel);
     }
   }
@@ -188,7 +189,6 @@ class AdyenPaymentPresenter {
               null, makePaymentListener);
         }
       };
-      fragmentView.lockRotation();
       fragmentView.navigateToUri(adyenTransactionModel.getUrl(), activityResultListener);
       waitingResult = true;
       //Analytics
@@ -203,6 +203,7 @@ class AdyenPaymentPresenter {
       fragmentView.close();
     } else if (refusalReason != null && refusalReasonCode != -1) {
       if (refusalReasonCode == 24) {
+        fragmentView.unlockRotation();
         fragmentView.showCvvError();
       } else {
         AdyenErrorCodeMapper adyenErrorCodeMapper = new AdyenErrorCodeMapper();
