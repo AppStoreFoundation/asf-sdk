@@ -35,7 +35,8 @@ class AdyenPaymentPresenter {
   private final AdyenPaymentInteract adyenPaymentInteract;
   private String returnUrl;
   private boolean waitingResult;
-  private boolean isDestroyed;
+  private Runnable getTransactionRunnable;
+  private Handler getTransactionHandler;
 
   AdyenPaymentPresenter(AdyenPaymentView fragmentView, AdyenPaymentInfo adyenPaymentInfo,
       AdyenPaymentInteract adyenPaymentInteract, String returnUrl) {
@@ -271,21 +272,19 @@ class AdyenPaymentPresenter {
 
   private void requestTransaction(final String uid, long delayInMillis,
       final GetTransactionListener getTransactionListener) {
-    final Handler handler = new Handler();
-    Runnable runnable = new Runnable() {
+    getTransactionHandler = new Handler();
+    getTransactionRunnable = new Runnable() {
       @Override public void run() {
-        if (!isDestroyed) {
-          adyenPaymentInteract.getTransaction(uid, adyenPaymentInfo.getWalletAddress(),
-              adyenPaymentInfo.getSignature(), getTransactionListener);
-        }
-        handler.removeCallbacks(this);
+        adyenPaymentInteract.getTransaction(uid, adyenPaymentInfo.getWalletAddress(),
+            adyenPaymentInfo.getSignature(), getTransactionListener);
+        getTransactionHandler.removeCallbacks(this);
       }
     };
-    handler.postDelayed(runnable, delayInMillis);
+    getTransactionHandler.postDelayed(getTransactionRunnable, delayInMillis);
   }
 
   void onDestroy() {
-    isDestroyed = true;
+    getTransactionHandler.removeCallbacks(getTransactionRunnable);
     adyenPaymentInteract.cancelRequests();
   }
 }
