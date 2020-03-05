@@ -1,14 +1,12 @@
 package com.appcoins.sdk.billing.utils;
 
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 public class LayoutUtils {
 
@@ -105,14 +103,5 @@ public class LayoutUtils {
       return View.generateViewId();
     }
     return currentId;
-  }
-
-  public static void setCompoundDrawable(TextView view, Drawable start, Drawable top, Drawable end,
-      Drawable bottom) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      view.setCompoundDrawablesRelativeWithIntrinsicBounds(start, top, end, bottom);
-    } else {
-      view.setCompoundDrawablesWithIntrinsicBounds(start, top, end, bottom);
-    }
   }
 }
