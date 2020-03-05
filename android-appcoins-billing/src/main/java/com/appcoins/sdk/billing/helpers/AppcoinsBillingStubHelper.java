@@ -13,10 +13,13 @@ import android.os.RemoteException;
 import android.util.Log;
 import com.appcoins.billing.AppcoinsBilling;
 import com.appcoins.billing.sdk.BuildConfig;
+import com.appcoins.communication.SyncIpcMessageRequester;
+import com.appcoins.communication.requester.MessageRequesterFactory;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
+import com.appcoins.sdk.billing.UriCommunicationAppcoinsBilling;
 import com.appcoins.sdk.billing.WSServiceController;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import java.io.Serializable;
@@ -221,7 +224,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     if (intentServices != null && !intentServices.isEmpty()) {
       return context.bindService(serviceIntent, new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName name, IBinder service) {
-          serviceAppcoinsBilling = Stub.asInterface(service);
+          serviceAppcoinsBilling = Stub.asInterface(service, "");
           startPurchaseAfterConnectionListener.startPurchaseAfterBind();
           Log.d(TAG, "onServiceConnected() called service = [" + serviceAppcoinsBilling + "]");
         }
@@ -236,11 +239,21 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
 
   public static abstract class Stub {
 
-    public static AppcoinsBilling asInterface(IBinder service) {
+    public static AppcoinsBilling asInterface(IBinder service, String componentName) {
       if (!WalletUtils.hasWalletInstalled()) {
         return AppcoinsBillingStubHelper.getInstance();
       } else {
-        return AppcoinsBilling.Stub.asInterface(service);
+        if (UriCommunicationAppcoinsBilling.class.getSimpleName()
+            .equals(componentName)) {
+          SyncIpcMessageRequester messageRequester =
+              MessageRequesterFactory.create(WalletUtils.getContext(),
+                  BuildConfig.BDS_WALLET_PACKAGE_NAME,
+                  "appcoins://billing/communication/processor/1",
+                  "appcoins://billing/communication/requester/1");
+          return new UriCommunicationAppcoinsBilling(messageRequester);
+        } else {
+          return AppcoinsBilling.Stub.asInterface(service);
+        }
       }
     }
   }
