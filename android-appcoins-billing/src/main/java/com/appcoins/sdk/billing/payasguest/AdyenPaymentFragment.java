@@ -3,6 +3,7 @@ package com.appcoins.sdk.billing.payasguest;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -251,7 +252,6 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     layout.getCreditCardEditTextLayout()
         .setStoredPaymentId("");
     CardNumberEditText cardNumberEditText = layout.getCardNumberEditText();
-    cardNumberEditText.setStoredCard(false);
     cardNumberEditText.setText("");
     cardNumberEditText.setCacheSavedNumber("");
     cardNumberEditText.setEnabled(true);
@@ -266,12 +266,30 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         .setVisibility(View.GONE);
   }
 
+  @Override public void showCvvError() {
+    EditText cvv = layout.getCvvEditText();
+    cvv.setTextColor(Color.RED);
+    cvv.requestFocus();
+    layout.getDialogLayout()
+        .setVisibility(View.VISIBLE);
+    layout.getPaypalLoading()
+        .setVisibility(View.INVISIBLE);
+    layout.getErrorView()
+        .setVisibility(View.INVISIBLE);
+    showKeyboard();
+  }
+
+  @Override public void showError(String errorMessage) {
+    layout.getPaymentErrorViewLayout()
+        .setMessage(errorMessage);
+    showError();
+  }
+
   private void setStoredPaymentMethodDetails(StoredMethodDetails storedMethodDetails) {
     layout.getChangeCardView()
         .setVisibility(View.VISIBLE);
     CardNumberEditText cardNumberEditText = layout.getCardNumberEditText();
     cardNumberEditText.setText(String.format("••••%s", storedMethodDetails.getCardNumber()));
-    cardNumberEditText.setStoredCard(true);
     cardNumberEditText.setEnabled(false);
     EditText expiryText = layout.getExpiryDateEditText();
     ExpiryDate expiryDate =
@@ -383,6 +401,13 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
       return (BuyItemProperties) getArguments().getSerializable(key);
     }
     throw new IllegalArgumentException(key + "data not found");
+  }
+
+  private void showKeyboard() {
+    InputMethodManager inputMethodManager =
+        (InputMethodManager) getActivity().getApplicationContext()
+            .getSystemService(Context.INPUT_METHOD_SERVICE);
+    inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
   }
 
   private void hideKeyboard() {

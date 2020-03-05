@@ -80,10 +80,11 @@ public class AdyenMapper {
           paymentData = action.getString("paymentData");
         }
         refusalReason = paymentJson.optString("refusalReason", null);
-        refusalReasonCode = paymentJson.optString("refusalReasonCode", null);
+        refusalReasonCode = paymentJson.optString("refusalReasonCode", "-1");
         adyenTransactionModel =
             new AdyenTransactionModel(uid, hash, orderReference, status, pspReference, resultCode,
-                url, paymentData, refusalReason, refusalReasonCode, !isSuccess(code));
+                url, paymentData, refusalReason, Integer.parseInt(refusalReasonCode),
+                !isSuccess(code));
       } catch (JSONException e) {
         e.printStackTrace();
       }

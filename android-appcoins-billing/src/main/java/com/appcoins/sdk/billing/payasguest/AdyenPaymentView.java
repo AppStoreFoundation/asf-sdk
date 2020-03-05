@@ -26,4 +26,8 @@ interface AdyenPaymentView {
   void navigateToPaymentSelection();
 
   void clearCreditCardInput();
+
+  void showCvvError();
+
+  void showError(String errorMessage);
 }

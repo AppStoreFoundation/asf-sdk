@@ -24,6 +24,7 @@ public class PaymentErrorViewLayout {
   private final Activity activity;
   private final int orientation;
   private Button errorPositiveButton;
+  private TextView errorMessage;
 
   public PaymentErrorViewLayout(Activity activity, int orientation) {
 
@@ -58,7 +59,7 @@ public class PaymentErrorViewLayout {
     relativeLayout.setLayoutParams(layoutParams);
 
     TextView errorTitle = buildErrorTitle();
-    TextView errorMessage = buildErrorMessage();
+    errorMessage = buildErrorMessage();
     errorPositiveButton = buildErrorPositiveButton();
 
     relativeLayout.addView(errorTitle);
@@ -131,5 +132,9 @@ public class PaymentErrorViewLayout {
 
   public Button getErrorPositiveButton() {
     return errorPositiveButton;
+  }
+
+  public void setMessage(String message) {
+    errorMessage.setText(message);
   }
 }

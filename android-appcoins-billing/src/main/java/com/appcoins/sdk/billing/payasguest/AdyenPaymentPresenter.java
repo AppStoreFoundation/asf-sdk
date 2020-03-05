@@ -195,15 +195,20 @@ class AdyenPaymentPresenter {
     }
   }
 
-  private void handlePaymentResult(String uid, String resultCode, String refusalReasonCode,
+  private void handlePaymentResult(String uid, String resultCode, int refusalReasonCode,
       String refusalReason, String status) {
     if (resultCode.equalsIgnoreCase("AUTHORISED")) {
       handleSuccessAdyenTransaction(uid);
     } else if (status.equalsIgnoreCase(Status.CANCELED.toString())) {
       fragmentView.close();
-    } else if (refusalReason != null && refusalReasonCode != null) {
-      //Improve later with specific errors
-      fragmentView.showError();
+    } else if (refusalReason != null && refusalReasonCode != -1) {
+      if (refusalReasonCode == 24) {
+        fragmentView.showCvvError();
+      } else {
+        AdyenErrorCodeMapper adyenErrorCodeMapper = new AdyenErrorCodeMapper();
+        String errorMessage = adyenErrorCodeMapper.map(refusalReasonCode);
+        fragmentView.showError(errorMessage);
+      }
     } else {
       fragmentView.showError();
     }
