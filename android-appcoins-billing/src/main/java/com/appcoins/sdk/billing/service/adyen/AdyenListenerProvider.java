@@ -1,9 +1,9 @@
 package com.appcoins.sdk.billing.service.adyen;
 
-import com.appcoins.sdk.billing.listeners.GetTransactionListener;
-import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
-import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.listeners.NoInfoResponseListener;
+import com.appcoins.sdk.billing.listeners.billing.GetTransactionListener;
+import com.appcoins.sdk.billing.listeners.billing.LoadPaymentInfoListener;
+import com.appcoins.sdk.billing.listeners.billing.MakePaymentListener;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.ServiceResponseListener;
 
@@ -35,7 +35,7 @@ public class AdyenListenerProvider {
     };
   }
 
-  public ServiceResponseListener createGetTransactionListener(
+  ServiceResponseListener createGetTransactionListener(
       final GetTransactionListener getTransactionListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
@@ -44,7 +44,7 @@ public class AdyenListenerProvider {
     };
   }
 
-  public ServiceResponseListener createSubmitRedirectListener(
+  ServiceResponseListener createSubmitRedirectListener(
       final MakePaymentListener makePaymentListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
@@ -53,7 +53,7 @@ public class AdyenListenerProvider {
     };
   }
 
-  public ServiceResponseListener createDisablePaymentsListener(
+  ServiceResponseListener createDisablePaymentsListener(
       final NoInfoResponseListener noInfoResponseListener) {
     return new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {

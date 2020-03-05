@@ -1,6 +1,6 @@
 package com.appcoins.sdk.billing;
 
-import com.appcoins.sdk.billing.models.WalletGenerationModel;
+import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 
 public interface WalletInteractListener {
 

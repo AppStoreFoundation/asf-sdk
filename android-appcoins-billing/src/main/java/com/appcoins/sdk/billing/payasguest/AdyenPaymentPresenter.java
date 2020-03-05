@@ -6,14 +6,19 @@ import android.os.Handler;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.DeveloperPayload;
-import com.appcoins.sdk.billing.listeners.GetTransactionListener;
-import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
-import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.listeners.NoInfoResponseListener;
-import com.appcoins.sdk.billing.models.AdyenTransactionModel;
-import com.appcoins.sdk.billing.models.PaymentMethodsModel;
+import com.appcoins.sdk.billing.listeners.billing.GetTransactionListener;
+import com.appcoins.sdk.billing.listeners.billing.LoadPaymentInfoListener;
+import com.appcoins.sdk.billing.listeners.billing.MakePaymentListener;
+import com.appcoins.sdk.billing.listeners.billing.PurchaseListener;
+import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
+import com.appcoins.sdk.billing.mappers.BillingMapper;
 import com.appcoins.sdk.billing.models.Transaction.Status;
-import com.appcoins.sdk.billing.models.TransactionResponse;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentInfo;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentMethodsModel;
+import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
+import com.appcoins.sdk.billing.models.billing.PurchaseModel;
+import com.appcoins.sdk.billing.models.billing.TransactionResponse;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
 import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
 import com.sdk.appcoins_adyen.models.ExpiryDate;
@@ -32,7 +37,7 @@ class AdyenPaymentPresenter {
   private boolean waitingResult;
   private boolean isDestroyed;
 
-  public AdyenPaymentPresenter(AdyenPaymentView fragmentView, AdyenPaymentInfo adyenPaymentInfo,
+  AdyenPaymentPresenter(AdyenPaymentView fragmentView, AdyenPaymentInfo adyenPaymentInfo,
       AdyenPaymentInteract adyenPaymentInteract, String returnUrl) {
     this.fragmentView = fragmentView;
     this.adyenPaymentInfo = adyenPaymentInfo;
@@ -45,7 +50,7 @@ class AdyenPaymentPresenter {
     fragmentView.showLoading();
     AdyenRepository.Methods method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
     LoadPaymentInfoListener loadPaymentInfoListener = new LoadPaymentInfoListener() {
-      @Override public void onResponse(PaymentMethodsModel paymentMethodsModel) {
+      @Override public void onResponse(AdyenPaymentMethodsModel paymentMethodsModel) {
         if (paymentMethodsModel.hasError()) {
           fragmentView.showError();
         } else {
@@ -60,16 +65,16 @@ class AdyenPaymentPresenter {
         loadPaymentInfoListener);
   }
 
-  public void onSaveInstanceState(Bundle outState) {
+  void onSaveInstanceState(Bundle outState) {
     outState.putBoolean(WAITING_RESULT_KEY, waitingResult);
   }
 
-  public void onSavedInstance(Bundle savedInstance) {
+  void onSavedInstance(Bundle savedInstance) {
     waitingResult = savedInstance.getBoolean(WAITING_RESULT_KEY);
   }
 
-  public void onPositiveClick(String cardNumber, String expiryDate, String cvv,
-      String storedPaymentId, BigDecimal serverFiatPrice, String serverCurrency) {
+  void onPositiveClick(String cardNumber, String expiryDate, String cvv, String storedPaymentId,
+      BigDecimal serverFiatPrice, String serverCurrency) {
     fragmentView.showLoading();
     fragmentView.lockRotation();
     CardEncryptorImpl cardEncryptor = new CardEncryptorImpl(BuildConfig.ADYEN_PUBLIC_KEY);
@@ -83,6 +88,33 @@ class AdyenPaymentPresenter {
     }
 
     makePayment(encryptedCard, serverFiatPrice, serverCurrency);
+  }
+
+  void onCancelClick() {
+    fragmentView.close();
+  }
+
+  void onErrorButtonClick() {
+    fragmentView.close();
+  }
+
+  void onChangeCardClick() {
+    fragmentView.showLoading();
+    NoInfoResponseListener noInfoResponseListener = new NoInfoResponseListener() {
+      @Override public void onResponse(boolean error) {
+        if (error) {
+          fragmentView.showError();
+        } else {
+          fragmentView.clearCreditCardInput();
+          fragmentView.showCreditCardView(null);
+        }
+      }
+    };
+    adyenPaymentInteract.forgetCard(adyenPaymentInfo.getWalletAddress(), noInfoResponseListener);
+  }
+
+  void onMorePaymentsClick() {
+    fragmentView.navigateToPaymentSelection();
   }
 
   private void makePayment(String encryptedCard, BigDecimal serverFiatPrice,
@@ -108,45 +140,18 @@ class AdyenPaymentPresenter {
             .toUpperCase(), adyenPaymentInfo.getWalletAddress(), makePaymentListener);
   }
 
-  public void onCancelClick() {
-    fragmentView.close();
-  }
-
-  public void onErrorButtonClick() {
-    fragmentView.close();
-  }
-
-  public void onChangeCardClick() {
-    fragmentView.showLoading();
-    NoInfoResponseListener noInfoResponseListener = new NoInfoResponseListener() {
-      @Override public void onResponse(boolean error) {
-        if (error) {
-          fragmentView.showError();
-        } else {
-          fragmentView.clearCreditCardInput();
-          fragmentView.showCreditCardView(null);
-        }
-      }
-    };
-    adyenPaymentInteract.forgetCard(adyenPaymentInfo.getWalletAddress(), noInfoResponseListener);
-  }
-
-  public void onMorePaymentsClick() {
-    fragmentView.navigateToPaymentSelection();
-  }
-
-  private void launchPayment(PaymentMethodsModel paymentMethodsModel) {
+  private void launchPayment(AdyenPaymentMethodsModel adyenPaymentMethodsModel) {
     if (adyenPaymentInfo.getPaymentMethod()
         .equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
-      fragmentView.showCreditCardView(paymentMethodsModel.getStoredMethodDetails());
+      fragmentView.showCreditCardView(adyenPaymentMethodsModel.getStoredMethodDetails());
     } else {
       fragmentView.showLoading();
       fragmentView.lockRotation();
-      launchPaypal(paymentMethodsModel);
+      launchPaypal(adyenPaymentMethodsModel);
     }
   }
 
-  private void launchPaypal(PaymentMethodsModel paymentMethod) {
+  private void launchPaypal(AdyenPaymentMethodsModel paymentMethod) {
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
     DeveloperPayload developerPayload = buyItemProperties.getDeveloperPayload();
     MakePaymentListener makePaymentListener = new MakePaymentListener() {

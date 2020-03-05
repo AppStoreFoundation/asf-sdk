@@ -1,6 +1,9 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.os.AsyncTask;
+import com.appcoins.sdk.billing.listeners.AddressRetrievedListener;
+import com.appcoins.sdk.billing.models.AddressModel;
+import com.appcoins.sdk.billing.service.address.AddressService;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -13,8 +16,8 @@ public class AddressAsyncTask extends AsyncTask {
   private AddressRetrievedListener addressRetrievedListener;
   private String packageName;
 
-  public AddressAsyncTask(AddressService addressService,
-      AddressRetrievedListener addressRetrievedListener, String packageName) {
+  AddressAsyncTask(AddressService addressService, AddressRetrievedListener addressRetrievedListener,
+      String packageName) {
 
     this.addressService = addressService;
     this.addressRetrievedListener = addressRetrievedListener;

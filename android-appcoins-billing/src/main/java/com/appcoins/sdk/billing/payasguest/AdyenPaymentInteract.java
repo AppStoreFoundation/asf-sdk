@@ -2,13 +2,18 @@ package com.appcoins.sdk.billing.payasguest;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import com.appcoins.sdk.billing.listeners.GetTransactionListener;
-import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
-import com.appcoins.sdk.billing.listeners.MakePaymentListener;
+import com.appcoins.sdk.billing.listeners.AddressRetrievedListener;
 import com.appcoins.sdk.billing.listeners.NoInfoResponseListener;
-import com.appcoins.sdk.billing.models.AdyenPaymentParams;
-import com.appcoins.sdk.billing.models.TransactionInformation;
-import com.appcoins.sdk.billing.models.TransactionWallets;
+import com.appcoins.sdk.billing.listeners.billing.GetTransactionListener;
+import com.appcoins.sdk.billing.listeners.billing.LoadPaymentInfoListener;
+import com.appcoins.sdk.billing.listeners.billing.MakePaymentListener;
+import com.appcoins.sdk.billing.listeners.billing.PurchaseListener;
+import com.appcoins.sdk.billing.models.AddressModel;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentParams;
+import com.appcoins.sdk.billing.models.billing.PurchaseModel;
+import com.appcoins.sdk.billing.models.billing.TransactionInformation;
+import com.appcoins.sdk.billing.models.billing.TransactionWallets;
+import com.appcoins.sdk.billing.service.address.AddressService;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +26,7 @@ public class AdyenPaymentInteract {
   private AddressService addressService;
   private List<AsyncTask> asyncTasks;
 
-  public AdyenPaymentInteract(AdyenRepository adyenRepository, BillingRepository billingRepository,
+  AdyenPaymentInteract(AdyenRepository adyenRepository, BillingRepository billingRepository,
       AddressService addressService) {
     this.adyenRepository = adyenRepository;
     this.billingRepository = billingRepository;
@@ -29,7 +34,7 @@ public class AdyenPaymentInteract {
     this.asyncTasks = new ArrayList<>();
   }
 
-  public void loadPaymentInfo(AdyenRepository.Methods method, String fiatPrice, String fiatCurrency,
+  void loadPaymentInfo(AdyenRepository.Methods method, String fiatPrice, String fiatCurrency,
       String walletAddress, LoadPaymentInfoListener loadPaymentInfoListener) {
     adyenRepository.loadPaymentInfo(method.getTransactionType(), fiatPrice, fiatCurrency,
         walletAddress, loadPaymentInfoListener);

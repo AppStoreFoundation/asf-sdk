@@ -1,9 +1,9 @@
 package com.appcoins.sdk.billing.service.adyen;
 
-import com.appcoins.sdk.billing.models.AdyenTransactionModel;
-import com.appcoins.sdk.billing.models.PaymentMethodsModel;
-import com.appcoins.sdk.billing.models.StoredMethodDetails;
-import com.appcoins.sdk.billing.models.TransactionResponse;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentMethodsModel;
+import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
+import com.appcoins.sdk.billing.models.billing.TransactionResponse;
+import com.appcoins.sdk.billing.models.payasguest.StoredMethodDetails;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import java.math.BigDecimal;
 import org.json.JSONArray;
@@ -92,9 +92,9 @@ public class AdyenMapper {
     return adyenTransactionModel;
   }
 
-  public PaymentMethodsModel mapPaymentMethodsResponse(RequestResponse requestResponse) {
+  public AdyenPaymentMethodsModel mapPaymentMethodsResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    PaymentMethodsModel paymentMethodsResponse = new PaymentMethodsModel();
+    AdyenPaymentMethodsModel paymentMethodsResponse = new AdyenPaymentMethodsModel();
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     BigDecimal value;
@@ -130,8 +130,8 @@ public class AdyenMapper {
           }
         }
         paymentMethodsResponse =
-            new PaymentMethodsModel(value, currency, paymentMethodsApiResponse, storedMethodDetails,
-                !isSuccess(code));
+            new AdyenPaymentMethodsModel(value, currency, paymentMethodsApiResponse,
+                storedMethodDetails, !isSuccess(code));
       } catch (JSONException e) {
         e.printStackTrace();
       }

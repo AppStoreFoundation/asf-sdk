@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.WalletInteractListener;
+import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
+import com.appcoins.sdk.billing.listeners.payasguest.PaymentMethodsListener;
 import java.util.ArrayList;
 import java.util.List;
 

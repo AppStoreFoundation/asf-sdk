@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import com.appcoins.sdk.billing.helpers.TranslationsModel;
+import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 
 interface IabView {
 

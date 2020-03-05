@@ -1,5 +1,8 @@
 package com.appcoins.sdk.billing.payasguest;
 
+import com.appcoins.sdk.billing.listeners.billing.PurchaseListener;
+import com.appcoins.sdk.billing.mappers.PurchaseMapper;
+import com.appcoins.sdk.billing.models.billing.PurchaseModel;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.Service;
 import com.appcoins.sdk.billing.service.ServiceResponseListener;
@@ -8,17 +11,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BillingRepository {
+class BillingRepository {
 
   private Service service;
 
-  public BillingRepository(Service service) {
+  BillingRepository(Service service) {
 
     this.service = service;
   }
 
-  public void getSkuPurchase(String packageName, String sku, String walletAddress,
-      String walletSignature, final PurchaseListener purchaseListener) {
+  void getSkuPurchase(String packageName, String sku, String walletAddress, String walletSignature,
+      final PurchaseListener purchaseListener) {
     ServiceResponseListener serviceResponseListener = new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
         PurchaseMapper purchaseMapper = new PurchaseMapper();

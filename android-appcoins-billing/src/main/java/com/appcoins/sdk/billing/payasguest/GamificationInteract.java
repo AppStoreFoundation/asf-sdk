@@ -1,6 +1,7 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import com.appcoins.sdk.billing.SharedPreferencesRepository;
+import com.appcoins.sdk.billing.mappers.GamificationMapper;
 import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.ServiceResponseListener;
@@ -12,14 +13,14 @@ class GamificationInteract {
   private final GamificationMapper gamificationMapper;
   private final BdsService bdsService;
 
-  public GamificationInteract(SharedPreferencesRepository sharedPreferencesRepository,
+  GamificationInteract(SharedPreferencesRepository sharedPreferencesRepository,
       GamificationMapper gamificationMapper, BdsService bdsService) {
     this.sharedPreferencesRepository = sharedPreferencesRepository;
     this.gamificationMapper = gamificationMapper;
     this.bdsService = bdsService;
   }
 
-  public void loadMaxBonus(final MaxBonusListener maxBonusListener) {
+  void loadMaxBonus(final MaxBonusListener maxBonusListener) {
     if (sharedPreferencesRepository.hasSavedBonus(System.currentTimeMillis())) {
       maxBonusListener.onBonusReceived(sharedPreferencesRepository.getMaxBonus());
     } else {

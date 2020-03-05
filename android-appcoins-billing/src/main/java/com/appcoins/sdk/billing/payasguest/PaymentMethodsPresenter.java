@@ -6,7 +6,12 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
-import com.appcoins.sdk.billing.models.WalletGenerationModel;
+import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
+import com.appcoins.sdk.billing.listeners.payasguest.PaymentMethodsListener;
+import com.appcoins.sdk.billing.models.billing.SkuDetailsModel;
+import com.appcoins.sdk.billing.models.payasguest.PaymentMethod;
+import com.appcoins.sdk.billing.models.payasguest.PaymentMethodsModel;
+import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 
 class PaymentMethodsPresenter {
 

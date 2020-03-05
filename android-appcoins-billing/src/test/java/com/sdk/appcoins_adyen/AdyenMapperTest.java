@@ -1,8 +1,8 @@
 package com.sdk.appcoins_adyen;
 
-import com.appcoins.sdk.billing.models.AdyenTransactionModel;
-import com.appcoins.sdk.billing.models.PaymentMethodsModel;
-import com.appcoins.sdk.billing.models.TransactionResponse;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentMethodsModel;
+import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
+import com.appcoins.sdk.billing.models.billing.TransactionResponse;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
 import java.math.BigDecimal;
@@ -118,7 +118,7 @@ public class AdyenMapperTest {
         + "{\"key\":\"encryptedExpiryMonth\",\"type\":\"cardToken\"},"
         + "{\"key\":\"encryptedExpiryYear\",\"type\":\"cardToken\"},{\"key\":\"holderName\","
         + "\"optional\":true,\"type\":\"text\"}],\"name\":\"Credit Card\",\"type\":\"scheme\"}]}}";
-    PaymentMethodsModel paymentMethodsResponse =
+    AdyenPaymentMethodsModel paymentMethodsResponse =
         adyenMapper.mapPaymentMethodsResponse(new RequestResponse(200, response, null));
     Assert.assertFalse(paymentMethodsResponse.hasError());
     Assert.assertEquals(new BigDecimal("9.06"), paymentMethodsResponse.getValue());
@@ -137,7 +137,7 @@ public class AdyenMapperTest {
     String response = "{\"price\":{\"value\":\"9.06\",\"currency\":\"EUR\"},"
         + "\"payment\":{\"paymentMethods\":[{\"name\":\"PayPal\",\"supportsRecurring\":true,"
         + "\"type\":\"paypal\"}]}}";
-    PaymentMethodsModel paymentMethodsResponse =
+    AdyenPaymentMethodsModel paymentMethodsResponse =
         adyenMapper.mapPaymentMethodsResponse(new RequestResponse(200, response, null));
     Assert.assertFalse(paymentMethodsResponse.hasError());
     Assert.assertEquals(new BigDecimal("9.06"), paymentMethodsResponse.getValue());
@@ -150,7 +150,7 @@ public class AdyenMapperTest {
     String response = "{\"price\":{\"value\":\"9.06\",\"currency\":\"EUR\"},"
         + "\"payment\":{\"paymentMethods\":[{\"name\":\"PayPal\",\"supportsRecurring\":true,"
         + "\"type\":\"paypal\"}]}}";
-    PaymentMethodsModel paymentMethodsResponse =
+    AdyenPaymentMethodsModel paymentMethodsResponse =
         adyenMapper.mapPaymentMethodsResponse(new RequestResponse(400, response, null));
     Assert.assertTrue(paymentMethodsResponse.hasError());
   }
@@ -158,7 +158,7 @@ public class AdyenMapperTest {
   @Test public void paymentMethodsRequestNoPaymentTest() {
     String response = "{\"price\":{\"value\":\"9.06\",\"currency\":\"EUR\"},"
         + "\"payment\":{\"paymentMethods\":[]}}";
-    PaymentMethodsModel paymentMethodsResponse =
+    AdyenPaymentMethodsModel paymentMethodsResponse =
         adyenMapper.mapPaymentMethodsResponse(new RequestResponse(200, response, null));
     Assert.assertFalse(paymentMethodsResponse.hasError());
     Assert.assertEquals(new BigDecimal("9.06"), paymentMethodsResponse.getValue());

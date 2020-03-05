@@ -1,7 +1,7 @@
 package com.appcoins.sdk.billing.service.wallet;
 
 import com.appcoins.sdk.billing.WalletInteractListener;
-import com.appcoins.sdk.billing.models.WalletGenerationModel;
+import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.Service;
 import com.appcoins.sdk.billing.service.ServiceResponseListener;

@@ -19,6 +19,7 @@ import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
 import com.appcoins.sdk.billing.helpers.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
 import com.appcoins.sdk.billing.helpers.Utils;
+import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 import java.util.Locale;
 
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES;

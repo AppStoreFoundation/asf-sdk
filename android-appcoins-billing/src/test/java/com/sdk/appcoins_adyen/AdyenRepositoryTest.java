@@ -1,19 +1,18 @@
 package com.sdk.appcoins_adyen;
 
-import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
-import com.appcoins.sdk.billing.listeners.MakePaymentListener;
-import com.appcoins.sdk.billing.models.AdyenPaymentParams;
-import com.appcoins.sdk.billing.models.AdyenTransactionModel;
-import com.appcoins.sdk.billing.models.PaymentMethodsModel;
-import com.appcoins.sdk.billing.models.TransactionInformation;
-import com.appcoins.sdk.billing.models.TransactionWallets;
+import com.appcoins.sdk.billing.listeners.billing.LoadPaymentInfoListener;
+import com.appcoins.sdk.billing.listeners.billing.MakePaymentListener;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentMethodsModel;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentParams;
+import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
+import com.appcoins.sdk.billing.models.billing.TransactionInformation;
+import com.appcoins.sdk.billing.models.billing.TransactionWallets;
 import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.ServiceResponseListener;
 import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -42,7 +41,7 @@ public class AdyenRepositoryTest {
     queries.put("price.currency", "EUR");
     queries.put("method", "credit_card");
     LoadPaymentInfoListener loadPaymentInfoListener = new LoadPaymentInfoListener() {
-      @Override public void onResponse(PaymentMethodsModel paymentMethodsResponse) {
+      @Override public void onResponse(AdyenPaymentMethodsModel paymentMethodsResponse) {
 
       }
     };
@@ -54,8 +53,8 @@ public class AdyenRepositoryTest {
     when(adyenListenerProvider.createLoadPaymentInfoListener(loadPaymentInfoListener)).thenReturn(
         serviceResponseListener);
     adyenRepository.loadPaymentInfo("credit_card", "9.06", "EUR", "0x212", loadPaymentInfoListener);
-    verify(bdsService).makeRequest("8.20191202/gateways/adyen_v2/payment-methods", "GET", new ArrayList<String>(), queries, null,
-        null, serviceResponseListener);
+    verify(bdsService).makeRequest("8.20191202/gateways/adyen_v2/payment-methods", "GET",
+        new ArrayList<String>(), queries, null, null, serviceResponseListener);
   }
 
   @Test public void makePaymentTest() {
@@ -94,7 +93,7 @@ public class AdyenRepositoryTest {
     adyenRepository.makePayment(new AdyenPaymentParams("", false, ""),
         new TransactionInformation("", "", "", "", "", "", "", "", "", ""),
         new TransactionWallets("0x123", "", "", "", ""), makePaymentListener);
-    verify(bdsService).makeRequest("8.20191202/gateways/adyen_v2/transactions", "POST", new ArrayList<String>(), queries, null,
-        body, serviceResponseListener);
+    verify(bdsService).makeRequest("8.20191202/gateways/adyen_v2/transactions", "POST",
+        new ArrayList<String>(), queries, null, body, serviceResponseListener);
   }
 }

@@ -1,7 +1,8 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.os.Bundle;
-import com.appcoins.sdk.billing.models.StoredMethodDetails;
+import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
+import com.appcoins.sdk.billing.models.payasguest.StoredMethodDetails;
 import java.math.BigDecimal;
 
 interface AdyenPaymentView {

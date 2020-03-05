@@ -1,12 +1,12 @@
 package com.appcoins.sdk.billing.service.adyen;
 
-import com.appcoins.sdk.billing.listeners.GetTransactionListener;
-import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
-import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.listeners.NoInfoResponseListener;
-import com.appcoins.sdk.billing.models.AdyenPaymentParams;
-import com.appcoins.sdk.billing.models.TransactionInformation;
-import com.appcoins.sdk.billing.models.TransactionWallets;
+import com.appcoins.sdk.billing.listeners.billing.GetTransactionListener;
+import com.appcoins.sdk.billing.listeners.billing.LoadPaymentInfoListener;
+import com.appcoins.sdk.billing.listeners.billing.MakePaymentListener;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentParams;
+import com.appcoins.sdk.billing.models.billing.TransactionInformation;
+import com.appcoins.sdk.billing.models.billing.TransactionWallets;
 import com.appcoins.sdk.billing.service.Service;
 import com.appcoins.sdk.billing.service.ServiceResponseListener;
 import java.util.ArrayList;
