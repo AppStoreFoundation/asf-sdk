@@ -10,6 +10,8 @@ import com.appcoins.sdk.billing.models.AdyenPaymentParams;
 import com.appcoins.sdk.billing.models.TransactionInformation;
 import com.appcoins.sdk.billing.models.TransactionWallets;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
+import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONObject;
 
 public class AdyenPaymentInteract {
@@ -17,12 +19,14 @@ public class AdyenPaymentInteract {
   private AdyenRepository adyenRepository;
   private BillingRepository billingRepository;
   private AddressService addressService;
+  private List<AsyncTask> asyncTasks;
 
   public AdyenPaymentInteract(AdyenRepository adyenRepository, BillingRepository billingRepository,
       AddressService addressService) {
     this.adyenRepository = adyenRepository;
     this.billingRepository = billingRepository;
     this.addressService = addressService;
+    this.asyncTasks = new ArrayList<>();
   }
 
   public void loadPaymentInfo(AdyenRepository.Methods method, String fiatPrice, String fiatCurrency,
@@ -52,6 +56,7 @@ public class AdyenPaymentInteract {
     AddressAsyncTask addressAsyncTask =
         new AddressAsyncTask(addressService, addressRetrievedListener, packageName);
     addressAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    asyncTasks.add(addressAsyncTask);
   }
 
   void submitRedirect(String uid, String walletAddress, JSONObject details, String paymentData,
@@ -75,7 +80,14 @@ public class AdyenPaymentInteract {
     }
   }
 
-  public void forgetCard(String walletAddress, NoInfoResponseListener noInfoResponseListener) {
+  void cancelRequests() {
+    for (AsyncTask asyncTask : asyncTasks) {
+      asyncTask.cancel(true);
+    }
+    adyenRepository.cancelRequests();
+  }
+
+  void forgetCard(String walletAddress, NoInfoResponseListener noInfoResponseListener) {
     adyenRepository.disablePayments(walletAddress, noInfoResponseListener);
   }
 

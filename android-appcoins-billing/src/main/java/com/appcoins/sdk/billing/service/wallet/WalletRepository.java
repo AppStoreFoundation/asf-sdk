@@ -37,4 +37,8 @@ public class WalletRepository {
     service.makeRequest("/appc/guest_wallet", "GET", new ArrayList<String>(), queries, null, null,
         serviceResponseListener);
   }
+
+  public void cancelRequests() {
+    service.cancelRequests();
+  }
 }

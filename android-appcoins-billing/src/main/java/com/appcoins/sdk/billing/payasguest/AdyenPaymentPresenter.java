@@ -30,7 +30,7 @@ class AdyenPaymentPresenter {
   private final AdyenPaymentInteract adyenPaymentInteract;
   private String returnUrl;
   private boolean waitingResult;
-  private boolean destroyed;
+  private boolean isDestroyed;
 
   public AdyenPaymentPresenter(AdyenPaymentView fragmentView, AdyenPaymentInfo adyenPaymentInfo,
       AdyenPaymentInteract adyenPaymentInteract, String returnUrl) {
@@ -71,6 +71,7 @@ class AdyenPaymentPresenter {
   public void onPositiveClick(String cardNumber, String expiryDate, String cvv,
       String storedPaymentId, BigDecimal serverFiatPrice, String serverCurrency) {
     fragmentView.showLoading();
+    fragmentView.lockRotation();
     CardEncryptorImpl cardEncryptor = new CardEncryptorImpl(BuildConfig.ADYEN_PUBLIC_KEY);
     ExpiryDate mExpiryDate = CardValidationUtils.getDate(expiryDate);
     String encryptedCard;
@@ -220,9 +221,7 @@ class AdyenPaymentPresenter {
           } else if (paymentFailed(transactionResponse.getStatus())) {
             fragmentView.showError();
           } else {
-            if (!destroyed) {
-              requestTransaction(uid, 10000, this);
-            }
+            requestTransaction(uid, 10000, this);
           }
         }
       }
@@ -264,8 +263,10 @@ class AdyenPaymentPresenter {
     final Handler handler = new Handler();
     Runnable runnable = new Runnable() {
       @Override public void run() {
-        adyenPaymentInteract.getTransaction(uid, adyenPaymentInfo.getWalletAddress(),
-            adyenPaymentInfo.getSignature(), getTransactionListener);
+        if (!isDestroyed) {
+          adyenPaymentInteract.getTransaction(uid, adyenPaymentInfo.getWalletAddress(),
+              adyenPaymentInfo.getSignature(), getTransactionListener);
+        }
         handler.removeCallbacks(this);
       }
     };
@@ -273,6 +274,7 @@ class AdyenPaymentPresenter {
   }
 
   void onDestroy() {
-    destroyed = true;
+    isDestroyed = true;
+    adyenPaymentInteract.cancelRequests();
   }
 }

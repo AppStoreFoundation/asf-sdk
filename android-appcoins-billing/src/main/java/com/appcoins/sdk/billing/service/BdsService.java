@@ -1,6 +1,7 @@
 package com.appcoins.sdk.billing.service;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import com.appcoins.sdk.billing.utils.RequestBuilderUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,9 +19,12 @@ import java.util.Map;
 public class BdsService implements Service {
 
   private String baseUrl;
+  private List<ServiceAsyncTask> asyncTasks;
 
   public BdsService(String baseUrl) {
+
     this.baseUrl = baseUrl;
+    this.asyncTasks = new ArrayList<>();
   }
 
   RequestResponse createRequest(String baseUrl, String endPoint, String httpMethod,
@@ -29,6 +33,7 @@ public class BdsService implements Service {
     HttpURLConnection urlConnection = null;
     try {
       String urlBuilder = RequestBuilderUtils.buildUrl(baseUrl, endPoint, paths, queries);
+      Log.d("TAG123", "Calling: " + urlBuilder);
       URL url = new URL(urlBuilder);
       urlConnection = openUrlConnection(url, httpMethod);
 
@@ -93,7 +98,7 @@ public class BdsService implements Service {
     urlConnection.setDoOutput(true);
     OutputStream os = urlConnection.getOutputStream();
     String body = RequestBuilderUtils.buildBody(bodyKeys);
-    byte[] input = body.getBytes(Charset.forName("UTF-8"));
+    byte[] input = body.getBytes(StandardCharsets.UTF_8);
     os.write(input, 0, input.length);
   }
 
@@ -120,9 +125,16 @@ public class BdsService implements Service {
     if (queries == null) {
       queries = new HashMap<>();
     }
-    ServiceAsyncTask asyncTask =
+    ServiceAsyncTask serviceAsyncTask =
         new ServiceAsyncTask(this, baseUrl, endPoint, httpMethod, paths, queries, header, body,
             serviceResponseListener);
-    asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    serviceAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    asyncTasks.add(serviceAsyncTask);
+  }
+
+  @Override public void cancelRequests() {
+    for (ServiceAsyncTask asyncTask : asyncTasks) {
+      asyncTask.cancel(true);
+    }
   }
 }

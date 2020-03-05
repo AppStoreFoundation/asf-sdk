@@ -17,4 +17,10 @@ public interface Service {
   void makeRequest(String endPoint, String httpMethod, List<String> paths,
       Map<String, String> queries, Map<String, String> header, Map<String, Object> body,
       ServiceResponseListener serviceResponseListener);
+
+  /**
+   * Cancel all async tasks currently in execution
+   * This method should call when the view is destroyed
+   */
+  void cancelRequests();
 }

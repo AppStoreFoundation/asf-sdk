@@ -32,4 +32,8 @@ class PaymentMethodsRepository {
     bdsService.makeRequest("/broker/8.20191014/methods", "GET", new ArrayList<String>(), queries,
         new HashMap<String, String>(), new HashMap<String, Object>(), serviceResponseListener);
   }
+
+  public void cancelRequests() {
+    bdsService.cancelRequests();
+  }
 }

@@ -35,4 +35,8 @@ class GamificationInteract {
           new HashMap<String, Object>(), serviceResponseListener);
     }
   }
+
+  public void cancelRequests() {
+    bdsService.cancelRequests();
+  }
 }

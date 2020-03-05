@@ -138,6 +138,19 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     outState.putString(SELECTED_RADIO_KEY, selectedRadioButton);
   }
 
+  @Override public void onDestroyView() {
+    layout = null;
+    super.onDestroyView();
+  }
+
+  @Override public void onDestroy() {
+    skuDetailsModel = null;
+    walletGenerationModel = null;
+    paymentMethodsPresenter.onDestroy();
+    paymentMethodsPresenter = null;
+    super.onDestroy();
+  }
+
   private void onErrorButtonClicked(Button errorButton) {
     errorButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {

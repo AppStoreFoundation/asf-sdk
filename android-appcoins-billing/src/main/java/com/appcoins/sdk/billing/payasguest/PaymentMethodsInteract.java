@@ -4,12 +4,15 @@ import android.os.AsyncTask;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.WalletInteractListener;
+import java.util.ArrayList;
+import java.util.List;
 
 class PaymentMethodsInteract {
 
   private final PaymentMethodsRepository paymentMethodsRepository;
   private WalletInteract walletInteract;
   private GamificationInteract gamificationInteract;
+  private List<AsyncTask> asyncTasks;
 
   PaymentMethodsInteract(WalletInteract walletInteract, GamificationInteract gamificationInteract,
       PaymentMethodsRepository paymentMethodsRepository) {
@@ -17,6 +20,7 @@ class PaymentMethodsInteract {
     this.walletInteract = walletInteract;
     this.gamificationInteract = gamificationInteract;
     this.paymentMethodsRepository = paymentMethodsRepository;
+    this.asyncTasks = new ArrayList<>();
   }
 
   String retrieveWalletId() {
@@ -32,6 +36,7 @@ class PaymentMethodsInteract {
     SingleSkuDetailsAsync singleSkuDetailsAsync =
         new SingleSkuDetailsAsync(buyItemProperties, skuDetailsListener);
     singleSkuDetailsAsync.execute(AsyncTask.THREAD_POOL_EXECUTOR);
+    asyncTasks.add(singleSkuDetailsAsync);
   }
 
   void loadPaymentsAvailable(String fiatPrice, String fiatCurrency,
@@ -41,5 +46,14 @@ class PaymentMethodsInteract {
 
   void requestMaxBonus(MaxBonusListener maxBonusListener) {
     gamificationInteract.loadMaxBonus(maxBonusListener);
+  }
+
+  void cancelRequests() {
+    for (AsyncTask asyncTask : asyncTasks) {
+      asyncTask.cancel(true);
+    }
+    gamificationInteract.cancelRequests();
+    paymentMethodsRepository.cancelRequests();
+    walletInteract.cancelRequests();
   }
 }

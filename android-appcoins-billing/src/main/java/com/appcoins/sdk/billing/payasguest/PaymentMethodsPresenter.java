@@ -67,6 +67,10 @@ class PaymentMethodsPresenter {
     fragmentView.close();
   }
 
+  void onDestroy() {
+    paymentMethodsInteract.cancelRequests();
+  }
+
   private void provideSkuDetailsInformation(BuyItemProperties buyItemProperties,
       boolean walletGenerated) {
     if (!walletGenerated) {

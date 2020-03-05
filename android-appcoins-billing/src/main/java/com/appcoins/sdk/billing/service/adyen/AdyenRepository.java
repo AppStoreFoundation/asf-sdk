@@ -103,6 +103,10 @@ public class AdyenRepository {
         null, body, serviceResponseListener);
   }
 
+  public void cancelRequests() {
+    bdsService.cancelRequests();
+  }
+
   private Map<String, Object> buildMakePaymentBody(AdyenPaymentParams adyenPaymentParams,
       TransactionInformation transactionInformation, TransactionWallets transactionWallets) {
     Map<String, Object> body = new LinkedHashMap<>();
