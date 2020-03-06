@@ -54,7 +54,6 @@ public class AdyenMapperTest {
     Assert.assertNull(adyenTransactionModel.getUrl());
     Assert.assertNull(adyenTransactionModel.getPaymentData());
     Assert.assertNull(adyenTransactionModel.getRefusalReason());
-    Assert.assertNull(adyenTransactionModel.getRefusalReasonCode());
   }
 
   @Test public void adyenPaypalTransactionRequest() {
@@ -76,7 +75,6 @@ public class AdyenMapperTest {
     Assert.assertNull(adyenTransactionModel.getPspReference());
     Assert.assertNull(adyenTransactionModel.getResultCode());
     Assert.assertNull(adyenTransactionModel.getRefusalReason());
-    Assert.assertNull(adyenTransactionModel.getRefusalReasonCode());
   }
 
   @Test public void adyenTransactionRequestErrorTest() {
@@ -103,7 +101,6 @@ public class AdyenMapperTest {
     Assert.assertEquals("pspReference", adyenTransactionModel.getPspReference());
     Assert.assertEquals("Refused", adyenTransactionModel.getResultCode());
     Assert.assertEquals("CVC Declined", adyenTransactionModel.getRefusalReason());
-    Assert.assertEquals("24", adyenTransactionModel.getRefusalReasonCode());
     Assert.assertNull(adyenTransactionModel.getUrl());
     Assert.assertNull(adyenTransactionModel.getPaymentData());
   }
