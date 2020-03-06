@@ -284,7 +284,9 @@ class AdyenPaymentPresenter {
   }
 
   void onDestroy() {
-    getTransactionHandler.removeCallbacks(getTransactionRunnable);
+    if(getTransactionHandler != null && getTransactionRunnable != null){
+      getTransactionHandler.removeCallbacks(getTransactionRunnable);
+    }
     adyenPaymentInteract.cancelRequests();
   }
 }
