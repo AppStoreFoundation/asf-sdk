@@ -46,6 +46,8 @@ public class CvvTextWatcher implements TextWatcher {
   }
 
   private void goToPreviousInputFocus() {
-    previousViewToFocus.requestFocus();
+    if (previousViewToFocus.isEnabled()) {
+      previousViewToFocus.requestFocus();
+    }
   }
 }
