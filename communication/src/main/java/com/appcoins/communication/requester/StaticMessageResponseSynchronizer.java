@@ -38,15 +38,16 @@ class StaticMessageResponseSynchronizer {
    * method. See {@link StaticMessageResponseSynchronizer#init()}
    *
    * @param requestCode id of the message to wait for
+   * @param timeout the maximum time to wait in milliseconds.
    *
    * @return the response from the target application
    *
-   * @throws InterruptedException if the waiter thread is interrupted
+   * @throws InterruptedException if the waiter thread is interrupted or timeout was reached
    * @throws IllegalStateException if {@link StaticMessageResponseSynchronizer#init()} not called
    * before calling waitMessage method
    * @see StaticMessageResponseSynchronizer#init()
    */
-  public static Parcelable waitMessage(long requestCode)
+  public static Parcelable waitMessage(long requestCode, int timeout)
       throws InterruptedException, IllegalStateException {
     checkIfInitialized();
     if (!responses.containsKey(requestCode)) {
@@ -54,8 +55,11 @@ class StaticMessageResponseSynchronizer {
       blockingObjects.put(requestCode, blockingObject);
       //noinspection SynchronizationOnLocalVariableOrMethodParameter
       synchronized (blockingObject) {
-        blockingObject.wait();
+        blockingObject.wait(timeout);
       }
+    }
+    if (!responses.containsKey(requestCode)) {
+      throw new InterruptedException("timeout reached");
     }
     return responses.get(requestCode);
   }

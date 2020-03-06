@@ -13,7 +13,8 @@ import static org.mockito.Mockito.times;
 @RunWith(AndroidJUnit4.class) public class IntentSyncIpcExecutorTest {
 
   public static final long MESSAGE_ID = 0L;
-  private final int TYPE = 1;
+  public static final int TIMEOUT = 10000;
+  private final int TYPE = 0;
   private IntentSyncIpcMessageSender service;
   private MessageRequesterSynchronizer messageResponseSynchronizer;
   private MessageRequesterSender messageSender;
@@ -26,11 +27,12 @@ import static org.mockito.Mockito.times;
         .thenReturn(0L);
 
     service =
-        new IntentSyncIpcMessageSender(messageSender, messageResponseSynchronizer, idGenerator);
+        new IntentSyncIpcMessageSender(messageSender, messageResponseSynchronizer, idGenerator,
+            TIMEOUT);
   }
 
   @Test public void sendMessageTest() throws InterruptedException, MainThreadException {
-    Mockito.when(messageResponseSynchronizer.waitMessage(0L))
+    Mockito.when(messageResponseSynchronizer.waitMessage(0L, TIMEOUT))
         .thenReturn(new Intent("intent1"));
     Intent arguments = new Intent("intent2");
     Intent intent = (Intent) service.sendMessage(TYPE, arguments);

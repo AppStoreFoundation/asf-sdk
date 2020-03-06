@@ -10,8 +10,8 @@ public class WalletBillingService implements AppcoinsBilling {
 
   private AppcoinsBilling service;
 
-  public WalletBillingService(IBinder service) {
-    this.service = AppcoinsBillingStubHelper.Stub.asInterface(service);
+  public WalletBillingService(IBinder service, String componentName) {
+    this.service = AppcoinsBillingStubHelper.Stub.asInterface(service, componentName);
   }
 
   @Override
