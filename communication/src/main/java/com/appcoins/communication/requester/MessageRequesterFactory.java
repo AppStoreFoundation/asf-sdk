@@ -11,14 +11,15 @@ public class MessageRequesterFactory {
    * described in activity's intent-filter)
    * @param requesterActivityUri URI of the activity declared on manifest that extends
    * {@link MessageRequesterActivity } (usually described in activity's intent-filter)
+   * @param timeout
    *
    * @return {@link SyncIpcMessageRequester} that allows you to communicate with the processor
    * application
    */
   public static SyncIpcMessageRequester create(Context context, String processorPackage,
-      String processorActivityUri, String requesterActivityUri) {
+      String processorActivityUri, String requesterActivityUri, int timeout) {
     return new IntentSyncIpcMessageSender(
         new MessageRequesterSender(context, processorPackage, processorActivityUri,
-            requesterActivityUri), new MessageRequesterSynchronizer(), new IdGenerator());
+            requesterActivityUri), new MessageRequesterSynchronizer(), new IdGenerator(), timeout);
   }
 }
