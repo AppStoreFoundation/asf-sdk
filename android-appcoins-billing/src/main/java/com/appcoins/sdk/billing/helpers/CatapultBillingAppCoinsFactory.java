@@ -14,10 +14,11 @@ public class CatapultBillingAppCoinsFactory {
       PurchasesUpdatedListener purchaseFinishedListener) {
 
     AppCoinsAndroidBillingRepository repository =
-        new AppCoinsAndroidBillingRepository(context, 3, context.getPackageName());
+        new AppCoinsAndroidBillingRepository(3, context.getPackageName());
 
-    RepositoryServiceConnection connection = new RepositoryServiceConnection(context, repository);
-    WalletUtils.setContext(context);
+    RepositoryServiceConnection connection =
+        new RepositoryServiceConnection(context.getApplicationContext(), repository);
+    WalletUtils.setContext(context.getApplicationContext());
 
     byte[] base64DecodedPublicKey = Base64.decode(base64PublicKey, Base64.DEFAULT);
 
