@@ -6,6 +6,8 @@ import org.junit.Test;
 
 public class StaticMessageResponseSynchronizerTest {
 
+  public static final int TIMEOUT = 0;
+
   @Test public void init() {
     StaticMessageResponseSynchronizer.init();
     MessageRequesterListener messageListener =
@@ -19,7 +21,7 @@ public class StaticMessageResponseSynchronizerTest {
         StaticMessageResponseSynchronizer.getMessageListener();
     Intent returnValue = new Intent();
     messageListener.onMessageReceived(1, returnValue);
-    Intent data = (Intent) StaticMessageResponseSynchronizer.waitMessage(1);
+    Intent data = (Intent) StaticMessageResponseSynchronizer.waitMessage(1, TIMEOUT);
     Assert.assertEquals(returnValue, data);
   }
 }
