@@ -60,9 +60,11 @@ class PaymentMethodsPresenter {
     } else {
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
       if (intent != null) {
-        boolean shouldHide = intent.getPackage() != null && intent.getPackage()
-            .equals(BuildConfig.APTOIDE_PACKAGE_NAME);
-        fragmentView.redirectToWalletInstallation(intent, shouldHide);
+        if (intent.getPackage() != null && intent.getPackage()
+            .equals(BuildConfig.APTOIDE_PACKAGE_NAME)) {
+          fragmentView.hideDialog();
+        }
+        fragmentView.redirectToWalletInstallation(intent);
       } else {
         fragmentView.showAlertNoBrowserAndStores();
       }

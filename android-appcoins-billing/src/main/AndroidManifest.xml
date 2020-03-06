@@ -15,5 +15,15 @@
     <activity
         android:name="com.appcoins.sdk.billing.WebViewActivity"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+    <activity android:name="com.appcoins.sdk.billing.UriCommunicationActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <data
+            android:host="billing"
+            android:path="/communication/requester/1"
+            android:scheme="appcoins" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+    </activity>
   </application>
 </manifest>

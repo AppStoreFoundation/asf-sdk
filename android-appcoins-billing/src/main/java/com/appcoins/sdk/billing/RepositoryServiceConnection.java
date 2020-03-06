@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
+import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
@@ -25,7 +26,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
   @Override public void onServiceConnected(ComponentName name, IBinder service) {
     Log.d(TAG,
         "onServiceConnected() called with: name = [" + name + "], service = [" + service + "]");
-    connectionLifeCycle.onConnect(service, listener);
+    connectionLifeCycle.onConnect(name, service, listener);
   }
 
   @Override public void onServiceDisconnected(ComponentName name) {
@@ -61,13 +62,21 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
   }
 
   private void walletNotInstalledBehaviour() {
-    onServiceConnected(new ComponentName("", ""), new IBinderWalletNotInstalled());
+    onServiceConnected(new ComponentName("", AppcoinsBillingStubHelper.class.getSimpleName()),
+        new IBinderWalletNotInstalled());
+  }
+
+  private void bindFailedBehaviour() {
+    onServiceConnected(new ComponentName("", UriCommunicationAppcoinsBilling.class.getSimpleName()),
+        new IBinderWalletNotInstalled());
   }
 
   private void walletInstalledBehaviour(String packageName) {
     String iabAction = WalletUtils.getIabAction();
     Intent serviceIntent = new Intent(iabAction);
     serviceIntent.setPackage(packageName);
-    context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+    if (!context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)) {
+      bindFailedBehaviour();
+    }
   }
 }

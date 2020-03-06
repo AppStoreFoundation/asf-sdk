@@ -1,24 +1,25 @@
 package com.appcoins.sdk.billing.helpers;
 
+import android.content.ComponentName;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
+import com.appcoins.billing.AppcoinsBilling;
 import com.appcoins.sdk.billing.ConnectionLifeCycle;
 import com.appcoins.sdk.billing.LaunchBillingFlowResult;
 import com.appcoins.sdk.billing.PurchasesResult;
 import com.appcoins.sdk.billing.Repository;
 import com.appcoins.sdk.billing.ResponseCode;
-import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
 import com.appcoins.sdk.billing.SkuDetailsResult;
+import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
+import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
 import com.appcoins.sdk.billing.service.WalletBillingService;
-
 import java.util.List;
 
 class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycle {
   private final int apiVersion;
   private final String packageName;
-  private WalletBillingService service;
+  private AppcoinsBilling service;
   private boolean isServiceReady;
 
   public AppCoinsAndroidBillingRepository(int apiVersion, String packageName) {
@@ -26,8 +27,9 @@ class AppCoinsAndroidBillingRepository implements Repository, ConnectionLifeCycl
     this.packageName = packageName;
   }
 
-  @Override public void onConnect(IBinder service, final AppCoinsBillingStateListener listener) {
-    this.service = new WalletBillingService(service);
+  @Override public void onConnect(ComponentName name, IBinder service,
+      final AppCoinsBillingStateListener listener) {
+    this.service = new WalletBillingService(service, name.getClassName());
     isServiceReady = true;
     listener.onBillingSetupFinished(ResponseCode.OK.getValue());
   }

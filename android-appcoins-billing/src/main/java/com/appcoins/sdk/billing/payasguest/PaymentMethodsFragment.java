@@ -76,11 +76,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     BdsService apiService = new BdsService(BuildConfig.HOST_WS);
 
     SharedPreferencesRepository sharedPreferencesRepository =
-        new SharedPreferencesRepository(getActivity());
+        new SharedPreferencesRepository(getActivity(), 86400 * 30); //86400 = 24h
     WalletRepository walletRepository =
         new WalletRepository(backendService, new WalletGenerationMapper());
     WalletInteract walletInteract =
-        new WalletInteract(new SharedPreferencesRepository(getActivity()), walletRepository);
+        new WalletInteract(sharedPreferencesRepository, walletRepository);
     GamificationInteract gamificationInteract =
         new GamificationInteract(sharedPreferencesRepository, new GamificationMapper(),
             backendService);
@@ -248,13 +248,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     iabView.showAlertNoBrowserAndStores();
   }
 
-  @Override public void redirectToWalletInstallation(Intent intent, boolean shouldHide) {
-    if (shouldHide) {
-      layout.getDialogLayout()
-          .setVisibility(View.INVISIBLE);
-      layout.getIntentLoadingView()
-          .setVisibility(View.VISIBLE);
-    }
+  @Override public void hideDialog() {
+    layout.getDialogLayout()
+        .setVisibility(View.INVISIBLE);
+    layout.getIntentLoadingView()
+        .setVisibility(View.VISIBLE);
+  }
+
+  @Override public void redirectToWalletInstallation(Intent intent) {
     iabView.redirectToWalletInstallation(intent);
   }
 

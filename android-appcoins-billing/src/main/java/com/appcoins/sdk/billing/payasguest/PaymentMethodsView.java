@@ -14,7 +14,7 @@ interface PaymentMethodsView {
 
   void showAlertNoBrowserAndStores();
 
-  void redirectToWalletInstallation(Intent intent, boolean shouldHide);
+  void redirectToWalletInstallation(Intent intent);
 
   void navigateToAdyen(String selectedRadioButton);
 
@@ -33,4 +33,6 @@ interface PaymentMethodsView {
   void showInstallDialog();
 
   void showItemAlreadyOwnedError(SkuPurchase skuPurchase);
+
+  void hideDialog();
 }
