@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.WalletInteractListener;
+import com.appcoins.sdk.billing.listeners.PurchasesListener;
 import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
 import com.appcoins.sdk.billing.listeners.payasguest.PaymentMethodsListener;
 import java.util.ArrayList;
@@ -12,16 +13,18 @@ import java.util.List;
 class PaymentMethodsInteract {
 
   private final PaymentMethodsRepository paymentMethodsRepository;
+  private BillingRepository billingRepository;
   private WalletInteract walletInteract;
   private GamificationInteract gamificationInteract;
   private List<AsyncTask> asyncTasks;
 
   PaymentMethodsInteract(WalletInteract walletInteract, GamificationInteract gamificationInteract,
-      PaymentMethodsRepository paymentMethodsRepository) {
+      PaymentMethodsRepository paymentMethodsRepository, BillingRepository billingRepository) {
 
     this.walletInteract = walletInteract;
     this.gamificationInteract = gamificationInteract;
     this.paymentMethodsRepository = paymentMethodsRepository;
+    this.billingRepository = billingRepository;
     this.asyncTasks = new ArrayList<>();
   }
 
@@ -57,5 +60,11 @@ class PaymentMethodsInteract {
     gamificationInteract.cancelRequests();
     paymentMethodsRepository.cancelRequests();
     walletInteract.cancelRequests();
+    billingRepository.cancelRequests();
+  }
+
+  void checkForUnconsumedPurchased(String packageName, String walletAddress, String signature,
+      String type, PurchasesListener purchasesListener) {
+    billingRepository.getPurchases(packageName, walletAddress, signature, type, purchasesListener);
   }
 }

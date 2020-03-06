@@ -90,6 +90,7 @@ public class AdyenPaymentInteract {
       asyncTask.cancel(true);
     }
     adyenRepository.cancelRequests();
+    billingRepository.cancelRequests();
   }
 
   void forgetCard(String walletAddress, NoInfoResponseListener noInfoResponseListener) {

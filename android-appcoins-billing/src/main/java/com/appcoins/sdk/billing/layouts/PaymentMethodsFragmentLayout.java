@@ -1022,6 +1022,10 @@ public class PaymentMethodsFragmentLayout {
     return paymentErrorViewLayout.getErrorPositiveButton();
   }
 
+  public void setErrorMessage(String message) {
+    paymentErrorViewLayout.setMessage(message);
+  }
+
   public RelativeLayout getErrorView() {
     return errorView;
   }

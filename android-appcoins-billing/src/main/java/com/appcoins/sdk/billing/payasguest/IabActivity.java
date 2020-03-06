@@ -45,6 +45,7 @@ public class IabActivity extends Activity implements IabView {
   private FrameLayout frameLayout;
   private BuyItemProperties buyItemProperties;
   private ActivityResultListener activityResultListener;
+  private boolean backEnabled = true;
 
   @SuppressLint("ResourceType") @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -78,7 +79,9 @@ public class IabActivity extends Activity implements IabView {
   }
 
   @Override public void onBackPressed() {
-    close();
+    if (backEnabled) {
+      close();
+    }
   }
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -200,6 +203,10 @@ public class IabActivity extends Activity implements IabView {
     intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
     finish();
     startActivity(intent);
+  }
+
+  @Override public void disableBack() {
+    backEnabled = false;
   }
 
   private void buildAlertNoBrowserAndStores() {

@@ -35,4 +35,6 @@ interface IabView {
   void navigateToPaymentSelection();
 
   void navigateToInstallDialog();
+
+  void disableBack();
 }

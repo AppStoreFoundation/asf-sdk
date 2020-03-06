@@ -22,8 +22,10 @@ import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.layouts.PaymentMethodsFragmentLayout;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
+import com.appcoins.sdk.billing.mappers.BillingMapper;
 import com.appcoins.sdk.billing.mappers.GamificationMapper;
 import com.appcoins.sdk.billing.models.billing.SkuDetailsModel;
+import com.appcoins.sdk.billing.models.billing.SkuPurchase;
 import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.wallet.WalletGenerationMapper;
@@ -47,6 +49,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private SkuDetailsModel skuDetailsModel;
   private WalletGenerationModel walletGenerationModel;
   private AppcoinsBillingStubHelper appcoinsBillingStubHelper;
+  private SkuPurchase itemAlreadyOwnedPurchase;
 
   public static PaymentMethodsFragment newInstance(BuyItemProperties buyItemProperties) {
     PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
@@ -69,24 +72,27 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    BdsService bdsService = new BdsService(BuildConfig.BACKEND_BASE);
+    BdsService backendService = new BdsService(BuildConfig.BACKEND_BASE);
+    BdsService apiService = new BdsService(BuildConfig.HOST_WS);
 
     SharedPreferencesRepository sharedPreferencesRepository =
         new SharedPreferencesRepository(getActivity());
     WalletRepository walletRepository =
-        new WalletRepository(bdsService, new WalletGenerationMapper());
+        new WalletRepository(backendService, new WalletGenerationMapper());
     WalletInteract walletInteract =
         new WalletInteract(new SharedPreferencesRepository(getActivity()), walletRepository);
     GamificationInteract gamificationInteract =
-        new GamificationInteract(sharedPreferencesRepository, new GamificationMapper(), bdsService);
-    PaymentMethodsRepository paymentMethodsRepository =
-        new PaymentMethodsRepository(new BdsService(BuildConfig.HOST_WS));
+        new GamificationInteract(sharedPreferencesRepository, new GamificationMapper(),
+            backendService);
+    PaymentMethodsRepository paymentMethodsRepository = new PaymentMethodsRepository(apiService);
+    BillingRepository billingRepository = new BillingRepository(apiService);
 
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
     paymentMethodsPresenter = new PaymentMethodsPresenter(this,
-        new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository),
+        new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository,
+            billingRepository),
         new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
             getActivity().getPackageName(), getActivity().getApplicationContext()));
   }
@@ -228,7 +234,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   @Override public void close() {
-    iabView.close();
+    if (itemAlreadyOwnedPurchase != null) {
+      BillingMapper billingMapper = new BillingMapper();
+      Bundle bundle = billingMapper.mapAlreadyOwned(itemAlreadyOwnedPurchase);
+      itemAlreadyOwnedPurchase = null;
+      iabView.finish(bundle);
+    } else {
+      iabView.close();
+    }
   }
 
   @Override public void showAlertNoBrowserAndStores() {
@@ -315,6 +328,15 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void showInstallDialog() {
     iabView.navigateToInstallDialog();
+  }
+
+  @Override public void showItemAlreadyOwnedError(SkuPurchase skuPurchase) {
+    itemAlreadyOwnedPurchase = skuPurchase;
+    iabView.disableBack();
+    layout.setErrorMessage(
+        "It seems this purchase is already being processed. Please hold on until the transaction "
+            + "is completed or contact our Support Team.");
+    showError();
   }
 
   private void setInitialRadioButtonSelected() {

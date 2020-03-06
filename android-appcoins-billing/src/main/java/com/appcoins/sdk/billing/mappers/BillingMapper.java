@@ -29,4 +29,16 @@ public class BillingMapper {
     bundle.putInt(RESPONSE_CODE, 0); //Success
     return bundle;
   }
+
+  public Bundle mapAlreadyOwned(SkuPurchase skuPurchase) {
+    Bundle bundle = new Bundle();
+    bundle.putString(INAPP_PURCHASE_DATA, skuPurchase.getSignature()
+        .getMessage()
+        .toString());
+    bundle.putString(INAPP_DATA_SIGNATURE, skuPurchase.getSignature()
+        .getValue());
+    bundle.putString(INAPP_PURCHASE_ID, skuPurchase.getUid());
+    bundle.putInt(RESPONSE_CODE, 7); //Item already owned
+    return bundle;
+  }
 }

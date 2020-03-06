@@ -6,9 +6,12 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
+import com.appcoins.sdk.billing.listeners.PurchasesListener;
+import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
 import com.appcoins.sdk.billing.listeners.payasguest.PaymentMethodsListener;
 import com.appcoins.sdk.billing.models.billing.SkuDetailsModel;
+import com.appcoins.sdk.billing.models.billing.SkuPurchase;
 import com.appcoins.sdk.billing.models.payasguest.PaymentMethod;
 import com.appcoins.sdk.billing.models.payasguest.PaymentMethodsModel;
 import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
@@ -33,6 +36,9 @@ class PaymentMethodsPresenter {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
         fragmentView.saveWalletInformation(walletGenerationModel);
         provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
+        checkForUnconsumedPurchased(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
+            walletGenerationModel.getWalletAddress(), walletGenerationModel.getSignature(),
+            "INAPP");
       }
     };
     paymentMethodsInteract.requestWallet(id, walletInteractListener);
@@ -114,5 +120,26 @@ class PaymentMethodsPresenter {
       }
     };
     paymentMethodsInteract.loadPaymentsAvailable(fiatPrice, fiatCurrency, paymentMethodsListener);
+  }
+
+  private void checkForUnconsumedPurchased(String packageName, final String sku,
+      String walletAddress, String signature, String type) {
+    PurchasesListener purchasesListener = new PurchasesListener() {
+      @Override public void onResponse(PurchasesModel purchasesModel) {
+        if (!purchasesModel.isError()) {
+          for (SkuPurchase skuPurchase : purchasesModel.getSkuPurchases()) {
+            if (skuPurchase.getProduct()
+                .getName()
+                .equals(sku)) {
+              paymentMethodsInteract.cancelRequests();
+              fragmentView.showItemAlreadyOwnedError(skuPurchase);
+              return;
+            }
+          }
+        }
+      }
+    };
+    paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature,
+        type.toLowerCase(), purchasesListener);
   }
 }

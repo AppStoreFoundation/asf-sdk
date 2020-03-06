@@ -1,5 +1,7 @@
 package com.appcoins.sdk.billing.payasguest;
 
+import com.appcoins.sdk.billing.listeners.PurchasesListener;
+import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.listeners.billing.PurchaseListener;
 import com.appcoins.sdk.billing.mappers.PurchaseMapper;
 import com.appcoins.sdk.billing.models.billing.PurchaseModel;
@@ -41,5 +43,32 @@ class BillingRepository {
     queries.put("wallet.signature", walletSignature);
     service.makeRequest("/inapp/8.20180518/packages", "GET", path, queries, null, null,
         serviceResponseListener);
+  }
+
+  void getPurchases(String packageName, String walletAddress, String signedWallet, String type,
+      final PurchasesListener purchasesListener) {
+    ServiceResponseListener serviceResponseListener = new ServiceResponseListener() {
+      @Override public void onResponseReceived(RequestResponse requestResponse) {
+        PurchaseMapper purchaseMapper = new PurchaseMapper();
+        PurchasesModel purchasesModel = purchaseMapper.mapList(requestResponse);
+        purchasesListener.onResponse(purchasesModel);
+      }
+    };
+
+    List<String> path = new ArrayList<>();
+    path.add(packageName);
+    path.add("purchases");
+
+    Map<String, String> queries = new HashMap<>();
+    queries.put("wallet.address", walletAddress);
+    queries.put("wallet.signature", signedWallet);
+    queries.put("type", type);
+
+    service.makeRequest("/inapp/8.20180518/packages", "GET", path, queries,
+        new HashMap<String, String>(), new HashMap<String, Object>(), serviceResponseListener);
+  }
+
+  public void cancelRequests() {
+    service.cancelRequests();
   }
 }
