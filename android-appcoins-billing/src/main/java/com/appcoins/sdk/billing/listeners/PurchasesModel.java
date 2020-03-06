@@ -23,7 +23,7 @@ public class PurchasesModel {
     return skuPurchases;
   }
 
-  public boolean isError() {
+  public boolean hasError() {
     return error;
   }
 }

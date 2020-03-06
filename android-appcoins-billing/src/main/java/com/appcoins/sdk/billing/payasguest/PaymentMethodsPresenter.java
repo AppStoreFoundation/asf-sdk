@@ -129,7 +129,7 @@ class PaymentMethodsPresenter {
       String walletAddress, String signature, String type) {
     PurchasesListener purchasesListener = new PurchasesListener() {
       @Override public void onResponse(PurchasesModel purchasesModel) {
-        if (false) {
+        if (!purchasesModel.hasError()) {
           for (SkuPurchase skuPurchase : purchasesModel.getSkuPurchases()) {
             if (skuPurchase.getProduct()
                 .getName()
