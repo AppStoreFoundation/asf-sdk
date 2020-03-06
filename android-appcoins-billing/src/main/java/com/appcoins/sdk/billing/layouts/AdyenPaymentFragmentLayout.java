@@ -45,6 +45,7 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
 
 public class AdyenPaymentFragmentLayout {
+  private static int GENERIC_CARD_ID = 37;
   private static int MORE_PAYMENTS_ID = 36;
   private static int CREDIT_CARD_INPUT_ID = 35;
   private static int CREDIT_CARD_HEADER_ID = 34;
@@ -354,7 +355,6 @@ public class AdyenPaymentFragmentLayout {
     creditCardLayout.setId(CREDIT_CARD_INPUT_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(44));
-    creditCardLayout.setOrientation(LinearLayout.HORIZONTAL);
     layoutParams.addRule(RelativeLayout.BELOW, CREDIT_CARD_HEADER_ID);
     setConstraint(layoutParams, RelativeLayout.ALIGN_START, CREDIT_CARD_HEADER_ID);
     setConstraint(layoutParams, RelativeLayout.ALIGN_END, CREDIT_CARD_HEADER_ID);
@@ -372,7 +372,7 @@ public class AdyenPaymentFragmentLayout {
     cvvEditText = buildCvvEditText();
 
     CardNumberFocusChangeListener cardNumberFocusChangeListener =
-        new CardNumberFocusChangeListener(cardNumberEditText);
+        new CardNumberFocusChangeListener(cardNumberEditText, expiryDateEditText, cvvEditText);
     cardNumberEditText.addTextChangedListener(
         new CardNumberTextWatcher(creditCardLayout, cardNumberEditText, expiryDateEditText,
             cvvEditText));
@@ -396,8 +396,12 @@ public class AdyenPaymentFragmentLayout {
 
   private ImageView buildGenericCardView() {
     ImageView imageView = new ImageView(activity);
-    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(dpToPx(30), dpToPx(19));
-    layoutParams.gravity = Gravity.CENTER_VERTICAL;
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(dpToPx(30), dpToPx(19));
+    GENERIC_CARD_ID = generateRandomId(GENERIC_CARD_ID);
+    imageView.setId(GENERIC_CARD_ID);
+    setConstraint(layoutParams, RelativeLayout.CENTER_VERTICAL);
+    setMargins(layoutParams, 8, 0, 0, 0);
     Drawable genericCreditCard = convertAssetDrawable(
         IMAGES_RESOURCE_PATH + "generic_card/" + densityPath + "generic_card.png");
     setMargins(layoutParams, 10, 0, 10, 0);
@@ -406,14 +410,16 @@ public class AdyenPaymentFragmentLayout {
     return imageView;
   }
 
-  private EditText buildCvvEditText() {
+  @SuppressLint("InlinedApi") private EditText buildCvvEditText() {
     EditText editText = new EditText(activity);
-    LinearLayout.LayoutParams layoutParams =
-        new LinearLayout.LayoutParams(dpToPx(40), ViewGroup.LayoutParams.MATCH_PARENT);
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(dpToPx(40), ViewGroup.LayoutParams.MATCH_PARENT);
     editText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.CVV_MAX_LENGTH)
     });
-    layoutParams.gravity = Gravity.CENTER_VERTICAL;
+    layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setMargins(layoutParams, 0, 0, 32, 0);
     editText.setHint("CVV");
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
@@ -427,17 +433,18 @@ public class AdyenPaymentFragmentLayout {
     return editText;
   }
 
-  private EditText buildExpiryDateEditText() {
+  @SuppressLint("InlinedApi") private EditText buildExpiryDateEditText() {
     EditText editText = new EditText(activity);
-    LinearLayout.LayoutParams layoutParams =
-        new LinearLayout.LayoutParams(dpToPx(60), ViewGroup.LayoutParams.MATCH_PARENT);
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(dpToPx(60), ViewGroup.LayoutParams.MATCH_PARENT);
     editText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.DATE_MAX_LENGTH)
     });
     editText.setHint("MM/YY");
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
-    layoutParams.gravity = Gravity.CENTER_VERTICAL;
+    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+    setMargins(layoutParams, 0, 0, 114, 0);
     editText.setLayoutParams(layoutParams);
     editText.setInputType(InputType.TYPE_CLASS_NUMBER);
     editText.setBackgroundColor(Color.parseColor("#00000000"));
@@ -448,17 +455,18 @@ public class AdyenPaymentFragmentLayout {
     return editText;
   }
 
-  private CardNumberEditText buildCardNumberEditText() {
+  @SuppressLint("InlinedApi") private CardNumberEditText buildCardNumberEditText() {
     CardNumberEditText cardNumberEditText = new CardNumberEditText(activity);
     cardNumberEditText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.MAXIMUM_CARD_NUMBER_LENGTH
             + CardValidationUtils.MAX_DIGIT_SEPARATOR_COUNT)
     });
-    LinearLayout.LayoutParams layoutParams =
-        new LinearLayout.LayoutParams(dpToPx(140), ViewGroup.LayoutParams.MATCH_PARENT);
+    RelativeLayout.LayoutParams layoutParams =
+        new RelativeLayout.LayoutParams(dpToPx(140), ViewGroup.LayoutParams.MATCH_PARENT);
 
-    setMargins(layoutParams, 0, 0, 8, 0);
-    layoutParams.gravity = Gravity.CENTER_VERTICAL;
+    layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+    setConstraint(layoutParams, RelativeLayout.END_OF, GENERIC_CARD_ID);
+    setMargins(layoutParams, 6, 0, 8, 0);
 
     cardNumberEditText.setTextSize(14);
     cardNumberEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);

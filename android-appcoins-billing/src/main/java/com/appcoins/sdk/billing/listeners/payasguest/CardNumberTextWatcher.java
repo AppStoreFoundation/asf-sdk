@@ -56,11 +56,13 @@ public class CardNumberTextWatcher implements TextWatcher {
 
   @Override public void afterTextChanged(Editable editable) {
     final String initial = editable.toString();
-    String processed = initial.trim();
-    processed = processed.replaceAll("(\\d{4})(?=\\d)", "$1" + DIGIT_SEPARATOR);
-    if (!initial.equals(processed)) {
-      editText.setText(processed);
-      editText.setSelection(processed.length());
+    if (editText.isEnabled()) {
+      String processed = initial.trim();
+      processed = processed.replaceAll("(\\d{4})(?=\\d)", "$1" + DIGIT_SEPARATOR);
+      if (!initial.equals(processed)) {
+        editText.setText(processed);
+        editText.setSelection(processed.length());
+      }
     }
   }
 
@@ -75,14 +77,18 @@ public class CardNumberTextWatcher implements TextWatcher {
   }
 
   private void goToNextInputFocus() {
-    Editable text = editText.getText();
-    editText.setCacheSavedNumber(text.toString());
-    editText.setText(String.format("••••%s", text.subSequence(text.length() - 4, text.length())));
+    String text = editText.getText()
+        .toString()
+        .trim();
+    editText.setCacheSavedNumber(text);
+    String format = String.format("••••%s", text.subSequence(text.length() - 4, text.length()));
+    editText.setText(format);
     editText.setSelection(editText.getText()
         .length());
     nextViewToFocus.setVisibility(View.VISIBLE);
     cvvEditText.setVisibility(View.VISIBLE);
     nextViewToFocus.requestFocus();
+    editText.setEnabled(false);
   }
 
   private boolean isValidCardNumber(String cardNumber) {

@@ -1,9 +1,9 @@
 package com.appcoins.sdk.billing.layouts;
 
 import android.content.Context;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
-public class CreditCardLayout extends LinearLayout {
+public class CreditCardLayout extends RelativeLayout {
 
   private boolean isCardNumberValid = false;
   private boolean isExpiryDateValid = false;
@@ -13,6 +13,10 @@ public class CreditCardLayout extends LinearLayout {
 
   public CreditCardLayout(Context context) {
     super(context);
+  }
+
+  public boolean isCardNumberValid() {
+    return isCardNumberValid;
   }
 
   public void setCardNumberValid(boolean cardNumberValid) {

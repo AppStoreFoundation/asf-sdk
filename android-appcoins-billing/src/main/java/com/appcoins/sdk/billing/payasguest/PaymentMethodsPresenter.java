@@ -108,6 +108,7 @@ class PaymentMethodsPresenter {
       @Override public void onResponse(PaymentMethodsModel paymentMethodsModel) {
         if (paymentMethodsModel.hasError() || paymentMethodsModel.getPaymentMethods()
             .isEmpty()) {
+          paymentMethodsInteract.cancelRequests();
           fragmentView.showInstallDialog();
         } else {
           for (PaymentMethod paymentMethod : paymentMethodsModel.getPaymentMethods()) {
@@ -126,7 +127,7 @@ class PaymentMethodsPresenter {
       String walletAddress, String signature, String type) {
     PurchasesListener purchasesListener = new PurchasesListener() {
       @Override public void onResponse(PurchasesModel purchasesModel) {
-        if (!purchasesModel.isError()) {
+        if (false) {
           for (SkuPurchase skuPurchase : purchasesModel.getSkuPurchases()) {
             if (skuPurchase.getProduct()
                 .getName()
