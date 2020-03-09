@@ -15,23 +15,26 @@ public class GetSkuDetailsService {
   private final String serviceUrl;
   private String packageName;
   private List<String> sku;
+  private String userAgent;
 
   public GetSkuDetailsService(final String serviceUrl, final String packageName,
-      final List<String> sku) {
+      final List<String> sku, String userAgent) {
     this.serviceUrl = serviceUrl;
     this.packageName = packageName;
     this.sku = sku;
+    this.userAgent = userAgent;
   }
 
   public String getSkuDetailsForPackageName() {
     String response = "";
     URL url;
     try {
-      String urlBuilt =buildURL(packageName, sku);
+      String urlBuilt = buildURL(packageName, sku);
       url = new URL(urlBuilt);
 
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
+      connection.setRequestProperty("User-Agent", userAgent);
       connection.connect();
       BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
       String inputLine;
