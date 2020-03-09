@@ -31,12 +31,10 @@ import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
-import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Locale;
 
 import static android.graphics.Typeface.BOLD;
 import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.getUserCountry;
@@ -86,9 +84,6 @@ public class InstallDialogActivity extends Activity {
     //This log is necessary for the automatic test that validates the wallet installation dialog
     Log.d("InstallDialogActivity",
         "com.appcoins.sdk.billing.helpers.InstallDialogActivity started");
-    Locale locale = Locale.getDefault();
-    TranslationsRepository.getInstance(this)
-        .fetchTranslations(locale.getLanguage());
 
     installationDialog = setupInstallationDialog(storeUrl);
 

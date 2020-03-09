@@ -33,16 +33,19 @@ class AdyenPaymentPresenter {
   private final AdyenPaymentView fragmentView;
   private final AdyenPaymentInfo adyenPaymentInfo;
   private final AdyenPaymentInteract adyenPaymentInteract;
+  private AdyenErrorCodeMapper adyenErrorCodeMapper;
   private String returnUrl;
   private boolean waitingResult;
   private Runnable getTransactionRunnable;
   private Handler getTransactionHandler;
 
   AdyenPaymentPresenter(AdyenPaymentView fragmentView, AdyenPaymentInfo adyenPaymentInfo,
-      AdyenPaymentInteract adyenPaymentInteract, String returnUrl) {
+      AdyenPaymentInteract adyenPaymentInteract, AdyenErrorCodeMapper adyenErrorCodeMapper,
+      String returnUrl) {
     this.fragmentView = fragmentView;
     this.adyenPaymentInfo = adyenPaymentInfo;
     this.adyenPaymentInteract = adyenPaymentInteract;
+    this.adyenErrorCodeMapper = adyenErrorCodeMapper;
     this.returnUrl = returnUrl;
     waitingResult = false;
   }
@@ -212,7 +215,6 @@ class AdyenPaymentPresenter {
         fragmentView.unlockRotation();
         fragmentView.showCvvError();
       } else {
-        AdyenErrorCodeMapper adyenErrorCodeMapper = new AdyenErrorCodeMapper();
         String errorMessage = adyenErrorCodeMapper.map(refusalReasonCode);
         fragmentView.showError(errorMessage);
       }
@@ -284,7 +286,7 @@ class AdyenPaymentPresenter {
   }
 
   void onDestroy() {
-    if(getTransactionHandler != null && getTransactionRunnable != null){
+    if (getTransactionHandler != null && getTransactionRunnable != null) {
       getTransactionHandler.removeCallbacks(getTransactionRunnable);
     }
     adyenPaymentInteract.cancelRequests();

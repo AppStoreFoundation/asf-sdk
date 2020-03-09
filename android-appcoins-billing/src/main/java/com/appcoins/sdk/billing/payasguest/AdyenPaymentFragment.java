@@ -16,6 +16,8 @@ import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.layouts.AdyenPaymentFragmentLayout;
 import com.appcoins.sdk.billing.layouts.CardNumberEditText;
 import com.appcoins.sdk.billing.layouts.FieldValidationListener;
@@ -65,7 +67,11 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
+    TranslationsModel translationsModel =
+        TranslationsRepository.getInstance(getActivity().getApplicationContext(),
+            Locale.getDefault()
+                .getLanguage())
+            .getTranslationsModel();
     adyenPaymentInfo = extractBundleInfo();
     AdyenRepository adyenRepository =
         new AdyenRepository(new BdsService(BuildConfig.HOST_WS + "/broker/"),
@@ -82,6 +88,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
     presenter = new AdyenPaymentPresenter(this, adyenPaymentInfo,
         new AdyenPaymentInteract(adyenRepository, billingRepository, addressService),
+        new AdyenErrorCodeMapper(translationsModel),
         RedirectUtils.getReturnUrl(getActivity().getApplicationContext()));
   }
 

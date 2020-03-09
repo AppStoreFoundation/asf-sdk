@@ -20,7 +20,6 @@ import com.appcoins.sdk.billing.helpers.Utils;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
-import java.util.Locale;
 
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES;
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.ERROR_RESULT_CODE;
@@ -64,9 +63,6 @@ public class IabActivity extends Activity implements IabView {
 
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(BUY_ITEM_PROPERTIES);
 
-    Locale locale = Locale.getDefault();
-    translationsRepository = TranslationsRepository.getInstance(this);
-    translationsRepository.fetchTranslations(locale.getLanguage());
     if (savedInstanceState == null) {
       navigateToPaymentSelection();
     }

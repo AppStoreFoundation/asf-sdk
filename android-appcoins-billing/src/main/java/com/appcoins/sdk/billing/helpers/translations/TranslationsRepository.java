@@ -19,10 +19,11 @@ public class TranslationsRepository {
     this.translationsXmlParser = translationsXmlParser;
   }
 
-  public static TranslationsRepository getInstance(Context context) {
+  public static TranslationsRepository getInstance(Context context, String languageCode) {
     if (translationsRepositoryInstance == null) {
       translationsRepositoryInstance =
           new TranslationsRepository(new TranslationsModel(), new TranslationsXmlParser(context));
+      translationsRepositoryInstance.fetchTranslations(languageCode);
     }
     return translationsRepositoryInstance;
   }
@@ -31,12 +32,7 @@ public class TranslationsRepository {
     return translationsModel;
   }
 
-  /**
-   * This method should be executed at the start of the activity
-   *
-   * @param languageCode
-   */
-  public void fetchTranslations(String languageCode) {
+  private void fetchTranslations(String languageCode) {
     if (WalletUtils.getIabAction()
         .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
       if (needsToRefreshModel(languageCode) || languageFromIran()) {

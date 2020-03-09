@@ -4,7 +4,7 @@ import java.util.List;
 
 public class TranslationsModel {
 
-  private static final int NUMBER_OF_TRANSLATED_STRINGS = 32;
+  private static final int NUMBER_OF_TRANSLATED_STRINGS = 46;
   // SDK - Purchasing when wallet is not installed
   private String installationDialogBody = "To buy this item you first need to get the %s.";
   private String dialogStringHighlight = "AppCoins Wallet";
@@ -45,6 +45,30 @@ public class TranslationsModel {
   private String cancelButton = "CANCEL";
   private String buyButton = "BUY";
   private String installationButtonString = "INSTALL WALLET";
+  private String okButton = "OK";
+  private String installButton = "Install";
+  //Error messages
+  private String errorTitle = "Error";
+  private String itemAlreadyOwned = "You already own this item!";
+  private String genericError = "Oops, something went wrong.";
+  private String adyenGeneralError1 =
+      "There was a problem with your card. Please try again or contact us.";
+  private String adyenGeneralError2 =
+      "The transaction has been rejected by your bank. Please try with a different card or "
+          + "contact us.";
+  private String noFundsError =
+      "It seems you don\'t have enough funds or there\'s a limit on your card. Please try with a "
+          + "different one.";
+  private String expiredError = "It seems your card has expired. Please try with a different one.";
+  private String invalidDetailsError =
+      "Are you sure your card number is correct? Please check and try again.";
+  private String cardNotSupportedError =
+      "Your card type is not supported yet. Try with a different one.";
+  private String securityError =
+      "Are you sure the security information is correct? Please try again.";
+  private String wrongCVVError = "Your CVV/CVC code seems to be wrong. Please try again.";
+  private String cvvError = "Wrong CVV/CVC";
+  private String contactUsError = "If the problem persists please contact us.";
 
   TranslationsModel() {
   }
@@ -89,6 +113,20 @@ public class TranslationsModel {
       cancelButton = list.get(29 - offset);
       buyButton = list.get(30 - offset);
       installationDialogBody = list.get(31 - offset);
+      okButton = list.get(32 - offset);
+      installButton = list.get(33 - offset);
+      errorTitle = list.get(34 - offset);
+      itemAlreadyOwned = list.get(35 - offset);
+      adyenGeneralError1 = list.get(36 - offset);
+      adyenGeneralError2 = list.get(37 - offset);
+      noFundsError = list.get(38 - offset);
+      expiredError = list.get(39 - offset);
+      invalidDetailsError = list.get(40 - offset);
+      cardNotSupportedError = list.get(41 - offset);
+      securityError = list.get(42 - offset);
+      wrongCVVError = list.get(43 - offset);
+      cvvError = list.get(44 - offset);
+      contactUsError = list.get(45 - offset);
     }
   }
 
@@ -218,5 +256,65 @@ public class TranslationsModel {
 
   public String getBuyButton() {
     return buyButton;
+  }
+
+  public String getOkButton() {
+    return okButton;
+  }
+
+  public String getInstallButton() {
+    return installButton;
+  }
+
+  public String getErrorTitle() {
+    return errorTitle;
+  }
+
+  public String getItemAlreadyOwned() {
+    return itemAlreadyOwned;
+  }
+
+  public String getGenericError() {
+    return genericError;
+  }
+
+  public String getAdyenGeneralError1() {
+    return adyenGeneralError1;
+  }
+
+  public String getAdyenGeneralError2() {
+    return adyenGeneralError2;
+  }
+
+  public String getNoFundsError() {
+    return noFundsError;
+  }
+
+  public String getExpiredError() {
+    return expiredError;
+  }
+
+  public String getInvalidDetailsError() {
+    return invalidDetailsError;
+  }
+
+  public String getCardNotSupportedError() {
+    return cardNotSupportedError;
+  }
+
+  public String getSecurityError() {
+    return securityError;
+  }
+
+  public String getWrongCVVError() {
+    return wrongCVVError;
+  }
+
+  public String getCvvError() {
+    return cvvError;
+  }
+
+  public String getContactUsError() {
+    return contactUsError;
   }
 }

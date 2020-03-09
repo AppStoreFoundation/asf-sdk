@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
+import java.util.Locale;
 
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
@@ -25,6 +28,7 @@ public class PaymentErrorViewLayout {
   private final int orientation;
   private Button errorPositiveButton;
   private TextView errorMessage;
+  private TranslationsModel translationModel;
 
   public PaymentErrorViewLayout(Activity activity, int orientation) {
 
@@ -33,6 +37,9 @@ public class PaymentErrorViewLayout {
   }
 
   public RelativeLayout buildErrorView() {
+    translationModel = TranslationsRepository.getInstance(activity, Locale.getDefault()
+        .getLanguage())
+        .getTranslationsModel();
     RelativeLayout relativeLayout = new RelativeLayout(activity);
     setPadding(relativeLayout, 16, 16, 16, 16);
     RelativeLayout.LayoutParams layoutParams =
@@ -91,7 +98,7 @@ public class PaymentErrorViewLayout {
 
     button.setTextColor(Color.WHITE);
     button.setTextSize(14);
-    button.setText("OK".toUpperCase());
+    button.setText(translationModel.getOkButton());
     button.setLayoutParams(layoutParams);
 
     return button;
@@ -109,7 +116,7 @@ public class PaymentErrorViewLayout {
 
     textView.setLayoutParams(layoutParams);
     textView.setMaxLines(3);
-    textView.setText("An error as ocurred");
+    textView.setText(translationModel.getGenericError());
     textView.setTextColor(Color.parseColor("#8a8a8a"));
     textView.setTextSize(12);
     return textView;
@@ -123,7 +130,7 @@ public class PaymentErrorViewLayout {
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     textView.setLayoutParams(layoutParams);
-    textView.setText("Error");
+    textView.setText(translationModel.getErrorTitle());
     textView.setTextColor(Color.BLACK);
     textView.setTextSize(16);
 
