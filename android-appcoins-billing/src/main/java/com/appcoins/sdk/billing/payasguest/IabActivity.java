@@ -16,9 +16,9 @@ import android.widget.FrameLayout;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WebViewActivity;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
-import com.appcoins.sdk.billing.helpers.TranslationsModel;
-import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
 import com.appcoins.sdk.billing.helpers.Utils;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 import java.util.Locale;
 
@@ -38,10 +38,9 @@ public class IabActivity extends Activity implements IabView {
   public final static String FIAT_CURRENCY_KEY = "fiat_currency";
   public final static String APPC_VALUE_KEY = "appc_value";
   public final static String SKU_KEY = "sku_key";
-  private final static String TRANSLATIONS = "translations";
   private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private static int IAB_ACTIVITY_MAIN_LAYOUT_ID = 1;
-  private TranslationsModel translationsModel;
+  private TranslationsRepository translationsRepository;
   private FrameLayout frameLayout;
   private BuyItemProperties buyItemProperties;
   private ActivityResultListener activityResultListener;
@@ -65,10 +64,10 @@ public class IabActivity extends Activity implements IabView {
 
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(BUY_ITEM_PROPERTIES);
 
-    if (savedInstanceState != null) {
-      translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
-    } else {
-      fetchTranslations();
+    Locale locale = Locale.getDefault();
+    translationsRepository = TranslationsRepository.getInstance(this);
+    translationsRepository.fetchTranslations(locale.getLanguage());
+    if (savedInstanceState == null) {
       navigateToPaymentSelection();
     }
   }
@@ -102,25 +101,10 @@ public class IabActivity extends Activity implements IabView {
     }
   }
 
-  private void fetchTranslations() {
-    Locale locale = Locale.getDefault();
-    if (translationsModel == null || !translationsModel.getLanguageCode()
-        .equalsIgnoreCase(locale.getLanguage()) || !translationsModel.getCountryCode()
-        .equalsIgnoreCase(locale.getCountry())) {
-      TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
-      translationsModel =
-          translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
-    }
-  }
-
   private void navigateTo(Fragment fragment) {
     getFragmentManager().beginTransaction()
         .replace(frameLayout.getId(), fragment)
         .commit();
-  }
-
-  @Override public TranslationsModel getTranslationsModel() {
-    return translationsModel;
   }
 
   @Override public void close() {
@@ -211,6 +195,7 @@ public class IabActivity extends Activity implements IabView {
 
   private void buildAlertNoBrowserAndStores() {
     AlertDialog.Builder alert = new AlertDialog.Builder(this);
+    TranslationsModel translationsModel = translationsRepository.getTranslationsModel();
     String value = translationsModel.getAlertDialogMessage();
     String dismissValue = translationsModel.getAlertDialogDismissButton();
     alert.setMessage(value);

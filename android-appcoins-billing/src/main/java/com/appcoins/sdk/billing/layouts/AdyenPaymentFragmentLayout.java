@@ -25,6 +25,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.CardNumberFocusChangeListener;
 import com.appcoins.sdk.billing.listeners.payasguest.CardNumberTextWatcher;
 import com.appcoins.sdk.billing.listeners.payasguest.CvvTextWatcher;
@@ -73,6 +75,7 @@ public class AdyenPaymentFragmentLayout {
   private EditText expiryDateEditText;
   private EditText cvvEditText;
   private CreditCardLayout creditCardEditTextLayout;
+  private TranslationsModel translationModel;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -81,6 +84,8 @@ public class AdyenPaymentFragmentLayout {
 
   public View build(String fiatPrice, String fiatCurrency, String appcPrice, String sku,
       String packageName) {
+    translationModel = TranslationsRepository.getInstance(activity)
+        .getTranslationsModel();
     DisplayMetrics displayMetrics = new DisplayMetrics();
     activity.getWindowManager()
         .getDefaultDisplay()
@@ -236,7 +241,7 @@ public class AdyenPaymentFragmentLayout {
     setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.WHITE);
     button.setTextSize(14);
-    button.setText("BUY".toUpperCase());
+    button.setText(translationModel.getBuyButton());
     button.setLayoutParams(layoutParams);
     return button;
   }
@@ -258,7 +263,7 @@ public class AdyenPaymentFragmentLayout {
     setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.parseColor("#8a000000"));
     button.setTextSize(14);
-    button.setText("Cancel".toUpperCase());
+    button.setText(translationModel.getCancelButton());
     button.setLayoutParams(layoutParams);
     return button;
   }
@@ -308,7 +313,7 @@ public class AdyenPaymentFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#fd786b"));
     textView.setTextSize(12);
-    textView.setText("CHANGE CARD");
+    textView.setText(translationModel.getChangeCard());
     textView.setLayoutParams(layoutParams);
 
     return textView;
@@ -342,7 +347,7 @@ public class AdyenPaymentFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#fd786b"));
     textView.setTextSize(12);
-    textView.setText("MORE PAYMENTS METHODS");
+    textView.setText(translationModel.getMorePaymentMethods());
     textView.setLayoutParams(layoutParams);
 
     return textView;
@@ -420,7 +425,7 @@ public class AdyenPaymentFragmentLayout {
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
     setMargins(layoutParams, 0, 0, 32, 0);
-    editText.setHint("CVV");
+    editText.setHint(translationModel.getCardCvv());
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
     editText.setLayoutParams(layoutParams);
@@ -440,7 +445,7 @@ public class AdyenPaymentFragmentLayout {
     editText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.DATE_MAX_LENGTH)
     });
-    editText.setHint("MM/YY");
+    editText.setHint(translationModel.getExpiryDate());
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
@@ -472,7 +477,7 @@ public class AdyenPaymentFragmentLayout {
     cardNumberEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     cardNumberEditText.setTextColor(Color.parseColor("#292929"));
     cardNumberEditText.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
-    cardNumberEditText.setHint("Card Number");
+    cardNumberEditText.setHint(translationModel.getCardNumber());
     cardNumberEditText.setHintTextColor(Color.parseColor("#9d9d9d"));
     cardNumberEditText.setLayoutParams(layoutParams);
     cardNumberEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -545,7 +550,7 @@ public class AdyenPaymentFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#000000"));
     textView.setTextSize(14);
-    textView.setText("Pay as Guest");
+    textView.setText(translationModel.getPayAsGuestTitle());
     textView.setLayoutParams(layoutParams);
     return textView;
   }

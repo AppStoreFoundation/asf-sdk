@@ -20,6 +20,8 @@ import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.layouts.PaymentMethodsFragmentLayout;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.mappers.BillingMapper;
@@ -50,6 +52,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private WalletGenerationModel walletGenerationModel;
   private AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private SkuPurchase itemAlreadyOwnedPurchase;
+  private TranslationsModel translationsModel;
 
   public static PaymentMethodsFragment newInstance(BuyItemProperties buyItemProperties) {
     PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
@@ -72,6 +75,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    translationsModel = TranslationsRepository.getInstance(getActivity().getApplicationContext())
+        .getTranslationsModel();
     BdsService backendService = new BdsService(BuildConfig.BACKEND_BASE);
     BdsService apiService = new BdsService(BuildConfig.HOST_WS);
 
@@ -248,13 +253,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     iabView.showAlertNoBrowserAndStores();
   }
 
-  @Override public void hideDialog() {
-    layout.getDialogLayout()
-        .setVisibility(View.INVISIBLE);
-    layout.getIntentLoadingView()
-        .setVisibility(View.VISIBLE);
-  }
-
   @Override public void redirectToWalletInstallation(Intent intent) {
     iabView.redirectToWalletInstallation(intent);
   }
@@ -279,9 +277,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     if (selectedRadioButton != null) {
       Button positiveButton = layout.getPositiveButton();
       if (selectedRadioButton.equals(PaymentMethodsFragment.INSTALL_RADIO)) {
-        positiveButton.setText("INSTALL");
+        positiveButton.setText(translationsModel.getInstallationButtonString()); //INSTALL
       } else {
-        positiveButton.setText("NEXT");
+        positiveButton.setText(translationsModel.getNextButton());
       }
     }
   }
@@ -319,10 +317,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void showBonus(int bonus) {
     TextView bonusText = layout.getInstallSecondaryText();
     if (bonus > 0) {
-      bonusText.setText(String.format("Get up to %s%% bonus", bonus));
+      bonusText.setText(String.format(translationsModel.getWalletRewardBody(), bonus + "%"));
       bonusText.setVisibility(View.VISIBLE);
     } else if (bonus == -1) { //-1 -> Request fail code
-      bonusText.setText("Earn bonus with the purchase");
+      bonusText.setText(translationsModel.getNoConnectionWalletRewardBody());
       bonusText.setVisibility(View.VISIBLE);
     }
   }
@@ -338,6 +336,13 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         "It seems this purchase is already being processed. Please hold on until the transaction "
             + "is completed or contact our Support Team.");
     showError();
+  }
+
+  @Override public void hideDialog() {
+    layout.getDialogLayout()
+        .setVisibility(View.INVISIBLE);
+    layout.getIntentLoadingView()
+        .setVisibility(View.VISIBLE);
   }
 
   private void setInitialRadioButtonSelected() {

@@ -30,6 +30,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +49,6 @@ public class InstallDialogActivity extends Activity {
   public final static String LOADING_DIALOG_CARD = "loading_dialog_install";
   public final static int REQUEST_CODE = 10001;
   public final static int ERROR_RESULT_CODE = 6;
-  private final static String TRANSLATIONS = "translations";
   private final static int MINIMUM_APTOIDE_VERSION = 9908;
   private final static int RESULT_USER_CANCELED = 1;
   private static final String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
@@ -85,12 +86,9 @@ public class InstallDialogActivity extends Activity {
     //This log is necessary for the automatic test that validates the wallet installation dialog
     Log.d("InstallDialogActivity",
         "com.appcoins.sdk.billing.helpers.InstallDialogActivity started");
-
-    if (savedInstanceState != null) {
-      translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
-    } else {
-      fetchTranslations();
-    }
+    Locale locale = Locale.getDefault();
+    TranslationsRepository.getInstance(this)
+        .fetchTranslations(locale.getLanguage());
 
     installationDialog = setupInstallationDialog(storeUrl);
 
@@ -111,7 +109,6 @@ public class InstallDialogActivity extends Activity {
 
   @Override protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    outState.putSerializable(TRANSLATIONS, translationsModel);
   }
 
   @Override public void onBackPressed() {
@@ -354,25 +351,6 @@ public class InstallDialogActivity extends Activity {
             + translationsModel.getDialogStringHighlight()
             .length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
     return messageStylized;
-  }
-
-  private void fetchTranslations() {
-    if (WalletUtils.getIabAction()
-        .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
-      if (translationsModel == null) {
-        TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
-        translationsModel = translationsParser.parseTranslationXml("fa", "IR");
-      }
-    } else {
-      Locale locale = Locale.getDefault();
-      if (translationsModel == null || !translationsModel.getLanguageCode()
-          .equalsIgnoreCase(locale.getLanguage()) || !translationsModel.getCountryCode()
-          .equalsIgnoreCase(locale.getCountry())) {
-        TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
-        translationsModel =
-            translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
-      }
-    }
   }
 
   @SuppressLint("ResourceType")
