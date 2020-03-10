@@ -12,7 +12,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
-import java.util.Locale;
 
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
@@ -37,8 +36,7 @@ public class PaymentErrorViewLayout {
   }
 
   public RelativeLayout buildErrorView() {
-    translationModel = TranslationsRepository.getInstance(activity, Locale.getDefault()
-        .getLanguage())
+    translationModel = TranslationsRepository.getInstance(activity)
         .getTranslationsModel();
     RelativeLayout relativeLayout = new RelativeLayout(activity);
     setPadding(relativeLayout, 16, 16, 16, 16);

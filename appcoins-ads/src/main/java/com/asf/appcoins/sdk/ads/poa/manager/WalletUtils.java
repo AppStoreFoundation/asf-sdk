@@ -252,9 +252,7 @@ public class WalletUtils {
     builder = new Notification.Builder(context, channelId);
     builder.setContentIntent(pendingIntent);
 
-    TranslationsModel translationsModel = TranslationsRepository.getInstance(context,
-        Locale.getDefault()
-            .getLanguage())
+    TranslationsModel translationsModel = TranslationsRepository.getInstance(context)
         .getTranslationsModel();
 
     builder.setSmallIcon(intent.getExtras()
@@ -308,9 +306,7 @@ public class WalletUtils {
     builder.setContentIntent(pendingIntent);
     builder.setVibrate(new long[0]);
 
-    TranslationsModel translationsModel = TranslationsRepository.getInstance(context,
-        Locale.getDefault()
-            .getLanguage())
+    TranslationsModel translationsModel = TranslationsRepository.getInstance(context)
         .getTranslationsModel();
 
     builder.setSmallIcon(intent.getExtras()

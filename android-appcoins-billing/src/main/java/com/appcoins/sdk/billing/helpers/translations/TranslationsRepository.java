@@ -4,6 +4,7 @@ import android.content.Context;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 import java.util.List;
+import java.util.Locale;
 
 public class TranslationsRepository {
 
@@ -19,11 +20,11 @@ public class TranslationsRepository {
     this.translationsXmlParser = translationsXmlParser;
   }
 
-  public static TranslationsRepository getInstance(Context context, String languageCode) {
+  public static TranslationsRepository getInstance(Context context) {
     if (translationsRepositoryInstance == null) {
       translationsRepositoryInstance =
           new TranslationsRepository(new TranslationsModel(), new TranslationsXmlParser(context));
-      translationsRepositoryInstance.fetchTranslations(languageCode);
+      translationsRepositoryInstance.fetchTranslations();
     }
     return translationsRepositoryInstance;
   }
@@ -32,26 +33,30 @@ public class TranslationsRepository {
     return translationsModel;
   }
 
-  private void fetchTranslations(String languageCode) {
+  private void fetchTranslations() {
+    Locale locale = Locale.getDefault();
     if (WalletUtils.getIabAction()
         .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
-      if (needsToRefreshModel(languageCode) || languageFromIran()) {
-        translate("fa");
+      if (needsToRefreshModel(locale.getLanguage(), locale.getCountry()) || languageFromIran()) {
+        translate("fa", "IR");
       }
     }
-    if (needsToRefreshModel(languageCode)) {
-      translate(languageCode);
+    if (needsToRefreshModel(locale.getLanguage(), locale.getCountry())) {
+      translate(locale.getLanguage(), "IR");
     }
   }
 
-  private void translate(String languageCode) {
+  private void translate(String languageCode, String countryCode) {
     this.languageCode = languageCode;
-    List<String> translationList = translationsXmlParser.parseTranslationXml(languageCode);
+    this.countryCode = countryCode;
+    List<String> translationList =
+        translationsXmlParser.parseTranslationXml(languageCode, countryCode);
     translationsModel.mapStrings(translationList);
   }
 
-  private boolean needsToRefreshModel(String languageCode) {
-    return !this.languageCode.equalsIgnoreCase(languageCode);
+  private boolean needsToRefreshModel(String languageCode, String countryCode) {
+    return !this.languageCode.equalsIgnoreCase(languageCode) && !this.countryCode.equalsIgnoreCase(
+        countryCode);
   }
 
   private boolean languageFromIran() {

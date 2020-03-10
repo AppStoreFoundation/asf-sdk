@@ -67,11 +67,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    TranslationsModel translationsModel =
-        TranslationsRepository.getInstance(getActivity().getApplicationContext(),
-            Locale.getDefault()
-                .getLanguage())
-            .getTranslationsModel();
+    TranslationsModel translationsModel = TranslationsRepository.getInstance(getActivity())
+        .getTranslationsModel();
     adyenPaymentInfo = extractBundleInfo();
     AdyenRepository adyenRepository =
         new AdyenRepository(new BdsService(BuildConfig.HOST_WS + "/broker/"),

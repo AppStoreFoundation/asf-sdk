@@ -4,6 +4,7 @@ import android.content.Context;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -14,14 +15,21 @@ public class TranslationsXmlParser {
       "appcoins-wallet/resources/translations/values-";
   private static final String translationsFileName = "/external_strings.xml";
   private Context context;
+  private List<String> requiredCountryCodes;
 
   public TranslationsXmlParser(Context context) {
     this.context = context;
+    this.requiredCountryCodes = Arrays.asList("HR", "BR", "CN");
   }
 
-  List<String> parseTranslationXml(String language) {
+  List<String> parseTranslationXml(String language, String countryCode) {
     String translationXmlPath;
-    translationXmlPath = translationsRelativePath + language + translationsFileName;
+    if (isRequiredCountryCode(countryCode)) {
+      translationXmlPath =
+          translationsRelativePath + language + "-r" + countryCode + translationsFileName;
+    } else {
+      translationXmlPath = translationsRelativePath + language + translationsFileName;
+    }
 
     InputStream inputStream;
     List<String> xmlContent = new ArrayList<>();
@@ -73,5 +81,14 @@ public class TranslationsXmlParser {
       e.printStackTrace();
     }
     return xmlContent;
+  }
+
+  private boolean isRequiredCountryCode(String countryCode) {
+    for (String code : requiredCountryCodes) {
+      if (code.equals(countryCode)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

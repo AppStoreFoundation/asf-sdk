@@ -34,7 +34,6 @@ import com.appcoins.sdk.billing.service.wallet.WalletGenerationMapper;
 import com.appcoins.sdk.billing.service.wallet.WalletRepository;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.Locale;
 
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.KEY_BUY_INTENT;
 
@@ -76,9 +75,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    translationsModel = TranslationsRepository.getInstance(getActivity().getApplicationContext(),
-        Locale.getDefault()
-            .getLanguage())
+    translationsModel = TranslationsRepository.getInstance(getActivity())
         .getTranslationsModel();
     BdsService backendService = new BdsService(BuildConfig.BACKEND_BASE);
     BdsService apiService = new BdsService(BuildConfig.HOST_WS);

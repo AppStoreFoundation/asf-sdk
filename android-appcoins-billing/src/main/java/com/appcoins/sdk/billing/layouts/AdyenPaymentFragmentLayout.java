@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.Locale;
 
 import static com.appcoins.sdk.billing.utils.LayoutUtils.IMAGES_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
@@ -85,8 +84,7 @@ public class AdyenPaymentFragmentLayout {
 
   public View build(String fiatPrice, String fiatCurrency, String appcPrice, String sku,
       String packageName) {
-    translationModel = TranslationsRepository.getInstance(activity, Locale.getDefault()
-        .getLanguage())
+    translationModel = TranslationsRepository.getInstance(activity)
         .getTranslationsModel();
     DisplayMetrics displayMetrics = new DisplayMetrics();
     activity.getWindowManager()
