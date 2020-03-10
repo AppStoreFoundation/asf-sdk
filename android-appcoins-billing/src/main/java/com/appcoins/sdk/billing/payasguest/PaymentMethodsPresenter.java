@@ -10,6 +10,7 @@ import com.appcoins.sdk.billing.listeners.PurchasesListener;
 import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
 import com.appcoins.sdk.billing.listeners.payasguest.PaymentMethodsListener;
+import com.appcoins.sdk.billing.models.GamificationModel;
 import com.appcoins.sdk.billing.models.billing.SkuDetailsModel;
 import com.appcoins.sdk.billing.models.billing.SkuPurchase;
 import com.appcoins.sdk.billing.models.payasguest.PaymentMethod;
@@ -43,8 +44,12 @@ class PaymentMethodsPresenter {
     };
     paymentMethodsInteract.requestWallet(id, walletInteractListener);
     MaxBonusListener maxBonusListener = new MaxBonusListener() {
-      @Override public void onBonusReceived(int bonus) {
-        fragmentView.showBonus(bonus);
+      @Override public void onBonusReceived(GamificationModel gamificationModel) {
+        if (gamificationModel.getStatus()
+            .equalsIgnoreCase("ACTIVE")) {
+          paymentMethodsInteract.saveMaxBonus(gamificationModel.getMaxBonus());
+          fragmentView.showBonus(gamificationModel.getMaxBonus());
+        }
       }
     };
     paymentMethodsInteract.requestMaxBonus(maxBonusListener);
