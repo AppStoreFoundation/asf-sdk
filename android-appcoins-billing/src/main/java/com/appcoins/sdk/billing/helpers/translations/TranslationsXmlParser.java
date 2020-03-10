@@ -8,14 +8,14 @@ import java.util.List;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-class TranslationsXmlParser {
+public class TranslationsXmlParser {
 
   private static final String translationsRelativePath =
       "appcoins-wallet/resources/translations/values-";
   private static final String translationsFileName = "/external_strings.xml";
   private Context context;
 
-  TranslationsXmlParser(Context context) {
+  public TranslationsXmlParser(Context context) {
     this.context = context;
   }
 
@@ -28,6 +28,21 @@ class TranslationsXmlParser {
     try {
       inputStream = context.getAssets()
           .open(translationXmlPath);
+      xmlContent = parseXml(inputStream);
+      inputStream.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return xmlContent;
+  }
+
+  public List<String> parseTranslationXmlWithPath(String path) {
+
+    InputStream inputStream;
+    List<String> xmlContent = new ArrayList<>();
+    try {
+      inputStream = context.getAssets()
+          .open(path);
       xmlContent = parseXml(inputStream);
       inputStream.close();
     } catch (IOException e) {
