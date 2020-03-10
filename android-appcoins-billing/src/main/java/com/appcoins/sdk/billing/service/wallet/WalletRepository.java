@@ -29,8 +29,7 @@ public class WalletRepository {
             walletGenerationMapper.mapWalletGenerationResponse(requestResponse);
         WalletGenerationModel walletGenerationModel =
             new WalletGenerationModel(walletGenerationResponse.getAddress(),
-                walletGenerationResponse.getEwt(), walletGenerationResponse.getSignature(),
-                walletGenerationResponse.hasError());
+                walletGenerationResponse.getSignature(), walletGenerationResponse.hasError());
         walletInteractListener.walletIdRetrieved(walletGenerationModel);
       }
     };

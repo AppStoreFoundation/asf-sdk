@@ -248,13 +248,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     iabView.showAlertNoBrowserAndStores();
   }
 
-  @Override public void hideDialog() {
-    layout.getDialogLayout()
-        .setVisibility(View.INVISIBLE);
-    layout.getIntentLoadingView()
-        .setVisibility(View.VISIBLE);
-  }
-
   @Override public void redirectToWalletInstallation(Intent intent) {
     iabView.redirectToWalletInstallation(intent);
   }
@@ -262,9 +255,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void navigateToAdyen(String selectedRadioButton) {
     if (walletGenerationModel.getWalletAddress() != null && skuDetailsModel != null) {
       iabView.navigateToAdyen(selectedRadioButton, walletGenerationModel.getWalletAddress(),
-          walletGenerationModel.getEwt(), walletGenerationModel.getSignature(),
-          skuDetailsModel.getFiatPrice(), skuDetailsModel.getFiatPriceCurrencyCode(),
-          skuDetailsModel.getAppcPrice(), skuDetailsModel.getSku());
+          walletGenerationModel.getSignature(), skuDetailsModel.getFiatPrice(),
+          skuDetailsModel.getFiatPriceCurrencyCode(), skuDetailsModel.getAppcPrice(),
+          skuDetailsModel.getSku());
     } else {
       showError();
     }
@@ -338,6 +331,13 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         "It seems this purchase is already being processed. Please hold on until the transaction "
             + "is completed or contact our Support Team.");
     showError();
+  }
+
+  @Override public void hideDialog() {
+    layout.getDialogLayout()
+        .setVisibility(View.INVISIBLE);
+    layout.getIntentLoadingView()
+        .setVisibility(View.VISIBLE);
   }
 
   private void setInitialRadioButtonSelected() {

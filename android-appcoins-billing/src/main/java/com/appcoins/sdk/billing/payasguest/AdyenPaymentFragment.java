@@ -313,7 +313,6 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private AdyenPaymentInfo extractBundleInfo() {
     String paymentMethod = getBundleString(IabActivity.PAYMENT_METHOD_KEY);
     String walletAddress = getBundleString(IabActivity.WALLET_ADDRESS_KEY);
-    String ewt = getBundleString(IabActivity.EWT_KEY);
     String signature = getBundleString(IabActivity.SIGNATURE_KEY);
     String fiatPrice = getBundleString(IabActivity.FIAT_VALUE_KEY);
     String fiatCurrency = getBundleString(IabActivity.FIAT_CURRENCY_KEY);
@@ -321,8 +320,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     BuyItemProperties buyItemProperties =
         getBundleBuyItemProperties(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
 
-    return new AdyenPaymentInfo(paymentMethod, walletAddress, ewt, signature, fiatPrice,
-        fiatCurrency, appcPrice, buyItemProperties);
+    return new AdyenPaymentInfo(paymentMethod, walletAddress, signature, fiatPrice, fiatCurrency,
+        appcPrice, buyItemProperties);
   }
 
   private void attach(Context context) {

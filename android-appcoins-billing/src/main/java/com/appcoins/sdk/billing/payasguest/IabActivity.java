@@ -32,7 +32,6 @@ public class IabActivity extends Activity implements IabView {
   public final static int LAUNCH_INSTALL_BILLING_FLOW_REQUEST_CODE = 10001;
   public final static String PAYMENT_METHOD_KEY = "payment_method";
   public final static String WALLET_ADDRESS_KEY = "wallet_address_key";
-  public final static String EWT_KEY = "ewt_key";
   public final static String SIGNATURE_KEY = "signature_key";
   public final static String FIAT_VALUE_KEY = "fiat_value";
   public final static String FIAT_CURRENCY_KEY = "fiat_currency";
@@ -148,14 +147,12 @@ public class IabActivity extends Activity implements IabView {
   }
 
   @Override
-  public void navigateToAdyen(String selectedRadioButton, String walletAddress, String ewt,
-      String signature, String fiatPrice, String fiatPriceCurrencyCode, String appcPrice,
-      String sku) {
+  public void navigateToAdyen(String selectedRadioButton, String walletAddress, String signature,
+      String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku) {
     AdyenPaymentFragment adyenPaymentFragment = new AdyenPaymentFragment();
     Bundle bundle = new Bundle();
     bundle.putString(PAYMENT_METHOD_KEY, selectedRadioButton);
     bundle.putString(WALLET_ADDRESS_KEY, walletAddress);
-    bundle.putString(EWT_KEY, ewt);
     bundle.putString(SIGNATURE_KEY, signature);
     bundle.putString(FIAT_VALUE_KEY, fiatPrice);
     bundle.putString(FIAT_CURRENCY_KEY, fiatPriceCurrencyCode);
