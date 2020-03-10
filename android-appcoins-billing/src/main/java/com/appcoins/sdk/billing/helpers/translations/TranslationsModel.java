@@ -39,16 +39,12 @@ public class TranslationsModel {
   }
 
   public void mapStrings(List<String> list) {
-    if (list.size() == NUMBER_OF_TRANSLATED_STRINGS - 2) {//Some files don't have all strings
-      list.add(3, stringsList.get(3));
-      list.add(4, stringsList.get(4));
-    }
     for (int i = 0; i < list.size(); i++) {
       stringsList.set(i, list.get(i));
     }
   }
 
-  public String getInstallationButtonString() {
+  public String getInstallationDialogBody() {
     return stringsList.get(0);
   }
 
@@ -172,7 +168,7 @@ public class TranslationsModel {
     return stringsList.get(30);
   }
 
-  public String getInstallationDialogBody() {
+  public String getInstallationButtonString() {
     return stringsList.get(31);
   }
 
@@ -181,7 +177,8 @@ public class TranslationsModel {
   }
 
   public String getInstallButton() {
-    return stringsList.get(33);
+    return stringsList.get(33)
+        .toUpperCase();
   }
 
   public String getErrorTitle() {

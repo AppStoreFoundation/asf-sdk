@@ -31,8 +31,8 @@ import java.util.concurrent.CountDownLatch;
 
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
-  private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
   public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 15000;
+  private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
@@ -125,7 +125,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
 
       final Context context = WalletUtils.getContext();
       Intent intent;
-      if (type.equalsIgnoreCase("inapp") && sku != null && !sku.isEmpty()) {
+      if (hasRequiredFields(type, sku) && !WalletUtils.getIabAction()
+          .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
         intent = new Intent(context, IabActivity.class);
       } else {
         intent = new Intent(context, InstallDialogActivity.class);
@@ -241,6 +242,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       }, Context.BIND_AUTO_CREATE);
     }
     return false;
+  }
+
+  private boolean hasRequiredFields(String type, String sku) {
+    return type.equalsIgnoreCase("inapp") && sku != null && !sku.isEmpty();
   }
 
   public static abstract class Stub {

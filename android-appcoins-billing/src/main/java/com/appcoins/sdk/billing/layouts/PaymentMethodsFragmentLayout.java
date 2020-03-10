@@ -408,6 +408,7 @@ public class PaymentMethodsFragmentLayout {
     LinearLayout.LayoutParams layoutParams =
         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(36));
     layoutParams.gravity = Gravity.CENTER_VERTICAL;
+    setMargins(layoutParams, 0, 0, 16, 0);
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
     background.setStroke(dpToPx(1), Color.WHITE);

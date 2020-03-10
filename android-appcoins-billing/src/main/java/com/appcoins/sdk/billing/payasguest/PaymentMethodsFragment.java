@@ -277,7 +277,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     if (selectedRadioButton != null) {
       Button positiveButton = layout.getPositiveButton();
       if (selectedRadioButton.equals(PaymentMethodsFragment.INSTALL_RADIO)) {
-        positiveButton.setText(translationsModel.getInstallationButtonString()); //INSTALL
+        positiveButton.setText(translationsModel.getInstallButton());
       } else {
         positiveButton.setText(translationsModel.getNextButton());
       }
@@ -317,7 +317,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void showBonus(int bonus) {
     TextView bonusText = layout.getInstallSecondaryText();
     if (bonus > 0) {
-      bonusText.setText(String.format(translationsModel.getWalletRewardBody(), bonus + "%"));
+      bonusText.setText(String.format(translationsModel.getWalletRewardTitle(), bonus));
       bonusText.setVisibility(View.VISIBLE);
     } else if (bonus == -1) { //-1 -> Request fail code
       bonusText.setText(translationsModel.getNoConnectionWalletRewardBody());
@@ -332,9 +332,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void showItemAlreadyOwnedError(SkuPurchase skuPurchase) {
     itemAlreadyOwnedPurchase = skuPurchase;
     iabView.disableBack();
-    layout.setErrorMessage(
-        "It seems this purchase is already being processed. Please hold on until the transaction "
-            + "is completed or contact our Support Team.");
+    layout.setErrorMessage(translationsModel.getItemAlreadyOwned());
     showError();
   }
 
@@ -358,7 +356,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         .getVisibility() == View.VISIBLE) {
       selectedRadioButton = INSTALL_RADIO;
       layout.getPositiveButton()
-          .setText("INSTALL");
+          .setText(translationsModel.getInstallButton());
       layout.selectRadioButton(selectedRadioButton);
     }
   }
