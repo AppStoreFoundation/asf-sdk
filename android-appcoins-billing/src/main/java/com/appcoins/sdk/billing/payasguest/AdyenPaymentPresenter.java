@@ -20,6 +20,7 @@ import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
 import com.appcoins.sdk.billing.models.billing.PurchaseModel;
 import com.appcoins.sdk.billing.models.billing.TransactionResponse;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
+import com.sdk.appcoins_adyen.card.EncryptedCard;
 import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
 import com.sdk.appcoins_adyen.models.ExpiryDate;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
@@ -82,8 +83,10 @@ class AdyenPaymentPresenter {
     ExpiryDate mExpiryDate = CardValidationUtils.getDate(expiryDate);
     String encryptedCard;
     if (storedPaymentId.equals("")) {
-      encryptedCard = cardEncryptor.encryptFields(cardNumber, mExpiryDate.getExpiryMonth(),
-          mExpiryDate.getExpiryYear(), cvv);
+      EncryptedCard encryptedCardModel =
+          cardEncryptor.encryptFields(cardNumber, mExpiryDate.getExpiryMonth(),
+              mExpiryDate.getExpiryYear(), cvv);
+      encryptedCard = new EncryptedCardMapper().map(encryptedCardModel);
     } else {
       encryptedCard = cardEncryptor.encryptStoredPaymentFields(cvv, storedPaymentId, "scheme");
     }
@@ -284,7 +287,7 @@ class AdyenPaymentPresenter {
   }
 
   void onDestroy() {
-    if(getTransactionHandler != null && getTransactionRunnable != null){
+    if (getTransactionHandler != null && getTransactionRunnable != null) {
       getTransactionHandler.removeCallbacks(getTransactionRunnable);
     }
     adyenPaymentInteract.cancelRequests();
