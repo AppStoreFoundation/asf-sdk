@@ -42,7 +42,7 @@ public class TranslationsRepository {
       }
     }
     if (needsToRefreshModel(locale.getLanguage(), locale.getCountry())) {
-      translate(locale.getLanguage(), "IR");
+      translate(locale.getLanguage(), locale.getCountry());
     }
   }
 
