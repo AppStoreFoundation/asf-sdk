@@ -32,7 +32,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
   private final static String APPCOINS_BILLING_STUB_HELPER_INSTANCE =
       "appcoins_billing_stub_helper";
-  public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 15000;
+  public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 35000;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
