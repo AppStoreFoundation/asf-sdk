@@ -39,7 +39,6 @@ public class IabActivity extends Activity implements IabView {
   public final static String SKU_KEY = "sku_key";
   private final static String TRANSLATIONS = "translations";
   private final static int WEB_VIEW_REQUEST_CODE = 1234;
-  private static int IAB_ACTIVITY_MAIN_LAYOUT_ID = 1;
   private TranslationsModel translationsModel;
   private FrameLayout frameLayout;
   private BuyItemProperties buyItemProperties;
@@ -55,9 +54,8 @@ public class IabActivity extends Activity implements IabView {
     int backgroundColor = Color.parseColor("#64000000");
     frameLayout = new FrameLayout(this);
     if (savedInstanceState == null) {
-      IAB_ACTIVITY_MAIN_LAYOUT_ID = generateRandomId(IAB_ACTIVITY_MAIN_LAYOUT_ID);
+      frameLayout.setId(generateRandomId());
     }
-    frameLayout.setId(IAB_ACTIVITY_MAIN_LAYOUT_ID);
     frameLayout.setBackgroundColor(backgroundColor);
 
     setContentView(frameLayout);

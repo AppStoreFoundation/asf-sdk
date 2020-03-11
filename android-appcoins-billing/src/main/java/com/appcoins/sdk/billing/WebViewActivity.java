@@ -18,8 +18,6 @@ import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import com.appcoins.sdk.billing.utils.LayoutUtils;
 
-import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
-
 public class WebViewActivity extends Activity {
 
   public static final int SUCCESS = 1;
@@ -27,8 +25,6 @@ public class WebViewActivity extends Activity {
   private static final String ADYEN_PAYMENT_SCHEMA = "adyencheckout://";
   private static final String CURRENT_URL = "current_url";
   private static final String URL = "url";
-  private static int WEB_VIEW_ACTIVITY_MAIN_LAYOUT_ID = 2;
-  private static int WEB_VIEW_ID = 3;
   private String currentUrl;
 
   public static Intent newIntent(Activity activity, String url) {
@@ -44,12 +40,8 @@ public class WebViewActivity extends Activity {
             RelativeLayout.LayoutParams.MATCH_PARENT);
 
     RelativeLayout mainLayout = new RelativeLayout(this);
-    WEB_VIEW_ACTIVITY_MAIN_LAYOUT_ID = generateRandomId(WEB_VIEW_ACTIVITY_MAIN_LAYOUT_ID);
-    mainLayout.setId(WEB_VIEW_ACTIVITY_MAIN_LAYOUT_ID);
     mainLayout.setLayoutParams(layoutParams);
     WebView webView = new WebView(this);
-    WEB_VIEW_ID = generateRandomId(WEB_VIEW_ID);
-    webView.setId(WEB_VIEW_ID);
     LayoutUtils.setMargins(layoutParams, 8, 8, 8, 8);
     webView.setLayoutParams(layoutParams);
     mainLayout.addView(webView);
