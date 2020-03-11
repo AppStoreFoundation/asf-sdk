@@ -269,13 +269,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   @Override public void setPositiveButtonText(String selectedRadioButton) {
-    if (selectedRadioButton != null) {
       Button positiveButton = layout.getPositiveButton();
       if (selectedRadioButton.equals(PaymentMethodsFragment.INSTALL_RADIO)) {
         positiveButton.setText("INSTALL");
       } else {
         positiveButton.setText("NEXT");
-      }
     }
   }
 

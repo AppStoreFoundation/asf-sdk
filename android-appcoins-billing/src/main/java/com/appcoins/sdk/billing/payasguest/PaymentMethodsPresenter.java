@@ -78,7 +78,9 @@ class PaymentMethodsPresenter {
 
   void onRadioButtonClicked(String selectedRadioButton) {
     fragmentView.setRadioButtonSelected(selectedRadioButton);
-    fragmentView.setPositiveButtonText(selectedRadioButton);
+    if (selectedRadioButton != null) {
+      fragmentView.setPositiveButtonText(selectedRadioButton);
+    }
   }
 
   void onErrorButtonClicked() {
