@@ -13,11 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class BillingRepository {
+public class BillingRepository {
 
   private Service service;
 
-  BillingRepository(Service service) {
+  public BillingRepository(Service service) {
 
     this.service = service;
   }
@@ -45,8 +45,8 @@ class BillingRepository {
         serviceResponseListener);
   }
 
-  void getPurchases(String packageName, String walletAddress, String signedWallet, String type,
-      final PurchasesListener purchasesListener) {
+  public void getPurchases(String packageName, String walletAddress, String signedWallet,
+      String type, final PurchasesListener purchasesListener) {
     ServiceResponseListener serviceResponseListener = new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
         PurchaseMapper purchaseMapper = new PurchaseMapper();

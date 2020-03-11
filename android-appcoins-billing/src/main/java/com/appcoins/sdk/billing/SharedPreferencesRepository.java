@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 public class SharedPreferencesRepository {
 
+  public static final int TTL_IN_SECONDS = 86400 * 30; //86400 = 24h
   private static final String WALLET_ID_KEY = "WALLET_ID";
   private static final String MAX_BONUS_KEY = "MAX_BONUS";
   private static final String MAX_BONUS_TTL_SECONDS_KEY = "MAX_BONUS_TTL";

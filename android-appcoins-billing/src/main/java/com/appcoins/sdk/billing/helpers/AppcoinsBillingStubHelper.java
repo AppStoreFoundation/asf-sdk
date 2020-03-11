@@ -18,6 +18,7 @@ import com.appcoins.communication.requester.MessageRequesterFactory;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.DeveloperPayload;
 import com.appcoins.sdk.billing.ResponseCode;
+import com.appcoins.sdk.billing.SharedPreferencesRepository;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.UriCommunicationAppcoinsBilling;
@@ -28,10 +29,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 15000;
+  final static String INAPP_PURCHASE_ID_LIST = "INAPP_PURCHASE_ID_LIST";
+  final static String INAPP_PURCHASE_ITEM_LIST = "INAPP_PURCHASE_ITEM_LIST";
+  final static String INAPP_PURCHASE_DATA_LIST = "INAPP_PURCHASE_DATA_LIST";
+  final static String INAPP_DATA_SIGNATURE_LIST = "INAPP_DATA_SIGNATURE_LIST";
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
@@ -142,24 +148,32 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     }
   }
 
-  @Override public Bundle getPurchases(int apiVersion, String packageName, String type,
+  @Override public Bundle getPurchases(int apiVersion, final String packageName, String type,
       String continuationToken) {
     Bundle bundleResponse = new Bundle();
     if (WalletUtils.hasWalletInstalled()) {
       try {
-        return serviceAppcoinsBilling.getPurchases(apiVersion, packageName, type, null);
+        return serviceAppcoinsBilling.getPurchases(apiVersion, packageName, type,
+            continuationToken);
       } catch (RemoteException e) {
         e.printStackTrace();
         bundleResponse.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
       }
     } else {
-
-      bundleResponse.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
-      bundleResponse.putStringArrayList("INAPP_PURCHASE_ITEM_LIST", new ArrayList<String>());
-      bundleResponse.putStringArrayList("INAPP_PURCHASE_DATA_LIST", new ArrayList<String>());
-      bundleResponse.putStringArrayList("INAPP_DATA_SIGNATURE_LIST", new ArrayList<String>());
+      SharedPreferencesRepository sharedPreferencesRepository =
+          new SharedPreferencesRepository(WalletUtils.getContext(),
+              SharedPreferencesRepository.TTL_IN_SECONDS);
+      String walletId = sharedPreferencesRepository.getWalletId();
+      if (walletId != null && type.equalsIgnoreCase("INAPP")) {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract();
+        guestPurchaseInteract.mapGuestPurchases(bundleResponse, walletId, packageName, type,
+            countDownLatch);
+        waitForPurchases(countDownLatch, bundleResponse);
+      } else {
+        buildEmptyBundle(bundleResponse);
+      }
     }
-
     return bundleResponse;
   }
 
@@ -174,6 +188,22 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     } else {
       return ResponseCode.OK.getValue();
     }
+  }
+
+  private void waitForPurchases(CountDownLatch countDownLatch, Bundle bundleResponse) {
+    try {
+      countDownLatch.await(MESSAGE_RESPONSE_WAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+      buildEmptyBundle(bundleResponse);
+    }
+  }
+
+  private void buildEmptyBundle(Bundle bundleResponse) {
+    bundleResponse.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
+    bundleResponse.putStringArrayList(INAPP_PURCHASE_ITEM_LIST, new ArrayList<String>());
+    bundleResponse.putStringArrayList(INAPP_PURCHASE_DATA_LIST, new ArrayList<String>());
+    bundleResponse.putStringArrayList(INAPP_DATA_SIGNATURE_LIST, new ArrayList<String>());
   }
 
   private void getSkuDetailsFromService(String packageName, String type, Bundle skusBundle,
@@ -254,6 +284,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       if (!WalletUtils.hasWalletInstalled()) {
         return AppcoinsBillingStubHelper.getInstance();
       } else {
+        SharedPreferencesRepository sharedPreferencesRepository =
+            new SharedPreferencesRepository(WalletUtils.getContext(),
+                SharedPreferencesRepository.TTL_IN_SECONDS);
+        AppcoinsBilling appcoinsBilling;
         if (UriCommunicationAppcoinsBilling.class.getSimpleName()
             .equals(componentName)) {
           SyncIpcMessageRequester messageRequester =
@@ -261,10 +295,12 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
                   BuildConfig.BDS_WALLET_PACKAGE_NAME,
                   "appcoins://billing/communication/processor/1",
                   "appcoins://billing/communication/requester/1", MESSAGE_RESPONSE_WAIT_TIMEOUT);
-          return new UriCommunicationAppcoinsBilling(messageRequester);
+          appcoinsBilling = new UriCommunicationAppcoinsBilling(messageRequester);
         } else {
-          return AppcoinsBilling.Stub.asInterface(service);
+          appcoinsBilling = AppcoinsBilling.Stub.asInterface(service);
         }
+        return new AppcoinsBillingWrapper(appcoinsBilling,
+            sharedPreferencesRepository.getWalletId());
       }
     }
   }
