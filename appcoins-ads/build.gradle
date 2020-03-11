@@ -141,8 +141,8 @@ bintray {
   key = "${BDS_BINTRAY_KEY}"
   publications = ['MyPublication']
   pkg {
-    def buildType = System.getenv('BUILD_NAME_SUFFIX')
-    repo = buildType != null ? 'bds-stage' : 'bds'
+    def publishNameSuffix = System.getenv('BUILD_NAME_SUFFIX')
+    repo = publishNameSuffix != null ? 'bds-stage' : 'bds'
     name = "${project.name}"
     userOrg = "${BDS_BINTRAY_ORG}"
     licenses = ['GPL-3.0']
