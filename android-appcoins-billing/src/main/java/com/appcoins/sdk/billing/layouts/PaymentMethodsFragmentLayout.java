@@ -68,16 +68,16 @@ public class PaymentMethodsFragmentLayout {
   private String densityPath;
   private Button cancelButton;
   private Button positiveButton;
-  private RelativeLayout creditCardWrapperLayout;
-  private RelativeLayout paypalWrapperLayout;
-  private RelativeLayout installWrapperLayout;
+  private ViewGroup creditCardWrapperLayout;
+  private ViewGroup paypalWrapperLayout;
+  private ViewGroup installWrapperLayout;
   private GradientDrawable selectedBackground;
   private GradientDrawable defaultBackground;
-  private RelativeLayout paymentMethodsLayout;
-  private RelativeLayout errorView;
-  private RelativeLayout dialogLayout;
+  private ViewGroup paymentMethodsLayout;
+  private ViewGroup errorView;
+  private ViewGroup dialogLayout;
   private TextView installSecondaryText;
-  private RelativeLayout intentLoadingView;
+  private ViewGroup intentLoadingView;
   private PaymentErrorViewLayout paymentErrorViewLayout;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
@@ -1002,19 +1002,19 @@ public class PaymentMethodsFragmentLayout {
     return positiveButton;
   }
 
-  public RelativeLayout getCreditCardWrapperLayout() {
+  public ViewGroup getCreditCardWrapperLayout() {
     return creditCardWrapperLayout;
   }
 
-  public RelativeLayout getPaypalWrapperLayout() {
+  public ViewGroup getPaypalWrapperLayout() {
     return paypalWrapperLayout;
   }
 
-  public RelativeLayout getInstallWrapperLayout() {
+  public ViewGroup getInstallWrapperLayout() {
     return installWrapperLayout;
   }
 
-  public RelativeLayout getPaymentMethodsLayout() {
+  public ViewGroup getPaymentMethodsLayout() {
     return paymentMethodsLayout;
   }
 
@@ -1026,11 +1026,11 @@ public class PaymentMethodsFragmentLayout {
     paymentErrorViewLayout.setMessage(message);
   }
 
-  public RelativeLayout getErrorView() {
+  public ViewGroup getErrorView() {
     return errorView;
   }
 
-  public RelativeLayout getDialogLayout() {
+  public ViewGroup getDialogLayout() {
     return dialogLayout;
   }
 
@@ -1038,7 +1038,7 @@ public class PaymentMethodsFragmentLayout {
     return installSecondaryText;
   }
 
-  public RelativeLayout getIntentLoadingView() {
+  public ViewGroup getIntentLoadingView() {
     return intentLoadingView;
   }
 }

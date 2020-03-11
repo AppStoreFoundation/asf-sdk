@@ -32,8 +32,8 @@ public class PaymentErrorViewLayout {
     this.orientation = orientation;
   }
 
-  public RelativeLayout buildErrorView() {
-    RelativeLayout relativeLayout = new RelativeLayout(activity);
+  public ViewGroup buildErrorView() {
+    ViewGroup relativeLayout = new RelativeLayout(activity);
     setPadding(relativeLayout, 16, 16, 16, 16);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(160));

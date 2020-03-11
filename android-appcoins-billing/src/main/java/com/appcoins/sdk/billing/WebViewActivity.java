@@ -111,7 +111,7 @@ public class WebViewActivity extends Activity {
         .getRotation();
     switch (orientation) {
       case Surface.ROTATION_0:
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         break;
       case Surface.ROTATION_90:
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);

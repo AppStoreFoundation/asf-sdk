@@ -59,15 +59,15 @@ public class AdyenPaymentFragmentLayout {
   private final Activity activity;
   private final int orientation;
   private String densityPath;
-  private RelativeLayout errorView;
-  private RelativeLayout dialogLayout;
+  private ViewGroup errorView;
+  private ViewGroup dialogLayout;
   private TextView fiatPriceView;
   private Button cancelButton;
   private Button positiveButton;
-  private LinearLayout buttonsView;
+  private ViewGroup buttonsView;
   private TextView morePaymentsText;
   private TextView changeCard;
-  private RelativeLayout paypalLoading;
+  private ViewGroup paypalLoading;
   private PaymentErrorViewLayout paymentErrorViewLayout;
   private CardNumberEditText cardNumberEditText;
   private EditText expiryDateEditText;
@@ -732,11 +732,11 @@ public class AdyenPaymentFragmentLayout {
     return backgroundLayout;
   }
 
-  public RelativeLayout getErrorView() {
+  public ViewGroup getErrorView() {
     return errorView;
   }
 
-  public RelativeLayout getDialogLayout() {
+  public ViewGroup getDialogLayout() {
     return dialogLayout;
   }
 
@@ -764,7 +764,7 @@ public class AdyenPaymentFragmentLayout {
     return positiveButton;
   }
 
-  public LinearLayout getButtonsView() {
+  public ViewGroup getButtonsView() {
     return buttonsView;
   }
 
@@ -776,7 +776,7 @@ public class AdyenPaymentFragmentLayout {
     return changeCard;
   }
 
-  public RelativeLayout getPaypalLoading() {
+  public ViewGroup getPaypalLoading() {
     return paypalLoading;
   }
 
