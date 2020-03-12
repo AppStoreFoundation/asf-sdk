@@ -52,12 +52,14 @@ public class InstallDialogActivity extends Activity {
   private static final String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
   private static final String DIALOG_WALLET_INSTALL_EMPTY_IMAGE =
       "dialog_wallet_install_empty_image";
-  private static String installButtonColor = "#ffffbb33";
-  private static String installButtonTextColor = "#ffffffff";
-  private final String GOOGLE_PLAY_URL =
+  private String installButtonColor = "#ffffbb33";
+  private String installButtonTextColor = "#ffffffff";
+  private static final String GOOGLE_PLAY_URL =
       "https://play.google.com/store/apps/details?id=" + BuildConfig.BDS_WALLET_PACKAGE_NAME;
-  private final String CAFE_BAZAAR_APP_URL = "bazaar://details?id=com.hezardastan.wallet";
-  private final String CAFE_BAZAAR_WEB_URL = "https://cafebazaar.ir/app/com.hezardastaan.wallet";
+  private static final String CAFE_BAZAAR_APP_URL =
+      "bazaar://details?id=" + BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
+  private static final String CAFE_BAZAAR_WEB_URL =
+      "https://cafebazaar.ir/app/" + BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
   private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
