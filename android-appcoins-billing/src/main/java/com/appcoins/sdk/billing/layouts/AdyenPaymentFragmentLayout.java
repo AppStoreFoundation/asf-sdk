@@ -66,12 +66,14 @@ public class AdyenPaymentFragmentLayout {
   private ViewGroup buttonsView;
   private TextView morePaymentsText;
   private TextView changeCard;
-  private ViewGroup paypalLoading;
+  private ViewGroup loadingView;
   private PaymentErrorViewLayout paymentErrorViewLayout;
   private CardNumberEditText cardNumberEditText;
   private EditText expiryDateEditText;
   private EditText cvvEditText;
   private CreditCardLayout creditCardEditTextLayout;
+  private CompletedPurchaseLayout completedPurchaseLayout;
+  private ViewGroup completedPurchaseView;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -91,14 +93,20 @@ public class AdyenPaymentFragmentLayout {
     errorView = paymentErrorViewLayout.buildErrorView();
     errorView.setVisibility(View.INVISIBLE);
 
-    paypalLoading = buildPaypalLoading();
-    paypalLoading.setVisibility(View.INVISIBLE);
+    completedPurchaseLayout = new CompletedPurchaseLayout(activity, orientation);
+    completedPurchaseView =
+        completedPurchaseLayout.buildView(fiatPrice, fiatCurrency, sku, packageName);
+    completedPurchaseView.setVisibility(View.INVISIBLE);
+
+    loadingView = buildLoadingView();
+    loadingView.setVisibility(View.INVISIBLE);
 
     dialogLayout = buildDialogLayout(fiatPrice, fiatCurrency, appcPrice, sku, packageName);
     dialogLayout.setVisibility(View.INVISIBLE);
     mainLayout.addView(dialogLayout);
     mainLayout.addView(errorView);
-    mainLayout.addView(paypalLoading);
+    mainLayout.addView(loadingView);
+    mainLayout.addView(completedPurchaseView);
     return mainLayout;
   }
 
@@ -108,7 +116,7 @@ public class AdyenPaymentFragmentLayout {
     cvvEditText = null;
   }
 
-  private RelativeLayout buildPaypalLoading() {
+  private RelativeLayout buildLoadingView() {
     RelativeLayout relativeLayout = new RelativeLayout(activity);
 
     RelativeLayout.LayoutParams layoutParams =
@@ -772,8 +780,8 @@ public class AdyenPaymentFragmentLayout {
     return changeCard;
   }
 
-  public ViewGroup getPaypalLoading() {
-    return paypalLoading;
+  public ViewGroup getLoadingView() {
+    return loadingView;
   }
 
   public PaymentErrorViewLayout getPaymentErrorViewLayout() {
@@ -782,5 +790,9 @@ public class AdyenPaymentFragmentLayout {
 
   public CreditCardLayout getCreditCardEditTextLayout() {
     return creditCardEditTextLayout;
+  }
+
+  public ViewGroup getCompletedPurchaseView() {
+    return completedPurchaseView;
   }
 }

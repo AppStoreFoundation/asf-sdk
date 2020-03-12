@@ -198,18 +198,22 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   @Override public void showError() {
     layout.getDialogLayout()
         .setVisibility(View.INVISIBLE);
-    layout.getPaypalLoading()
+    layout.getLoadingView()
+        .setVisibility(View.INVISIBLE);
+    layout.getCompletedPurchaseView()
         .setVisibility(View.INVISIBLE);
     layout.getErrorView()
         .setVisibility(View.VISIBLE);
   }
 
   @Override public void showLoading() {
-    layout.getPaypalLoading()
+    layout.getLoadingView()
         .setVisibility(View.VISIBLE);
     layout.getErrorView()
         .setVisibility(View.INVISIBLE);
     layout.getDialogLayout()
+        .setVisibility(View.INVISIBLE);
+    layout.getCompletedPurchaseView()
         .setVisibility(View.INVISIBLE);
   }
 
@@ -223,7 +227,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   }
 
   @Override public void showCreditCardView(StoredMethodDetails storedMethodDetails) {
-    layout.getPaypalLoading()
+    layout.getLoadingView()
         .setVisibility(View.INVISIBLE);
     layout.getErrorView()
         .setVisibility(View.INVISIBLE);
@@ -278,7 +282,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     cvv.requestFocus();
     layout.getDialogLayout()
         .setVisibility(View.VISIBLE);
-    layout.getPaypalLoading()
+    layout.getLoadingView()
         .setVisibility(View.INVISIBLE);
     layout.getErrorView()
         .setVisibility(View.INVISIBLE);
@@ -289,6 +293,21 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     layout.getPaymentErrorViewLayout()
         .setMessage(errorMessage);
     showError();
+  }
+
+  @Override public void showCompletedPurchase() {
+    layout.getCompletedPurchaseView()
+        .setVisibility(View.VISIBLE);
+    layout.getDialogLayout()
+        .setVisibility(View.INVISIBLE);
+    layout.getLoadingView()
+        .setVisibility(View.INVISIBLE);
+    layout.getErrorView()
+        .setVisibility(View.INVISIBLE);
+  }
+
+  @Override public void disableBack() {
+    iabView.disableBack();
   }
 
   private void setStoredPaymentMethodDetails(StoredMethodDetails storedMethodDetails) {
@@ -338,7 +357,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     } else if (paymentMethod.equals(PaymentMethodsFragment.PAYPAL_RADIO)) {
       layout.getDialogLayout()
           .setVisibility(View.INVISIBLE);
-      layout.getPaypalLoading()
+      layout.getLoadingView()
           .setVisibility(View.VISIBLE);
     }
   }
