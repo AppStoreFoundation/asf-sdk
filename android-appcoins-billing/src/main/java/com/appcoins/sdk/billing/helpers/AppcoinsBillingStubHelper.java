@@ -29,16 +29,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
-  public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 15000;
   final static String INAPP_PURCHASE_ID_LIST = "INAPP_PURCHASE_ID_LIST";
   final static String INAPP_PURCHASE_ITEM_LIST = "INAPP_PURCHASE_ITEM_LIST";
   final static String INAPP_PURCHASE_DATA_LIST = "INAPP_PURCHASE_DATA_LIST";
   final static String INAPP_DATA_SIGNATURE_LIST = "INAPP_DATA_SIGNATURE_LIST";
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
+  public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 35000;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
@@ -225,7 +224,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       skuSendList.add(sku.get(i - 1));
       if (i % MAX_SKUS_SEND_WS == 0 || i == sku.size()) {
         String response =
-            WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuSendList);
+            WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuSendList,
+                WalletUtils.getUserAgent());
         skuDetailsList.addAll(AndroidBillingMapper.mapSkuDetailsFromWS(type, response));
         skuSendList.clear();
       }

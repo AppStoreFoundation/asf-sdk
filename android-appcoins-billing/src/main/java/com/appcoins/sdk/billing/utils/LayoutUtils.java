@@ -7,11 +7,13 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LayoutUtils {
 
   public static final String BUTTONS_RESOURCE_PATH = "appcoins-wallet/resources/buttons/";
   public static final String IMAGES_RESOURCE_PATH = "appcoins-wallet/resources/images/";
+  private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
   public static String mapDisplayMetrics(DisplayMetrics displayMetrics) {
     String densityPath;
@@ -98,10 +100,15 @@ public class LayoutUtils {
     }
   }
 
-  public static int generateRandomId(int currentId) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      return View.generateViewId();
+  public static int generateRandomId() {
+    for (; ; ) {
+      final int result = sNextGeneratedId.get();
+      // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
+      int newValue = result + 1;
+      if (newValue > 0x00FFFFFF) newValue = 1; // Roll over to 1, not 0.
+      if (sNextGeneratedId.compareAndSet(result, newValue)) {
+        return result;
+      }
     }
-    return currentId;
   }
 }

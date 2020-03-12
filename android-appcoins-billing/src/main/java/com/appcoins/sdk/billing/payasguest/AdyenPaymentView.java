@@ -31,4 +31,8 @@ interface AdyenPaymentView {
   void showCvvError();
 
   void showError(String errorMessage);
+
+  void showCompletedPurchase();
+
+  void disableBack();
 }

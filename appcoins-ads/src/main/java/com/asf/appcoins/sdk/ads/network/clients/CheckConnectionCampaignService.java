@@ -1,7 +1,8 @@
 package com.asf.appcoins.sdk.ads.network.clients;
 
-import com.asf.appcoins.sdk.ads.network.responses.GetResponseHandler;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.asf.appcoins.sdk.ads.network.Interceptor;
+import com.asf.appcoins.sdk.ads.network.responses.GetResponseHandler;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -11,8 +12,8 @@ public class CheckConnectionCampaignService extends CampaignService implements R
 
   private static final String SERVICE_URL_PATH = "/campaign/listall";
 
-  public CheckConnectionCampaignService(String packageName,int versionCode,String serviceUrl, Interceptor interceptor,
-      GetResponseHandler getResponseHandler) {
+  public CheckConnectionCampaignService(String packageName, int versionCode, String serviceUrl,
+      Interceptor interceptor, GetResponseHandler getResponseHandler) {
     super(packageName, versionCode, serviceUrl, interceptor, null, getResponseHandler);
   }
 
@@ -27,15 +28,12 @@ public class CheckConnectionCampaignService extends CampaignService implements R
     URL url = null;
     HttpURLConnection urlConnection = null;
     try {
-      url = new URL(serviceUrl+SERVICE_URL_PATH);
+      url = new URL(serviceUrl + SERVICE_URL_PATH);
       urlConnection = (HttpURLConnection) url.openConnection();
+      urlConnection.setRequestProperty("User-Agent", WalletUtils.getUserAgent());
 
       int responseCode = urlConnection.getResponseCode();
-      if (responseCode == HttpURLConnection.HTTP_OK) {
-        result = true;
-      } else {
-        result = false;
-      }
+      result = responseCode == HttpURLConnection.HTTP_OK;
     } catch (MalformedURLException e) {
       e.printStackTrace();
       result = false;

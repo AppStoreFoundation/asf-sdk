@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -47,35 +48,36 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
 
 public class AdyenPaymentFragmentLayout {
-  private static int GENERIC_CARD_ID = 37;
-  private static int MORE_PAYMENTS_ID = 36;
-  private static int CREDIT_CARD_INPUT_ID = 35;
-  private static int CREDIT_CARD_HEADER_ID = 34;
-  private static int CREDIT_CARD_VIEW_ID = 33;
-  private static int HEADER_ID = 32;
-  private static int APPC_PRICE_VIEW_ID = 31;
-  private static int FIAT_PRICE_VIEW_ID = 30;
-  private static int APP_NAME_ID = 29;
-  private static int APP_ICON_ID = 28;
-  private static int PAYMENT_METHODS_HEADER_ID = 27;
+  private static int GENERIC_CARD_ID;
+  private static int CREDIT_CARD_INPUT_ID;
+  private static int CREDIT_CARD_HEADER_ID;
+  private static int CREDIT_CARD_VIEW_ID;
+  private static int HEADER_ID;
+  private static int APPC_PRICE_VIEW_ID;
+  private static int FIAT_PRICE_VIEW_ID;
+  private static int APP_NAME_ID;
+  private static int APP_ICON_ID;
+  private static int PAYMENT_METHODS_HEADER_ID;
   private final Activity activity;
   private final int orientation;
   private String densityPath;
-  private RelativeLayout errorView;
-  private RelativeLayout dialogLayout;
+  private ViewGroup errorView;
+  private ViewGroup dialogLayout;
   private TextView fiatPriceView;
   private Button cancelButton;
   private Button positiveButton;
-  private LinearLayout buttonsView;
+  private ViewGroup buttonsView;
   private TextView morePaymentsText;
   private TextView changeCard;
-  private RelativeLayout paypalLoading;
+  private ViewGroup loadingView;
   private PaymentErrorViewLayout paymentErrorViewLayout;
   private CardNumberEditText cardNumberEditText;
   private EditText expiryDateEditText;
   private EditText cvvEditText;
   private CreditCardLayout creditCardEditTextLayout;
   private TranslationsModel translationModel;
+  private CompletedPurchaseLayout completedPurchaseLayout;
+  private ViewGroup completedPurchaseView;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -97,14 +99,20 @@ public class AdyenPaymentFragmentLayout {
     errorView = paymentErrorViewLayout.buildErrorView();
     errorView.setVisibility(View.INVISIBLE);
 
-    paypalLoading = buildPaypalLoading();
-    paypalLoading.setVisibility(View.INVISIBLE);
+    completedPurchaseLayout = new CompletedPurchaseLayout(activity, orientation);
+    completedPurchaseView =
+        completedPurchaseLayout.buildView(fiatPrice, fiatCurrency, sku, packageName);
+    completedPurchaseView.setVisibility(View.INVISIBLE);
+
+    loadingView = buildLoadingView();
+    loadingView.setVisibility(View.INVISIBLE);
 
     dialogLayout = buildDialogLayout(fiatPrice, fiatCurrency, appcPrice, sku, packageName);
     dialogLayout.setVisibility(View.INVISIBLE);
     mainLayout.addView(dialogLayout);
     mainLayout.addView(errorView);
-    mainLayout.addView(paypalLoading);
+    mainLayout.addView(loadingView);
+    mainLayout.addView(completedPurchaseView);
     return mainLayout;
   }
 
@@ -114,7 +122,7 @@ public class AdyenPaymentFragmentLayout {
     cvvEditText = null;
   }
 
-  private RelativeLayout buildPaypalLoading() {
+  private RelativeLayout buildLoadingView() {
     RelativeLayout relativeLayout = new RelativeLayout(activity);
 
     RelativeLayout.LayoutParams layoutParams =
@@ -271,7 +279,7 @@ public class AdyenPaymentFragmentLayout {
 
   private RelativeLayout buildCreditCardLayout() {
     RelativeLayout parentLayout = new RelativeLayout(activity);
-    CREDIT_CARD_VIEW_ID = generateRandomId(CREDIT_CARD_VIEW_ID);
+    CREDIT_CARD_VIEW_ID = generateRandomId();
     parentLayout.setId(CREDIT_CARD_VIEW_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -323,9 +331,6 @@ public class AdyenPaymentFragmentLayout {
   @SuppressLint("InlinedApi") private TextView buildMorePaymentsView() {
     TextView textView = new TextView(activity);
 
-    MORE_PAYMENTS_ID = generateRandomId(MORE_PAYMENTS_ID);
-    textView.setId(MORE_PAYMENTS_ID);
-
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -357,7 +362,7 @@ public class AdyenPaymentFragmentLayout {
   @SuppressLint("InlinedApi") private CreditCardLayout buildCreditCardEditTextLayout() {
     CreditCardLayout creditCardLayout = new CreditCardLayout(activity);
 
-    CREDIT_CARD_INPUT_ID = generateRandomId(CREDIT_CARD_INPUT_ID);
+    CREDIT_CARD_INPUT_ID = generateRandomId();
     creditCardLayout.setId(CREDIT_CARD_INPUT_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(44));
@@ -404,7 +409,7 @@ public class AdyenPaymentFragmentLayout {
     ImageView imageView = new ImageView(activity);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(30), dpToPx(19));
-    GENERIC_CARD_ID = generateRandomId(GENERIC_CARD_ID);
+    GENERIC_CARD_ID = generateRandomId();
     imageView.setId(GENERIC_CARD_ID);
     setConstraint(layoutParams, RelativeLayout.CENTER_VERTICAL);
     setMargins(layoutParams, 8, 0, 0, 0);
@@ -492,7 +497,7 @@ public class AdyenPaymentFragmentLayout {
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
-    CREDIT_CARD_HEADER_ID = generateRandomId(CREDIT_CARD_HEADER_ID);
+    CREDIT_CARD_HEADER_ID = generateRandomId();
     relativeLayout.setId(CREDIT_CARD_HEADER_ID);
     layoutParams.addRule(RelativeLayout.BELOW, HEADER_ID);
 
@@ -558,7 +563,7 @@ public class AdyenPaymentFragmentLayout {
 
   private View buildHeaderSeparatorLayout() {
     View view = new View(activity);
-    HEADER_ID = generateRandomId(HEADER_ID);
+    HEADER_ID = generateRandomId();
     view.setId(HEADER_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(1));
@@ -585,7 +590,7 @@ public class AdyenPaymentFragmentLayout {
     paymentMethodHeaderLayout.setLayoutParams(
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT));
-    PAYMENT_METHODS_HEADER_ID = generateRandomId(PAYMENT_METHODS_HEADER_ID);
+    PAYMENT_METHODS_HEADER_ID = generateRandomId();
     paymentMethodHeaderLayout.setId(PAYMENT_METHODS_HEADER_ID);
     Drawable icon = null;
     String appName = "";
@@ -615,7 +620,7 @@ public class AdyenPaymentFragmentLayout {
 
   @SuppressLint("InlinedApi") private TextView createAppcPriceView(String appcPrice) {
     TextView textView = new TextView(activity);
-    APPC_PRICE_VIEW_ID = generateRandomId(APPC_PRICE_VIEW_ID);
+    APPC_PRICE_VIEW_ID = generateRandomId();
     textView.setId(APPC_PRICE_VIEW_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -635,7 +640,7 @@ public class AdyenPaymentFragmentLayout {
   @SuppressLint("InlinedApi")
   private TextView createFiatPriceView(String fiatPrice, String fiatCurrency) {
     TextView textView = new TextView(activity);
-    FIAT_PRICE_VIEW_ID = generateRandomId(FIAT_PRICE_VIEW_ID);
+    FIAT_PRICE_VIEW_ID = generateRandomId();
     textView.setId(FIAT_PRICE_VIEW_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -670,7 +675,7 @@ public class AdyenPaymentFragmentLayout {
 
   @SuppressLint("InlinedApi") private TextView createAppNameLayout(String appName) {
     TextView textView = new TextView(activity);
-    APP_NAME_ID = generateRandomId(APP_NAME_ID);
+    APP_NAME_ID = generateRandomId();
     textView.setId(APP_NAME_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -689,7 +694,7 @@ public class AdyenPaymentFragmentLayout {
 
   private ImageView createAppIconLayout(Drawable icon) {
     ImageView imageView = new ImageView(activity);
-    APP_ICON_ID = generateRandomId(APP_ICON_ID);
+    APP_ICON_ID = generateRandomId();
     imageView.setId(APP_ICON_ID);
     if (icon != null) {
       imageView.setImageDrawable(icon);
@@ -723,6 +728,8 @@ public class AdyenPaymentFragmentLayout {
 
   private ProgressBar buildProgressBar() {
     ProgressBar progressBar = new ProgressBar(activity);
+    progressBar.getIndeterminateDrawable()
+        .setColorFilter(Color.parseColor("#fd786b"), PorterDuff.Mode.MULTIPLY);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -738,11 +745,11 @@ public class AdyenPaymentFragmentLayout {
     return backgroundLayout;
   }
 
-  public RelativeLayout getErrorView() {
+  public ViewGroup getErrorView() {
     return errorView;
   }
 
-  public RelativeLayout getDialogLayout() {
+  public ViewGroup getDialogLayout() {
     return dialogLayout;
   }
 
@@ -770,7 +777,7 @@ public class AdyenPaymentFragmentLayout {
     return positiveButton;
   }
 
-  public LinearLayout getButtonsView() {
+  public ViewGroup getButtonsView() {
     return buttonsView;
   }
 
@@ -782,8 +789,8 @@ public class AdyenPaymentFragmentLayout {
     return changeCard;
   }
 
-  public RelativeLayout getPaypalLoading() {
-    return paypalLoading;
+  public ViewGroup getLoadingView() {
+    return loadingView;
   }
 
   public PaymentErrorViewLayout getPaymentErrorViewLayout() {
@@ -792,5 +799,9 @@ public class AdyenPaymentFragmentLayout {
 
   public CreditCardLayout getCreditCardEditTextLayout() {
     return creditCardEditTextLayout;
+  }
+
+  public ViewGroup getCompletedPurchaseView() {
+    return completedPurchaseView;
   }
 }

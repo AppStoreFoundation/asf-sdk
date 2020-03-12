@@ -9,33 +9,59 @@ public class TranslationsModel {
   private List<String> stringsList;
 
   public TranslationsModel() {
-    stringsList =
-        Arrays.asList("To buy this item you first need to get the %s.", "AppCoins Wallet", "CLOSE",
-            "You need the AppCoins Wallet to make this purchase. Download it from Aptoide or Play "
-                + "Store"
-                + " and come back to complete your purchase!", "GOT IT!",
-            "You need the AppCoins Wallet!", "To get your reward you need the AppCoins Wallet.",
-            "Pay as a guest", "Credit Card", "PayPal", "PAY USING PAYPAL", "PAY USING CREDIT CARD",
-            "Card number", "MM/YY", "CVV", "CVC/CVV", "CHANGE CARD", "Pay with AppCoins Wallet",
-            "Get up to %s%% Bonus!", "You\'ll receive %s on this purchase.",
-            "You'll receive a Bonus on this purchase.", "BEST DEAL", "DONE!",
-            "Next time, get up to %s%% Bonus with the AppCoins Wallet!",
-            "Next time, get a Bonus with the AppCoins Wallet!",
-            "You could have received %s on this purchase.", "Purchase completed!",
-            "MORE PAYMENT METHODS", "NEXT", "CANCEL", "BUY", "INSTALL WALLET", "OK", "Install",
-            "Error", "You already own this item!", "Oops, something went wrong.",
-            "There was a problem with your card. Please try again or contact us.",
-            "The transaction has been rejected by your bank. Please try with a different card or "
-                + "contact us.",
-            "It seems you don't have enough funds or there's a limit on your card. Please try "
-                + "with a "
-                + "different one.",
-            "It seems your card has expired. Please try with a different one.",
-            "Are you sure your card number is correct? Please check and try again.",
-            "Your card type is not supported yet. Try with a different one.",
-            "Are you sure the security information is correct? Please try again.",
-            "Your CVV/CVC code seems to be wrong. Please try again.", "Wrong CVV/CVC",
-            "If the problem persists please contact us.");
+    stringsList = Arrays.asList("To buy this item you first need to get the %s.",//0
+        "AppCoins Wallet", //1
+        "CLOSE", //2
+        "You need the AppCoins Wallet to make this purchase. Download it from Aptoide or Play "
+            + "Store"
+            + " and come back to complete your purchase!", //3
+        "GOT IT!", //4
+        "You need the AppCoins Wallet!", //5
+        "To get your reward you need the AppCoins Wallet.", //6
+        "Pay as a guest", //7
+        "Credit Card", //8
+        "PayPal", //9
+        "PAY USING PAYPAL", //10
+        "PAY USING CREDIT CARD", //11
+        "Card number", //12
+        "MM/YY", //13
+        "CVV", //14
+        "CVC/CVV", //15
+        "CHANGE CARD", //16
+        "Pay with AppCoins Wallet", //17
+        "Get up to %s%% Bonus!", //18
+        "You\'ll receive %s on this purchase.", //19
+        "You'll receive a Bonus on this purchase.", //20
+        "BEST DEAL", //21
+        "DONE!", //22
+        "Next time, get up to %s%% Bonus with the AppCoins Wallet!", //23
+        "Next time, get a Bonus with the AppCoins Wallet!", //24
+        "You could have received %s on this purchase.", //25
+        "Purchase completed!", //26
+        "MORE PAYMENT METHODS", //27
+        "NEXT", //28
+        "CANCEL", //29
+        "BUY", //30
+        "INSTALL WALLET", //31
+        "OK", //32
+        "Install", //33
+        "Error", //34
+        "You already own this item!", //35
+        "Oops, something went wrong.", //36
+        "There was a problem with your card. Please try again or contact us.", //37
+        "The transaction has been rejected by your bank. Please try with a different card or "
+            + "contact us.", //38
+        "It seems you don't have enough funds or there's a limit on your card. Please try "
+            + "with a "
+            + "different one.", //39
+        "It seems your card has expired. Please try with a different one.", //40
+        "Are you sure your card number is correct? Please check and try again.", //41
+        "Your card type is not supported yet. Try with a different one.", //42
+        "Are you sure the security information is correct? Please try again.", //43
+        "Your CVV/CVC code seems to be wrong. Please try again.", //44
+        "Wrong CVV/CVC", //45
+        "If the problem persists please contact us." //46
+    );
   }
 
   public void mapStrings(List<String> list) {

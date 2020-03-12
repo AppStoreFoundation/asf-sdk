@@ -34,7 +34,11 @@ public class PurchaseMapper {
           productName = remoteProduct.optString("name");
         }
         String status = jsonObject.optString("status");
-        String packageName = jsonObject.optString("packageName");
+        String packageName = null;
+        JSONObject packageObject = jsonObject.optJSONObject("package");
+        if (packageObject != null) {
+          packageName = packageObject.optString("name");
+        }
         JSONObject signature = jsonObject.optJSONObject("signature");
         String signatureValue = null;
         JSONObject developerPurchase = null;
@@ -71,7 +75,11 @@ public class PurchaseMapper {
               productName = remoteProduct.optString("name");
             }
             String status = jsonObject.optString("status");
-            String packageName = jsonObject.optString("packageName");
+            String packageName = null;
+            JSONObject packageObject = jsonObject.optJSONObject("package");
+            if (packageObject != null) {
+              packageName = packageObject.optString("name");
+            }
             JSONObject signature = jsonObject.optJSONObject("signature");
             String signatureValue = null;
             JSONObject developerPurchase = null;

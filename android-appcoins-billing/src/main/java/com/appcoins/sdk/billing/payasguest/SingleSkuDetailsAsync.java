@@ -6,6 +6,7 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WSServiceController;
 import com.appcoins.sdk.billing.helpers.AndroidBillingMapper;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,8 @@ class SingleSkuDetailsAsync extends AsyncTask<Object, Object, SkuDetails> {
     List<String> skuList = new ArrayList<>();
     skuList.add(sku);
     String response =
-        WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuList);
+        WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuList,
+            WalletUtils.getUserAgent());
     return AndroidBillingMapper.mapSingleSkuDetails(type, response);
   }
 }

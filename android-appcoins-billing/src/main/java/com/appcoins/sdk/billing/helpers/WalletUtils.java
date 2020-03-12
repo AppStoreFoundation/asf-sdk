@@ -6,6 +6,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 import com.appcoins.billing.sdk.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +23,7 @@ public class WalletUtils {
   public static Context context;
   private static String billingPackageName;
   private static String iabAction;
+  private static String userAgent = null;
 
   public static boolean hasWalletInstalled() {
     if (billingPackageName == null) {
@@ -122,5 +126,40 @@ public class WalletUtils {
       }
     }
     return iabAction;
+  }
+
+  public static String getUserAgent() {
+    if (userAgent == null) {
+      WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+      Display display = wm.getDefaultDisplay();
+      DisplayMetrics displayMetrics = new DisplayMetrics();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        display.getRealMetrics(displayMetrics);
+      } else {
+        display.getMetrics(displayMetrics);
+      }
+      userAgent = "SDK/"
+          + BuildConfig.VERSION_NAME
+          + " (Linux; Android "
+          + Build.VERSION.RELEASE.replaceAll(";", " ")
+          + "; "
+          + Build.VERSION.SDK_INT
+          + "; "
+          + Build.MODEL.replaceAll(";", " ")
+          + " Build/"
+          + Build.PRODUCT.replace(";", " ")
+          + "; "
+          + System.getProperty("os.arch")
+          + "; "
+          + BuildConfig.APPLICATION_ID
+          + "; "
+          + BuildConfig.VERSION_CODE
+          + "; "
+          + displayMetrics.widthPixels
+          + "x"
+          + displayMetrics.heightPixels
+          + ")";
+    }
+    return userAgent;
   }
 }
