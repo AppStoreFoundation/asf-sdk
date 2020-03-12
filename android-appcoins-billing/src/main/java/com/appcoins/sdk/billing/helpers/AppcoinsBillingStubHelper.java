@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
