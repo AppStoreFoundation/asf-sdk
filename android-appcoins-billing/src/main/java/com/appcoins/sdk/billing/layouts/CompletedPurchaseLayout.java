@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
@@ -24,6 +26,7 @@ public class CompletedPurchaseLayout {
   private static int PURCHASE_DONE_TEXT;
   private final Activity activity;
   private final int orientation;
+  private TranslationsModel translationModel;
 
   public CompletedPurchaseLayout(Activity activity, int orientation) {
 
@@ -33,6 +36,8 @@ public class CompletedPurchaseLayout {
 
   public ViewGroup buildView(String fiatPrice, String fiatCurrency, String sku,
       String packageName) {
+    translationModel = TranslationsRepository.getInstance(activity)
+        .getTranslationsModel();
     LinearLayout purchaseLayout = new LinearLayout(activity);
     purchaseLayout.setClipToPadding(false);
 
@@ -92,7 +97,7 @@ public class CompletedPurchaseLayout {
             LinearLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
     setMargins(layoutParams, 0, 16, 0, 0);
-    textView.setText("PURCHASE COMPLETED");
+    textView.setText(translationModel.getDoneTitleLong());
     textView.setTextColor(Color.parseColor("#de000000"));
     textView.setTypeface(null, Typeface.BOLD);
     textView.setTextSize(18);
