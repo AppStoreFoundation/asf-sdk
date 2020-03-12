@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -133,6 +134,8 @@ public class InstallDialogActivity extends Activity {
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
             RelativeLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+    progressBar.getIndeterminateDrawable()
+        .setColorFilter(Color.parseColor("#ff578c"), PorterDuff.Mode.MULTIPLY);
     progressBar.setLayoutParams(layoutParams);
     dialogLayout.addView(progressBar);
     showInstallationDialog(backgroundLayout);

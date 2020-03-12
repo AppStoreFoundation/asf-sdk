@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -721,6 +722,8 @@ public class AdyenPaymentFragmentLayout {
 
   private ProgressBar buildProgressBar() {
     ProgressBar progressBar = new ProgressBar(activity);
+    progressBar.getIndeterminateDrawable()
+        .setColorFilter(Color.parseColor("#ff578c"), PorterDuff.Mode.MULTIPLY);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
