@@ -217,6 +217,7 @@ class AdyenPaymentPresenter {
     } else if (refusalReason != null && refusalReasonCode != -1) {
       if (refusalReasonCode == 24) {
         fragmentView.unlockRotation();
+        fragmentView.enableBack();
         fragmentView.showCvvError();
       } else {
         AdyenErrorCodeMapper adyenErrorCodeMapper = new AdyenErrorCodeMapper();

@@ -35,4 +35,6 @@ interface AdyenPaymentView {
   void showCompletedPurchase();
 
   void disableBack();
+
+  void enableBack();
 }

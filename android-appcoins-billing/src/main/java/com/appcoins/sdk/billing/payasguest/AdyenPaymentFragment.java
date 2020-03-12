@@ -310,6 +310,10 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     iabView.disableBack();
   }
 
+  @Override public void enableBack() {
+    iabView.enableBack();
+  }
+
   private void setStoredPaymentMethodDetails(StoredMethodDetails storedMethodDetails) {
     layout.getChangeCardView()
         .setVisibility(View.VISIBLE);
