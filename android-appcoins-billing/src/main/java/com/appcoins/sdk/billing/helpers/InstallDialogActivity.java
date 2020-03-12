@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -12,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -53,13 +53,6 @@ public class InstallDialogActivity extends Activity {
   private static final String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
   private static final String DIALOG_WALLET_INSTALL_EMPTY_IMAGE =
       "dialog_wallet_install_empty_image";
-  private static int SKIP_BUTTON_ID = 46;
-  private static int INSTALL_BUTTON_ID = 45;
-  private static int DIALOG_BODY_ID = 44;
-  private static int APP_ICON_ID = 43;
-  private static int INSTALL_APP_BANNER_ID = 42;
-  private static int INSTALL_DIALOG_ID = 41;
-  private static int INSTALL_DIALOG_BACKGROUND_ID = 40;
   private static String installButtonColor = "#ffffbb33";
   private static String installButtonTextColor = "#ffffffff";
   private final String GOOGLE_PLAY_URL =
@@ -140,6 +133,8 @@ public class InstallDialogActivity extends Activity {
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
             RelativeLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+    progressBar.getIndeterminateDrawable()
+        .setColorFilter(Color.parseColor("#fd786b"), PorterDuff.Mode.MULTIPLY);
     progressBar.setLayoutParams(layoutParams);
     dialogLayout.addView(progressBar);
     showInstallationDialog(backgroundLayout);
@@ -212,24 +207,19 @@ public class InstallDialogActivity extends Activity {
     setContentView(dialogLayout, layoutParams);
   }
 
-  @SuppressLint("ResourceType") private RelativeLayout buildBackground() {
+  private RelativeLayout buildBackground() {
     int backgroundColor = Color.parseColor("#64000000");
     RelativeLayout backgroundLayout = new RelativeLayout(this);
-    INSTALL_DIALOG_BACKGROUND_ID = generateRandomId(INSTALL_DIALOG_BACKGROUND_ID);
-    backgroundLayout.setId(INSTALL_DIALOG_BACKGROUND_ID);
     backgroundLayout.setBackgroundColor(backgroundColor);
     return backgroundLayout;
   }
 
-  @SuppressLint("ResourceType")
   private Button buildSkipButton(Button installButton, String skipButtonText) {
     int skipButtonColor = Color.parseColor("#8f000000");
     Button skipButton = new Button(this);
     skipButton.setText(skipButtonText);
     skipButton.setTextSize(12);
     skipButton.setTextColor(skipButtonColor);
-    SKIP_BUTTON_ID = generateRandomId(SKIP_BUTTON_ID);
-    skipButton.setId(SKIP_BUTTON_ID);
     skipButton.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
     skipButton.setBackgroundColor(Color.TRANSPARENT);
     skipButton.setIncludeFontPadding(false);
@@ -255,15 +245,13 @@ public class InstallDialogActivity extends Activity {
     return skipButton;
   }
 
-  @SuppressLint("ResourceType")
   private Button buildInstallButton(RelativeLayout dialogLayout, String installButtonText,
       final String storeUrl) {
     Button installButton = new Button(this);
     installButton.setText(installButtonText);
     installButton.setTextSize(12);
     installButton.setTextColor(Color.parseColor(installButtonTextColor));
-    INSTALL_BUTTON_ID = generateRandomId(INSTALL_BUTTON_ID);
-    installButton.setId(INSTALL_BUTTON_ID);
+    installButton.setId(generateRandomId());
     installButton.setGravity(Gravity.CENTER);
     installButton.setIncludeFontPadding(false);
     installButton.setPadding(0, 0, 0, 0);
@@ -318,12 +306,9 @@ public class InstallDialogActivity extends Activity {
     }
   }
 
-  @SuppressLint("ResourceType")
   private TextView buildDialogBody(int layoutOrientation, ImageView appIcon) {
     int dialogBodyColor = Color.parseColor("#4a4a4a");
     TextView dialogBody = new TextView(this);
-    DIALOG_BODY_ID = generateRandomId(DIALOG_BODY_ID);
-    dialogBody.setId(DIALOG_BODY_ID);
     dialogBody.setMaxLines(2);
     dialogBody.setTextColor(dialogBodyColor);
     dialogBody.setTextSize(16);
@@ -375,11 +360,9 @@ public class InstallDialogActivity extends Activity {
     }
   }
 
-  @SuppressLint("ResourceType")
   private ImageView buildAppIcon(int layoutOrientation, RelativeLayout dialogLayout) {
     ImageView appIcon = new ImageView(this);
-    APP_ICON_ID = generateRandomId(APP_ICON_ID);
-    appIcon.setId(APP_ICON_ID);
+    appIcon.setId(generateRandomId());
     appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
     int appIconMarginTop = dpToPx(85);
     int appIconSize = dpToPx(66);
@@ -396,10 +379,8 @@ public class InstallDialogActivity extends Activity {
     return appIcon;
   }
 
-  @SuppressLint("ResourceType") private ImageView buildAppBanner() {
+  private ImageView buildAppBanner() {
     ImageView appBanner = new ImageView(this);
-    INSTALL_APP_BANNER_ID = generateRandomId(INSTALL_APP_BANNER_ID);
-    appBanner.setId(INSTALL_APP_BANNER_ID);
     appBanner.setScaleType(ImageView.ScaleType.CENTER_CROP);
     RelativeLayout.LayoutParams appBannerParams =
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dpToPx(120));
@@ -408,11 +389,10 @@ public class InstallDialogActivity extends Activity {
     return appBanner;
   }
 
-  @SuppressLint("ResourceType") private RelativeLayout buildDialogLayout(int layoutOrientation) {
+  private RelativeLayout buildDialogLayout(int layoutOrientation) {
     RelativeLayout dialogLayout = new RelativeLayout(this);
+    dialogLayout.setId(generateRandomId());
     dialogLayout.setClipToPadding(false);
-    INSTALL_DIALOG_ID = generateRandomId(INSTALL_DIALOG_ID);
-    dialogLayout.setId(INSTALL_DIALOG_ID);
     dialogLayout.setBackgroundColor(Color.WHITE);
 
     int dialogLayoutMargins = dpToPx(12);

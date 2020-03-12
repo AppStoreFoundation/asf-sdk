@@ -20,11 +20,14 @@ import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
 import com.appcoins.sdk.billing.models.billing.PurchaseModel;
 import com.appcoins.sdk.billing.models.billing.TransactionResponse;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
+import com.sdk.appcoins_adyen.card.EncryptedCard;
 import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
 import com.sdk.appcoins_adyen.models.ExpiryDate;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 import com.sdk.appcoins_adyen.utils.RedirectUtils;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONObject;
 
 class AdyenPaymentPresenter {
@@ -35,8 +38,7 @@ class AdyenPaymentPresenter {
   private final AdyenPaymentInteract adyenPaymentInteract;
   private String returnUrl;
   private boolean waitingResult;
-  private Runnable getTransactionRunnable;
-  private Handler getTransactionHandler;
+  private Map<Handler, Runnable> handlerRunnableMap;
 
   AdyenPaymentPresenter(AdyenPaymentView fragmentView, AdyenPaymentInfo adyenPaymentInfo,
       AdyenPaymentInteract adyenPaymentInteract, String returnUrl) {
@@ -44,6 +46,7 @@ class AdyenPaymentPresenter {
     this.adyenPaymentInfo = adyenPaymentInfo;
     this.adyenPaymentInteract = adyenPaymentInteract;
     this.returnUrl = returnUrl;
+    this.handlerRunnableMap = new HashMap<>();
     waitingResult = false;
   }
 
@@ -78,12 +81,15 @@ class AdyenPaymentPresenter {
       BigDecimal serverFiatPrice, String serverCurrency) {
     fragmentView.showLoading();
     fragmentView.lockRotation();
+    fragmentView.disableBack();
     CardEncryptorImpl cardEncryptor = new CardEncryptorImpl(BuildConfig.ADYEN_PUBLIC_KEY);
     ExpiryDate mExpiryDate = CardValidationUtils.getDate(expiryDate);
     String encryptedCard;
     if (storedPaymentId.equals("")) {
-      encryptedCard = cardEncryptor.encryptFields(cardNumber, mExpiryDate.getExpiryMonth(),
-          mExpiryDate.getExpiryYear(), cvv);
+      EncryptedCard encryptedCardModel =
+          cardEncryptor.encryptFields(cardNumber, mExpiryDate.getExpiryMonth(),
+              mExpiryDate.getExpiryYear(), cvv);
+      encryptedCard = new EncryptedCardMapper().map(encryptedCardModel);
     } else {
       encryptedCard = cardEncryptor.encryptStoredPaymentFields(cvv, storedPaymentId, "scheme");
     }
@@ -184,6 +190,7 @@ class AdyenPaymentPresenter {
               if (adyenTransactionModel.hasError()) {
                 fragmentView.showError();
               } else {
+                fragmentView.disableBack();
                 handlePaymentResult(adyenTransactionModel.getUid(),
                     adyenTransactionModel.getResultCode(),
                     adyenTransactionModel.getRefusalReasonCode(),
@@ -246,8 +253,17 @@ class AdyenPaymentPresenter {
     PurchaseListener purchaseListener = new PurchaseListener() {
       @Override public void onResponse(PurchaseModel purchaseModel) {
         BillingMapper billingMapper = new BillingMapper();
-        Bundle bundle = billingMapper.map(purchaseModel, transactionResponse.getOrderReference());
-        fragmentView.finish(bundle);
+        final Bundle bundle =
+            billingMapper.map(purchaseModel, transactionResponse.getOrderReference());
+        fragmentView.showCompletedPurchase();
+        Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+          @Override public void run() {
+            fragmentView.finish(bundle);
+          }
+        };
+        handlerRunnableMap.put(handler, runnable);
+        handler.postDelayed(runnable, 3000);
       }
     };
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
@@ -272,20 +288,22 @@ class AdyenPaymentPresenter {
 
   private void requestTransaction(final String uid, long delayInMillis,
       final GetTransactionListener getTransactionListener) {
-    getTransactionHandler = new Handler();
-    getTransactionRunnable = new Runnable() {
+    final Handler handler = new Handler();
+    Runnable runnable = new Runnable() {
       @Override public void run() {
         adyenPaymentInteract.getTransaction(uid, adyenPaymentInfo.getWalletAddress(),
             adyenPaymentInfo.getSignature(), getTransactionListener);
-        getTransactionHandler.removeCallbacks(this);
+        handler.removeCallbacks(this);
       }
     };
-    getTransactionHandler.postDelayed(getTransactionRunnable, delayInMillis);
+    handlerRunnableMap.put(handler, runnable);
+    handler.postDelayed(runnable, delayInMillis);
   }
 
   void onDestroy() {
-    if(getTransactionHandler != null && getTransactionRunnable != null){
-      getTransactionHandler.removeCallbacks(getTransactionRunnable);
+    for (Map.Entry<Handler, Runnable> entry : handlerRunnableMap.entrySet()) {
+      entry.getKey()
+          .removeCallbacks(entry.getValue());
     }
     adyenPaymentInteract.cancelRequests();
   }

@@ -31,10 +31,10 @@ public class AddressAsyncTask extends AsyncTask {
     getDeveloperAddress(countDownLatch);
     try {
       countDownLatch.await(30, TimeUnit.SECONDS);
+      addressRetrievedListener.onAddressRetrieved(oemAddress, storeAddress, developerAddress);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    addressRetrievedListener.onAddressRetrieved(oemAddress, storeAddress, developerAddress);
     return null;
   }
 
