@@ -31,8 +31,8 @@ import java.util.concurrent.CountDownLatch;
 
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
-  public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 15000;
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
+  public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 35000;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
@@ -195,7 +195,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       skuSendList.add(sku.get(i - 1));
       if (i % MAX_SKUS_SEND_WS == 0 || i == sku.size()) {
         String response =
-            WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuSendList);
+            WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuSendList,
+                WalletUtils.getUserAgent());
         skuDetailsList.addAll(AndroidBillingMapper.mapSkuDetailsFromWS(type, response));
         skuSendList.clear();
       }

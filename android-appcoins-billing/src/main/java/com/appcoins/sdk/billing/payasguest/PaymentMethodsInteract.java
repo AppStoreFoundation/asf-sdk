@@ -53,6 +53,10 @@ class PaymentMethodsInteract {
     gamificationInteract.loadMaxBonus(maxBonusListener);
   }
 
+  void saveMaxBonus(int maxBonus) {
+    gamificationInteract.setMaxBonus(maxBonus);
+  }
+
   void cancelRequests() {
     for (AsyncTask asyncTask : asyncTasks) {
       asyncTask.cancel(true);

@@ -21,8 +21,7 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
 
 public class PaymentErrorViewLayout {
 
-  private static int ERROR_MESSAGE_ID = 26;
-  private static int ERROR_TITLE_ID = 25;
+  private static int ERROR_TITLE_ID;
   private final Activity activity;
   private final int orientation;
   private Button errorPositiveButton;
@@ -35,10 +34,10 @@ public class PaymentErrorViewLayout {
     this.orientation = orientation;
   }
 
-  public RelativeLayout buildErrorView() {
+  public ViewGroup buildErrorView() {
     translationModel = TranslationsRepository.getInstance(activity)
         .getTranslationsModel();
-    RelativeLayout relativeLayout = new RelativeLayout(activity);
+    ViewGroup relativeLayout = new RelativeLayout(activity);
     setPadding(relativeLayout, 16, 16, 16, 16);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(160));
@@ -104,8 +103,7 @@ public class PaymentErrorViewLayout {
 
   private TextView buildErrorMessage() {
     TextView textView = new TextView(activity);
-    ERROR_MESSAGE_ID = generateRandomId(ERROR_MESSAGE_ID);
-    textView.setId(ERROR_MESSAGE_ID);
+    textView.setId(generateRandomId());
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -122,7 +120,7 @@ public class PaymentErrorViewLayout {
 
   private TextView buildErrorTitle() {
     TextView textView = new TextView(activity);
-    ERROR_TITLE_ID = generateRandomId(ERROR_TITLE_ID);
+    ERROR_TITLE_ID = generateRandomId();
     textView.setId(ERROR_TITLE_ID);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,

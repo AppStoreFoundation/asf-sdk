@@ -117,9 +117,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     RadioButton creditCardButton = layout.getCreditCardRadioButton();
     RadioButton paypalButton = layout.getPaypalRadioButton();
     RadioButton installRadioButton = layout.getInstallRadioButton();
-    RelativeLayout creditWrapper = layout.getCreditCardWrapperLayout();
-    RelativeLayout paypalWrapper = layout.getPaypalWrapperLayout();
-    RelativeLayout installWrapper = layout.getInstallWrapperLayout();
+    ViewGroup creditWrapper = layout.getCreditCardWrapperLayout();
+    ViewGroup paypalWrapper = layout.getPaypalWrapperLayout();
+    ViewGroup installWrapper = layout.getInstallWrapperLayout();
     Button errorButton = layout.getErrorPositiveButton();
     onRotation(savedInstanceState);
     onCancelButtonClicked(cancelButton);
@@ -173,8 +173,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   private void onRadioButtonClicked(RadioButton creditCardButton, RadioButton paypalButton,
-      RadioButton installRadioButton, RelativeLayout creditWrapper, RelativeLayout paypalWrapper,
-      RelativeLayout installWrapper) {
+      RadioButton installRadioButton, ViewGroup creditWrapper, ViewGroup paypalWrapper,
+      ViewGroup installWrapper) {
     RadioButtonClickListener creditCardListener =
         new RadioButtonClickListener(PaymentMethodsFragment.CREDIT_CARD_RADIO);
     RadioButtonClickListener paypalListener =
@@ -230,9 +230,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   @Override public void showError() {
-    RelativeLayout intentProgressBar = layout.getIntentLoadingView();
-    RelativeLayout dialogLayout = layout.getDialogLayout();
-    RelativeLayout errorLayout = layout.getErrorView();
+    ViewGroup intentProgressBar = layout.getIntentLoadingView();
+    ViewGroup dialogLayout = layout.getDialogLayout();
+    ViewGroup errorLayout = layout.getErrorView();
     intentProgressBar.setVisibility(View.INVISIBLE);
     dialogLayout.setVisibility(View.GONE);
     errorLayout.setVisibility(View.VISIBLE);
@@ -260,9 +260,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void navigateToAdyen(String selectedRadioButton) {
     if (walletGenerationModel.getWalletAddress() != null && skuDetailsModel != null) {
       iabView.navigateToAdyen(selectedRadioButton, walletGenerationModel.getWalletAddress(),
-          walletGenerationModel.getEwt(), walletGenerationModel.getSignature(),
-          skuDetailsModel.getFiatPrice(), skuDetailsModel.getFiatPriceCurrencyCode(),
-          skuDetailsModel.getAppcPrice(), skuDetailsModel.getSku());
+          walletGenerationModel.getSignature(), skuDetailsModel.getFiatPrice(),
+          skuDetailsModel.getFiatPriceCurrencyCode(), skuDetailsModel.getAppcPrice(),
+          skuDetailsModel.getSku());
     } else {
       showError();
     }
@@ -274,7 +274,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   @Override public void setPositiveButtonText(String selectedRadioButton) {
-    if (selectedRadioButton != null) {
       Button positiveButton = layout.getPositiveButton();
       if (selectedRadioButton.equals(PaymentMethodsFragment.INSTALL_RADIO)) {
         positiveButton.setText(translationsModel.getInstallButton());
