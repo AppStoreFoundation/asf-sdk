@@ -32,7 +32,7 @@ import java.util.concurrent.CountDownLatch;
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
-  public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 15000;
+  public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 35000;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
