@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -135,7 +134,7 @@ public class InstallDialogActivity extends Activity {
             RelativeLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
     progressBar.getIndeterminateDrawable()
-        .setColorFilter(Color.parseColor("#ff578c"), PorterDuff.Mode.MULTIPLY);
+        .setColorFilter(Color.parseColor("#fd786b"), PorterDuff.Mode.MULTIPLY);
     progressBar.setLayoutParams(layoutParams);
     dialogLayout.addView(progressBar);
     showInstallationDialog(backgroundLayout);
@@ -208,14 +207,13 @@ public class InstallDialogActivity extends Activity {
     setContentView(dialogLayout, layoutParams);
   }
 
-  @SuppressLint("ResourceType") private RelativeLayout buildBackground() {
+  private RelativeLayout buildBackground() {
     int backgroundColor = Color.parseColor("#64000000");
     RelativeLayout backgroundLayout = new RelativeLayout(this);
     backgroundLayout.setBackgroundColor(backgroundColor);
     return backgroundLayout;
   }
 
-  @SuppressLint("ResourceType")
   private Button buildSkipButton(Button installButton, String skipButtonText) {
     int skipButtonColor = Color.parseColor("#8f000000");
     Button skipButton = new Button(this);
@@ -247,7 +245,6 @@ public class InstallDialogActivity extends Activity {
     return skipButton;
   }
 
-  @SuppressLint("ResourceType")
   private Button buildInstallButton(RelativeLayout dialogLayout, String installButtonText,
       final String storeUrl) {
     Button installButton = new Button(this);
@@ -309,7 +306,6 @@ public class InstallDialogActivity extends Activity {
     }
   }
 
-  @SuppressLint("ResourceType")
   private TextView buildDialogBody(int layoutOrientation, ImageView appIcon) {
     int dialogBodyColor = Color.parseColor("#4a4a4a");
     TextView dialogBody = new TextView(this);
@@ -364,7 +360,6 @@ public class InstallDialogActivity extends Activity {
     }
   }
 
-  @SuppressLint("ResourceType")
   private ImageView buildAppIcon(int layoutOrientation, RelativeLayout dialogLayout) {
     ImageView appIcon = new ImageView(this);
     appIcon.setId(generateRandomId());
@@ -384,7 +379,7 @@ public class InstallDialogActivity extends Activity {
     return appIcon;
   }
 
-  @SuppressLint("ResourceType") private ImageView buildAppBanner() {
+  private ImageView buildAppBanner() {
     ImageView appBanner = new ImageView(this);
     appBanner.setScaleType(ImageView.ScaleType.CENTER_CROP);
     RelativeLayout.LayoutParams appBannerParams =
@@ -394,7 +389,7 @@ public class InstallDialogActivity extends Activity {
     return appBanner;
   }
 
-  @SuppressLint("ResourceType") private RelativeLayout buildDialogLayout(int layoutOrientation) {
+  private RelativeLayout buildDialogLayout(int layoutOrientation) {
     RelativeLayout dialogLayout = new RelativeLayout(this);
     dialogLayout.setId(generateRandomId());
     dialogLayout.setClipToPadding(false);

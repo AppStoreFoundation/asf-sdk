@@ -723,7 +723,7 @@ public class AdyenPaymentFragmentLayout {
   private ProgressBar buildProgressBar() {
     ProgressBar progressBar = new ProgressBar(activity);
     progressBar.getIndeterminateDrawable()
-        .setColorFilter(Color.parseColor("#ff578c"), PorterDuff.Mode.MULTIPLY);
+        .setColorFilter(Color.parseColor("#fd786b"), PorterDuff.Mode.MULTIPLY);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);

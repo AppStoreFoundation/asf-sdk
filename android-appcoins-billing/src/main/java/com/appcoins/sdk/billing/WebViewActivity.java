@@ -33,7 +33,7 @@ public class WebViewActivity extends Activity {
     return intent;
   }
 
-  @SuppressLint("ResourceType") @Override public void onCreate(Bundle savedInstanceState) {
+  @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,

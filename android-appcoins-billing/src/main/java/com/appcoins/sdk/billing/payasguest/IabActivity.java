@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.payasguest;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -45,7 +44,7 @@ public class IabActivity extends Activity implements IabView {
   private ActivityResultListener activityResultListener;
   private boolean backEnabled = true;
 
-  @SuppressLint("ResourceType") @Override protected void onCreate(Bundle savedInstanceState) {
+  @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     //This log is necessary for the automatic test that validates the wallet installation dialog
