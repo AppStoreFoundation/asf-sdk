@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
@@ -274,12 +273,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   @Override public void setPositiveButtonText(String selectedRadioButton) {
-      Button positiveButton = layout.getPositiveButton();
-      if (selectedRadioButton.equals(PaymentMethodsFragment.INSTALL_RADIO)) {
-        positiveButton.setText(translationsModel.getInstallButton());
-      } else {
-        positiveButton.setText(translationsModel.getNextButton());
-      }
+    Button positiveButton = layout.getPositiveButton();
+    if (selectedRadioButton.equals(PaymentMethodsFragment.INSTALL_RADIO)) {
+      positiveButton.setText(translationsModel.getInstallButton());
+    } else {
+      positiveButton.setText(translationsModel.getNextButton());
     }
   }
 
