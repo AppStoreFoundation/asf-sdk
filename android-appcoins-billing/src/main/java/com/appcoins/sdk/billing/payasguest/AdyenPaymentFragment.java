@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -41,17 +42,43 @@ import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES;
+
 public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   private static final String CARD_NUMBER_KEY = "credit_card";
   private static final String EXPIRY_DATE_KEY = "expiry_date";
   private static final String CVV_KEY = "cvv_key";
+  private final static String PAYMENT_METHOD_KEY = "payment_method";
+  private final static String WALLET_ADDRESS_KEY = "wallet_address_key";
+  private final static String SIGNATURE_KEY = "signature_key";
+  private final static String FIAT_VALUE_KEY = "fiat_value";
+  private final static String FIAT_CURRENCY_KEY = "fiat_currency";
+  private final static String APPC_VALUE_KEY = "appc_value";
+  private final static String SKU_KEY = "sku_key";
   private IabView iabView;
   private AdyenPaymentInfo adyenPaymentInfo;
   private AdyenPaymentPresenter presenter;
   private AdyenPaymentFragmentLayout layout;
   private String serverCurrency;
   private BigDecimal serverFiatPrice;
+
+  public static AdyenPaymentFragment newInstance(String selectedRadioButton, String walletAddress,
+      String signature, String fiatPrice, String fiatPriceCurrencyCode, String appcPrice,
+      String sku, BuyItemProperties buyItemProperties) {
+    AdyenPaymentFragment adyenPaymentFragment = new AdyenPaymentFragment();
+    Bundle bundle = new Bundle();
+    bundle.putString(PAYMENT_METHOD_KEY, selectedRadioButton);
+    bundle.putString(WALLET_ADDRESS_KEY, walletAddress);
+    bundle.putString(SIGNATURE_KEY, signature);
+    bundle.putString(FIAT_VALUE_KEY, fiatPrice);
+    bundle.putString(FIAT_CURRENCY_KEY, fiatPriceCurrencyCode);
+    bundle.putString(APPC_VALUE_KEY, appcPrice);
+    bundle.putString(SKU_KEY, sku);
+    bundle.putSerializable(BUY_ITEM_PROPERTIES, buyItemProperties);
+    adyenPaymentFragment.setArguments(bundle);
+    return adyenPaymentFragment;
+  }
 
   @Override public void onAttach(Context context) {
     super.onAttach(context);
@@ -77,7 +104,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     BillingRepository billingRepository = new BillingRepository(apiService);
 
     AddressService addressService = new AddressService(getActivity().getApplicationContext(),
-        new WalletAddressService(apiService), new DeveloperAddressService(ws75Service),
+        new WalletAddressService(apiService, BuildConfig.DEFAULT_STORE_ADDRESS,
+            BuildConfig.DEFAULT_OEM_ADDRESS), new DeveloperAddressService(ws75Service),
         Build.MANUFACTURER, Build.MODEL, new OemIdExtractorService(extractorV1));
 
     presenter = new AdyenPaymentPresenter(this, adyenPaymentInfo,
@@ -246,7 +274,12 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     iabView.unlockRotation();
   }
 
-  @Override public void navigateToUri(String url, ActivityResultListener activityResultListener) {
+  @Override public void navigateToUri(String url, final String uid) {
+    ActivityResultListener activityResultListener = new ActivityResultListener() {
+      @Override public void onActivityResult(Uri data) {
+        presenter.onActivityResult(data, uid);
+      }
+    };
     iabView.navigateToUri(url, activityResultListener);
   }
 
@@ -310,6 +343,10 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     iabView.disableBack();
   }
 
+  @Override public void enableBack() {
+    iabView.enableBack();
+  }
+
   private void setStoredPaymentMethodDetails(StoredMethodDetails storedMethodDetails) {
     layout.getChangeCardView()
         .setVisibility(View.VISIBLE);
@@ -330,12 +367,12 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   }
 
   private AdyenPaymentInfo extractBundleInfo() {
-    String paymentMethod = getBundleString(IabActivity.PAYMENT_METHOD_KEY);
-    String walletAddress = getBundleString(IabActivity.WALLET_ADDRESS_KEY);
-    String signature = getBundleString(IabActivity.SIGNATURE_KEY);
-    String fiatPrice = getBundleString(IabActivity.FIAT_VALUE_KEY);
-    String fiatCurrency = getBundleString(IabActivity.FIAT_CURRENCY_KEY);
-    String appcPrice = getBundleString(IabActivity.APPC_VALUE_KEY);
+    String paymentMethod = getBundleString(PAYMENT_METHOD_KEY);
+    String walletAddress = getBundleString(WALLET_ADDRESS_KEY);
+    String signature = getBundleString(SIGNATURE_KEY);
+    String fiatPrice = getBundleString(FIAT_VALUE_KEY);
+    String fiatCurrency = getBundleString(FIAT_CURRENCY_KEY);
+    String appcPrice = getBundleString(APPC_VALUE_KEY);
     BuyItemProperties buyItemProperties =
         getBundleBuyItemProperties(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
 

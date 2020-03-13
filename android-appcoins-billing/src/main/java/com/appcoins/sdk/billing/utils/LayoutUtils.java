@@ -25,6 +25,7 @@ public class LayoutUtils {
         densityPath = "drawable-mdpi";
         break;
       case DisplayMetrics.DENSITY_HIGH:
+      case DisplayMetrics.DENSITY_TV:
       case DisplayMetrics.DENSITY_260:
       case DisplayMetrics.DENSITY_280:
         densityPath = "drawable-hdpi/";
@@ -65,8 +66,8 @@ public class LayoutUtils {
 
   public static void setMargins(ViewGroup.MarginLayoutParams layoutParams, int start, int top,
       int end, int bottom) {
-    layoutParams.setMargins(0, dpToPx(top), 0, dpToPx(bottom));
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      layoutParams.setMargins(0, dpToPx(top), 0, dpToPx(bottom));
       layoutParams.setMarginStart(dpToPx(start));
       layoutParams.setMarginEnd(dpToPx(end));
     } else {
@@ -75,28 +76,32 @@ public class LayoutUtils {
   }
 
   public static void setConstraint(RelativeLayout.LayoutParams layoutParams, int rule, int id) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
       layoutParams.addRule(rule, id);
     } else {
-      if (rule == RelativeLayout.END_OF) {
-        layoutParams.addRule(RelativeLayout.RIGHT_OF, id);
-      } else if (rule == RelativeLayout.START_OF) {
-        layoutParams.addRule(RelativeLayout.LEFT_OF, id);
-      } else if (rule == RelativeLayout.ALIGN_END) {
-        layoutParams.addRule(RelativeLayout.ALIGN_RIGHT, id);
-      } else if (rule == RelativeLayout.ALIGN_START) {
-        layoutParams.addRule(RelativeLayout.ALIGN_LEFT, id);
+      if (rule == RelativeLayout.RIGHT_OF) {
+        layoutParams.addRule(RelativeLayout.END_OF, id);
+      } else if (rule == RelativeLayout.LEFT_OF) {
+        layoutParams.addRule(RelativeLayout.START_OF, id);
+      } else if (rule == RelativeLayout.ALIGN_RIGHT) {
+        layoutParams.addRule(RelativeLayout.ALIGN_END, id);
+      } else if (rule == RelativeLayout.ALIGN_LEFT) {
+        layoutParams.addRule(RelativeLayout.ALIGN_START, id);
+      } else {
+        layoutParams.addRule(rule, id);
       }
     }
   }
 
   public static void setConstraint(RelativeLayout.LayoutParams layoutParams, int rule) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
       layoutParams.addRule(rule);
-    } else if (rule == RelativeLayout.ALIGN_PARENT_END) {
-      layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-    } else if (rule == RelativeLayout.ALIGN_PARENT_START) {
-      layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+    } else if (rule == RelativeLayout.ALIGN_PARENT_RIGHT) {
+      layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+    } else if (rule == RelativeLayout.ALIGN_PARENT_LEFT) {
+      layoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
+    } else {
+      layoutParams.addRule(rule);
     }
   }
 

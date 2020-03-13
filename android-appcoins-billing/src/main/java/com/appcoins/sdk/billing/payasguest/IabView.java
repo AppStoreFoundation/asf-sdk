@@ -36,4 +36,6 @@ interface IabView {
   void navigateToInstallDialog();
 
   void disableBack();
+
+  void enableBack();
 }
