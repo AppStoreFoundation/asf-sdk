@@ -17,24 +17,21 @@ import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
-import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
 
-public class CompletedPurchaseLayout {
+class CompletedPurchaseLayout {
 
-  private static int APP_ICON_ID;
-  private static int PURCHASE_DONE_TEXT;
   private final Activity activity;
   private final int orientation;
   private TranslationsModel translationModel;
 
-  public CompletedPurchaseLayout(Activity activity, int orientation) {
+  CompletedPurchaseLayout(Activity activity, int orientation) {
 
     this.activity = activity;
     this.orientation = orientation;
   }
 
-  public ViewGroup buildView(String fiatPrice, String fiatCurrency, String sku,
+  ViewGroup buildView(String fiatPrice, String fiatCurrency, String sku,
       String packageName) {
     translationModel = TranslationsRepository.getInstance(activity)
         .getTranslationsModel();
@@ -73,8 +70,6 @@ public class CompletedPurchaseLayout {
 
   private TextView createPurchaseDetailsView(String fiatPrice, String fiatCurrency, String sku) {
     TextView textView = new TextView(activity);
-    PURCHASE_DONE_TEXT = generateRandomId();
-    textView.setId(PURCHASE_DONE_TEXT);
     LinearLayout.LayoutParams layoutParams =
         new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -90,8 +85,6 @@ public class CompletedPurchaseLayout {
 
   private TextView createPurchaseDoneView() {
     TextView textView = new TextView(activity);
-    PURCHASE_DONE_TEXT = generateRandomId();
-    textView.setId(PURCHASE_DONE_TEXT);
     LinearLayout.LayoutParams layoutParams =
         new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -109,8 +102,6 @@ public class CompletedPurchaseLayout {
     Drawable icon = getIcon(packageName);
 
     ImageView imageView = new ImageView(activity);
-    APP_ICON_ID = generateRandomId();
-    imageView.setId(APP_ICON_ID);
     if (icon != null) {
       imageView.setImageDrawable(icon);
     }

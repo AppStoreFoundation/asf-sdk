@@ -151,6 +151,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   @Override public void onDestroyView() {
+    layout.onDestroyView();
     layout = null;
     super.onDestroyView();
   }

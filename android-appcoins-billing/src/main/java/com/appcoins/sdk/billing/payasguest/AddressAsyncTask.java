@@ -7,7 +7,7 @@ import com.appcoins.sdk.billing.service.address.AddressService;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class AddressAsyncTask extends AsyncTask {
+public class AddressAsyncTask extends AsyncTask<Object, Object, Object> {
 
   private String oemAddress;
   private String storeAddress;
