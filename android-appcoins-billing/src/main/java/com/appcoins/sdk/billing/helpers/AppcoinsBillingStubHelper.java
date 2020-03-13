@@ -24,7 +24,9 @@ import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.UriCommunicationAppcoinsBilling;
 import com.appcoins.sdk.billing.WSServiceController;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
+import com.appcoins.sdk.billing.payasguest.BillingRepository;
 import com.appcoins.sdk.billing.payasguest.IabActivity;
+import com.appcoins.sdk.billing.service.BdsService;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   private static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 35000;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
+  private static int SUPPORTED_API_VERSION = 3;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
 
   private AppcoinsBillingStubHelper() {
@@ -65,7 +68,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       }
     } else {
       if (type.equalsIgnoreCase("inapp")) {
-        if (apiVersion == 3) {
+        if (apiVersion == SUPPORTED_API_VERSION) {
           return ResponseCode.OK.getValue();
         } else {
           return ResponseCode.BILLING_UNAVAILABLE.getValue();
@@ -160,13 +163,14 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         bundleResponse.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
       }
     } else {
-      SharedPreferencesRepository sharedPreferencesRepository =
-          new SharedPreferencesRepository(WalletUtils.getContext(),
-              SharedPreferencesRepository.TTL_IN_SECONDS);
-      String walletId = sharedPreferencesRepository.getWalletId();
+      String walletId = getWalletId();
       if (walletId != null && type.equalsIgnoreCase("INAPP")) {
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract();
+        BillingRepository billingRepository =
+            new BillingRepository(new BdsService(BuildConfig.HOST_WS));
+        GuestPurchasesInteract guestPurchaseInteract =
+            new GuestPurchasesInteract(billingRepository);
+
         guestPurchaseInteract.mapGuestPurchases(bundleResponse, walletId, packageName, type,
             countDownLatch);
         waitForPurchases(countDownLatch, bundleResponse);
@@ -178,16 +182,40 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   }
 
   @Override public int consumePurchase(int apiVersion, String packageName, String purchaseToken) {
-    if (WalletUtils.hasWalletInstalled()) {
-      try {
+    try {
+      if (WalletUtils.hasWalletInstalled()) {
         return serviceAppcoinsBilling.consumePurchase(apiVersion, packageName, purchaseToken);
-      } catch (RemoteException e) {
-        e.printStackTrace();
-        return ResponseCode.SERVICE_UNAVAILABLE.getValue();
+      } else {
+        String walletId = getWalletId();
+        if (walletId != null && apiVersion == SUPPORTED_API_VERSION) {
+          return consumeGuestPurchase(walletId, apiVersion, packageName, purchaseToken);
+        } else {
+          return ResponseCode.OK.getValue();
+        }
       }
-    } else {
-      return ResponseCode.OK.getValue();
+    } catch (RemoteException e) {
+      e.printStackTrace();
+      return ResponseCode.SERVICE_UNAVAILABLE.getValue();
     }
+  }
+
+  private int consumeGuestPurchase(String walletId, int apiVersion, String packageName,
+      String purchaseToken) {
+    int[] responseCode = new int[1]; //Generic error
+    CountDownLatch countDownLatch = new CountDownLatch(1);
+    BillingRepository billingRepository =
+        new BillingRepository(new BdsService(BuildConfig.HOST_WS));
+    GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract(billingRepository);
+
+    guestPurchaseInteract.consumeGuestPurchase(walletId, packageName, purchaseToken, responseCode,
+        countDownLatch);
+
+    try {
+      countDownLatch.await(MESSAGE_RESPONSE_WAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    return responseCode[0];
   }
 
   private void waitForPurchases(CountDownLatch countDownLatch, Bundle bundleResponse) {
@@ -277,6 +305,13 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
 
   private boolean hasRequiredFields(String type, String sku) {
     return type.equalsIgnoreCase("inapp") && sku != null && !sku.isEmpty();
+  }
+
+  private String getWalletId() {
+    SharedPreferencesRepository sharedPreferencesRepository =
+        new SharedPreferencesRepository(WalletUtils.getContext(),
+            SharedPreferencesRepository.TTL_IN_SECONDS);
+    return sharedPreferencesRepository.getWalletId();
   }
 
   public static abstract class Stub {

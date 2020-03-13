@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import com.appcoins.billing.AppcoinsBilling;
+import com.appcoins.billing.sdk.BuildConfig;
+import com.appcoins.sdk.billing.payasguest.BillingRepository;
+import com.appcoins.sdk.billing.service.BdsService;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -50,7 +53,9 @@ class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
       ArrayList<String> skuList = bundle.getStringArrayList(INAPP_PURCHASE_ITEM_LIST);
       ArrayList<String> dataList = bundle.getStringArrayList(INAPP_PURCHASE_DATA_LIST);
       ArrayList<String> signatureDataList = bundle.getStringArrayList(INAPP_DATA_SIGNATURE_LIST);
-      GuestPurchasesInteract guestPurchasesInteract = new GuestPurchasesInteract();
+      BillingRepository billingRepository =
+          new BillingRepository(new BdsService(BuildConfig.HOST_WS));
+      GuestPurchasesInteract guestPurchasesInteract = new GuestPurchasesInteract(billingRepository);
       CountDownLatch countDownLatch = new CountDownLatch(1);
       guestPurchasesInteract.mapGuestPurchases(bundle, walletId, packageName, type, countDownLatch,
           idsList, skuList, dataList, signatureDataList);

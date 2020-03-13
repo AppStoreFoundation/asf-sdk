@@ -22,8 +22,11 @@ import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_P
 
 class GuestPurchasesInteract {
 
-  GuestPurchasesInteract() {
+  private BillingRepository billingRepository;
 
+  GuestPurchasesInteract(BillingRepository billingRepository) {
+
+    this.billingRepository = billingRepository;
   }
 
   void mapGuestPurchases(Bundle bundleResponse, String walletId, String packageName, String type,
@@ -33,35 +36,49 @@ class GuestPurchasesInteract {
         new ArrayList<String>());
   }
 
-  void mapGuestPurchases(Bundle bundleResponse, String walletId, String packageName, String type,
-      CountDownLatch countDownLatch, ArrayList<String> idsList, ArrayList<String> skuList,
-      ArrayList<String> dataList, ArrayList<String> signatureDataList) {
-    WalletRepository walletRepository =
-        new WalletRepository(new BdsService(BuildConfig.BACKEND_BASE),
-            new WalletGenerationMapper());
-
-    WalletInteractListener walletInteractListener =
-        getWalletListener(countDownLatch, bundleResponse, packageName, type, idsList, skuList,
-            dataList, signatureDataList);
-
-    walletRepository.requestWallet(walletId, walletInteractListener);
-  }
-
-  private WalletInteractListener getWalletListener(final CountDownLatch countDownLatch,
-      final Bundle bundle, final String packageName, final String type,
-      final ArrayList<String> idsList, final ArrayList<String> skuList,
-      final ArrayList<String> dataList, final ArrayList<String> signatureDataList) {
-    return new WalletInteractListener() {
+  void mapGuestPurchases(final Bundle bundleResponse, String walletId, final String packageName,
+      final String type, final CountDownLatch countDownLatch, final ArrayList<String> idsList,
+      final ArrayList<String> skuList, final ArrayList<String> dataList,
+      final ArrayList<String> signatureDataList) {
+    WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
-        BillingRepository billingRepository =
-            new BillingRepository(new BdsService(BuildConfig.HOST_WS));
 
         PurchasesListener purchasesListener =
-            getPurchasesListener(countDownLatch, bundle, idsList, skuList, dataList,
+            getPurchasesListener(countDownLatch, bundleResponse, idsList, skuList, dataList,
                 signatureDataList);
 
         billingRepository.getPurchases(packageName, walletGenerationModel.getWalletAddress(),
             walletGenerationModel.getSignature(), type, purchasesListener);
+      }
+    };
+    requestWallet(walletId, walletInteractListener);
+  }
+
+  void consumeGuestPurchase(String walletId, final String packageName, final String purchaseToken,
+      final int[] responseCode, final CountDownLatch countDownLatch) {
+    WalletInteractListener walletInteractListener = new WalletInteractListener() {
+      @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
+
+        ConsumePurchaseListener consumePurchaseListener =
+            getConsumePurchaseListener(countDownLatch, responseCode);
+
+        billingRepository.consumePurchase(walletGenerationModel.getWalletAddress(),
+            walletGenerationModel.getSignature(), packageName, purchaseToken,
+            consumePurchaseListener);
+      }
+    };
+    requestWallet(walletId, walletInteractListener);
+  }
+
+  private ConsumePurchaseListener getConsumePurchaseListener(CountDownLatch countDownLatch,
+      final int[] responseCode) {
+    return new ConsumePurchaseListener() {
+      @Override public void onConsumed(boolean wasConsumed) {
+        if (wasConsumed) {
+          responseCode[0] = 0; //Success
+        } else {
+          responseCode[0] = 6; //Error
+        }
       }
     };
   }
@@ -98,5 +115,13 @@ class GuestPurchasesInteract {
     bundle.putStringArrayList(INAPP_PURCHASE_ITEM_LIST, skuList);
     bundle.putStringArrayList(INAPP_PURCHASE_DATA_LIST, dataList);
     bundle.putStringArrayList(INAPP_DATA_SIGNATURE_LIST, signatureDataList);
+  }
+
+  private void requestWallet(String walletId, WalletInteractListener walletInteractListener) {
+    WalletRepository walletRepository =
+        new WalletRepository(new BdsService(BuildConfig.BACKEND_BASE),
+            new WalletGenerationMapper());
+
+    walletRepository.requestWallet(walletId, walletInteractListener);
   }
 }
