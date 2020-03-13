@@ -28,14 +28,8 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
 public class IabActivity extends Activity implements IabView {
 
   public final static int LAUNCH_INSTALL_BILLING_FLOW_REQUEST_CODE = 10001;
-  public final static String PAYMENT_METHOD_KEY = "payment_method";
-  public final static String WALLET_ADDRESS_KEY = "wallet_address_key";
-  public final static String SIGNATURE_KEY = "signature_key";
-  public final static String FIAT_VALUE_KEY = "fiat_value";
-  public final static String FIAT_CURRENCY_KEY = "fiat_currency";
-  public final static String APPC_VALUE_KEY = "appc_value";
-  public final static String SKU_KEY = "sku_key";
   private final static int WEB_VIEW_REQUEST_CODE = 1234;
+  private static int IAB_ACTIVITY_ID;
   private TranslationsRepository translationsRepository;
   private FrameLayout frameLayout;
   private BuyItemProperties buyItemProperties;
@@ -51,8 +45,9 @@ public class IabActivity extends Activity implements IabView {
     int backgroundColor = Color.parseColor("#64000000");
     frameLayout = new FrameLayout(this);
     if (savedInstanceState == null) {
-      frameLayout.setId(generateRandomId());
+      IAB_ACTIVITY_ID = generateRandomId();
     }
+    frameLayout.setId(IAB_ACTIVITY_ID);
     frameLayout.setBackgroundColor(backgroundColor);
 
     setContentView(frameLayout);
@@ -126,17 +121,9 @@ public class IabActivity extends Activity implements IabView {
   @Override
   public void navigateToAdyen(String selectedRadioButton, String walletAddress, String signature,
       String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku) {
-    AdyenPaymentFragment adyenPaymentFragment = new AdyenPaymentFragment();
-    Bundle bundle = new Bundle();
-    bundle.putString(PAYMENT_METHOD_KEY, selectedRadioButton);
-    bundle.putString(WALLET_ADDRESS_KEY, walletAddress);
-    bundle.putString(SIGNATURE_KEY, signature);
-    bundle.putString(FIAT_VALUE_KEY, fiatPrice);
-    bundle.putString(FIAT_CURRENCY_KEY, fiatPriceCurrencyCode);
-    bundle.putString(APPC_VALUE_KEY, appcPrice);
-    bundle.putString(SKU_KEY, sku);
-    bundle.putSerializable(BUY_ITEM_PROPERTIES, buyItemProperties);
-    adyenPaymentFragment.setArguments(bundle);
+    AdyenPaymentFragment adyenPaymentFragment =
+        AdyenPaymentFragment.newInstance(selectedRadioButton, walletAddress, signature, fiatPrice,
+            fiatPriceCurrencyCode, appcPrice, sku, buyItemProperties);
     navigateTo(adyenPaymentFragment);
   }
 
@@ -181,6 +168,10 @@ public class IabActivity extends Activity implements IabView {
 
   @Override public void disableBack() {
     backEnabled = false;
+  }
+
+  @Override public void enableBack() {
+    backEnabled = true;
   }
 
   private void buildAlertNoBrowserAndStores() {

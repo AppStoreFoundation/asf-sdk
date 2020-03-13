@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.service.address;
 
-import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.mappers.AddressResponseMapper;
 import com.appcoins.sdk.billing.models.AddressModel;
 import com.appcoins.sdk.billing.service.RequestResponse;
@@ -18,10 +17,11 @@ public class WalletAddressService {
   private final String defaultOemAddress;
   private Service service;
 
-  public WalletAddressService(Service service) {
+  public WalletAddressService(Service service, String defaultStoreAddress,
+      String defaultOemAddress) {
     this.service = service;
-    defaultStoreAddress = BuildConfig.DEFAULT_STORE_ADDRESS;
-    defaultOemAddress = BuildConfig.DEFAULT_OEM_ADDRESS;
+    this.defaultStoreAddress = defaultStoreAddress;
+    this.defaultOemAddress = defaultOemAddress;
   }
 
   String getDefaultStoreAddress() {

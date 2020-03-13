@@ -38,7 +38,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   final static String INAPP_PURCHASE_DATA_LIST = "INAPP_PURCHASE_DATA_LIST";
   final static String INAPP_DATA_SIGNATURE_LIST = "INAPP_DATA_SIGNATURE_LIST";
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
-  public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 35000;
+  private static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 35000;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
