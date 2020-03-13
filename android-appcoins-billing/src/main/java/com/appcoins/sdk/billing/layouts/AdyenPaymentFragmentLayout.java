@@ -420,7 +420,7 @@ public class AdyenPaymentFragmentLayout {
     setMargins(layoutParams, 8, 0, 0, 0);
     Drawable genericCreditCard = convertAssetDrawable(
         IMAGES_RESOURCE_PATH + "generic_card/" + densityPath + "generic_card.png");
-    setMargins(layoutParams, 10, 0, 10, 0);
+    setMargins(layoutParams, 10, 0, 0, 0);
     imageView.setImageDrawable(genericCreditCard);
     imageView.setLayoutParams(layoutParams);
     return imageView;
@@ -482,7 +482,7 @@ public class AdyenPaymentFragmentLayout {
 
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     setConstraint(layoutParams, RelativeLayout.RIGHT_OF, genericCardId);
-    setMargins(layoutParams, 6, 0, 8, 0);
+    setMargins(layoutParams, 12, 0, 8, 0);
 
     cardNumberEditText.setTextSize(14);
     cardNumberEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
@@ -609,11 +609,11 @@ public class AdyenPaymentFragmentLayout {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    fiatPriceView = createFiatPriceView(fiatPrice, fiatCurrency);
+    TextView appcPriceView = createAppcPriceView(appcPrice);
     ImageView iconImageView = createAppIconLayout(icon);
     TextView appNameView = createAppNameLayout(appName);
     TextView skuView = createSkuLayout(sku);
-    fiatPriceView = createFiatPriceView(fiatPrice, fiatCurrency);
-    TextView appcPriceView = createAppcPriceView(appcPrice);
 
     paymentMethodHeaderLayout.addView(iconImageView);
     paymentMethodHeaderLayout.addView(appNameView);
