@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -246,7 +247,12 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     iabView.unlockRotation();
   }
 
-  @Override public void navigateToUri(String url, ActivityResultListener activityResultListener) {
+  @Override public void navigateToUri(String url, final String uid) {
+    ActivityResultListener activityResultListener = new ActivityResultListener() {
+      @Override public void onActivityResult(Uri data) {
+        presenter.onActivityResult(data, uid);
+      }
+    };
     iabView.navigateToUri(url, activityResultListener);
   }
 

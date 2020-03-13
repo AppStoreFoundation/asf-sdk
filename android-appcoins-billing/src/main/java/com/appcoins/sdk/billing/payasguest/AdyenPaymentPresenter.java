@@ -11,7 +11,6 @@ import com.appcoins.sdk.billing.listeners.billing.GetTransactionListener;
 import com.appcoins.sdk.billing.listeners.billing.LoadPaymentInfoListener;
 import com.appcoins.sdk.billing.listeners.billing.MakePaymentListener;
 import com.appcoins.sdk.billing.listeners.billing.PurchaseListener;
-import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 import com.appcoins.sdk.billing.mappers.BillingMapper;
 import com.appcoins.sdk.billing.models.Transaction.Status;
 import com.appcoins.sdk.billing.models.billing.AdyenPaymentInfo;
@@ -130,13 +129,7 @@ class AdyenPaymentPresenter {
     DeveloperPayload developerPayload = buyItemProperties.getDeveloperPayload();
     MakePaymentListener makePaymentListener = new MakePaymentListener() {
       @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
-        if (adyenTransactionModel.hasError()) {
-          fragmentView.showError();
-        } else {
-          handlePaymentResult(adyenTransactionModel.getUid(), adyenTransactionModel.getResultCode(),
-              adyenTransactionModel.getRefusalReasonCode(),
-              adyenTransactionModel.getRefusalReason(), adyenTransactionModel.getStatus());
-        }
+        onMakePaymentResponse(adyenTransactionModel);
       }
     };
     adyenPaymentInteract.makePayment(encryptedCard, true, returnUrl, serverFiatPrice.toString(),
@@ -181,30 +174,32 @@ class AdyenPaymentPresenter {
     if (adyenTransactionModel.hasError()) {
       fragmentView.showError();
     } else {
-      ActivityResultListener activityResultListener = new ActivityResultListener() {
-        @Override public void onActivityResult(Uri data) {
-          String uid = adyenTransactionModel.getUid();
-          JSONObject details = RedirectUtils.parseRedirectResult(data);
-          MakePaymentListener makePaymentListener = new MakePaymentListener() {
-            @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
-              if (adyenTransactionModel.hasError()) {
-                fragmentView.showError();
-              } else {
-                fragmentView.disableBack();
-                handlePaymentResult(adyenTransactionModel.getUid(),
-                    adyenTransactionModel.getResultCode(),
-                    adyenTransactionModel.getRefusalReasonCode(),
-                    adyenTransactionModel.getRefusalReason(), adyenTransactionModel.getStatus());
-              }
-            }
-          };
-          adyenPaymentInteract.submitRedirect(uid, adyenPaymentInfo.getWalletAddress(), details,
-              null, makePaymentListener);
-        }
-      };
-      fragmentView.navigateToUri(adyenTransactionModel.getUrl(), activityResultListener);
+      fragmentView.navigateToUri(adyenTransactionModel.getUrl(), adyenTransactionModel.getUid());
       waitingResult = true;
       //Analytics
+    }
+  }
+
+  void onActivityResult(Uri data, String uid) {
+    JSONObject details = RedirectUtils.parseRedirectResult(data);
+    MakePaymentListener makePaymentListener = new MakePaymentListener() {
+      @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
+        onMakePaymentResponse(adyenTransactionModel);
+      }
+    };
+    adyenPaymentInteract.submitRedirect(uid, adyenPaymentInfo.getWalletAddress(), details, null,
+        makePaymentListener);
+    fragmentView.disableBack();
+  }
+
+  private void onMakePaymentResponse(AdyenTransactionModel adyenTransactionModel) {
+    if (adyenTransactionModel.hasError()) {
+      fragmentView.showError();
+      fragmentView.enableBack();
+    } else {
+      handlePaymentResult(adyenTransactionModel.getUid(), adyenTransactionModel.getResultCode(),
+          adyenTransactionModel.getRefusalReasonCode(), adyenTransactionModel.getRefusalReason(),
+          adyenTransactionModel.getStatus());
     }
   }
 
