@@ -775,11 +775,6 @@ public class PaymentMethodsFragmentLayout {
 
   private void setRadioButtonDrawable(RadioButton radioButton) {
     StateListDrawable stateListDrawable = new StateListDrawable();
-    DisplayMetrics displayMetrics = new DisplayMetrics();
-    activity.getWindowManager()
-        .getDefaultDisplay()
-        .getMetrics(displayMetrics);
-    String densityPath = mapDisplayMetrics(displayMetrics);
     Drawable checkedRadioButton = convertAssetDrawable(
         BUTTONS_RESOURCE_PATH + "checked/" + densityPath + "ic_radio_checked.png");
     Drawable uncheckedRadioButton = convertAssetDrawable(

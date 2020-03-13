@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,7 +97,7 @@ public class BdsService implements Service {
     urlConnection.setDoOutput(true);
     OutputStream os = urlConnection.getOutputStream();
     String body = RequestBuilderUtils.buildBody(bodyKeys);
-    byte[] input = body.getBytes(StandardCharsets.UTF_8);
+    byte[] input = body.getBytes(); //Default: UTF-8
     os.write(input, 0, input.length);
   }
 

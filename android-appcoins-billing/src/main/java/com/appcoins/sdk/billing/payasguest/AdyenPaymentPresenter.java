@@ -236,7 +236,7 @@ class AdyenPaymentPresenter {
           } else if (paymentFailed(transactionResponse.getStatus())) {
             fragmentView.showError();
           } else {
-            requestTransaction(uid, 10000, this);
+            requestTransaction(uid, 5000, this);
           }
         }
       }

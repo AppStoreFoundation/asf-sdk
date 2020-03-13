@@ -25,6 +25,7 @@ public class LayoutUtils {
         densityPath = "drawable-mdpi";
         break;
       case DisplayMetrics.DENSITY_HIGH:
+      case DisplayMetrics.DENSITY_TV:
       case DisplayMetrics.DENSITY_260:
       case DisplayMetrics.DENSITY_280:
         densityPath = "drawable-hdpi/";
@@ -65,8 +66,8 @@ public class LayoutUtils {
 
   public static void setMargins(ViewGroup.MarginLayoutParams layoutParams, int start, int top,
       int end, int bottom) {
-    layoutParams.setMargins(0, dpToPx(top), 0, dpToPx(bottom));
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      layoutParams.setMargins(0, dpToPx(top), 0, dpToPx(bottom));
       layoutParams.setMarginStart(dpToPx(start));
       layoutParams.setMarginEnd(dpToPx(end));
     } else {

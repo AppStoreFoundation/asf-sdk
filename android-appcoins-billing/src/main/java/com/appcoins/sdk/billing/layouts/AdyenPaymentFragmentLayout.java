@@ -429,13 +429,13 @@ public class AdyenPaymentFragmentLayout {
   private EditText buildCvvEditText() {
     EditText editText = new EditText(activity);
     RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(dpToPx(40), ViewGroup.LayoutParams.MATCH_PARENT);
+        new RelativeLayout.LayoutParams(dpToPx(60), ViewGroup.LayoutParams.MATCH_PARENT);
     editText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.CVV_MAX_LENGTH)
     });
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
-    setMargins(layoutParams, 0, 0, 32, 0);
+    setMargins(layoutParams, 0, 0, 12, 0);
     editText.setHint("CVV");
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
@@ -452,7 +452,7 @@ public class AdyenPaymentFragmentLayout {
   private EditText buildExpiryDateEditText() {
     EditText editText = new EditText(activity);
     RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(dpToPx(60), ViewGroup.LayoutParams.MATCH_PARENT);
+        new RelativeLayout.LayoutParams(dpToPx(70), ViewGroup.LayoutParams.MATCH_PARENT);
     editText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.DATE_MAX_LENGTH)
     });
@@ -460,7 +460,7 @@ public class AdyenPaymentFragmentLayout {
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-    setMargins(layoutParams, 0, 0, 114, 0);
+    setMargins(layoutParams, 0, 0, 104, 0);
     editText.setLayoutParams(layoutParams);
     editText.setInputType(InputType.TYPE_CLASS_NUMBER);
     editText.setBackgroundColor(Color.parseColor("#00000000"));
