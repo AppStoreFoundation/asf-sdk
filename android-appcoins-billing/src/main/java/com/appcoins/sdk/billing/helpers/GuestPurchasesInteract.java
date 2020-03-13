@@ -70,7 +70,7 @@ class GuestPurchasesInteract {
     requestWallet(walletId, walletInteractListener);
   }
 
-  private ConsumePurchaseListener getConsumePurchaseListener(CountDownLatch countDownLatch,
+  private ConsumePurchaseListener getConsumePurchaseListener(final CountDownLatch countDownLatch,
       final int[] responseCode) {
     return new ConsumePurchaseListener() {
       @Override public void onConsumed(boolean wasConsumed) {
@@ -79,6 +79,7 @@ class GuestPurchasesInteract {
         } else {
           responseCode[0] = 6; //Error
         }
+        countDownLatch.countDown();
       }
     };
   }
