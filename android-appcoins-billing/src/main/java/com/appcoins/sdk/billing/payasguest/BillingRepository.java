@@ -94,7 +94,7 @@ public class BillingRepository {
     Map<String, Object> body = new HashMap<>();
     body.put("status", "CONSUMED");
 
-    service.makeRequest("inapp/8.20180518/packages", "PATCH", path, queries,
+    service.makeRequest("/inapp/8.20180518/packages", "PATCH", path, queries,
         new HashMap<String, String>(), body, serviceResponseListener);
   }
 }
