@@ -301,7 +301,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
           appcoinsBilling = AppcoinsBilling.Stub.asInterface(service);
         }
         return new AppcoinsBillingWrapper(appcoinsBilling,
-            sharedPreferencesRepository.getWalletId());
+            sharedPreferencesRepository.getWalletId(), MESSAGE_RESPONSE_WAIT_TIMEOUT);
       }
     }
   }

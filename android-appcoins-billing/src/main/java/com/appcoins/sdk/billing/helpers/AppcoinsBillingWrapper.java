@@ -13,16 +13,17 @@ import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_D
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_PURCHASE_DATA_LIST;
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_PURCHASE_ID_LIST;
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_PURCHASE_ITEM_LIST;
-import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.MESSAGE_RESPONSE_WAIT_TIMEOUT;
 
 class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
 
   private final AppcoinsBilling appcoinsBilling;
   private final String walletId;
+  private long timeout;
 
-  public AppcoinsBillingWrapper(AppcoinsBilling appcoinsBilling, String walletId) {
+  AppcoinsBillingWrapper(AppcoinsBilling appcoinsBilling, String walletId, long timeout) {
     this.appcoinsBilling = appcoinsBilling;
     this.walletId = walletId;
+    this.timeout = timeout;
   }
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type)
@@ -69,7 +70,7 @@ class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
 
   private void waitForPurchases(CountDownLatch countDownLatch) {
     try {
-      countDownLatch.await(MESSAGE_RESPONSE_WAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+      countDownLatch.await(timeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
