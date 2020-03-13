@@ -91,7 +91,10 @@ public class BillingRepository {
     queries.put("wallet.address", walletAddress);
     queries.put("wallet.signature", signature);
 
+    Map<String, Object> body = new HashMap<>();
+    body.put("status", "CONSUMED");
+
     service.makeRequest("inapp/8.20180518/packages", "PATCH", path, queries,
-        new HashMap<String, String>(), new HashMap<String, Object>(), serviceResponseListener);
+        new HashMap<String, String>(), body, serviceResponseListener);
   }
 }
