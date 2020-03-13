@@ -37,7 +37,7 @@ class CompletedPurchaseLayout {
     gradientDrawable.setCornerRadius(dpToPx(8));
     purchaseLayout.setBackground(gradientDrawable);
 
-    int width, layoutOrientation;
+    int width;
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
       width = dpToPx(340);
     } else {
