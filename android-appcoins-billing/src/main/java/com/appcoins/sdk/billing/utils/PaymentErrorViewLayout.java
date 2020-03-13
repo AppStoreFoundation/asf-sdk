@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.utils;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -68,12 +67,12 @@ public class PaymentErrorViewLayout {
     return relativeLayout;
   }
 
-  @SuppressLint("InlinedApi") private Button buildErrorPositiveButton() {
+  private Button buildErrorPositiveButton() {
     Button button = new Button(activity);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(36));
     setPadding(button, 0, 0, 4, 0);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_BOTTOM);
     setMargins(layoutParams, 0, 56, 0, 0);
     int[] gradientColors = { Color.parseColor("#FC9D48"), Color.parseColor("#FF578C") };

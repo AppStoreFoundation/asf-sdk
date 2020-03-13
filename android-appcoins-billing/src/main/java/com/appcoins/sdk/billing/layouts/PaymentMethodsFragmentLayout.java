@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.layouts;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -161,7 +160,7 @@ public class PaymentMethodsFragmentLayout {
     return paymentMethodHeaderLayout;
   }
 
-  @SuppressLint("InlinedApi") private TextView createAppcPriceView() {
+  private TextView createAppcPriceView() {
     TextView textView = new TextView(activity);
     appcPriceViewId = generateRandomId();
     textView.setId(appcPriceViewId);
@@ -169,7 +168,7 @@ public class PaymentMethodsFragmentLayout {
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.BELOW, fiatPriceViewId);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, 0, 16, 0);
     textView.setTextColor(Color.parseColor("#828282"));
     textView.setTextSize(12);
@@ -177,14 +176,14 @@ public class PaymentMethodsFragmentLayout {
     return textView;
   }
 
-  @SuppressLint("InlinedApi") private TextView createFiatPriceView() {
+  private TextView createFiatPriceView() {
     TextView textView = new TextView(activity);
     fiatPriceViewId = generateRandomId();
     textView.setId(fiatPriceViewId);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, 17, 16, 0);
     textView.setTextColor(Color.parseColor("#000000"));
     textView.setTextSize(15);
@@ -193,14 +192,14 @@ public class PaymentMethodsFragmentLayout {
     return textView;
   }
 
-  @SuppressLint("InlinedApi") private TextView createSkuLayout(String sku) {
+  private TextView createSkuLayout(String sku) {
     TextView textView = new TextView(activity);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.BELOW, appNameId);
-    setConstraint(layoutParams, RelativeLayout.START_OF, appcPriceViewId);
-    setConstraint(layoutParams, RelativeLayout.END_OF, appIconId);
+    setConstraint(layoutParams, RelativeLayout.LEFT_OF, appcPriceViewId);
+    setConstraint(layoutParams, RelativeLayout.RIGHT_OF, appIconId);
     setMargins(layoutParams, 10, 0, 12, 0);
     textView.setEllipsize(TextUtils.TruncateAt.END);
     textView.setMaxLines(1);
@@ -211,15 +210,15 @@ public class PaymentMethodsFragmentLayout {
     return textView;
   }
 
-  @SuppressLint("InlinedApi") private TextView createAppNameLayout(String appName) {
+  private TextView createAppNameLayout(String appName) {
     TextView textView = new TextView(activity);
     appNameId = generateRandomId();
     textView.setId(appNameId);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
-    setConstraint(layoutParams, RelativeLayout.START_OF, fiatPriceViewId);
-    setConstraint(layoutParams, RelativeLayout.END_OF, appIconId);
+    setConstraint(layoutParams, RelativeLayout.LEFT_OF, fiatPriceViewId);
+    setConstraint(layoutParams, RelativeLayout.RIGHT_OF, appIconId);
     setMargins(layoutParams, 10, 15, 12, 0);
     textView.setEllipsize(TextUtils.TruncateAt.END);
     textView.setMaxLines(1);
@@ -505,7 +504,7 @@ public class PaymentMethodsFragmentLayout {
     return relativeLayout;
   }
 
-  @SuppressLint("InlinedApi") private TextView buildInstallMainText() {
+  private TextView buildInstallMainText() {
     TextView textView = new TextView(activity);
     installMainTextId = generateRandomId();
     textView.setId(installMainTextId);
@@ -520,8 +519,8 @@ public class PaymentMethodsFragmentLayout {
       top = 12;
       end = 8;
       textSize = 12;
-      setConstraint(layoutParams, RelativeLayout.END_OF, installPaypalId);
-      setConstraint(layoutParams, RelativeLayout.START_OF, installRadioButtonId);
+      setConstraint(layoutParams, RelativeLayout.RIGHT_OF, installPaypalId);
+      setConstraint(layoutParams, RelativeLayout.LEFT_OF, installRadioButtonId);
     } else {
       top = 2;
       start = 0;
@@ -594,7 +593,7 @@ public class PaymentMethodsFragmentLayout {
     return imageView;
   }
 
-  @SuppressLint("InlinedApi") private ImageView buildInstallPaypalImage() {
+  private ImageView buildInstallPaypalImage() {
     ImageView imageView = new ImageView(activity);
     installPaypalId = generateRandomId();
     imageView.setId(installPaypalId);
@@ -607,13 +606,13 @@ public class PaymentMethodsFragmentLayout {
       layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     } else {
       top = 8;
-      setConstraint(layoutParams, RelativeLayout.END_OF, installCreditCardId);
+      setConstraint(layoutParams, RelativeLayout.RIGHT_OF, installCreditCardId);
     }
 
     Drawable paypal =
         convertAssetDrawable(IMAGES_RESOURCE_PATH + "paypal/" + densityPath + "ic_paypal.png");
     imageView.setImageDrawable(paypal);
-    setConstraint(layoutParams, RelativeLayout.END_OF, installCreditCardId);
+    setConstraint(layoutParams, RelativeLayout.RIGHT_OF, installCreditCardId);
     setMargins(layoutParams, 1, top, 0, 0);
     imageView.setLayoutParams(layoutParams);
     return imageView;
@@ -656,7 +655,7 @@ public class PaymentMethodsFragmentLayout {
     return relativeLayout;
   }
 
-  @SuppressLint("InlinedApi") private TextView buildPaypalTextView() {
+  private TextView buildPaypalTextView() {
     TextView textView = new TextView(activity);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -669,7 +668,7 @@ public class PaymentMethodsFragmentLayout {
       top = 0;
       textSize = 12;
       rule = RelativeLayout.CENTER_VERTICAL;
-      setConstraint(layoutParams, RelativeLayout.END_OF, paypalImageId);
+      setConstraint(layoutParams, RelativeLayout.RIGHT_OF, paypalImageId);
     } else {
       start = 0;
       top = 16;
@@ -747,7 +746,7 @@ public class PaymentMethodsFragmentLayout {
     return relativeLayout;
   }
 
-  @SuppressLint("InlinedApi") private RadioButton buildRadioButton(int id) {
+  private RadioButton buildRadioButton(int id) {
     RadioButton radioButton = new RadioButton(activity);
     radioButton.setId(id);
     RelativeLayout.LayoutParams layoutParams =
@@ -759,7 +758,7 @@ public class PaymentMethodsFragmentLayout {
       rule = RelativeLayout.CENTER_VERTICAL;
       end = 20;
       bottom = 0;
-      setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+      setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     } else {
       rule = RelativeLayout.CENTER_HORIZONTAL;
       end = 0;
@@ -825,7 +824,7 @@ public class PaymentMethodsFragmentLayout {
     return imageView;
   }
 
-  @SuppressLint("InlinedApi") private TextView buildCreditCardTextView() {
+  private TextView buildCreditCardTextView() {
     TextView textView = new TextView(activity);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -838,7 +837,7 @@ public class PaymentMethodsFragmentLayout {
       start = 20;
       top = 0;
       textSize = 12;
-      setConstraint(layoutParams, RelativeLayout.END_OF, creditCardImageId);
+      setConstraint(layoutParams, RelativeLayout.RIGHT_OF, creditCardImageId);
     } else {
       start = 0;
       top = 16;

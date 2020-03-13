@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.layouts;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -365,7 +364,7 @@ public class AdyenPaymentFragmentLayout {
     return textView;
   }
 
-  @SuppressLint("InlinedApi") private CreditCardLayout buildCreditCardEditTextLayout() {
+  private CreditCardLayout buildCreditCardEditTextLayout() {
     CreditCardLayout creditCardLayout = new CreditCardLayout(activity);
 
     creditCardInputId = generateRandomId();
@@ -373,8 +372,8 @@ public class AdyenPaymentFragmentLayout {
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(44));
     layoutParams.addRule(RelativeLayout.BELOW, creditCardHeaderId);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_START, creditCardHeaderId);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_END, creditCardHeaderId);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_LEFT, creditCardHeaderId);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_RIGHT, creditCardHeaderId);
     setMargins(layoutParams, 0, 28, 0, 0);
 
     GradientDrawable background = new GradientDrawable();
@@ -427,7 +426,7 @@ public class AdyenPaymentFragmentLayout {
     return imageView;
   }
 
-  @SuppressLint("InlinedApi") private EditText buildCvvEditText() {
+  private EditText buildCvvEditText() {
     EditText editText = new EditText(activity);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(40), ViewGroup.LayoutParams.MATCH_PARENT);
@@ -435,7 +434,7 @@ public class AdyenPaymentFragmentLayout {
         new InputFilter.LengthFilter(CardValidationUtils.CVV_MAX_LENGTH)
     });
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, 0, 32, 0);
     editText.setHint("CVV");
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
@@ -450,7 +449,7 @@ public class AdyenPaymentFragmentLayout {
     return editText;
   }
 
-  @SuppressLint("InlinedApi") private EditText buildExpiryDateEditText() {
+  private EditText buildExpiryDateEditText() {
     EditText editText = new EditText(activity);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(60), ViewGroup.LayoutParams.MATCH_PARENT);
@@ -460,7 +459,7 @@ public class AdyenPaymentFragmentLayout {
     editText.setHint("MM/YY");
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
-    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, 0, 114, 0);
     editText.setLayoutParams(layoutParams);
     editText.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -472,7 +471,7 @@ public class AdyenPaymentFragmentLayout {
     return editText;
   }
 
-  @SuppressLint("InlinedApi") private CardNumberEditText buildCardNumberEditText() {
+  private CardNumberEditText buildCardNumberEditText() {
     CardNumberEditText cardNumberEditText = new CardNumberEditText(activity);
     cardNumberEditText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.MAXIMUM_CARD_NUMBER_LENGTH
@@ -482,7 +481,7 @@ public class AdyenPaymentFragmentLayout {
         new RelativeLayout.LayoutParams(dpToPx(140), ViewGroup.LayoutParams.MATCH_PARENT);
 
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-    setConstraint(layoutParams, RelativeLayout.END_OF, genericCardId);
+    setConstraint(layoutParams, RelativeLayout.RIGHT_OF, genericCardId);
     setMargins(layoutParams, 6, 0, 8, 0);
 
     cardNumberEditText.setTextSize(14);
@@ -530,7 +529,7 @@ public class AdyenPaymentFragmentLayout {
     return relativeLayout;
   }
 
-  @SuppressLint("InlinedApi") private ImageView buildCreditCardImage() {
+  private ImageView buildCreditCardImage() {
     ImageView imageView = new ImageView(activity);
 
     int height;
@@ -543,7 +542,7 @@ public class AdyenPaymentFragmentLayout {
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(dpToPx(56), dpToPx(height));
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
 
     Drawable creditCard = convertAssetDrawable(
         IMAGES_RESOURCE_PATH + "credit_card/landscape/" + densityPath + "ic_credit_card.png");
@@ -624,7 +623,7 @@ public class AdyenPaymentFragmentLayout {
     return paymentMethodHeaderLayout;
   }
 
-  @SuppressLint("InlinedApi") private TextView createAppcPriceView(String appcPrice) {
+  private TextView createAppcPriceView(String appcPrice) {
     TextView textView = new TextView(activity);
     appcPriceViewId = generateRandomId();
     textView.setId(appcPriceViewId);
@@ -632,7 +631,7 @@ public class AdyenPaymentFragmentLayout {
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.BELOW, fiatPriceViewId);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, 0, 16, 0);
     textView.setTextColor(Color.parseColor("#828282"));
     DecimalFormat df = new DecimalFormat("0.00");
@@ -643,7 +642,6 @@ public class AdyenPaymentFragmentLayout {
     return textView;
   }
 
-  @SuppressLint("InlinedApi")
   private TextView createFiatPriceView(String fiatPrice, String fiatCurrency) {
     TextView textView = new TextView(activity);
     fiatPriceViewId = generateRandomId();
@@ -651,7 +649,7 @@ public class AdyenPaymentFragmentLayout {
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, 17, 16, 0);
     textView.setTextColor(Color.parseColor("#000000"));
     textView.setTextSize(15);
@@ -661,14 +659,14 @@ public class AdyenPaymentFragmentLayout {
     return textView;
   }
 
-  @SuppressLint("InlinedApi") private TextView createSkuLayout(String sku) {
+  private TextView createSkuLayout(String sku) {
     TextView textView = new TextView(activity);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.BELOW, appNameId);
-    setConstraint(layoutParams, RelativeLayout.START_OF, appcPriceViewId);
-    setConstraint(layoutParams, RelativeLayout.END_OF, appIconId);
+    setConstraint(layoutParams, RelativeLayout.LEFT_OF, appcPriceViewId);
+    setConstraint(layoutParams, RelativeLayout.RIGHT_OF, appIconId);
     setMargins(layoutParams, 10, 0, 12, 0);
     textView.setEllipsize(TextUtils.TruncateAt.END);
     textView.setMaxLines(1);
@@ -679,15 +677,15 @@ public class AdyenPaymentFragmentLayout {
     return textView;
   }
 
-  @SuppressLint("InlinedApi") private TextView createAppNameLayout(String appName) {
+  private TextView createAppNameLayout(String appName) {
     TextView textView = new TextView(activity);
     appNameId = generateRandomId();
     textView.setId(appNameId);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
-    setConstraint(layoutParams, RelativeLayout.START_OF, fiatPriceViewId);
-    setConstraint(layoutParams, RelativeLayout.END_OF, appIconId);
+    setConstraint(layoutParams, RelativeLayout.LEFT_OF, fiatPriceViewId);
+    setConstraint(layoutParams, RelativeLayout.RIGHT_OF, appIconId);
     setMargins(layoutParams, 10, 15, 12, 0);
     textView.setEllipsize(TextUtils.TruncateAt.END);
     textView.setMaxLines(1);
