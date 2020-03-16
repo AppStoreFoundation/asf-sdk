@@ -53,7 +53,7 @@ public class IabActivity extends Activity implements IabView {
     setContentView(frameLayout);
 
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(BUY_ITEM_PROPERTIES);
-
+    translationsRepository = TranslationsRepository.getInstance(this);
     if (savedInstanceState == null) {
       navigateToPaymentSelection();
     }
