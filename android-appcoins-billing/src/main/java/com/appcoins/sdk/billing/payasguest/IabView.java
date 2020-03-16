@@ -24,7 +24,7 @@ interface IabView {
 
   void unlockRotation();
 
-  void navigateToUri(String url, ActivityResultListener activityResultListener);
+  void navigateToUri(String url);
 
   void finish(Bundle bundle);
 
@@ -35,4 +35,6 @@ interface IabView {
   void disableBack();
 
   void enableBack();
+
+  void setOnActivityResultListener(ActivityResultListener activityResultListener);
 }

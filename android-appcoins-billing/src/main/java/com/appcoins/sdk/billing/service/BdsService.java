@@ -19,11 +19,13 @@ import java.util.Map;
 public class BdsService implements Service {
 
   private String baseUrl;
+  private int timeoutInMillis;
   private List<ServiceAsyncTask> asyncTasks;
 
-  public BdsService(String baseUrl) {
+  public BdsService(String baseUrl, int timeoutInMillis) {
 
     this.baseUrl = baseUrl;
+    this.timeoutInMillis = timeoutInMillis;
     this.asyncTasks = new ArrayList<>();
   }
 
@@ -33,11 +35,10 @@ public class BdsService implements Service {
     HttpURLConnection urlConnection = null;
     try {
       String urlBuilder = RequestBuilderUtils.buildUrl(baseUrl, endPoint, paths, queries);
-      Log.d("Service", "Calling: " + urlBuilder);
       URL url = new URL(urlBuilder);
       urlConnection = openUrlConnection(url, httpMethod);
 
-      urlConnection.setReadTimeout(300000);
+      urlConnection.setReadTimeout(timeoutInMillis);
 
       setUserAgent(urlConnection);
       if (header != null) {

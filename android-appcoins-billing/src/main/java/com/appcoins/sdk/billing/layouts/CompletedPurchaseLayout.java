@@ -43,18 +43,16 @@ class CompletedPurchaseLayout {
     gradientDrawable.setCornerRadius(dpToPx(8));
     purchaseLayout.setBackground(gradientDrawable);
 
-    int width, layoutOrientation;
+    int width;
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-      layoutOrientation = LinearLayout.VERTICAL;
       width = dpToPx(340);
     } else {
-      layoutOrientation = LinearLayout.HORIZONTAL;
       width = dpToPx(544);
     }
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-    purchaseLayout.setOrientation(layoutOrientation);
+    purchaseLayout.setOrientation(LinearLayout.VERTICAL);
 
     ImageView appIcon = createAppIconLayout(packageName);
     TextView purchaseDoneView = createPurchaseDoneView();
