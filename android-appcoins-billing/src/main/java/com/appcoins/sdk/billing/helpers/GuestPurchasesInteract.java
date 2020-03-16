@@ -120,7 +120,7 @@ class GuestPurchasesInteract {
 
   private void requestWallet(String walletId, WalletInteractListener walletInteractListener) {
     WalletRepository walletRepository =
-        new WalletRepository(new BdsService(BuildConfig.BACKEND_BASE),
+        new WalletRepository(new BdsService(BuildConfig.BACKEND_BASE, 30000),
             new WalletGenerationMapper());
 
     walletRepository.requestWallet(walletId, walletInteractListener);

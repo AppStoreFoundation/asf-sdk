@@ -54,7 +54,7 @@ class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
       ArrayList<String> dataList = bundle.getStringArrayList(INAPP_PURCHASE_DATA_LIST);
       ArrayList<String> signatureDataList = bundle.getStringArrayList(INAPP_DATA_SIGNATURE_LIST);
       BillingRepository billingRepository =
-          new BillingRepository(new BdsService(BuildConfig.HOST_WS));
+          new BillingRepository(new BdsService(BuildConfig.HOST_WS, 30000));
       GuestPurchasesInteract guestPurchasesInteract = new GuestPurchasesInteract(billingRepository);
       CountDownLatch countDownLatch = new CountDownLatch(1);
       guestPurchasesInteract.mapGuestPurchases(bundle, walletId, packageName, type, countDownLatch,

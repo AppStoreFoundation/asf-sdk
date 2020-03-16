@@ -167,7 +167,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       if (walletId != null && type.equalsIgnoreCase("INAPP")) {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         BillingRepository billingRepository =
-            new BillingRepository(new BdsService(BuildConfig.HOST_WS));
+            new BillingRepository(new BdsService(BuildConfig.HOST_WS, 30000));
         GuestPurchasesInteract guestPurchaseInteract =
             new GuestPurchasesInteract(billingRepository);
 
@@ -204,7 +204,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     int[] responseCode = new int[1]; //Generic error
     CountDownLatch countDownLatch = new CountDownLatch(1);
     BillingRepository billingRepository =
-        new BillingRepository(new BdsService(BuildConfig.HOST_WS));
+        new BillingRepository(new BdsService(BuildConfig.HOST_WS, 30000));
     GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract(billingRepository);
 
     guestPurchaseInteract.consumeGuestPurchase(walletId, packageName, purchaseToken, responseCode,
