@@ -121,12 +121,15 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     ViewGroup paypalWrapper = layout.getPaypalWrapperLayout();
     ViewGroup installWrapper = layout.getInstallWrapperLayout();
     Button errorButton = layout.getErrorPositiveButton();
+    TextView helpText = layout.getHelpText();
+
     onRotation(savedInstanceState);
     onCancelButtonClicked(cancelButton);
     onPositiveButtonClicked(positiveButton);
     onErrorButtonClicked(errorButton);
     onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton, creditWrapper,
         paypalWrapper, installWrapper);
+    createSpannableString(helpText);
   }
 
   @Override public void onResume() {
@@ -163,6 +166,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     paymentMethodsPresenter.onDestroy();
     paymentMethodsPresenter = null;
     super.onDestroy();
+  }
+
+  private void createSpannableString(TextView helpText) {
+
   }
 
   private void onErrorButtonClicked(Button errorButton) {
