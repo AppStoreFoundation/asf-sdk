@@ -146,11 +146,11 @@ public class PaymentMethodsFragmentLayout {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    fiatPriceView = createFiatPriceView();
+    appcPriceView = createAppcPriceView();
     ImageView iconImageView = createAppIconLayout(icon);
     TextView appNameView = createAppNameLayout(appName);
     TextView skuView = createSkuLayout(buyItemProperties.getSku());
-    fiatPriceView = createFiatPriceView();
-    appcPriceView = createAppcPriceView();
 
     paymentMethodHeaderLayout.addView(iconImageView);
     paymentMethodHeaderLayout.addView(appNameView);

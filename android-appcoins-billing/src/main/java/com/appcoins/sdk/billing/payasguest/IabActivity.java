@@ -165,8 +165,11 @@ public class IabActivity extends Activity implements IabView {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
   }
 
-  @Override public void navigateToUri(String url, ActivityResultListener activityResultListener) {
+  @Override public void setOnActivityResultListener(ActivityResultListener activityResultListener) {
     this.activityResultListener = activityResultListener;
+  }
+
+  @Override public void navigateToUri(String url) {
     startActivityForResult(WebViewActivity.newIntent(this, url), WEB_VIEW_REQUEST_CODE);
   }
 
