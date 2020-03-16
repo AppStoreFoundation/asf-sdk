@@ -22,6 +22,8 @@ import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_P
 
 class GuestPurchasesInteract {
 
+  public static final int RESPONSE_SUCCESS = 0;
+  public static final int RESPONSE_ERROR = 6;
   private BillingRepository billingRepository;
 
   GuestPurchasesInteract(BillingRepository billingRepository) {
@@ -75,9 +77,9 @@ class GuestPurchasesInteract {
     return new ConsumePurchaseListener() {
       @Override public void onConsumed(boolean wasConsumed) {
         if (wasConsumed) {
-          responseCode[0] = 0; //Success
+          responseCode[0] = RESPONSE_SUCCESS;
         } else {
-          responseCode[0] = 6; //Error
+          responseCode[0] = RESPONSE_ERROR;
         }
         countDownLatch.countDown();
       }
