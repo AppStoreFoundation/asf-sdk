@@ -280,7 +280,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         presenter.onActivityResult(data, uid);
       }
     };
-    iabView.navigateToUri(url, activityResultListener);
+    iabView.setOnActivityResultListener(activityResultListener);
+    iabView.navigateToUri(url);
   }
 
   @Override public void finish(Bundle bundle) {
