@@ -28,9 +28,10 @@ public class WalletUtils {
 
   private static final String URL_BROWSER = "https://play.google.com/store/apps/details?id="
       + com.appcoins.billing.sdk.BuildConfig.BDS_WALLET_PACKAGE_NAME;
-  private static final String CAFE_BAZAAR_APP_URL = "bazaar://details?id=com.hezardastan.wallet";
+  private static final String CAFE_BAZAAR_APP_URL =
+      "bazaar://details?id=" + BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
   private static final String CAFE_BAZAAR_WEB_URL =
-      "https://cafebazaar.ir/app/com.hezardastaan.wallet";
+      "https://cafebazaar.ir/app/" + BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
   public static Context context;
   private static String POA_NOTIFICATION_HEADS_UP = "POA_NOTIFICATION_HEADS_UP";
   private static int POA_NOTIFICATION_ID = 0;
