@@ -97,11 +97,12 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     TranslationsModel translationsModel = TranslationsRepository.getInstance(getActivity())
         .getTranslationsModel();
     adyenPaymentInfo = extractBundleInfo();
+    int timeoutInMillis = 30000;
     AdyenRepository adyenRepository =
-        new AdyenRepository(new BdsService(BuildConfig.HOST_WS + "/broker/"),
+        new AdyenRepository(new BdsService(BuildConfig.HOST_WS + "/broker/", 30000),
             new AdyenListenerProvider(new AdyenMapper()));
-    Service apiService = new BdsService(BuildConfig.HOST_WS);
-    Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST);
+    Service apiService = new BdsService(BuildConfig.HOST_WS, timeoutInMillis);
+    Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, timeoutInMillis);
     IExtractOemId extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
 
     BillingRepository billingRepository = new BillingRepository(apiService);
@@ -284,7 +285,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         presenter.onActivityResult(data, uid);
       }
     };
-    iabView.navigateToUri(url, activityResultListener);
+    iabView.setOnActivityResultListener(activityResultListener);
+    iabView.navigateToUri(url);
   }
 
   @Override public void finish(Bundle bundle) {
