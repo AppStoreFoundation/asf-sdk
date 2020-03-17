@@ -187,7 +187,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         Spanned.SPAN_INCLUSIVE_INCLUSIVE);
     helpText.setText(spannableString);
     helpText.setMovementMethod(LinkMovementMethod.getInstance());
-    helpText.setHighlightColor(Color.parseColor("#fe6e76"));
+    helpText.setLinkTextColor(Color.parseColor("#fe6e76"));
+    helpText.setHighlightColor(Color.TRANSPARENT);
   }
 
   private void onErrorButtonClicked(Button errorButton) {

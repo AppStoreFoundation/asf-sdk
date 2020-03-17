@@ -382,7 +382,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         Spanned.SPAN_INCLUSIVE_INCLUSIVE);
     helpText.setText(spannableString);
     helpText.setMovementMethod(LinkMovementMethod.getInstance());
-    helpText.setHighlightColor(Color.parseColor("#fe6e76"));
+    helpText.setLinkTextColor(Color.parseColor("#fe6e76"));
+    helpText.setHighlightColor(Color.TRANSPARENT);
   }
 
   private void setStoredPaymentMethodDetails(StoredMethodDetails storedMethodDetails) {
