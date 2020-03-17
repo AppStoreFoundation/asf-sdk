@@ -75,7 +75,13 @@ class CompletedPurchaseLayout {
         new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
-    setMargins(layoutParams, 0, 6, 0, 106);
+    int bottom;
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      bottom = 106;
+    } else {
+      bottom = 56;
+    }
+    setMargins(layoutParams, 0, 6, 0, bottom);
     textView.setText(String.format("%s - %s %s", sku, fiatPrice, fiatCurrency));
     textView.setTextColor(Color.BLACK);
     textView.setTypeface(null, Typeface.BOLD);
@@ -90,7 +96,13 @@ class CompletedPurchaseLayout {
         new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
-    setMargins(layoutParams, 0, 20, 0, 0);
+    int top;
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      top = 20;
+    } else {
+      top = 24;
+    }
+    setMargins(layoutParams, 0, top, 0, 0);
     textView.setText(translationModel.getDoneTitleLong());
     textView.setTextColor(Color.parseColor("#de000000"));
     textView.setTypeface(null, Typeface.BOLD);
@@ -109,7 +121,13 @@ class CompletedPurchaseLayout {
     imageView.setImageDrawable(supportImage);
 
     imageParams.gravity = Gravity.CENTER_HORIZONTAL;
-    setMargins(imageParams, 0, 76, 0, 0);
+    int top;
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      top = 76;
+    } else {
+      top = 48;
+    }
+    setMargins(imageParams, 0, top, 0, 0);
 
     imageView.setLayoutParams(imageParams);
     return imageView;
