@@ -117,11 +117,12 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         return response;
       }
     } else {
+      DeveloperPayload developerPayloadObject =
+          new DeveloperPayload(developerPayload, PayloadHelper.getPayload(developerPayload),
+              PayloadHelper.getOrderReference(developerPayload),
+              PayloadHelper.getOrigin(developerPayload));
       final BuyItemProperties buyItemProperties =
-          new BuyItemProperties(apiVersion, packageName, sku, type,
-              new DeveloperPayload(developerPayload, PayloadHelper.getPayload(developerPayload),
-                  PayloadHelper.getOrderReference(developerPayload),
-                  PayloadHelper.getOrigin(developerPayload)));
+          new BuyItemProperties(apiVersion, packageName, sku, type, developerPayloadObject);
 
       final Context context = WalletUtils.getContext();
       Intent intent;
