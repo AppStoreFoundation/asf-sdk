@@ -128,6 +128,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     super.onViewCreated(view, savedInstanceState);
     Button positiveButton = layout.getPositiveButton();
     setFieldChangeListener(positiveButton);
+    setOnActivityResultListener();
     if (savedInstanceState != null) {
       onSavedInstance(savedInstanceState);
 
@@ -164,6 +165,15 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     presenter.onDestroy();
     presenter = null;
     super.onDestroy();
+  }
+
+  private void setOnActivityResultListener() {
+    ActivityResultListener activityResultListener = new ActivityResultListener() {
+      @Override public void onActivityResult(Uri data, String uid) {
+        presenter.onActivityResult(data, uid);
+      }
+    };
+    iabView.setOnActivityResultListener(activityResultListener);
   }
 
   private void onSavedInstance(Bundle savedInstanceState) {
@@ -275,14 +285,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     iabView.unlockRotation();
   }
 
-  @Override public void navigateToUri(String url, final String uid) {
-    ActivityResultListener activityResultListener = new ActivityResultListener() {
-      @Override public void onActivityResult(Uri data) {
-        presenter.onActivityResult(data, uid);
-      }
-    };
-    iabView.setOnActivityResultListener(activityResultListener);
-    iabView.navigateToUri(url);
+  @Override public void navigateToUri(String url, String uid) {
+    iabView.navigateToUri(url, uid);
   }
 
   @Override public void finish(Bundle bundle) {

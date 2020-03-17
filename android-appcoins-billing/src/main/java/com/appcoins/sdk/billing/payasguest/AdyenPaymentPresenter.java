@@ -50,22 +50,24 @@ class AdyenPaymentPresenter {
   }
 
   void loadPaymentInfo() {
-    fragmentView.showLoading();
-    AdyenRepository.Methods method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
-    LoadPaymentInfoListener loadPaymentInfoListener = new LoadPaymentInfoListener() {
-      @Override public void onResponse(AdyenPaymentMethodsModel paymentMethodsModel) {
-        if (paymentMethodsModel.hasError()) {
-          fragmentView.showError();
-        } else {
-          fragmentView.updateFiatPrice(paymentMethodsModel.getValue(),
-              paymentMethodsModel.getCurrency());
-          launchPayment(paymentMethodsModel);
+    if (!waitingResult) {
+      fragmentView.showLoading();
+      AdyenRepository.Methods method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
+      LoadPaymentInfoListener loadPaymentInfoListener = new LoadPaymentInfoListener() {
+        @Override public void onResponse(AdyenPaymentMethodsModel paymentMethodsModel) {
+          if (paymentMethodsModel.hasError()) {
+            fragmentView.showError();
+          } else {
+            fragmentView.updateFiatPrice(paymentMethodsModel.getValue(),
+                paymentMethodsModel.getCurrency());
+            launchPayment(paymentMethodsModel);
+          }
         }
-      }
-    };
-    adyenPaymentInteract.loadPaymentInfo(method, adyenPaymentInfo.getFiatPrice(),
-        adyenPaymentInfo.getFiatCurrency(), adyenPaymentInfo.getWalletAddress(),
-        loadPaymentInfoListener);
+      };
+      adyenPaymentInteract.loadPaymentInfo(method, adyenPaymentInfo.getFiatPrice(),
+          adyenPaymentInfo.getFiatCurrency(), adyenPaymentInfo.getWalletAddress(),
+          loadPaymentInfoListener);
+    }
   }
 
   void onSaveInstanceState(Bundle outState) {
