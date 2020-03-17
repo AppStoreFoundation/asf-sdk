@@ -14,6 +14,7 @@ public class LayoutUtils {
   public static final String BUTTONS_RESOURCE_PATH = "appcoins-wallet/resources/buttons/";
   public static final String IMAGES_RESOURCE_PATH = "appcoins-wallet/resources/images/";
   public static final String SUPPORT_RESOURCE_PATH = IMAGES_RESOURCE_PATH + "support/";
+  public static final String COMPLETED_RESOURCE_PATH = IMAGES_RESOURCE_PATH + "completed/";
   private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
   public static String mapDisplayMetrics(DisplayMetrics displayMetrics) {

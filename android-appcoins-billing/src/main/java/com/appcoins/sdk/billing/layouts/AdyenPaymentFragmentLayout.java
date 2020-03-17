@@ -102,9 +102,8 @@ public class AdyenPaymentFragmentLayout {
     errorView.setVisibility(View.INVISIBLE);
 
     CompletedPurchaseLayout completedPurchaseLayout =
-        new CompletedPurchaseLayout(activity, orientation);
-    completedPurchaseView =
-        completedPurchaseLayout.buildView(fiatPrice, fiatCurrency, sku, packageName);
+        new CompletedPurchaseLayout(activity, orientation, densityPath);
+    completedPurchaseView = completedPurchaseLayout.buildView(fiatPrice, fiatCurrency, sku);
     completedPurchaseView.setVisibility(View.INVISIBLE);
 
     loadingView = buildLoadingView();
