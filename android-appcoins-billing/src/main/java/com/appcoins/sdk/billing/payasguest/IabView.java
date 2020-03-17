@@ -37,4 +37,6 @@ interface IabView {
   void enableBack();
 
   void setOnActivityResultListener(ActivityResultListener activityResultListener);
+
+  void redirectToSupportEmail(EmailInfo emailInfo);
 }

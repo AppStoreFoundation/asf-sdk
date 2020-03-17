@@ -5,7 +5,12 @@ import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -169,7 +174,20 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   private void createSpannableString(TextView helpText) {
-
+    String helpString = "Need help?";
+    String contactString = "Contact Support";
+    String concatenatedString = helpString + ' ' + contactString;
+    SpannableString spannableString = new SpannableString(concatenatedString);
+    ClickableSpan clickableSpan = new ClickableSpan() {
+      @Override public void onClick(View widget) {
+        paymentMethodsPresenter.onHelpTextClicked(buyItemProperties);
+      }
+    };
+    spannableString.setSpan(clickableSpan, helpString.length() + 1, concatenatedString.length(),
+        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+    helpText.setText(spannableString);
+    helpText.setMovementMethod(LinkMovementMethod.getInstance());
+    helpText.setHighlightColor(Color.parseColor("#fe6e76"));
   }
 
   private void onErrorButtonClicked(Button errorButton) {
@@ -347,6 +365,18 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         .setVisibility(View.INVISIBLE);
     layout.getIntentLoadingView()
         .setVisibility(View.VISIBLE);
+  }
+
+  @Override
+  public void redirectToSupportEmail(String packageName, String sku, String sdkVersionName,
+      int mobileVersion) {
+    String title = "Support title";
+    if (walletGenerationModel != null) {
+      EmailInfo emailInfo =
+          new EmailInfo(walletGenerationModel.getWalletAddress(), packageName, sku, sdkVersionName,
+              mobileVersion, title);
+      iabView.redirectToSupportEmail(emailInfo);
+    }
   }
 
   private void setInitialRadioButtonSelected() {

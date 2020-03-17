@@ -35,4 +35,7 @@ interface PaymentMethodsView {
   void showItemAlreadyOwnedError(SkuPurchase skuPurchase);
 
   void hideDialog();
+
+  void redirectToSupportEmail(String packageName, String sku, String sdkVersionName,
+      int mobileVersion);
 }

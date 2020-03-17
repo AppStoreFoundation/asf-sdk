@@ -145,10 +145,6 @@ public class IabActivity extends Activity implements IabView {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
   }
 
-  @Override public void setOnActivityResultListener(ActivityResultListener activityResultListener) {
-    this.activityResultListener = activityResultListener;
-  }
-
   @Override public void navigateToUri(String url) {
     startActivityForResult(WebViewActivity.newIntent(this, url), WEB_VIEW_REQUEST_CODE);
   }
@@ -175,6 +171,36 @@ public class IabActivity extends Activity implements IabView {
 
   @Override public void enableBack() {
     backEnabled = true;
+  }
+
+  @Override public void setOnActivityResultListener(ActivityResultListener activityResultListener) {
+    this.activityResultListener = activityResultListener;
+  }
+
+  @Override public void redirectToSupportEmail(EmailInfo emailInfo) {
+    String[] extraEmail = new String[] {
+        "info@appcoins.io"
+    };
+    String body = "Package Name: "
+        + emailInfo.getPackageName()
+        + "\n"
+        + "SDK version: "
+        + emailInfo.getSdkVersionName()
+        + "\n"
+        + "Item name: "
+        + emailInfo.getSku()
+        + "\n"
+        + "Mobile Version: "
+        + emailInfo.getMobileVersion()
+        + "\n"
+        + "Wallet Address: "
+        + emailInfo.getWalletAddress();
+    Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+    intent.setType("message/rfc822");
+    intent.putExtra(Intent.EXTRA_SUBJECT, emailInfo.getTitle());
+    intent.putExtra(Intent.EXTRA_EMAIL, extraEmail);
+    intent.putExtra(Intent.EXTRA_TEXT, body);
+    startActivity(Intent.createChooser(intent, "Select email application."));
   }
 
   private void buildAlertNoBrowserAndStores() {
