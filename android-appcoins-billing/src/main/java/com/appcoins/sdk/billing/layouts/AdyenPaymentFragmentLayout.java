@@ -39,8 +39,10 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import static com.appcoins.sdk.billing.utils.LayoutUtils.IMAGES_RESOURCE_PATH;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.SUPPORT_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.getCornerRadiusArray;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.mapDisplayMetrics;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setConstraint;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
@@ -49,6 +51,7 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
 public class AdyenPaymentFragmentLayout {
   private final Activity activity;
   private final int orientation;
+  private int buttonsViewId;
   private int genericCardId;
   private int creditCardInputId;
   private int creditCardHeaderId;
@@ -76,6 +79,7 @@ public class AdyenPaymentFragmentLayout {
   private CreditCardLayout creditCardEditTextLayout;
   private TranslationsModel translationModel;
   private ViewGroup completedPurchaseView;
+  private TextView helpText;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -183,16 +187,81 @@ public class AdyenPaymentFragmentLayout {
     buttonsView = buildButtonsView();
     buttonsView.setVisibility(View.INVISIBLE);
 
+    LinearLayout supportHookView = buildSupportHook();
+
     dialogLayout.addView(progressBar);
     dialogLayout.addView(paymentMethodsHeaderLayout);
     dialogLayout.addView(headerSeparator);
     dialogLayout.addView(creditCardLayout);
     dialogLayout.addView(buttonsView);
+    dialogLayout.addView(supportHookView);
     return dialogLayout;
+  }
+
+  private LinearLayout buildSupportHook() {
+    LinearLayout linearLayout = new LinearLayout(activity);
+
+    float[] radius;
+    RelativeLayout.LayoutParams layoutParams;
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      layoutParams =
+          new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(32));
+      radius = getCornerRadiusArray(0, 0, 8, 8);
+      layoutParams.addRule(RelativeLayout.BELOW, buttonsViewId);
+    } else {
+      layoutParams =
+          new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(32));
+      radius = getCornerRadiusArray(16, 16, 16, 16);
+      layoutParams.addRule(RelativeLayout.BELOW, creditCardViewId);
+      setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_LEFT);
+      setMargins(layoutParams, 18, 42, 0, 16);
+    }
+
+    GradientDrawable gradientDrawable = new GradientDrawable();
+    gradientDrawable.setColor(Color.parseColor("#f0f0f0"));
+    gradientDrawable.setCornerRadii(radius);
+    linearLayout.setBackground(gradientDrawable);
+
+    linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+    linearLayout.setGravity(Gravity.CENTER);
+    ImageView supportImage = buildSupportImage();
+    helpText = buildHelpText();
+
+    linearLayout.addView(supportImage);
+    linearLayout.addView(helpText);
+    linearLayout.setLayoutParams(layoutParams);
+    return linearLayout;
+  }
+
+  private TextView buildHelpText() {
+    TextView textView = new TextView(activity);
+    LinearLayout.LayoutParams layoutParams =
+        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT);
+    setMargins(layoutParams, 0, 0, 14, 0);
+    textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+    textView.setTextColor(Color.parseColor("#202020"));
+    textView.setTextSize(12);
+    textView.setLayoutParams(layoutParams);
+    return textView;
+  }
+
+  private ImageView buildSupportImage() {
+    ImageView imageView = new ImageView(activity);
+    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(dpToPx(18), dpToPx(18));
+    setMargins(layoutParams, 14, 0, 8, 0);
+    Drawable supportImage =
+        convertAssetDrawable(SUPPORT_RESOURCE_PATH + densityPath + "ic_settings_support.png");
+    imageView.setImageDrawable(supportImage);
+    imageView.setLayoutParams(layoutParams);
+    return imageView;
   }
 
   private LinearLayout buildButtonsView() {
     LinearLayout linearLayout = new LinearLayout(activity);
+
+    buttonsViewId = generateRandomId();
+    linearLayout.setId(buttonsViewId);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -813,5 +882,9 @@ public class AdyenPaymentFragmentLayout {
 
   public ViewGroup getCompletedPurchaseView() {
     return completedPurchaseView;
+  }
+
+  public TextView getHelpText() {
+    return helpText;
   }
 }

@@ -88,6 +88,14 @@ class PaymentMethodsPresenter {
     fragmentView.close();
   }
 
+  void onHelpTextClicked(BuyItemProperties buyItemProperties) {
+    String packageName = buyItemProperties.getPackageName();
+    String sku = buyItemProperties.getSku();
+    String sdkVersionName = BuildConfig.VERSION_NAME;
+    int mobileVersion = Build.VERSION.SDK_INT;
+    fragmentView.redirectToSupportEmail(packageName, sku, sdkVersionName, mobileVersion);
+  }
+
   void onDestroy() {
     paymentMethodsInteract.cancelRequests();
   }
@@ -152,13 +160,5 @@ class PaymentMethodsPresenter {
     };
     paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature,
         type.toLowerCase(), purchasesListener);
-  }
-
-  void onHelpTextClicked(BuyItemProperties buyItemProperties) {
-    String packageName = buyItemProperties.getPackageName();
-    String sku = buyItemProperties.getSku();
-    String sdkVersionName = BuildConfig.VERSION_NAME;
-    int mobileVersion = Build.VERSION.SDK_INT;
-    fragmentView.redirectToSupportEmail(packageName, sku, sdkVersionName, mobileVersion);
   }
 }

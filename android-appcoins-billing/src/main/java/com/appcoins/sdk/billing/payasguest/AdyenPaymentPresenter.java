@@ -1,6 +1,7 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import com.appcoins.billing.sdk.BuildConfig;
@@ -193,6 +194,17 @@ class AdyenPaymentPresenter {
     adyenPaymentInteract.submitRedirect(uid, adyenPaymentInfo.getWalletAddress(), details, null,
         makePaymentListener);
     fragmentView.disableBack();
+  }
+
+  void onHelpTextClicked() {
+    BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
+    String packageName = buyItemProperties.getPackageName();
+    String walletAddress = adyenPaymentInfo.getWalletAddress();
+    String sku = buyItemProperties.getSku();
+    String sdkVersionName = BuildConfig.VERSION_NAME;
+    int mobileVersion = Build.VERSION.SDK_INT;
+    fragmentView.redirectToSupportEmail(walletAddress, packageName, sku, sdkVersionName,
+        mobileVersion);
   }
 
   private void onMakePaymentResponse(AdyenTransactionModel adyenTransactionModel) {

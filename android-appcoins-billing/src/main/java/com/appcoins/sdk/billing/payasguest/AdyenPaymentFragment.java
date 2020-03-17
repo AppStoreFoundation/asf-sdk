@@ -7,6 +7,10 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -143,11 +147,14 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         .getErrorPositiveButton();
     TextView changeCardView = layout.getChangeCardView();
     TextView morePaymentsText = layout.getMorePaymentsText();
+    TextView helpText = layout.getHelpText();
+
     onPositiveButtonClick(positiveButton);
     onCancelButtonClick(cancelButton);
     onErrorButtonClick(errorButton);
     onChangeCardClick(changeCardView);
     onMorePaymentsClick(morePaymentsText);
+    createSpannableString(helpText);
 
     presenter.loadPaymentInfo();
   }
@@ -351,6 +358,31 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void enableBack() {
     iabView.enableBack();
+  }
+
+  @Override public void redirectToSupportEmail(String walletAddress, String packageName, String sku,
+      String sdkVersionName, int mobileVersion) {
+    String title = "Support title";
+    EmailInfo emailInfo =
+        new EmailInfo(walletAddress, packageName, sku, sdkVersionName, mobileVersion, title);
+    iabView.redirectToSupportEmail(emailInfo);
+  }
+
+  private void createSpannableString(TextView helpText) {
+    String helpString = "Need help?";
+    String contactString = "Contact Support";
+    String concatenatedString = helpString + ' ' + contactString;
+    SpannableString spannableString = new SpannableString(concatenatedString);
+    ClickableSpan clickableSpan = new ClickableSpan() {
+      @Override public void onClick(View widget) {
+        presenter.onHelpTextClicked();
+      }
+    };
+    spannableString.setSpan(clickableSpan, helpString.length() + 1, concatenatedString.length(),
+        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+    helpText.setText(spannableString);
+    helpText.setMovementMethod(LinkMovementMethod.getInstance());
+    helpText.setHighlightColor(Color.parseColor("#fe6e76"));
   }
 
   private void setStoredPaymentMethodDetails(StoredMethodDetails storedMethodDetails) {
