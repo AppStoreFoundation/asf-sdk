@@ -61,6 +61,7 @@ public class LayoutUtils {
   }
 
   public static int dpToPx(int dp) {
+    if (dp == 0) return 0;
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem()
         .getDisplayMetrics());
   }
@@ -116,5 +117,17 @@ public class LayoutUtils {
         return result;
       }
     }
+  }
+
+  public static float[] getCornerRadiusArray(int topLeft, int topRight, int bottomRight,
+      int bottomLeft) {
+    int pxTopLeft = dpToPx(topLeft);
+    int pxTopRight = dpToPx(topRight);
+    int pxBottomRight = dpToPx(bottomRight);
+    int pxBottomLeft = dpToPx(bottomLeft);
+    return new float[] {
+        pxTopLeft, pxTopLeft, pxTopRight, pxTopRight, pxBottomRight, pxBottomRight, pxBottomLeft,
+        pxBottomLeft
+    };
   }
 }

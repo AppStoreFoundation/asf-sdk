@@ -35,6 +35,7 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.IMAGES_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.SUPPORT_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.getCornerRadiusArray;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.mapDisplayMetrics;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setConstraint;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
@@ -303,15 +304,25 @@ public class PaymentMethodsFragmentLayout {
 
   private LinearLayout buildSupportHook() {
     LinearLayout linearLayout = new LinearLayout(activity);
-    RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(32));
-    layoutParams.addRule(RelativeLayout.BELOW, buttonsViewId);
+
+    float[] radius;
+    RelativeLayout.LayoutParams layoutParams;
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      layoutParams =
+          new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(32));
+      radius = getCornerRadiusArray(0, 0, 8, 8);
+      layoutParams.addRule(RelativeLayout.BELOW, buttonsViewId);
+    } else {
+      layoutParams =
+          new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(32));
+      radius = getCornerRadiusArray(16, 16, 16, 16);
+      layoutParams.addRule(RelativeLayout.BELOW, paymentMethodsId);
+      setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_LEFT);
+      setMargins(layoutParams, 18, 24, 0, 16);
+    }
 
     GradientDrawable gradientDrawable = new GradientDrawable();
     gradientDrawable.setColor(Color.parseColor("#f0f0f0"));
-    float[] radius = new float[] {
-        0, 0, 0, 0, dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8)
-    };
     gradientDrawable.setCornerRadii(radius);
     linearLayout.setBackground(gradientDrawable);
 
@@ -331,11 +342,10 @@ public class PaymentMethodsFragmentLayout {
     LinearLayout.LayoutParams layoutParams =
         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
-
+    setMargins(layoutParams, 0, 0, 14, 0);
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#202020"));
     textView.setTextSize(12);
-    textView.setText("Need help? Contact Support");
     textView.setLayoutParams(layoutParams);
     return textView;
   }
@@ -343,7 +353,7 @@ public class PaymentMethodsFragmentLayout {
   private ImageView buildSupportImage() {
     ImageView imageView = new ImageView(activity);
     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(dpToPx(18), dpToPx(18));
-    setMargins(layoutParams, 0, 0, 8, 0);
+    setMargins(layoutParams, 14, 0, 8, 0);
     Drawable supportImage =
         convertAssetDrawable(SUPPORT_RESOURCE_PATH + densityPath + "ic_settings_support.png");
     imageView.setImageDrawable(supportImage);
@@ -385,9 +395,10 @@ public class PaymentMethodsFragmentLayout {
   private LinearLayout buildButtonsView() {
     LinearLayout linearLayout = new LinearLayout(activity);
     RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.BELOW, paymentMethodsId);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     buttonsViewId = generateRandomId();
     linearLayout.setId(buttonsViewId);
     int end, top, bottom;
@@ -403,7 +414,6 @@ public class PaymentMethodsFragmentLayout {
     }
 
     setMargins(layoutParams, 0, top, end, bottom);
-    linearLayout.setGravity(Gravity.END);
     linearLayout.setOrientation(LinearLayout.HORIZONTAL);
     linearLayout.setClipChildren(false);
     linearLayout.setClipToPadding(false);
