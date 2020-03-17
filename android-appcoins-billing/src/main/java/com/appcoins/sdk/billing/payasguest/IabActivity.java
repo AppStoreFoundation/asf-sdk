@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -200,7 +201,11 @@ public class IabActivity extends Activity implements IabView {
     intent.putExtra(Intent.EXTRA_SUBJECT, emailInfo.getTitle());
     intent.putExtra(Intent.EXTRA_EMAIL, extraEmail);
     intent.putExtra(Intent.EXTRA_TEXT, body);
-    startActivity(Intent.createChooser(intent, "Select email application."));
+    PackageManager packageManager = getPackageManager();
+    ActivityInfo activityInfo = intent.resolveActivityInfo(packageManager, 0);
+    if (activityInfo != null) {
+      startActivity(Intent.createChooser(intent, "Select email application."));
+    }
   }
 
   private void buildAlertNoBrowserAndStores() {
