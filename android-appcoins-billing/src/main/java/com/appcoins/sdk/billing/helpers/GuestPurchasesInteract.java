@@ -91,10 +91,7 @@ class GuestPurchasesInteract {
       final ArrayList<String> dataList, final ArrayList<String> signatureDataList) {
     return new PurchasesListener() {
       @Override public void onResponse(PurchasesModel purchasesModel) {
-        if (!purchasesModel.hasError()) {
-          buildPurchaseBundle(bundle, purchasesModel, idsList, skuList, dataList,
-              signatureDataList);
-        }
+        buildPurchaseBundle(bundle, purchasesModel, idsList, skuList, dataList, signatureDataList);
         countDownLatch.countDown();
       }
     };
