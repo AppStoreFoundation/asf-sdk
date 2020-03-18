@@ -208,6 +208,14 @@ public class IabActivity extends Activity implements IabView {
     }
   }
 
+  @Override public boolean hasEmailApplication() {
+    PackageManager packageManager = getPackageManager();
+    Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+    intent.setType("message/rfc822");
+    ActivityInfo activityInfo = intent.resolveActivityInfo(packageManager, 0);
+    return activityInfo != null;
+  }
+
   private void buildAlertNoBrowserAndStores() {
     AlertDialog.Builder alert = new AlertDialog.Builder(this);
     TranslationsModel translationsModel = translationsRepository.getTranslationsModel();

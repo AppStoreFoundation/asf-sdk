@@ -148,14 +148,19 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     TextView changeCardView = layout.getChangeCardView();
     TextView morePaymentsText = layout.getMorePaymentsText();
     TextView helpText = layout.getHelpText();
+    ViewGroup supportHook = layout.getSupportHookView();
 
     onPositiveButtonClick(positiveButton);
     onCancelButtonClick(cancelButton);
     onErrorButtonClick(errorButton);
     onChangeCardClick(changeCardView);
     onMorePaymentsClick(morePaymentsText);
-    createSpannableString(helpText);
-
+    if (iabView.hasEmailApplication()) {
+      supportHook.setVisibility(View.VISIBLE);
+      createSpannableString(helpText);
+    } else {
+      supportHook.setVisibility(View.GONE);
+    }
     presenter.loadPaymentInfo();
   }
 

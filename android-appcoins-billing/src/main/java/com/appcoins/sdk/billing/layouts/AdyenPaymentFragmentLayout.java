@@ -80,6 +80,7 @@ public class AdyenPaymentFragmentLayout {
   private TranslationsModel translationModel;
   private ViewGroup completedPurchaseView;
   private TextView helpText;
+  private ViewGroup supportHookView;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -187,7 +188,7 @@ public class AdyenPaymentFragmentLayout {
     buttonsView = buildButtonsView();
     buttonsView.setVisibility(View.INVISIBLE);
 
-    LinearLayout supportHookView = buildSupportHook();
+    supportHookView = buildSupportHook();
 
     dialogLayout.addView(progressBar);
     dialogLayout.addView(paymentMethodsHeaderLayout);
@@ -886,5 +887,9 @@ public class AdyenPaymentFragmentLayout {
 
   public TextView getHelpText() {
     return helpText;
+  }
+
+  public ViewGroup getSupportHookView() {
+    return supportHookView;
   }
 }

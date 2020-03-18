@@ -126,6 +126,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     ViewGroup paypalWrapper = layout.getPaypalWrapperLayout();
     ViewGroup installWrapper = layout.getInstallWrapperLayout();
     Button errorButton = layout.getErrorPositiveButton();
+    ViewGroup supportHook = layout.getSupportHookView();
     TextView helpText = layout.getHelpText();
 
     onRotation(savedInstanceState);
@@ -134,7 +135,12 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     onErrorButtonClicked(errorButton);
     onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton, creditWrapper,
         paypalWrapper, installWrapper);
-    createSpannableString(helpText);
+    if (iabView.hasEmailApplication()) {
+      supportHook.setVisibility(View.VISIBLE);
+      createSpannableString(helpText);
+    } else {
+      supportHook.setVisibility(View.GONE);
+    }
   }
 
   @Override public void onResume() {
