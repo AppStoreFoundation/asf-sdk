@@ -151,7 +151,7 @@ public class WalletUtils {
           + "; "
           + System.getProperty("os.arch")
           + "; "
-          + BuildConfig.APPLICATION_ID
+          + context.getPackageName()
           + "; "
           + BuildConfig.VERSION_CODE
           + "; "
