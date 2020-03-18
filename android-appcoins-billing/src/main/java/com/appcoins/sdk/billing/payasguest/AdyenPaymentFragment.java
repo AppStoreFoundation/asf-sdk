@@ -94,13 +94,12 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     super.onCreate(savedInstanceState);
 
     adyenPaymentInfo = extractBundleInfo();
-    int timeoutInMillis = 30000;
-    AdyenRepository adyenRepository =
-        new AdyenRepository(new BdsService(BuildConfig.HOST_WS + "/broker/", 30000),
-            new AdyenListenerProvider(new AdyenMapper()));
-    Service apiService = new BdsService(BuildConfig.HOST_WS, timeoutInMillis);
-    Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, timeoutInMillis);
-    IExtractOemId extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
+    AdyenRepository adyenRepository = new AdyenRepository(
+        new BdsService(BuildConfig.HOST_WS + "/broker/", BdsService.TIME_OUT_IN_MILLIS),
+        new AdyenListenerProvider(new AdyenMapper()));
+    Service apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
+    Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, BdsService.TIME_OUT_IN_MILLIS);
+    OemIdExtractor extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
 
     BillingRepository billingRepository = new BillingRepository(apiService);
 

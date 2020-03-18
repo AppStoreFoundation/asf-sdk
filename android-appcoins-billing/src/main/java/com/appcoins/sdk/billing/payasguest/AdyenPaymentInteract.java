@@ -40,20 +40,14 @@ public class AdyenPaymentInteract {
         walletAddress, loadPaymentInfoListener);
   }
 
-  void makePayment(final String paymentMethod, final boolean shouldStoreCard,
-      final String returnUrl, final String fiatPrice, final String currency,
-      final String orderReference, final String paymentType, final String packageName,
-      final String metadata, final String sku, final String callBackUrl,
-      final String transactionType, final String userWalletAddress,
-      final MakePaymentListener makePaymentListener) {
+  void makePayment(final AdyenPaymentParams adyenPaymentParams,
+      final TransactionInformation transactionInformation, final String userWalletAddress,
+      String packageName, final MakePaymentListener makePaymentListener) {
 
     AddressRetrievedListener addressRetrievedListener = new AddressRetrievedListener() {
       @Override public void onAddressRetrieved(String oemAddress, String storeAddress,
           String developerAddress) {
-        adyenRepository.makePayment(
-            new AdyenPaymentParams(paymentMethod, shouldStoreCard, returnUrl),
-            new TransactionInformation(fiatPrice, currency, orderReference, paymentType, "BDS",
-                packageName, metadata, sku, callBackUrl, transactionType),
+        adyenRepository.makePayment(adyenPaymentParams, transactionInformation,
             new TransactionWallets(userWalletAddress, developerAddress, oemAddress, storeAddress,
                 userWalletAddress), makePaymentListener);
       }

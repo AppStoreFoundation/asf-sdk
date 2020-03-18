@@ -15,8 +15,10 @@ import com.appcoins.sdk.billing.mappers.BillingMapper;
 import com.appcoins.sdk.billing.models.Transaction.Status;
 import com.appcoins.sdk.billing.models.billing.AdyenPaymentInfo;
 import com.appcoins.sdk.billing.models.billing.AdyenPaymentMethodsModel;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentParams;
 import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
 import com.appcoins.sdk.billing.models.billing.PurchaseModel;
+import com.appcoins.sdk.billing.models.billing.TransactionInformation;
 import com.appcoins.sdk.billing.models.billing.TransactionResponse;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
 import com.sdk.appcoins_adyen.card.EncryptedCard;
@@ -129,17 +131,22 @@ class AdyenPaymentPresenter {
       String serverCurrency) {
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
     DeveloperPayload developerPayload = buyItemProperties.getDeveloperPayload();
+    AdyenRepository.Methods method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
+    String packageName = buyItemProperties.getPackageName();
     MakePaymentListener makePaymentListener = new MakePaymentListener() {
       @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
         onMakePaymentResponse(adyenTransactionModel);
       }
     };
-    adyenPaymentInteract.makePayment(encryptedCard, true, returnUrl, serverFiatPrice.toString(),
-        serverCurrency, developerPayload.getOrderReference(),
-        mapPaymentToService(adyenPaymentInfo.getPaymentMethod()).getTransactionType(),
-        buyItemProperties.getPackageName(), developerPayload.getDeveloperPayload(),
-        buyItemProperties.getSku(), null, buyItemProperties.getType()
-            .toUpperCase(), adyenPaymentInfo.getWalletAddress(), makePaymentListener);
+    AdyenPaymentParams adyenPaymentParams = new AdyenPaymentParams(encryptedCard, true, returnUrl);
+    TransactionInformation transactionInformation =
+        new TransactionInformation(serverFiatPrice.toString(), serverCurrency,
+            developerPayload.getOrderReference(), method.getTransactionType(), "BDS", packageName,
+            developerPayload.getDeveloperPayload(), buyItemProperties.getSku(), null,
+            buyItemProperties.getType()
+                .toUpperCase());
+    adyenPaymentInteract.makePayment(adyenPaymentParams, transactionInformation,
+        adyenPaymentInfo.getWalletAddress(), packageName, makePaymentListener);
   }
 
   private void launchPayment(AdyenPaymentMethodsModel adyenPaymentMethodsModel) {
@@ -156,6 +163,8 @@ class AdyenPaymentPresenter {
   private void launchPaypal(AdyenPaymentMethodsModel paymentMethod) {
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
     DeveloperPayload developerPayload = buyItemProperties.getDeveloperPayload();
+    AdyenRepository.Methods method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
+    String packageName = buyItemProperties.getPackageName();
     MakePaymentListener makePaymentListener = new MakePaymentListener() {
       @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
         if (!waitingResult) {
@@ -163,13 +172,16 @@ class AdyenPaymentPresenter {
         }
       }
     };
-    adyenPaymentInteract.makePayment(paymentMethod.getPaymentMethod(), false, returnUrl,
+    AdyenPaymentParams adyenPaymentParams =
+        new AdyenPaymentParams(paymentMethod.getPaymentMethod(), false, returnUrl);
+    TransactionInformation transactionInformation = new TransactionInformation(
         paymentMethod.getValue()
             .toString(), paymentMethod.getCurrency(), developerPayload.getOrderReference(),
-        mapPaymentToService(adyenPaymentInfo.getPaymentMethod()).getTransactionType(),
-        buyItemProperties.getPackageName(), developerPayload.getDeveloperPayload(),
+        method.getTransactionType(), "BDS", packageName, developerPayload.getDeveloperPayload(),
         buyItemProperties.getSku(), null, buyItemProperties.getType()
-            .toUpperCase(), adyenPaymentInfo.getWalletAddress(), makePaymentListener);
+        .toUpperCase());
+    adyenPaymentInteract.makePayment(adyenPaymentParams, transactionInformation,
+        adyenPaymentInfo.getWalletAddress(), packageName, makePaymentListener);
   }
 
   private void handlePaypalModel(final AdyenTransactionModel adyenTransactionModel) {

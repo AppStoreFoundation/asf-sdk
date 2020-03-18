@@ -1,7 +1,6 @@
 package com.appcoins.sdk.billing.service;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import com.appcoins.sdk.billing.utils.RequestBuilderUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,6 +16,7 @@ import java.util.Map;
 
 public class BdsService implements Service {
 
+  public final static int TIME_OUT_IN_MILLIS = 30000;
   private String baseUrl;
   private int timeoutInMillis;
   private List<ServiceAsyncTask> asyncTasks;
