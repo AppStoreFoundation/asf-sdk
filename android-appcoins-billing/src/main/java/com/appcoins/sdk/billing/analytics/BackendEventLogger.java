@@ -12,9 +12,11 @@ import java.util.Map;
 class BackendEventLogger implements EventLogger {
 
   private BdsService bdsService;
+  private String packageName;
 
-  BackendEventLogger(BdsService bdsService) {
+  BackendEventLogger(BdsService bdsService, String packageName) {
     this.bdsService = bdsService;
+    this.packageName = packageName;
   }
 
   @Override
@@ -28,11 +30,7 @@ class BackendEventLogger implements EventLogger {
     Map<String, Object> body = new HashMap<>();
     body.put("data", data);
     body.put("aptoide_vercode", BuildConfig.VERSION_CODE);
-    String suffix = "";
-    if (BuildConfig.DEBUG) {
-      suffix = ".dev";
-    }
-    body.put("aptoide_package", BuildConfig.APPLICATION_ID + suffix);
+    body.put("aptoide_package", packageName);
     bdsService.makeRequest("user/addEvent", "POST", path, new HashMap<String, String>(),
         new HashMap<String, String>(), body, null);
   }

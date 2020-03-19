@@ -30,6 +30,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
+import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
@@ -69,6 +71,8 @@ public class InstallDialogActivity extends Activity {
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    BillingAnalytics billingAnalytics =
+        new BillingAnalytics(AnalyticsManagerProvider.provideAnalyticsManager());
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
@@ -86,6 +90,9 @@ public class InstallDialogActivity extends Activity {
     installationDialog = setupInstallationDialog(storeUrl);
 
     showInstallationDialog(installationDialog);
+    billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
+        buyItemProperties.getSku(), "0.0", buyItemProperties.getType(),
+        BillingAnalytics.RAKAM_START_INSTALL);
   }
 
   @Override protected void onResume() {

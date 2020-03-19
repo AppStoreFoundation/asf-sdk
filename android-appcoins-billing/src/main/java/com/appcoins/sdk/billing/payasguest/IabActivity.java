@@ -75,14 +75,14 @@ public class IabActivity extends Activity implements IabView {
       setResult(resultCode, data);
       finish();
     } else if (requestCode == WEB_VIEW_REQUEST_CODE) {
-      if (resultCode == WebViewActivity.SUCCESS) {
-        if (activityResultListener != null) {
-          activityResultListener.onActivityResult(data.getData());
+      if (activityResultListener != null) {
+        if (resultCode == WebViewActivity.SUCCESS) {
+          activityResultListener.onActivityResult(data.getData(), true);
         } else {
-          Log.w("IabActivity", "ActivityResultListener was not set");
-          close();
+          activityResultListener.onActivityResult(data.getData(), false);
         }
       } else {
+        Log.w("IabActivity", "ActivityResultListener was not set");
         close();
       }
     }

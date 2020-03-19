@@ -20,6 +20,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.analytics.AdyenAnalyticsInteract;
+import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
+import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
@@ -98,6 +101,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
     TranslationsModel translationsModel = TranslationsRepository.getInstance(getActivity())
         .getTranslationsModel();
     adyenPaymentInfo = extractBundleInfo();
@@ -109,16 +113,21 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, timeoutInMillis);
     IExtractOemId extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
 
-    BillingRepository billingRepository = new BillingRepository(apiService);
-
     AddressService addressService = new AddressService(getActivity().getApplicationContext(),
         new WalletAddressService(apiService, BuildConfig.DEFAULT_STORE_ADDRESS,
             BuildConfig.DEFAULT_OEM_ADDRESS), new DeveloperAddressService(ws75Service),
         Build.MANUFACTURER, Build.MODEL, new OemIdExtractorService(extractorV1));
+    BillingRepository billingRepository = new BillingRepository(apiService);
 
-    presenter = new AdyenPaymentPresenter(this, adyenPaymentInfo,
-        new AdyenPaymentInteract(adyenRepository, billingRepository, addressService),
-        new AdyenErrorCodeMapper(translationsModel),
+    BillingAnalytics billingAnalytics =
+        new BillingAnalytics(AnalyticsManagerProvider.provideAnalyticsManager());
+    AdyenAnalyticsInteract adyenAnalyticsInteract = new AdyenAnalyticsInteract(billingAnalytics);
+
+    AdyenPaymentInteract adyenPaymentInteract =
+        new AdyenPaymentInteract(adyenRepository, billingRepository, addressService);
+
+    presenter = new AdyenPaymentPresenter(this, adyenPaymentInfo, adyenPaymentInteract,
+        adyenAnalyticsInteract, new AdyenErrorCodeMapper(translationsModel),
         RedirectUtils.getReturnUrl(getActivity().getApplicationContext()));
   }
 
@@ -288,8 +297,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void navigateToUri(String url, final String uid) {
     ActivityResultListener activityResultListener = new ActivityResultListener() {
-      @Override public void onActivityResult(Uri data) {
-        presenter.onActivityResult(data, uid);
+      @Override public void onActivityResult(Uri data, boolean success) {
+        presenter.onActivityResult(data, uid, success);
       }
     };
     iabView.setOnActivityResultListener(activityResultListener);

@@ -48,7 +48,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   public static String CREDIT_CARD_RADIO = "credit_card";
   public static String PAYPAL_RADIO = "paypal";
-  public static String INSTALL_RADIO = "install";
+  public static String INSTALL_RADIO = "install_wallet";
   private static String SELECTED_RADIO_KEY = "selected_radio";
   private IabView iabView;
   private BuyItemProperties buyItemProperties;
@@ -84,6 +84,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
     translationsModel = TranslationsRepository.getInstance(getActivity())
         .getTranslationsModel();
+    Activity activity = getActivity();
     int timeoutInMillis = 30000;
     BdsService backendService = new BdsService(BuildConfig.BACKEND_BASE, timeoutInMillis);
     BdsService apiService = new BdsService(BuildConfig.HOST_WS, timeoutInMillis);
@@ -92,24 +93,29 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         new SharedPreferencesRepository(getActivity(), SharedPreferencesRepository.TTL_IN_SECONDS);
     WalletRepository walletRepository =
         new WalletRepository(backendService, new WalletGenerationMapper());
+    PaymentMethodsRepository paymentMethodsRepository = new PaymentMethodsRepository(apiService);
+    BillingRepository billingRepository = new BillingRepository(apiService);
+    AnalyticsManager analyticsManager = AnalyticsManagerProvider.provideAnalyticsManager();
+    BillingAnalytics billingAnalytics = new BillingAnalytics(analyticsManager);
+
     WalletInteract walletInteract =
         new WalletInteract(sharedPreferencesRepository, walletRepository);
     GamificationInteract gamificationInteract =
         new GamificationInteract(sharedPreferencesRepository, new GamificationMapper(),
             backendService);
-    PaymentMethodsRepository paymentMethodsRepository = new PaymentMethodsRepository(apiService);
-    BillingRepository billingRepository = new BillingRepository(apiService);
-    AnalyticsManager analyticsManager = AnalyticsManagerProvider.provideAnalyticsManager();
-    BillingAnalytics billingAnalytics = new BillingAnalytics(analyticsManager);
+    PaymentMethodsInteract paymentMethodsInteract =
+        new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository,
+            billingRepository);
+    WalletInstallationIntentBuilder walletInstallationIntentBuilder =
+        new WalletInstallationIntentBuilder(activity.getPackageManager(), activity.getPackageName(),
+            activity.getApplicationContext());
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
-    paymentMethodsPresenter = new PaymentMethodsPresenter(this,
-        new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository,
-            billingRepository),
-        new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
-            getActivity().getPackageName(), getActivity().getApplicationContext()),
-        billingAnalytics, buyItemProperties);
+
+    paymentMethodsPresenter =
+        new PaymentMethodsPresenter(this, paymentMethodsInteract, walletInstallationIntentBuilder,
+            billingAnalytics, buyItemProperties);
   }
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -236,7 +242,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private void onCancelButtonClicked(Button cancelButton) {
     cancelButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        paymentMethodsPresenter.onCancelButtonClicked();
+        paymentMethodsPresenter.onCancelButtonClicked(selectedRadioButton);
       }
     });
   }

@@ -4,5 +4,5 @@ import android.net.Uri;
 
 public interface ActivityResultListener {
 
-  void onActivityResult(Uri data);
+  void onActivityResult(Uri data, boolean success);
 }

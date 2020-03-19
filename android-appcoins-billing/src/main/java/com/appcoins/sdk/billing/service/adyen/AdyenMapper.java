@@ -20,9 +20,9 @@ public class AdyenMapper {
 
   public TransactionResponse mapTransactionResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    TransactionResponse transactionResponse = new TransactionResponse();
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
+    TransactionResponse transactionResponse = new TransactionResponse(code);
     String uid;
     String hash;
     String orderReference;
@@ -38,7 +38,7 @@ public class AdyenMapper {
         orderReference = jsonObject.getString("reference");
         status = jsonObject.getString("status");
         transactionResponse =
-            new TransactionResponse(uid, hash, orderReference, status, !isSuccess(code));
+            new TransactionResponse(uid, hash, orderReference, status, !isSuccess(code), code);
       } catch (JSONException e) {
         e.printStackTrace();
       }
@@ -48,9 +48,9 @@ public class AdyenMapper {
 
   public AdyenTransactionModel mapAdyenTransactionResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    AdyenTransactionModel adyenTransactionModel = new AdyenTransactionModel();
-    String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
+    String response = requestResponse.getResponse();
+    AdyenTransactionModel adyenTransactionModel = new AdyenTransactionModel(code);
     String uid;
     String hash;
     String orderReference;
@@ -84,7 +84,7 @@ public class AdyenMapper {
         adyenTransactionModel =
             new AdyenTransactionModel(uid, hash, orderReference, status, pspReference, resultCode,
                 url, paymentData, refusalReason, Integer.parseInt(refusalReasonCode),
-                !isSuccess(code));
+                !isSuccess(code), code);
       } catch (JSONException e) {
         e.printStackTrace();
       }

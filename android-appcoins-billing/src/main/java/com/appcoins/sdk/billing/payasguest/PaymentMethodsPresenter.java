@@ -62,14 +62,17 @@ class PaymentMethodsPresenter {
     paymentMethodsInteract.requestMaxBonus(maxBonusListener);
   }
 
-  void onCancelButtonClicked() {
+  void onCancelButtonClicked(String selectedRadioButton) {
+    sendRakamPaymentMethodEvent(selectedRadioButton, "cancel");
     fragmentView.close();
   }
 
   void onPositiveButtonClicked(String selectedRadioButton) {
     if (selectedRadioButton.equals("paypal") || selectedRadioButton.equals("credit_card")) {
+      sendRakamPaymentMethodEvent(selectedRadioButton, "next");
       fragmentView.navigateToAdyen(selectedRadioButton);
     } else {
+      sendRakamPaymentMethodEvent(selectedRadioButton, "next");
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
       if (intent != null) {
         if (intent.getPackage() != null && intent.getPackage()
@@ -112,6 +115,7 @@ class PaymentMethodsPresenter {
       SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
         @Override public void onResponse(boolean error, SkuDetails skuDetails) {
           if (!error) {
+            paymentMethodsInteract.cacheFiatPrice(skuDetails.getFiatPrice());
             loadPaymentsAvailable(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode());
             fragmentView.setSkuInformation(new SkuDetailsModel(skuDetails.getFiatPrice(),
                 skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
@@ -142,6 +146,9 @@ class PaymentMethodsPresenter {
           }
           billingAnalytics.sendPurchaseDetailsEvent(buyItemProperties.getPackageName(),
               buyItemProperties.getSku(), fiatPrice, buyItemProperties.getType());
+          billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
+              buyItemProperties.getSku(), fiatPrice, buyItemProperties.getType(),
+              BillingAnalytics.RAKAM_START_PAYMENT_METHOD);
           fragmentView.showPaymentView();
         }
       }
@@ -168,5 +175,11 @@ class PaymentMethodsPresenter {
     };
     paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature,
         type.toLowerCase(), purchasesListener);
+  }
+
+  private void sendRakamPaymentMethodEvent(String selectedRadioButton, String action) {
+    billingAnalytics.sendPaymentMethodEvent(buyItemProperties.getPackageName(),
+        buyItemProperties.getSku(), paymentMethodsInteract.getCachedFiatPrice(),
+        selectedRadioButton, buyItemProperties.getType(), action);
   }
 }
