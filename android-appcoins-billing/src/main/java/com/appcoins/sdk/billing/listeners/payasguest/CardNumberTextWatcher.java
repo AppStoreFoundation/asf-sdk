@@ -16,7 +16,7 @@ public class CardNumberTextWatcher implements TextWatcher {
   private CardNumberEditText editText;
   private EditText nextViewToFocus;
   private EditText cvvEditText;
-  private boolean ignore;
+  private boolean isShortenCardNumber;
 
   public CardNumberTextWatcher(CreditCardLayout creditCardLayout, CardNumberEditText editText,
       EditText nextViewToFocus, EditText cvvEditText) {
@@ -28,27 +28,25 @@ public class CardNumberTextWatcher implements TextWatcher {
 
   @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
     if (CardValidationUtils.isShortenCardNumber(charSequence.toString())) {
-      ignore = true;
+      //When the number is in the following format ••••, and the user goes back to edit it, the
+      // onFocusListener is called to change the number back to the full card number and we
+      // should ignore that change or an infinite cycle will occur
+      isShortenCardNumber = true;
     }
   }
 
   @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-    if (ignore) {
-      ignore = false;
+    if (isShortenCardNumber) {
+      //onFocusChange changed number back to the full card number
+      isShortenCardNumber = false;
       editText.setSelection(charSequence.length());
     } else {
       if (charSequence.length() > 0) {
         String rawCardNumber = CardValidationUtils.getCardNumberRawValue(charSequence.toString());
         if (isValidCardNumber(rawCardNumber)) {
-          creditCardLayout.setCardNumberValid(true);
-          changeFocusOfInput(rawCardNumber);
+          onValidCardNumber(rawCardNumber);
         } else {
-          if (CardValidationUtils.isShortenCardNumber(charSequence.toString()) && isValidCardNumber(
-              CardValidationUtils.getCardNumberRawValue(editText.getCacheSavedNumber()))) {
-            creditCardLayout.setCardNumberValid(true);
-          } else {
-            creditCardLayout.setCardNumberValid(false);
-          }
+          setCachedCardNumberValidity(charSequence);
         }
       }
     }
@@ -94,5 +92,19 @@ public class CardNumberTextWatcher implements TextWatcher {
   private boolean isValidCardNumber(String cardNumber) {
     return CardValidationUtils.isValidCardNumber(
         CardValidationUtils.getCardNumberRawValue(cardNumber));
+  }
+
+  private void setCachedCardNumberValidity(CharSequence charSequence) {
+    if (CardValidationUtils.isShortenCardNumber(charSequence.toString()) && isValidCardNumber(
+        CardValidationUtils.getCardNumberRawValue(editText.getCacheSavedNumber()))) {
+      creditCardLayout.setCardNumberValid(true);
+    } else {
+      creditCardLayout.setCardNumberValid(false);
+    }
+  }
+
+  private void onValidCardNumber(String rawCardNumber) {
+    creditCardLayout.setCardNumberValid(true);
+    changeFocusOfInput(rawCardNumber);
   }
 }

@@ -9,10 +9,6 @@ import static com.appcoins.sdk.billing.utils.ServiceUtils.isSuccess;
 
 public class AddressResponseMapper {
 
-  public AddressResponseMapper() {
-
-  }
-
   public AddressModel map(RequestResponse requestResponse, String defaultAddress) {
     JSONObject jsonObject;
     AddressModel addressModel = new AddressModel(defaultAddress);

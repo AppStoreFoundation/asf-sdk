@@ -27,7 +27,7 @@ interface IabView {
 
   void unlockRotation();
 
-  void navigateToUri(String url);
+  void navigateToUri(String url, String uid);
 
   void finish(Bundle bundle);
 

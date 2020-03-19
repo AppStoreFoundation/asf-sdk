@@ -3,6 +3,7 @@ package com.appcoins.sdk.billing.payasguest;
 import android.os.AsyncTask;
 import com.appcoins.sdk.billing.listeners.AddressRetrievedListener;
 import com.appcoins.sdk.billing.models.AddressModel;
+import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.address.AddressService;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +31,7 @@ public class AddressAsyncTask extends AsyncTask<Object, Object, Object> {
     getStoreAddress(countDownLatch);
     getDeveloperAddress(countDownLatch);
     try {
-      countDownLatch.await(30, TimeUnit.SECONDS);
+      countDownLatch.await(BdsService.TIME_OUT_IN_MILLIS, TimeUnit.MILLISECONDS);
       addressRetrievedListener.onAddressRetrieved(oemAddress, storeAddress, developerAddress);
     } catch (InterruptedException e) {
       e.printStackTrace();
