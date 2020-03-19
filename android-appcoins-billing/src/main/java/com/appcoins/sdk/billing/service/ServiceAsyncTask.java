@@ -9,8 +9,8 @@ public class ServiceAsyncTask extends AsyncTask<Object, Object, RequestResponse>
   private final String httpMethod;
   private final List<String> paths;
   private final Map<String, String> queries;
-  private Map<String, String> header;
   private final Map<String, Object> body;
+  private Map<String, String> header;
   private BdsService bdsService;
   private String baseUrl;
   private String endPoint;
@@ -36,6 +36,8 @@ public class ServiceAsyncTask extends AsyncTask<Object, Object, RequestResponse>
 
   @Override protected void onPostExecute(RequestResponse requestResponse) {
     super.onPostExecute(requestResponse);
-    serviceResponseListener.onResponseReceived(requestResponse);
+    if (serviceResponseListener != null) {
+      serviceResponseListener.onResponseReceived(requestResponse);
+    }
   }
 }

@@ -1,0 +1,224 @@
+package com.appcoins.sdk.billing.analytics;
+
+import cm.aptoide.analytics.AnalyticsManager;
+import java.util.HashMap;
+import java.util.Map;
+
+public class BillingAnalytics implements EventSender {
+  public static final String PURCHASE_DETAILS = "PURCHASE_DETAILS";
+  public static final String PAYMENT_METHOD_DETAILS = "PAYMENT_METHOD_DETAILS";
+  public static final String PAYMENT = "PAYMENT";
+  public static final String REVENUE = "REVENUE";
+  public static final String PAYMENT_METHOD_CC = "CREDIT_CARD";
+  public static final String PAYMENT_METHOD_REWARDS = "REWARDS";
+  public static final String RAKAM_PRESELECTED_PAYMENT_METHOD = "wallet_preselected_payment_method";
+  public static final String RAKAM_PAYMENT_METHOD = "wallet_payment_method";
+  public static final String RAKAM_PAYMENT_CONFIRMATION = "wallet_payment_confirmation";
+  public static final String RAKAM_PAYMENT_CONCLUSION = "wallet_payment_conclusion";
+  public static final String RAKAM_PAYMENT_START = "wallet_payment_start";
+  private static final String WALLET = "WALLET";
+  private static final String EVENT_PACKAGE_NAME = "package_name";
+  private static final String EVENT_SKU = "sku";
+  private static final String EVENT_VALUE = "value";
+  private static final String EVENT_PURCHASE = "purchase";
+  private static final String EVENT_TRANSACTION_TYPE = "transaction_type";
+  private static final String EVENT_PAYMENT_METHOD = "payment_method";
+  private static final String EVENT_ACTION = "action";
+  private static final String EVENT_CONTEXT = "context";
+  private static final String EVENT_STATUS = "status";
+  private static final String EVENT_ERROR_CODE = "error_code";
+  private static final String EVENT_ERROR_DETAILS = "error_details";
+  private static final String EVENT_SUCCESS = "success";
+  private static final String EVENT_FAIL = "fail";
+  private static final String EVENT_PENDING = "pending";
+  private final AnalyticsManager analytics;
+
+  public BillingAnalytics(AnalyticsManager analytics) {
+    this.analytics = analytics;
+  }
+
+  @Override
+  public void sendPurchaseDetailsEvent(String packageName, String skuDetails, String value,
+      String transactionType) {
+    Map<String, Object> eventData = new HashMap<>();
+    Map<String, Object> purchaseData = new HashMap<>();
+
+    purchaseData.put(EVENT_PACKAGE_NAME, packageName);
+    purchaseData.put(EVENT_SKU, skuDetails);
+    purchaseData.put(EVENT_VALUE, value);
+
+    eventData.put(EVENT_PURCHASE, purchaseData);
+    eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
+
+    analytics.logEvent(eventData, PURCHASE_DETAILS, AnalyticsManager.Action.CLICK, WALLET);
+  }
+
+  @Override
+  public void sendPaymentMethodDetailsEvent(String packageName, String skuDetails, String value,
+      String purchaseDetails, String transactionType) {
+    Map<String, Object> eventData = new HashMap<>();
+    Map<String, Object> purchaseData = new HashMap<>();
+
+    purchaseData.put(EVENT_PACKAGE_NAME, packageName);
+    purchaseData.put(EVENT_SKU, skuDetails);
+    purchaseData.put(EVENT_VALUE, value);
+
+    eventData.put(EVENT_PURCHASE, purchaseData);
+    eventData.put(EVENT_PAYMENT_METHOD, purchaseDetails);
+    eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
+
+    analytics.logEvent(eventData, PAYMENT_METHOD_DETAILS, AnalyticsManager.Action.CLICK, WALLET);
+  }
+
+  @Override public void sendPaymentEvent(String packageName, String skuDetails, String value,
+      String purchaseDetails, String transactionType) {
+    Map<String, Object> eventData = new HashMap<>();
+    Map<String, Object> purchaseData = new HashMap<>();
+
+    purchaseData.put(EVENT_PACKAGE_NAME, packageName);
+    purchaseData.put(EVENT_SKU, skuDetails);
+    purchaseData.put(EVENT_VALUE, value);
+
+    eventData.put(EVENT_PURCHASE, purchaseData);
+    eventData.put(EVENT_PAYMENT_METHOD, purchaseDetails);
+    eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
+
+    analytics.logEvent(eventData, PAYMENT, AnalyticsManager.Action.IMPRESSION, WALLET);
+  }
+
+  @Override public void sendRevenueEvent(String value) {
+    Map<String, Object> eventData = new HashMap<>();
+
+    eventData.put(EVENT_VALUE, value);
+
+    analytics.logEvent(eventData, REVENUE, AnalyticsManager.Action.IMPRESSION, WALLET);
+  }
+
+  @Override
+  public void sendPreSelectedPaymentMethodEvent(String packageName, String skuDetails, String value,
+      String purchaseDetails, String transactionType, String action) {
+    Map<String, Object> eventData =
+        createBaseRakamEventMap(packageName, skuDetails, value, purchaseDetails, transactionType,
+            action);
+
+    analytics.logEvent(eventData, RAKAM_PRESELECTED_PAYMENT_METHOD, AnalyticsManager.Action.CLICK,
+        WALLET);
+  }
+
+  @Override public void sendPaymentMethodEvent(String packageName, String skuDetails, String value,
+      String purchaseDetails, String transactionType, String action) {
+    Map<String, Object> eventData =
+        createBaseRakamEventMap(packageName, skuDetails, value, purchaseDetails, transactionType,
+            action);
+
+    analytics.logEvent(eventData, RAKAM_PAYMENT_METHOD, AnalyticsManager.Action.CLICK, WALLET);
+  }
+
+  @Override
+  public void sendPaymentConfirmationEvent(String packageName, String skuDetails, String value,
+      String purchaseDetails, String transactionType, String action) {
+    Map<String, Object> eventData =
+        createBaseRakamEventMap(packageName, skuDetails, value, purchaseDetails, transactionType,
+            action);
+
+    analytics.logEvent(eventData, RAKAM_PAYMENT_CONFIRMATION, AnalyticsManager.Action.CLICK,
+        WALLET);
+  }
+
+  @Override public void sendPaymentErrorEvent(String packageName, String skuDetails, String value,
+      String purchaseDetails, String transactionType, String errorCode) {
+    Map<String, Object> eventData =
+        createConclusionRakamEventMap(packageName, skuDetails, value, purchaseDetails,
+            transactionType, EVENT_FAIL);
+
+    eventData.put(EVENT_ERROR_CODE, errorCode);
+
+    analytics.logEvent(eventData, RAKAM_PAYMENT_CONCLUSION, AnalyticsManager.Action.CLICK, WALLET);
+  }
+
+  @Override
+  public void sendPaymentErrorWithDetailsEvent(String packageName, String skuDetails, String value,
+      String purchaseDetails, String transactionType, String errorCode, String errorDetails) {
+    Map<String, Object> eventData =
+        createConclusionRakamEventMap(packageName, skuDetails, value, purchaseDetails,
+            transactionType, EVENT_FAIL);
+
+    eventData.put(EVENT_ERROR_CODE, errorCode);
+    eventData.put(EVENT_ERROR_DETAILS, errorDetails);
+
+    analytics.logEvent(eventData, RAKAM_PAYMENT_CONCLUSION, AnalyticsManager.Action.CLICK, WALLET);
+  }
+
+  @Override public void sendPaymentSuccessEvent(String packageName, String skuDetails, String value,
+      String purchaseDetails, String transactionType) {
+    Map<String, Object> eventData =
+        createConclusionRakamEventMap(packageName, skuDetails, value, purchaseDetails,
+            transactionType, EVENT_SUCCESS);
+
+    analytics.logEvent(eventData, RAKAM_PAYMENT_CONCLUSION, AnalyticsManager.Action.CLICK, WALLET);
+  }
+
+  @Override public void sendPaymentPendingEvent(String packageName, String skuDetails, String value,
+      String purchaseDetails, String transactionType) {
+    Map<String, Object> eventData =
+        createConclusionRakamEventMap(packageName, skuDetails, value, purchaseDetails,
+            transactionType, EVENT_PENDING);
+
+    analytics.logEvent(eventData, RAKAM_PAYMENT_CONCLUSION, AnalyticsManager.Action.CLICK, WALLET);
+  }
+
+  @Override public void sendPurchaseStartEvent(String packageName, String skuDetails, String value,
+      String purchaseDetails, String transactionType, String context) {
+    Map<String, Object> eventData = new HashMap<>();
+
+    eventData.put(EVENT_PACKAGE_NAME, packageName);
+    eventData.put(EVENT_SKU, skuDetails);
+    eventData.put(EVENT_VALUE, value);
+    eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
+    eventData.put(EVENT_PAYMENT_METHOD, purchaseDetails);
+    eventData.put(EVENT_CONTEXT, context);
+
+    analytics.logEvent(eventData, RAKAM_PAYMENT_START, AnalyticsManager.Action.CLICK, WALLET);
+  }
+
+  @Override public void sendPurchaseStartWithoutDetailsEvent(String packageName, String skuDetails,
+      String value, String transactionType, String context) {
+    Map<String, Object> eventData = new HashMap<>();
+
+    eventData.put(EVENT_PACKAGE_NAME, packageName);
+    eventData.put(EVENT_SKU, skuDetails);
+    eventData.put(EVENT_VALUE, value);
+    eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
+    eventData.put(EVENT_CONTEXT, context);
+
+    analytics.logEvent(eventData, RAKAM_PAYMENT_START, AnalyticsManager.Action.CLICK, WALLET);
+  }
+
+  private Map<String, Object> createBaseRakamEventMap(String packageName, String skuDetails,
+      String value, String purchaseDetails, String transactionType, String action) {
+    Map<String, Object> eventData = new HashMap<>();
+
+    eventData.put(EVENT_PACKAGE_NAME, packageName);
+    eventData.put(EVENT_SKU, skuDetails);
+    eventData.put(EVENT_VALUE, value);
+    eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
+    eventData.put(EVENT_PAYMENT_METHOD, purchaseDetails);
+    eventData.put(EVENT_ACTION, action);
+
+    return eventData;
+  }
+
+  private Map<String, Object> createConclusionRakamEventMap(String packageName, String skuDetails,
+      String value, String purchaseDetails, String transactionType, String status) {
+    Map<String, Object> eventData = new HashMap<>();
+
+    eventData.put(EVENT_PACKAGE_NAME, packageName);
+    eventData.put(EVENT_SKU, skuDetails);
+    eventData.put(EVENT_VALUE, value);
+    eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
+    eventData.put(EVENT_PAYMENT_METHOD, purchaseDetails);
+    eventData.put(EVENT_STATUS, status);
+
+    return eventData;
+  }
+}

@@ -2,6 +2,7 @@ package com.appcoins.sdk.billing.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +51,8 @@ public class RequestBuilderUtils {
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
+    //Encoder transforms "=" into %3D, but it's not needed for paths
+    encodedPath = encodedPath.replaceAll("%3D", "=");
     urlBuilder.append("/")
         .append(encodedPath);
   }
@@ -64,16 +67,23 @@ public class RequestBuilderUtils {
           if (isString(entry.getValue())) {
             value = "\"" + value + "\"";
           }
+          if (isHashMap(entry.getValue())) {
+            value = buildBody((HashMap) entry.getValue());
+          }
           builder.append("\"" + entry.getKey() + "\"" + ":" + value)
               .append(",");
         }
       }
-    }
-    if (!bodyKeys.isEmpty()) {
-      builder.deleteCharAt(builder.length() - 1);
+      if (!bodyKeys.isEmpty()) {
+        builder.deleteCharAt(builder.length() - 1);
+      }
     }
     builder.append("}");
     return builder.toString();
+  }
+
+  private static boolean isHashMap(Object value) {
+    return value instanceof HashMap;
   }
 
   private static boolean isString(Object value) {

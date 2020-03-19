@@ -6,6 +6,7 @@ import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
+import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.listeners.PurchasesListener;
 import com.appcoins.sdk.billing.listeners.PurchasesModel;
@@ -23,16 +24,21 @@ class PaymentMethodsPresenter {
   private final PaymentMethodsView fragmentView;
   private PaymentMethodsInteract paymentMethodsInteract;
   private WalletInstallationIntentBuilder walletInstallationIntentBuilder;
+  private BillingAnalytics billingAnalytics;
+  private BuyItemProperties buyItemProperties;
 
   PaymentMethodsPresenter(PaymentMethodsView view, PaymentMethodsInteract paymentMethodsInteract,
-      WalletInstallationIntentBuilder walletInstallationIntentBuilder) {
+      WalletInstallationIntentBuilder walletInstallationIntentBuilder,
+      BillingAnalytics billingAnalytics, BuyItemProperties buyItemProperties) {
 
     this.fragmentView = view;
     this.paymentMethodsInteract = paymentMethodsInteract;
     this.walletInstallationIntentBuilder = walletInstallationIntentBuilder;
+    this.billingAnalytics = billingAnalytics;
+    this.buyItemProperties = buyItemProperties;
   }
 
-  void prepareUi(final BuyItemProperties buyItemProperties) {
+  void prepareUi() {
     String id = paymentMethodsInteract.retrieveWalletId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
@@ -121,7 +127,7 @@ class PaymentMethodsPresenter {
     }
   }
 
-  private void loadPaymentsAvailable(String fiatPrice, String fiatCurrency) {
+  private void loadPaymentsAvailable(final String fiatPrice, String fiatCurrency) {
     PaymentMethodsListener paymentMethodsListener = new PaymentMethodsListener() {
       @Override public void onResponse(PaymentMethodsModel paymentMethodsModel) {
         if (paymentMethodsModel.hasError() || paymentMethodsModel.getPaymentMethods()
@@ -134,6 +140,8 @@ class PaymentMethodsPresenter {
               fragmentView.addPayment(paymentMethod.getName());
             }
           }
+          billingAnalytics.sendPurchaseDetailsEvent(buyItemProperties.getPackageName(),
+              buyItemProperties.getSku(), fiatPrice, buyItemProperties.getType());
           fragmentView.showPaymentView();
         }
       }

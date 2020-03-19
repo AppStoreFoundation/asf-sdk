@@ -17,10 +17,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import cm.aptoide.analytics.AnalyticsManager;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SharedPreferencesRepository;
 import com.appcoins.sdk.billing.WalletInteract;
+import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
+import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
@@ -96,7 +99,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
             backendService);
     PaymentMethodsRepository paymentMethodsRepository = new PaymentMethodsRepository(apiService);
     BillingRepository billingRepository = new BillingRepository(apiService);
-
+    AnalyticsManager analyticsManager = AnalyticsManagerProvider.provideAnalyticsManager();
+    BillingAnalytics billingAnalytics = new BillingAnalytics(analyticsManager);
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
@@ -104,7 +108,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository,
             billingRepository),
         new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
-            getActivity().getPackageName(), getActivity().getApplicationContext()));
+            getActivity().getPackageName(), getActivity().getApplicationContext()),
+        billingAnalytics, buyItemProperties);
   }
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -150,7 +155,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         }
       });
     } else {
-      paymentMethodsPresenter.prepareUi(buyItemProperties);
+      paymentMethodsPresenter.prepareUi();
     }
   }
 
