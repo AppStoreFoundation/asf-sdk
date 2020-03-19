@@ -128,6 +128,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       Intent intent;
       if (type.equalsIgnoreCase("inapp") && sku != null && !sku.isEmpty()) {
         intent = new Intent(context, IabActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
       } else {
         intent = new Intent(context, InstallDialogActivity.class);
       }
