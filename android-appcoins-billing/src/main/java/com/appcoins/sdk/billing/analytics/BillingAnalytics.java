@@ -5,17 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BillingAnalytics implements EventSender {
-  public static final String PURCHASE_DETAILS = "PURCHASE_DETAILS";
-  public static final String PAYMENT_METHOD_DETAILS = "PAYMENT_METHOD_DETAILS";
-  public static final String PAYMENT = "PAYMENT";
   public static final String PAYMENT_METHOD_CC = "CREDIT_CARD";
   public static final String PAYMENT_METHOD_PAYPAL = "PAYPAL";
-  public static final String RAKAM_PAYMENT_START = "appcoins_guest_sdk_payment_start";
-  public static final String RAKAM_PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
-  public static final String RAKAM_PAYMENT_CONFIRMATION = "appcoins_guest_sdk_payment_confirmation";
-  public static final String RAKAM_PAYMENT_CONCLUSION = "appcoins_guest_sdk_payment_conclusion";
   public static final String RAKAM_START_PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
   public static final String RAKAM_START_INSTALL = "appcoins_guest_sdk_install_wallet";
+  static final String RAKAM_PAYMENT_START = "appcoins_guest_sdk_payment_start";
+  static final String RAKAM_PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
+  static final String RAKAM_PAYMENT_CONFIRMATION = "appcoins_guest_sdk_payment_confirmation";
+  static final String RAKAM_PAYMENT_CONCLUSION = "appcoins_guest_sdk_payment_conclusion";
   private static final String SDK = "AppCoinsGuestSDK";
   private static final String EVENT_PACKAGE_NAME = "package_name";
   private static final String EVENT_SKU = "sku";
@@ -35,55 +32,6 @@ public class BillingAnalytics implements EventSender {
 
   public BillingAnalytics(AnalyticsManager analytics) {
     this.analytics = analytics;
-  }
-
-  @Override
-  public void sendPurchaseDetailsEvent(String packageName, String skuDetails, String value,
-      String transactionType) {
-    Map<String, Object> eventData = new HashMap<>();
-    Map<String, Object> purchaseData = new HashMap<>();
-
-    purchaseData.put(EVENT_PACKAGE_NAME, packageName);
-    purchaseData.put(EVENT_SKU, skuDetails);
-    purchaseData.put(EVENT_VALUE, value);
-
-    eventData.put(EVENT_PURCHASE, purchaseData);
-    eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
-
-    analytics.logEvent(eventData, PURCHASE_DETAILS, AnalyticsManager.Action.CLICK, SDK);
-  }
-
-  @Override
-  public void sendPaymentMethodDetailsEvent(String packageName, String skuDetails, String value,
-      String purchaseDetails, String transactionType) {
-    Map<String, Object> eventData = new HashMap<>();
-    Map<String, Object> purchaseData = new HashMap<>();
-
-    purchaseData.put(EVENT_PACKAGE_NAME, packageName);
-    purchaseData.put(EVENT_SKU, skuDetails);
-    purchaseData.put(EVENT_VALUE, value);
-
-    eventData.put(EVENT_PURCHASE, purchaseData);
-    eventData.put(EVENT_PAYMENT_METHOD, purchaseDetails);
-    eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
-
-    analytics.logEvent(eventData, PAYMENT_METHOD_DETAILS, AnalyticsManager.Action.CLICK, SDK);
-  }
-
-  @Override public void sendPaymentEvent(String packageName, String skuDetails, String value,
-      String purchaseDetails, String transactionType) {
-    Map<String, Object> eventData = new HashMap<>();
-    Map<String, Object> purchaseData = new HashMap<>();
-
-    purchaseData.put(EVENT_PACKAGE_NAME, packageName);
-    purchaseData.put(EVENT_SKU, skuDetails);
-    purchaseData.put(EVENT_VALUE, value);
-
-    eventData.put(EVENT_PURCHASE, purchaseData);
-    eventData.put(EVENT_PAYMENT_METHOD, purchaseDetails);
-    eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
-
-    analytics.logEvent(eventData, PAYMENT, AnalyticsManager.Action.IMPRESSION, SDK);
   }
 
   @Override public void sendPaymentMethodEvent(String packageName, String skuDetails, String value,

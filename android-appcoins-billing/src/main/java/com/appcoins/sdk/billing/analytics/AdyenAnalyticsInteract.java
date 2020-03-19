@@ -51,29 +51,6 @@ public class AdyenAnalyticsInteract {
         transactionType);
   }
 
-  public void sendPaymentEvent(AdyenPaymentInfo adyenPaymentInfo) {
-    BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
-    String packageName = buyItemProperties.getPackageName();
-    String sku = buyItemProperties.getSku();
-    String fiatPrice = adyenPaymentInfo.getFiatPrice();
-    String paymentMethod = mapPaymentToAnalytics(adyenPaymentInfo.getPaymentMethod());
-    String transactionType = buyItemProperties.getType();
-
-    billingAnalytics.sendPaymentEvent(packageName, sku, fiatPrice, paymentMethod, transactionType);
-  }
-
-  public void sendPaymentMethodDetailsEvent(AdyenPaymentInfo adyenPaymentInfo,
-      String paymentMethod) {
-    BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
-    String packageName = buyItemProperties.getPackageName();
-    String sku = buyItemProperties.getSku();
-    String fiatPrice = adyenPaymentInfo.getFiatPrice();
-    String transactionType = buyItemProperties.getType();
-
-    billingAnalytics.sendPaymentMethodDetailsEvent(packageName, sku, fiatPrice, paymentMethod,
-        transactionType);
-  }
-
   private String mapPaymentToAnalytics(String paymentMethod) {
     if (paymentMethod.equals("credit_card")) {
       return BillingAnalytics.PAYMENT_METHOD_CC;

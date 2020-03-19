@@ -8,7 +8,6 @@ import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.DeveloperPayload;
 import com.appcoins.sdk.billing.analytics.AdyenAnalyticsInteract;
-import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.listeners.NoInfoResponseListener;
 import com.appcoins.sdk.billing.listeners.billing.GetTransactionListener;
 import com.appcoins.sdk.billing.listeners.billing.LoadPaymentInfoListener;
@@ -153,7 +152,6 @@ class AdyenPaymentPresenter {
     if (adyenPaymentInfo.getPaymentMethod()
         .equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
       fragmentView.showCreditCardView(adyenPaymentMethodsModel.getStoredMethodDetails());
-      analytics.sendPaymentMethodDetailsEvent(adyenPaymentInfo, BillingAnalytics.PAYMENT_METHOD_CC);
     } else {
       fragmentView.showLoading();
       fragmentView.lockRotation();
@@ -186,8 +184,6 @@ class AdyenPaymentPresenter {
     } else {
       fragmentView.navigateToUri(adyenTransactionModel.getUrl(), adyenTransactionModel.getUid());
       waitingResult = true;
-      analytics.sendPaymentMethodDetailsEvent(adyenPaymentInfo,
-          BillingAnalytics.PAYMENT_METHOD_PAYPAL);
     }
   }
 
@@ -270,7 +266,6 @@ class AdyenPaymentPresenter {
               .equalsIgnoreCase(String.valueOf(Status.COMPLETED))) {
             analytics.sendPaymentSuccessEvent(adyenPaymentInfo);
             createBundle(transactionResponse);
-            analytics.sendPaymentEvent(adyenPaymentInfo);
           } else if (paymentFailed(transactionResponse.getStatus())) {
             sendGenericErrorEvent("Transaction Status: " + transactionResponse.getStatus());
             fragmentView.showError();

@@ -144,8 +144,6 @@ class PaymentMethodsPresenter {
               fragmentView.addPayment(paymentMethod.getName());
             }
           }
-          billingAnalytics.sendPurchaseDetailsEvent(buyItemProperties.getPackageName(),
-              buyItemProperties.getSku(), fiatPrice, buyItemProperties.getType());
           billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
               buyItemProperties.getSku(), fiatPrice, buyItemProperties.getType(),
               BillingAnalytics.RAKAM_START_PAYMENT_METHOD);

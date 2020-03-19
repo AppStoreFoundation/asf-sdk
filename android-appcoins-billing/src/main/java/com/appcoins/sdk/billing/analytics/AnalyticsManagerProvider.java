@@ -15,15 +15,12 @@ public class AnalyticsManagerProvider {
       int timeout = 30000; // should later be updated for static variable in BdsService
       String packageName = WalletUtils.getContext()
           .getPackageName();
-      BdsService backendService = new BdsService("https://ws75.aptoide.com/api/7/", timeout);
       BdsService rakamService =
           new BdsService("https://rakam-api.aptoide.com/event/collect", timeout);
 
-      BackendEventLogger backendEventLogger = new BackendEventLogger(backendService, packageName);
       RakamEventLogger rakamEventLogger = new RakamEventLogger(rakamService, packageName);
 
-      return new AnalyticsManager.Builder().addLogger(backendEventLogger, provideBiEventList())
-          .addLogger(rakamEventLogger, provideRakamEventList())
+      return new AnalyticsManager.Builder().addLogger(rakamEventLogger, provideRakamEventList())
           .setAnalyticsNormalizer(new KeysNormalizer())
           .setKnockLogger(new EmptyKnockLogger())
           .setDebugLogger(new DebugLogger())
@@ -31,14 +28,6 @@ public class AnalyticsManagerProvider {
     } else {
       return analyticsManagerInstance;
     }
-  }
-
-  private static List<String> provideBiEventList() {
-    List<String> list = new ArrayList<>();
-    list.add(BillingAnalytics.PURCHASE_DETAILS);
-    list.add(BillingAnalytics.PAYMENT_METHOD_DETAILS);
-    list.add(BillingAnalytics.PAYMENT);
-    return list;
   }
 
   private static List<String> provideRakamEventList() {

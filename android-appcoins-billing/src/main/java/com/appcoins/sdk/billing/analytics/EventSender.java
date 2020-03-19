@@ -1,14 +1,6 @@
 package com.appcoins.sdk.billing.analytics;
 
 interface EventSender {
-  void sendPurchaseDetailsEvent(String packageName, String skuDetails, String value,
-      String transactionType);
-
-  void sendPaymentMethodDetailsEvent(String packageName, String skuDetails, String value,
-      String purchaseDetails, String transactionType);
-
-  void sendPaymentEvent(String packageName, String skuDetails, String value, String purchaseDetails,
-      String transactionType);
 
   void sendPaymentMethodEvent(String packageName, String skuDetails, String value,
       String purchaseDetails, String transactionType, String action);
