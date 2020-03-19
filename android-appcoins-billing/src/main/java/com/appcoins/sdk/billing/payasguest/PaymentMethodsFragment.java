@@ -76,9 +76,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
     translationsModel = TranslationsRepository.getInstance(getActivity())
         .getTranslationsModel();
-    int timeoutInMillis = 30000;
-    BdsService backendService = new BdsService(BuildConfig.BACKEND_BASE, timeoutInMillis);
-    BdsService apiService = new BdsService(BuildConfig.HOST_WS, timeoutInMillis);
+    BdsService backendService =
+        new BdsService(BuildConfig.BACKEND_BASE, BdsService.TIME_OUT_IN_MILLIS);
+    BdsService apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
 
     SharedPreferencesRepository sharedPreferencesRepository =
         new SharedPreferencesRepository(getActivity(), 86400 * 30); //86400 = 24h
