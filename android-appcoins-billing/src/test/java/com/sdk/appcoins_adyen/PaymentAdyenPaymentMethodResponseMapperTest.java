@@ -10,7 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PaymentMethodsResponseMapperTest {
+public class PaymentAdyenPaymentMethodResponseMapperTest {
 
   private PaymentMethodsResponseMapper paymentMethodsResponseMapper;
 

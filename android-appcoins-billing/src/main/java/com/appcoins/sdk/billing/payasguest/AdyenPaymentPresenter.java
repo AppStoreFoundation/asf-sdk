@@ -20,7 +20,7 @@ import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
 import com.appcoins.sdk.billing.models.billing.PurchaseModel;
 import com.appcoins.sdk.billing.models.billing.TransactionInformation;
 import com.appcoins.sdk.billing.models.billing.TransactionResponse;
-import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
+import com.appcoins.sdk.billing.service.adyen.AdyenPaymentMethod;
 import com.sdk.appcoins_adyen.card.EncryptedCard;
 import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
 import com.sdk.appcoins_adyen.models.ExpiryDate;
@@ -54,7 +54,7 @@ class AdyenPaymentPresenter {
   void loadPaymentInfo() {
     if (!waitingResult) {
       fragmentView.showLoading();
-      AdyenRepository.Methods method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
+      AdyenPaymentMethod method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
       LoadPaymentInfoListener loadPaymentInfoListener = new LoadPaymentInfoListener() {
         @Override public void onResponse(AdyenPaymentMethodsModel paymentMethodsModel) {
           if (paymentMethodsModel.hasError()) {
@@ -131,7 +131,7 @@ class AdyenPaymentPresenter {
       String serverCurrency) {
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
     DeveloperPayload developerPayload = buyItemProperties.getDeveloperPayload();
-    AdyenRepository.Methods method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
+    AdyenPaymentMethod method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
     String packageName = buyItemProperties.getPackageName();
     MakePaymentListener makePaymentListener = new MakePaymentListener() {
       @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
@@ -163,7 +163,7 @@ class AdyenPaymentPresenter {
   private void launchPaypal(AdyenPaymentMethodsModel paymentMethod) {
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
     DeveloperPayload developerPayload = buyItemProperties.getDeveloperPayload();
-    AdyenRepository.Methods method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
+    AdyenPaymentMethod method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
     String packageName = buyItemProperties.getPackageName();
     MakePaymentListener makePaymentListener = new MakePaymentListener() {
       @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
@@ -288,11 +288,11 @@ class AdyenPaymentPresenter {
         String.valueOf(Status.INVALID_TRANSACTION));
   }
 
-  private AdyenRepository.Methods mapPaymentToService(String paymentType) {
+  private AdyenPaymentMethod mapPaymentToService(String paymentType) {
     if (paymentType.equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
-      return AdyenRepository.Methods.CREDIT_CARD;
+      return AdyenPaymentMethod.CREDIT_CARD;
     } else {
-      return AdyenRepository.Methods.PAYPAL;
+      return AdyenPaymentMethod.PAYPAL;
     }
   }
 

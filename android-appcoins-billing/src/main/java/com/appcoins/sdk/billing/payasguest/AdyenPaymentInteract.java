@@ -14,6 +14,7 @@ import com.appcoins.sdk.billing.models.billing.PurchaseModel;
 import com.appcoins.sdk.billing.models.billing.TransactionInformation;
 import com.appcoins.sdk.billing.models.billing.TransactionWallets;
 import com.appcoins.sdk.billing.service.address.AddressService;
+import com.appcoins.sdk.billing.service.adyen.AdyenPaymentMethod;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class AdyenPaymentInteract {
     this.asyncTasks = new ArrayList<>();
   }
 
-  void loadPaymentInfo(AdyenRepository.Methods method, String fiatPrice, String fiatCurrency,
+  void loadPaymentInfo(AdyenPaymentMethod method, String fiatPrice, String fiatCurrency,
       String walletAddress, LoadPaymentInfoListener loadPaymentInfoListener) {
     adyenRepository.loadPaymentInfo(method.getTransactionType(), fiatPrice, fiatCurrency,
         walletAddress, loadPaymentInfoListener);
