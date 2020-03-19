@@ -56,7 +56,7 @@ class PaymentMethodsPresenter {
   }
 
   void onCancelButtonClicked() {
-    fragmentView.close();
+    fragmentView.close(false);
   }
 
   void onPositiveButtonClicked(String selectedRadioButton) {
@@ -84,7 +84,7 @@ class PaymentMethodsPresenter {
   }
 
   void onErrorButtonClicked() {
-    fragmentView.close();
+    fragmentView.close(true);
   }
 
   void onDestroy() {

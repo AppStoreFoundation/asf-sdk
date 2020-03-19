@@ -239,14 +239,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     errorLayout.setVisibility(View.VISIBLE);
   }
 
-  @Override public void close() {
+  @Override public void close(boolean withError) {
     if (itemAlreadyOwnedPurchase != null) {
       BillingMapper billingMapper = new BillingMapper();
       Bundle bundle = billingMapper.mapAlreadyOwned(itemAlreadyOwnedPurchase);
       itemAlreadyOwnedPurchase = null;
       iabView.finish(bundle);
     } else {
-      iabView.close();
+      iabView.close(withError);
     }
   }
 

@@ -224,8 +224,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         });
   }
 
-  @Override public void close() {
-    iabView.close();
+  @Override public void close(boolean withError) {
+    iabView.close(withError);
   }
 
   @Override public void showError() {

@@ -66,7 +66,7 @@ public class IabActivity extends Activity implements IabView {
 
   @Override public void onBackPressed() {
     if (backEnabled) {
-      close();
+      close(false);
     }
   }
 
@@ -80,10 +80,10 @@ public class IabActivity extends Activity implements IabView {
           activityResultListener.onActivityResult(data.getData());
         } else {
           Log.w("IabActivity", "ActivityResultListener was not set");
-          close();
+          close(true);
         }
       } else {
-        close();
+        close(true);
       }
     }
   }
@@ -94,9 +94,13 @@ public class IabActivity extends Activity implements IabView {
         .commit();
   }
 
-  @Override public void close() {
+  @Override public void close(boolean withError) {
     Bundle bundle = new Bundle();
-    bundle.putInt(RESPONSE_CODE, 1); //CANCEL
+    if (withError) {
+      bundle.putInt(RESPONSE_CODE, 6); //ERROR
+    } else {
+      bundle.putInt(RESPONSE_CODE, 1); //CANCEL
+    }
     Intent intent = new Intent();
     intent.putExtras(bundle);
     setResult(Activity.RESULT_CANCELED, intent);
@@ -145,10 +149,6 @@ public class IabActivity extends Activity implements IabView {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
   }
 
-  @Override public void setOnActivityResultListener(ActivityResultListener activityResultListener) {
-    this.activityResultListener = activityResultListener;
-  }
-
   @Override public void navigateToUri(String url) {
     startActivityForResult(WebViewActivity.newIntent(this, url), WEB_VIEW_REQUEST_CODE);
   }
@@ -175,6 +175,10 @@ public class IabActivity extends Activity implements IabView {
 
   @Override public void enableBack() {
     backEnabled = true;
+  }
+
+  @Override public void setOnActivityResultListener(ActivityResultListener activityResultListener) {
+    this.activityResultListener = activityResultListener;
   }
 
   private void buildAlertNoBrowserAndStores() {
