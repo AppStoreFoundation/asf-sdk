@@ -115,7 +115,7 @@ class PaymentMethodsPresenter {
       SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
         @Override public void onResponse(boolean error, SkuDetails skuDetails) {
           if (!error) {
-            paymentMethodsInteract.cacheFiatPrice(skuDetails.getFiatPrice());
+            paymentMethodsInteract.cacheAppcPrice(skuDetails.getAppcPrice());
             loadPaymentsAvailable(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode());
             fragmentView.setSkuInformation(new SkuDetailsModel(skuDetails.getFiatPrice(),
                 skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
@@ -144,9 +144,7 @@ class PaymentMethodsPresenter {
               fragmentView.addPayment(paymentMethod.getName());
             }
           }
-          billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
-              buyItemProperties.getSku(), fiatPrice, buyItemProperties.getType(),
-              BillingAnalytics.RAKAM_START_PAYMENT_METHOD);
+          fragmentView.sendPurchaseStartEvent(paymentMethodsInteract.getCachedAppcPrice());
           fragmentView.showPaymentView();
         }
       }
@@ -177,7 +175,7 @@ class PaymentMethodsPresenter {
 
   private void sendRakamPaymentMethodEvent(String selectedRadioButton, String action) {
     billingAnalytics.sendPaymentMethodEvent(buyItemProperties.getPackageName(),
-        buyItemProperties.getSku(), paymentMethodsInteract.getCachedFiatPrice(),
+        buyItemProperties.getSku(), paymentMethodsInteract.getCachedAppcPrice(),
         selectedRadioButton, buyItemProperties.getType(), action);
   }
 }

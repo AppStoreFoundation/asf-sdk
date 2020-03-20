@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BillingAnalytics implements EventSender {
-  public static final String PAYMENT_METHOD_CC = "CREDIT_CARD";
-  public static final String PAYMENT_METHOD_PAYPAL = "PAYPAL";
   public static final String RAKAM_START_PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
   public static final String RAKAM_START_INSTALL = "appcoins_guest_sdk_install_wallet";
+  static final String PAYMENT_METHOD_CC = "CREDIT_CARD";
+  static final String PAYMENT_METHOD_PAYPAL = "PAYPAL";
   static final String RAKAM_PAYMENT_START = "appcoins_guest_sdk_payment_start";
   static final String RAKAM_PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
   static final String RAKAM_PAYMENT_CONFIRMATION = "appcoins_guest_sdk_payment_confirmation";
@@ -17,7 +17,6 @@ public class BillingAnalytics implements EventSender {
   private static final String EVENT_PACKAGE_NAME = "package_name";
   private static final String EVENT_SKU = "sku";
   private static final String EVENT_VALUE = "value";
-  private static final String EVENT_PURCHASE = "purchase";
   private static final String EVENT_TRANSACTION_TYPE = "transaction_type";
   private static final String EVENT_PAYMENT_METHOD = "payment_method";
   private static final String EVENT_ACTION = "action";
@@ -27,7 +26,6 @@ public class BillingAnalytics implements EventSender {
   private static final String EVENT_ERROR_DETAILS = "error_details";
   private static final String EVENT_SUCCESS = "success";
   private static final String EVENT_FAIL = "fail";
-  private static final String EVENT_PENDING = "pending";
   private final AnalyticsManager analytics;
 
   public BillingAnalytics(AnalyticsManager analytics) {

@@ -38,4 +38,6 @@ interface PaymentMethodsView {
 
   void redirectToSupportEmail(String packageName, String sku, String sdkVersionName,
       int mobileVersion);
+
+  void sendPurchaseStartEvent(String appcPrice);
 }

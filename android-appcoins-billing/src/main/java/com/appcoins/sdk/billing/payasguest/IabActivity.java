@@ -3,6 +3,7 @@ package com.appcoins.sdk.billing.payasguest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -14,13 +15,14 @@ import android.util.Log;
 import android.widget.FrameLayout;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WebViewActivity;
+import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
+import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
 import com.appcoins.sdk.billing.helpers.Utils;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 
-import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES;
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.ERROR_RESULT_CODE;
 import static com.appcoins.sdk.billing.helpers.Utils.RESPONSE_CODE;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
@@ -29,12 +31,21 @@ public class IabActivity extends Activity implements IabView {
 
   public final static int LAUNCH_INSTALL_BILLING_FLOW_REQUEST_CODE = 10001;
   private final static int WEB_VIEW_REQUEST_CODE = 1234;
+  private final static String FIRST_IMPRESSION_KEY = "first_impression";
+  private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static int IAB_ACTIVITY_ID;
   private TranslationsRepository translationsRepository;
   private FrameLayout frameLayout;
   private BuyItemProperties buyItemProperties;
   private ActivityResultListener activityResultListener;
   private boolean backEnabled = true;
+  private boolean firstImpression = true;
+
+  public static Intent newIntent(Context context, BuyItemProperties buyItemProperties) {
+    Intent intent = new Intent(context, IabActivity.class);
+    intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
+    return intent;
+  }
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -46,6 +57,8 @@ public class IabActivity extends Activity implements IabView {
     frameLayout = new FrameLayout(this);
     if (savedInstanceState == null) {
       IAB_ACTIVITY_ID = generateRandomId();
+    } else {
+      firstImpression = savedInstanceState.getBoolean(FIRST_IMPRESSION_KEY, true);
     }
     frameLayout.setId(IAB_ACTIVITY_ID);
     frameLayout.setBackgroundColor(backgroundColor);
@@ -57,6 +70,11 @@ public class IabActivity extends Activity implements IabView {
     if (savedInstanceState == null) {
       navigateToPaymentSelection();
     }
+  }
+
+  @Override protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putBoolean(FIRST_IMPRESSION_KEY, firstImpression);
   }
 
   @Override protected void onDestroy() {
@@ -159,8 +177,8 @@ public class IabActivity extends Activity implements IabView {
   }
 
   @Override public void navigateToInstallDialog() {
-    Intent intent = new Intent(this.getApplicationContext(), InstallDialogActivity.class);
-    intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
+    Intent intent =
+        InstallDialogActivity.newIntent(this.getApplicationContext(), buyItemProperties);
     finish();
     startActivity(intent);
   }
@@ -201,6 +219,17 @@ public class IabActivity extends Activity implements IabView {
     intent.putExtra(Intent.EXTRA_EMAIL, extraEmail);
     intent.putExtra(Intent.EXTRA_TEXT, body);
     startActivity(Intent.createChooser(intent, "Select email application."));
+  }
+
+  @Override public void sendPurchaseStartEvent(String appcPrice) {
+    if (firstImpression) {
+      BillingAnalytics billingAnalytics =
+          new BillingAnalytics(AnalyticsManagerProvider.provideAnalyticsManager());
+      billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
+          buyItemProperties.getSku(), appcPrice, buyItemProperties.getType(),
+          BillingAnalytics.RAKAM_START_PAYMENT_METHOD);
+      firstImpression = false;
+    }
   }
 
   private void buildAlertNoBrowserAndStores() {

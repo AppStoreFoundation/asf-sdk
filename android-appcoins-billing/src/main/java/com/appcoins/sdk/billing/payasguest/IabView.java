@@ -39,4 +39,6 @@ interface IabView {
   void setOnActivityResultListener(ActivityResultListener activityResultListener);
 
   void redirectToSupportEmail(EmailInfo emailInfo);
+
+  void sendPurchaseStartEvent(String appcPrice);
 }

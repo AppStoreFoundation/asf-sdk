@@ -16,10 +16,10 @@ public class AdyenAnalyticsInteract {
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
     String packageName = buyItemProperties.getPackageName();
     String sku = buyItemProperties.getSku();
-    String fiatPrice = adyenPaymentInfo.getFiatPrice();
+    String appcPrice = adyenPaymentInfo.getAppcPrice();
     String paymentMethod = mapPaymentToAnalytics(adyenPaymentInfo.getPaymentMethod());
     String transactionType = buyItemProperties.getType();
-    billingAnalytics.sendPaymentConfirmationEvent(packageName, sku, fiatPrice, paymentMethod,
+    billingAnalytics.sendPaymentConfirmationEvent(packageName, sku, appcPrice, paymentMethod,
         transactionType, action);
   }
 
@@ -28,14 +28,14 @@ public class AdyenAnalyticsInteract {
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
     String packageName = buyItemProperties.getPackageName();
     String sku = buyItemProperties.getSku();
-    String fiatPrice = adyenPaymentInfo.getFiatPrice();
+    String appcPrice = adyenPaymentInfo.getAppcPrice();
     String paymentMethod = mapPaymentToAnalytics(adyenPaymentInfo.getPaymentMethod());
     String transactionType = buyItemProperties.getType();
     if (errorCode != null) {
-      billingAnalytics.sendPaymentErrorEvent(packageName, sku, fiatPrice, paymentMethod,
+      billingAnalytics.sendPaymentErrorEvent(packageName, sku, appcPrice, paymentMethod,
           transactionType, errorCode);
     } else {
-      billingAnalytics.sendAdyenErrorEvent(packageName, sku, fiatPrice, paymentMethod,
+      billingAnalytics.sendAdyenErrorEvent(packageName, sku, appcPrice, paymentMethod,
           transactionType, refusalCode, refusalDetails);
     }
   }
@@ -44,10 +44,10 @@ public class AdyenAnalyticsInteract {
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
     String packageName = buyItemProperties.getPackageName();
     String sku = buyItemProperties.getSku();
-    String fiatPrice = adyenPaymentInfo.getFiatPrice();
+    String appcPrice = adyenPaymentInfo.getAppcPrice();
     String paymentMethod = mapPaymentToAnalytics(adyenPaymentInfo.getPaymentMethod());
     String transactionType = buyItemProperties.getType();
-    billingAnalytics.sendPaymentSuccessEvent(packageName, sku, fiatPrice, paymentMethod,
+    billingAnalytics.sendPaymentSuccessEvent(packageName, sku, appcPrice, paymentMethod,
         transactionType);
   }
 

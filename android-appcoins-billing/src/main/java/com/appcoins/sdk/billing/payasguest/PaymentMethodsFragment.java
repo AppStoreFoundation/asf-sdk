@@ -46,6 +46,7 @@ import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.KEY_BUY_INT
 
 public class PaymentMethodsFragment extends Fragment implements PaymentMethodsView {
 
+  private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   public static String CREDIT_CARD_RADIO = "credit_card";
   public static String PAYPAL_RADIO = "paypal";
   public static String INSTALL_RADIO = "install_wallet";
@@ -64,7 +65,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   public static PaymentMethodsFragment newInstance(BuyItemProperties buyItemProperties) {
     PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
     Bundle bundle = new Bundle();
-    bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
+    bundle.putSerializable(BUY_ITEM_PROPERTIES, buyItemProperties);
     paymentMethodsFragment.setArguments(bundle);
     return paymentMethodsFragment;
   }
@@ -110,8 +111,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         new WalletInstallationIntentBuilder(activity.getPackageManager(), activity.getPackageName(),
             activity.getApplicationContext());
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
-    buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
-        AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
+    buyItemProperties = (BuyItemProperties) getArguments().getSerializable(BUY_ITEM_PROPERTIES);
 
     paymentMethodsPresenter =
         new PaymentMethodsPresenter(this, paymentMethodsInteract, walletInstallationIntentBuilder,
@@ -389,6 +389,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
               mobileVersion, title);
       iabView.redirectToSupportEmail(emailInfo);
     }
+  }
+
+  @Override public void sendPurchaseStartEvent(String appcPrice) {
+    iabView.sendPurchaseStartEvent(appcPrice);
   }
 
   private void setInitialRadioButtonSelected() {

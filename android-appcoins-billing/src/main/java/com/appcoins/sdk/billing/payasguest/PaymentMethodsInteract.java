@@ -17,7 +17,7 @@ class PaymentMethodsInteract {
   private WalletInteract walletInteract;
   private GamificationInteract gamificationInteract;
   private List<AsyncTask> asyncTasks;
-  private String cacheFiatPrice = "";
+  private String cacheAppcPrice = "0.0";
 
   PaymentMethodsInteract(WalletInteract walletInteract, GamificationInteract gamificationInteract,
       PaymentMethodsRepository paymentMethodsRepository, BillingRepository billingRepository) {
@@ -73,11 +73,11 @@ class PaymentMethodsInteract {
     billingRepository.getPurchases(packageName, walletAddress, signature, type, purchasesListener);
   }
 
-  void cacheFiatPrice(String fiatPrice) {
-    this.cacheFiatPrice = fiatPrice;
+  void cacheAppcPrice(String appcPrice) {
+    this.cacheAppcPrice = appcPrice;
   }
 
-  String getCachedFiatPrice() {
-    return cacheFiatPrice;
+  String getCachedAppcPrice() {
+    return cacheAppcPrice;
   }
 }

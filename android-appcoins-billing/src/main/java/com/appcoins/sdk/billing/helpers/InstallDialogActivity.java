@@ -3,6 +3,7 @@ package com.appcoins.sdk.billing.helpers;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -63,21 +64,31 @@ public class InstallDialogActivity extends Activity {
       "bazaar://details?id=" + BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
   private static final String CAFE_BAZAAR_WEB_URL =
       "https://cafebazaar.ir/app/" + BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
+  private static final String FIRST_IMPRESSION_KEY = "first_impression";
+  private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
   private TranslationsModel translationsModel;
-  private RelativeLayout installationDialog;
+  private boolean firstImpression = true;
+
+  public static Intent newIntent(Context context, BuyItemProperties buyItemProperties) {
+    Intent intent = new Intent(context, InstallDialogActivity.class);
+    intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
+    return intent;
+  }
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     BillingAnalytics billingAnalytics =
         new BillingAnalytics(AnalyticsManagerProvider.provideAnalyticsManager());
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
-    buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
-        AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
+    buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(BUY_ITEM_PROPERTIES);
     translationsModel = TranslationsRepository.getInstance(this)
         .getTranslationsModel();
+    if (savedInstanceState != null) {
+      firstImpression = savedInstanceState.getBoolean(FIRST_IMPRESSION_KEY, true);
+    }
     String storeUrl = "market://details?id="
         + BuildConfig.BDS_WALLET_PACKAGE_NAME
         + "&utm_source=appcoinssdk&app_source="
@@ -87,12 +98,10 @@ public class InstallDialogActivity extends Activity {
     Log.d("InstallDialogActivity",
         "com.appcoins.sdk.billing.helpers.InstallDialogActivity started");
 
-    installationDialog = setupInstallationDialog(storeUrl);
+    RelativeLayout installationDialog = setupInstallationDialog(storeUrl);
 
     showInstallationDialog(installationDialog);
-    billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
-        buyItemProperties.getSku(), "0.0", buyItemProperties.getType(),
-        BillingAnalytics.RAKAM_START_INSTALL);
+    handlePurchaseStartEvent(billingAnalytics);
   }
 
   @Override protected void onResume() {
@@ -109,6 +118,7 @@ public class InstallDialogActivity extends Activity {
 
   @Override protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
+    outState.putBoolean(FIRST_IMPRESSION_KEY, firstImpression);
   }
 
   @Override public void onBackPressed() {
@@ -123,6 +133,15 @@ public class InstallDialogActivity extends Activity {
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     finishActivity(resultCode, data);
+  }
+
+  private void handlePurchaseStartEvent(BillingAnalytics billingAnalytics) {
+    if (firstImpression) {
+      billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
+          buyItemProperties.getSku(), "0.0", buyItemProperties.getType(),
+          BillingAnalytics.RAKAM_START_INSTALL);
+      firstImpression = false;
+    }
   }
 
   private void showLoadingDialog() {

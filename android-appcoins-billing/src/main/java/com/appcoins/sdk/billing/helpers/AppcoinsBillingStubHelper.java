@@ -34,7 +34,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
-  public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   final static String INAPP_PURCHASE_ID_LIST = "INAPP_PURCHASE_ID_LIST";
   final static String INAPP_PURCHASE_ITEM_LIST = "INAPP_PURCHASE_ITEM_LIST";
   final static String INAPP_PURCHASE_DATA_LIST = "INAPP_PURCHASE_DATA_LIST";
@@ -136,11 +135,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       Intent intent;
       if (hasRequiredFields(type, sku) && !WalletUtils.getIabAction()
           .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
-        intent = new Intent(context, IabActivity.class);
+        intent = IabActivity.newIntent(context, buyItemProperties);
       } else {
-        intent = new Intent(context, InstallDialogActivity.class);
+        intent = InstallDialogActivity.newIntent(context, buyItemProperties);
       }
-      intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
       PendingIntent pendingIntent =
           PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
       Bundle response = new Bundle();

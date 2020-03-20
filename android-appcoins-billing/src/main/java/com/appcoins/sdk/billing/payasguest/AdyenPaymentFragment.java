@@ -23,7 +23,6 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.analytics.AdyenAnalyticsInteract;
 import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
-import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.layouts.AdyenPaymentFragmentLayout;
@@ -51,8 +50,6 @@ import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES;
-
 public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   private static final String CARD_NUMBER_KEY = "credit_card";
@@ -65,6 +62,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private final static String FIAT_CURRENCY_KEY = "fiat_currency";
   private final static String APPC_VALUE_KEY = "appc_value";
   private final static String SKU_KEY = "sku_key";
+  private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private IabView iabView;
   private AdyenPaymentInfo adyenPaymentInfo;
   private AdyenPaymentPresenter presenter;
@@ -421,8 +419,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     String fiatPrice = getBundleString(FIAT_VALUE_KEY);
     String fiatCurrency = getBundleString(FIAT_CURRENCY_KEY);
     String appcPrice = getBundleString(APPC_VALUE_KEY);
-    BuyItemProperties buyItemProperties =
-        getBundleBuyItemProperties(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
+    BuyItemProperties buyItemProperties = getBundleBuyItemProperties(BUY_ITEM_PROPERTIES);
 
     return new AdyenPaymentInfo(paymentMethod, walletAddress, signature, fiatPrice, fiatCurrency,
         appcPrice, buyItemProperties);
