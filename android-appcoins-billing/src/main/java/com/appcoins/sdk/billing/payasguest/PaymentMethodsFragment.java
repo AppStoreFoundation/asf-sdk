@@ -81,9 +81,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
     translationsModel = TranslationsRepository.getInstance(getActivity())
         .getTranslationsModel();
-    int timeoutInMillis = 30000;
-    BdsService backendService = new BdsService(BuildConfig.BACKEND_BASE, timeoutInMillis);
-    BdsService apiService = new BdsService(BuildConfig.HOST_WS, timeoutInMillis);
+    BdsService backendService =
+        new BdsService(BuildConfig.BACKEND_BASE, BdsService.TIME_OUT_IN_MILLIS);
+    BdsService apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
 
     SharedPreferencesRepository sharedPreferencesRepository =
         new SharedPreferencesRepository(getActivity(), SharedPreferencesRepository.TTL_IN_SECONDS);
@@ -271,14 +271,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     errorLayout.setVisibility(View.VISIBLE);
   }
 
-  @Override public void close() {
+  @Override public void close(boolean withError) {
     if (itemAlreadyOwnedPurchase != null) {
       BillingMapper billingMapper = new BillingMapper();
       Bundle bundle = billingMapper.mapAlreadyOwned(itemAlreadyOwnedPurchase);
       itemAlreadyOwnedPurchase = null;
       iabView.finish(bundle);
     } else {
-      iabView.close();
+      iabView.close(withError);
     }
   }
 

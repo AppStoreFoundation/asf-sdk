@@ -67,7 +67,7 @@ public class IabActivity extends Activity implements IabView {
 
   @Override public void onBackPressed() {
     if (backEnabled) {
-      close();
+      close(false);
     }
   }
 
@@ -78,13 +78,14 @@ public class IabActivity extends Activity implements IabView {
     } else if (requestCode == WEB_VIEW_REQUEST_CODE) {
       if (resultCode == WebViewActivity.SUCCESS) {
         if (activityResultListener != null) {
-          activityResultListener.onActivityResult(data.getData());
+          activityResultListener.onActivityResult(data.getData(),
+              data.getStringExtra(WebViewActivity.TRANSACTION_ID));
         } else {
           Log.w("IabActivity", "ActivityResultListener was not set");
-          close();
+          close(true);
         }
       } else {
-        close();
+        close(true);
       }
     }
   }
@@ -95,9 +96,13 @@ public class IabActivity extends Activity implements IabView {
         .commit();
   }
 
-  @Override public void close() {
+  @Override public void close(boolean withError) {
     Bundle bundle = new Bundle();
-    bundle.putInt(RESPONSE_CODE, 1); //CANCEL
+    if (withError) {
+      bundle.putInt(RESPONSE_CODE, 6); //ERROR
+    } else {
+      bundle.putInt(RESPONSE_CODE, 1); //CANCEL
+    }
     Intent intent = new Intent();
     intent.putExtras(bundle);
     setResult(Activity.RESULT_CANCELED, intent);
@@ -146,8 +151,8 @@ public class IabActivity extends Activity implements IabView {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
   }
 
-  @Override public void navigateToUri(String url) {
-    startActivityForResult(WebViewActivity.newIntent(this, url), WEB_VIEW_REQUEST_CODE);
+  @Override public void navigateToUri(String url, String uid) {
+    startActivityForResult(WebViewActivity.newIntent(this, url, uid), WEB_VIEW_REQUEST_CODE);
   }
 
   @Override public void finish(Bundle bundle) {

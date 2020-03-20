@@ -14,6 +14,7 @@ import com.appcoins.sdk.billing.models.billing.PurchaseModel;
 import com.appcoins.sdk.billing.models.billing.TransactionInformation;
 import com.appcoins.sdk.billing.models.billing.TransactionWallets;
 import com.appcoins.sdk.billing.service.address.AddressService;
+import com.appcoins.sdk.billing.service.adyen.AdyenPaymentMethod;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,26 +35,20 @@ public class AdyenPaymentInteract {
     this.asyncTasks = new ArrayList<>();
   }
 
-  void loadPaymentInfo(AdyenRepository.Methods method, String fiatPrice, String fiatCurrency,
+  void loadPaymentInfo(AdyenPaymentMethod method, String fiatPrice, String fiatCurrency,
       String walletAddress, LoadPaymentInfoListener loadPaymentInfoListener) {
     adyenRepository.loadPaymentInfo(method.getTransactionType(), fiatPrice, fiatCurrency,
         walletAddress, loadPaymentInfoListener);
   }
 
-  void makePayment(final String paymentMethod, final boolean shouldStoreCard,
-      final String returnUrl, final String fiatPrice, final String currency,
-      final String orderReference, final String paymentType, final String packageName,
-      final String metadata, final String sku, final String callBackUrl,
-      final String transactionType, final String userWalletAddress,
-      final MakePaymentListener makePaymentListener) {
+  void makePayment(final AdyenPaymentParams adyenPaymentParams,
+      final TransactionInformation transactionInformation, final String userWalletAddress,
+      String packageName, final MakePaymentListener makePaymentListener) {
 
     AddressRetrievedListener addressRetrievedListener = new AddressRetrievedListener() {
       @Override public void onAddressRetrieved(String oemAddress, String storeAddress,
           String developerAddress) {
-        adyenRepository.makePayment(
-            new AdyenPaymentParams(paymentMethod, shouldStoreCard, returnUrl),
-            new TransactionInformation(fiatPrice, currency, orderReference, paymentType, "BDS",
-                packageName, metadata, sku, callBackUrl, transactionType),
+        adyenRepository.makePayment(adyenPaymentParams, transactionInformation,
             new TransactionWallets(userWalletAddress, developerAddress, oemAddress, storeAddress,
                 userWalletAddress), makePaymentListener);
       }
