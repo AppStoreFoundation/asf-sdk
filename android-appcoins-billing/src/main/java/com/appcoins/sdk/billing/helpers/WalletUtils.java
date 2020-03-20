@@ -24,6 +24,7 @@ public class WalletUtils {
   private static String billingPackageName;
   private static String iabAction;
   private static String userAgent = null;
+  private static Long payAsGuestSessionId;
 
   public static boolean hasWalletInstalled() {
     if (billingPackageName == null) {
@@ -107,6 +108,17 @@ public class WalletUtils {
 
   public static void setContext(Context context) {
     WalletUtils.context = context.getApplicationContext();
+  }
+
+  static void setPayAsGuestSessionId() {
+    payAsGuestSessionId = System.currentTimeMillis();
+  }
+
+  public static long getPayAsGuestSessionId() {
+    if (payAsGuestSessionId == null) {
+      payAsGuestSessionId = System.currentTimeMillis();
+    }
+    return payAsGuestSessionId;
   }
 
   public static String getBillingServicePackageName() {

@@ -139,6 +139,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       } else {
         intent = InstallDialogActivity.newIntent(context, buyItemProperties);
       }
+      WalletUtils.setPayAsGuestSessionId();
       PendingIntent pendingIntent =
           PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
       Bundle response = new Bundle();

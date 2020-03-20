@@ -189,7 +189,6 @@ class AdyenPaymentPresenter {
 
   void onActivityResult(Uri data, String uid, boolean success) {
     if (success) {
-      analytics.sendConfirmationEvent(adyenPaymentInfo, "buy");
       JSONObject details = RedirectUtils.parseRedirectResult(data);
       MakePaymentListener makePaymentListener = new MakePaymentListener() {
         @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
@@ -230,16 +229,19 @@ class AdyenPaymentPresenter {
 
   private void handlePaymentResult(String uid, String resultCode, int refusalReasonCode,
       String refusalReason, String status) {
-    if (resultCode.equalsIgnoreCase("AUTHORISED")) {
-      handleSuccessAdyenTransaction(uid);
-    } else if (status.equalsIgnoreCase(Status.CANCELED.toString())) {
+    if (status.equalsIgnoreCase(Status.CANCELED.toString())) {
       analytics.sendConfirmationEvent(adyenPaymentInfo, "cancel");
       fragmentView.close();
-    } else if (refusalReason != null && refusalReasonCode != -1) {
-      handleAdyenTransactionError(refusalReason, refusalReasonCode);
     } else {
-      sendGenericErrorEvent("UNKNOWN ADYEN ERROR");
-      fragmentView.showError();
+      analytics.sendConfirmationEvent(adyenPaymentInfo, "buy");
+      if (resultCode.equalsIgnoreCase("AUTHORISED")) {
+        handleSuccessAdyenTransaction(uid);
+      } else if (refusalReason != null && refusalReasonCode != -1) {
+        handleAdyenTransactionError(refusalReason, refusalReasonCode);
+      } else {
+        sendGenericErrorEvent("UNKNOWN ADYEN ERROR");
+        fragmentView.showError();
+      }
     }
   }
 

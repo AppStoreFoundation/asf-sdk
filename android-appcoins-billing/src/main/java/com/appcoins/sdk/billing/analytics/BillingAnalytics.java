@@ -7,8 +7,8 @@ import java.util.Map;
 public class BillingAnalytics implements EventSender {
   public static final String RAKAM_START_PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
   public static final String RAKAM_START_INSTALL = "appcoins_guest_sdk_install_wallet";
-  static final String PAYMENT_METHOD_CC = "CREDIT_CARD";
-  static final String PAYMENT_METHOD_PAYPAL = "PAYPAL";
+  static final String PAYMENT_METHOD_CC = "credit_card";
+  static final String PAYMENT_METHOD_PAYPAL = "paypal";
   static final String RAKAM_PAYMENT_START = "appcoins_guest_sdk_payment_start";
   static final String RAKAM_PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
   static final String RAKAM_PAYMENT_CONFIRMATION = "appcoins_guest_sdk_payment_confirmation";
