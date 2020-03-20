@@ -138,7 +138,7 @@ public class WalletUtils {
       } else {
         display.getMetrics(displayMetrics);
       }
-      userAgent = "SDK/"
+      userAgent = "AppCoinsGuestSDK/"
           + BuildConfig.VERSION_NAME
           + " (Linux; Android "
           + Build.VERSION.RELEASE.replaceAll(";", " ")
@@ -151,7 +151,7 @@ public class WalletUtils {
           + "; "
           + System.getProperty("os.arch")
           + "; "
-          + BuildConfig.APPLICATION_ID
+          + context.getPackageName()
           + "; "
           + BuildConfig.VERSION_CODE
           + "; "

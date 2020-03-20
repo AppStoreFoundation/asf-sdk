@@ -16,17 +16,19 @@ import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_D
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_PURCHASE_DATA_LIST;
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_PURCHASE_ID_LIST;
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_PURCHASE_ITEM_LIST;
+import static com.appcoins.sdk.billing.helpers.GuestPurchasesInteract.RESPONSE_ERROR;
+import static com.appcoins.sdk.billing.helpers.GuestPurchasesInteract.RESPONSE_SUCCESS;
 
 class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
 
   private final AppcoinsBilling appcoinsBilling;
   private final String walletId;
-  private long timeout;
+  private long timeoutInMillis;
 
-  AppcoinsBillingWrapper(AppcoinsBilling appcoinsBilling, String walletId, long timeout) {
+  AppcoinsBillingWrapper(AppcoinsBilling appcoinsBilling, String walletId, long timeoutInMillis) {
     this.appcoinsBilling = appcoinsBilling;
     this.walletId = walletId;
-    this.timeout = timeout;
+    this.timeoutInMillis = timeoutInMillis;
   }
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type)
@@ -66,7 +68,17 @@ class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
 
   @Override public int consumePurchase(int apiVersion, String packageName, String purchaseToken)
       throws RemoteException {
-    return appcoinsBilling.consumePurchase(apiVersion, packageName, purchaseToken);
+    int responseCode = appcoinsBilling.consumePurchase(apiVersion, packageName, purchaseToken);
+    if (walletId != null && apiVersion == 3) {
+      int guestResponseCode = consumeGuestPurchase(packageName, purchaseToken);
+      if (responseCode == RESPONSE_SUCCESS || guestResponseCode == RESPONSE_SUCCESS) {
+        return RESPONSE_SUCCESS;
+      } else {
+        return RESPONSE_ERROR;
+      }
+    } else {
+      return responseCode;
+    }
   }
 
   @Override public IBinder asBinder() {
@@ -75,9 +87,27 @@ class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
 
   private void waitForPurchases(CountDownLatch countDownLatch) {
     try {
-      countDownLatch.await(timeout, TimeUnit.MILLISECONDS);
+      countDownLatch.await(timeoutInMillis, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+  }
+
+  private int consumeGuestPurchase(String packageName, String purchaseToken) {
+    int[] responseCode = new int[1]; //Generic error
+    CountDownLatch countDownLatch = new CountDownLatch(1);
+    BillingRepository billingRepository =
+        new BillingRepository(new BdsService(BuildConfig.HOST_WS, 30000));
+    GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract(billingRepository);
+
+    guestPurchaseInteract.consumeGuestPurchase(walletId, packageName, purchaseToken, responseCode,
+        countDownLatch);
+
+    try {
+      countDownLatch.await(timeoutInMillis, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    return responseCode[0];
   }
 }

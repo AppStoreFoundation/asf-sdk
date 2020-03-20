@@ -81,9 +81,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
     translationsModel = TranslationsRepository.getInstance(getActivity())
         .getTranslationsModel();
-    int timeoutInMillis = 30000;
-    BdsService backendService = new BdsService(BuildConfig.BACKEND_BASE, timeoutInMillis);
-    BdsService apiService = new BdsService(BuildConfig.HOST_WS, timeoutInMillis);
+    BdsService backendService =
+        new BdsService(BuildConfig.BACKEND_BASE, BdsService.TIME_OUT_IN_MILLIS);
+    BdsService apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
 
     SharedPreferencesRepository sharedPreferencesRepository =
         new SharedPreferencesRepository(getActivity(), SharedPreferencesRepository.TTL_IN_SECONDS);
@@ -126,6 +126,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     ViewGroup paypalWrapper = layout.getPaypalWrapperLayout();
     ViewGroup installWrapper = layout.getInstallWrapperLayout();
     Button errorButton = layout.getErrorPositiveButton();
+    ViewGroup supportHook = layout.getSupportHookView();
     TextView helpText = layout.getHelpText();
 
     onRotation(savedInstanceState);
@@ -134,7 +135,12 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     onErrorButtonClicked(errorButton);
     onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton, creditWrapper,
         paypalWrapper, installWrapper);
-    createSpannableString(helpText);
+    if (iabView.hasEmailApplication()) {
+      supportHook.setVisibility(View.VISIBLE);
+      createSpannableString(helpText);
+    } else {
+      supportHook.setVisibility(View.GONE);
+    }
   }
 
   @Override public void onResume() {
@@ -265,14 +271,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     errorLayout.setVisibility(View.VISIBLE);
   }
 
-  @Override public void close() {
+  @Override public void close(boolean withError) {
     if (itemAlreadyOwnedPurchase != null) {
       BillingMapper billingMapper = new BillingMapper();
       Bundle bundle = billingMapper.mapAlreadyOwned(itemAlreadyOwnedPurchase);
       itemAlreadyOwnedPurchase = null;
       iabView.finish(bundle);
     } else {
-      iabView.close();
+      iabView.close(withError);
     }
   }
 

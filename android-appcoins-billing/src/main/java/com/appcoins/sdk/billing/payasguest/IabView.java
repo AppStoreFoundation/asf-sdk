@@ -7,7 +7,7 @@ import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 
 interface IabView {
 
-  void close();
+  void close(boolean withError);
 
   void finishWithError();
 
@@ -24,7 +24,7 @@ interface IabView {
 
   void unlockRotation();
 
-  void navigateToUri(String url);
+  void navigateToUri(String url, String uid);
 
   void finish(Bundle bundle);
 
@@ -39,4 +39,6 @@ interface IabView {
   void setOnActivityResultListener(ActivityResultListener activityResultListener);
 
   void redirectToSupportEmail(EmailInfo emailInfo);
+
+  boolean hasEmailApplication();
 }

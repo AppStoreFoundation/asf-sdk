@@ -10,7 +10,7 @@ interface PaymentMethodsView {
 
   void showError();
 
-  void close();
+  void close(boolean withError);
 
   void showAlertNoBrowserAndStores();
 
