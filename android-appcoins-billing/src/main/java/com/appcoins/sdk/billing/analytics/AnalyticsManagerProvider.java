@@ -13,12 +13,10 @@ public class AnalyticsManagerProvider {
   public static AnalyticsManager provideAnalyticsManager() {
     if (analyticsManagerInstance == null) {
       int timeout = 30000; // should later be updated for static variable in BdsService
-      String packageName = WalletUtils.getContext()
-          .getPackageName();
       BdsService rakamService =
           new BdsService("https://rakam-api.aptoide.com/event/collect", timeout);
 
-      RakamEventLogger rakamEventLogger = new RakamEventLogger(rakamService, packageName);
+      RakamEventLogger rakamEventLogger = new RakamEventLogger(rakamService, WalletUtils.context);
 
       return new AnalyticsManager.Builder().addLogger(rakamEventLogger, provideRakamEventList())
           .setAnalyticsNormalizer(new KeysNormalizer())

@@ -2,7 +2,6 @@ package com.appcoins.sdk.billing.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +10,9 @@ public class RequestBuilderUtils {
   public static String buildUrl(String baseUrl, String endPoint, List<String> paths,
       Map<String, String> queries) {
     boolean hasQueries = !queries.isEmpty();
+    if (endPoint == null) {
+      endPoint = "";
+    }
     StringBuilder urlBuilder = new StringBuilder(baseUrl + endPoint);
     for (String path : paths) {
       if (path != null) {
@@ -67,8 +69,8 @@ public class RequestBuilderUtils {
           if (isString(entry.getValue())) {
             value = "\"" + value + "\"";
           }
-          if (isHashMap(entry.getValue())) {
-            value = buildBody((HashMap) entry.getValue());
+          if (isMap(entry.getValue())) {
+            value = buildBody((Map) entry.getValue());
           }
           builder.append("\"" + entry.getKey() + "\"" + ":" + value)
               .append(",");
@@ -82,8 +84,8 @@ public class RequestBuilderUtils {
     return builder.toString();
   }
 
-  private static boolean isHashMap(Object value) {
-    return value instanceof HashMap;
+  private static boolean isMap(Object value) {
+    return value instanceof Map;
   }
 
   private static boolean isString(Object value) {

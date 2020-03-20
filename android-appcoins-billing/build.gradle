@@ -15,6 +15,7 @@ android {
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     versionCode VERSION_CODE
     versionName VERSION_NAME
+    buildConfigField 'String', 'RAKAM_API_KEY', project.RAKAM_API_KEY
   }
 
   buildTypes {
