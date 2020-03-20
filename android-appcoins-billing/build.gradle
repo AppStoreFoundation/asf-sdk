@@ -43,6 +43,10 @@ android {
               "\""
       buildConfigField 'String', 'ADYEN_PUBLIC_KEY',
           "\"" + project.ADYEN_PUBLIC_KEY_DEV + "\""
+      buildConfigField 'String', 'DEFAULT_OEM_ADDRESS', "\"" + project.DEFAULT_OEM_ADDRESS + "\""
+      buildConfigField 'String', 'DEFAULT_STORE_ADDRESS',
+          "\"" + project.DEFAULT_STORE_ADDRESS + "\""
+      buildConfigField 'String', 'BDS_BASE_HOST', project.BDS_BASE_HOST_DEV
     }
     release {
       minifyEnabled false
@@ -73,7 +77,11 @@ android {
               project.CAFE_BAZAAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
       buildConfigField 'String', 'ADYEN_PUBLIC_KEY',
-          "\"" + project.ADYEN_PUBLIC_KEY + "\""
+          "\"" + project.ADYEN_PUBLIC_KEY_DEV + "\""
+      buildConfigField 'String', 'DEFAULT_OEM_ADDRESS', "\"" + project.DEFAULT_OEM_ADDRESS + "\""
+      buildConfigField 'String', 'DEFAULT_STORE_ADDRESS',
+          "\"" + project.DEFAULT_STORE_ADDRESS + "\""
+      buildConfigField 'String', 'BDS_BASE_HOST', project.BDS_BASE_HOST_PROD
       minifyEnabled false
     }
   }

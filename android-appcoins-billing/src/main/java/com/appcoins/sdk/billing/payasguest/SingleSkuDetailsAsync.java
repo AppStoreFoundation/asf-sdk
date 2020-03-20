@@ -6,6 +6,7 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WSServiceController;
 import com.appcoins.sdk.billing.helpers.AndroidBillingMapper;
+import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +15,7 @@ class SingleSkuDetailsAsync extends AsyncTask<Object, Object, SkuDetails> {
   private final BuyItemProperties buyItemProperties;
   private final SingleSkuDetailsListener listener;
 
-  public SingleSkuDetailsAsync(BuyItemProperties buyItemProperties,
-      SingleSkuDetailsListener listener) {
+  SingleSkuDetailsAsync(BuyItemProperties buyItemProperties, SingleSkuDetailsListener listener) {
 
     this.buyItemProperties = buyItemProperties;
     this.listener = listener;
@@ -27,11 +27,9 @@ class SingleSkuDetailsAsync extends AsyncTask<Object, Object, SkuDetails> {
   }
 
   @Override protected void onPostExecute(SkuDetails skuDetails) {
-    if (skuDetails == null) {
-      listener.onResponse(true, null);
-    } else {
-      listener.onResponse(false, skuDetails);
-    }
+    boolean hasError = skuDetails == null || skuDetails.getFiatPrice()
+        .equals("");
+    listener.onResponse(hasError, skuDetails);
   }
 
   private SkuDetails getSkuDetails(String packageName, String sku, String type) {

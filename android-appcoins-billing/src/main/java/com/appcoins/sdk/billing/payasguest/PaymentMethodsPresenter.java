@@ -6,7 +6,16 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
-import com.appcoins.sdk.billing.models.WalletGenerationModel;
+import com.appcoins.sdk.billing.listeners.PurchasesListener;
+import com.appcoins.sdk.billing.listeners.PurchasesModel;
+import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
+import com.appcoins.sdk.billing.listeners.payasguest.PaymentMethodsListener;
+import com.appcoins.sdk.billing.models.GamificationModel;
+import com.appcoins.sdk.billing.models.billing.SkuDetailsModel;
+import com.appcoins.sdk.billing.models.billing.SkuPurchase;
+import com.appcoins.sdk.billing.models.payasguest.PaymentMethod;
+import com.appcoins.sdk.billing.models.payasguest.PaymentMethodsModel;
+import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 
 class PaymentMethodsPresenter {
 
@@ -28,12 +37,19 @@ class PaymentMethodsPresenter {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
         fragmentView.saveWalletInformation(walletGenerationModel);
         provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
+        checkForUnconsumedPurchased(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
+            walletGenerationModel.getWalletAddress(), walletGenerationModel.getSignature(),
+            "INAPP");
       }
     };
     paymentMethodsInteract.requestWallet(id, walletInteractListener);
     MaxBonusListener maxBonusListener = new MaxBonusListener() {
-      @Override public void onBonusReceived(int bonus) {
-        fragmentView.showBonus(bonus);
+      @Override public void onBonusReceived(GamificationModel gamificationModel) {
+        if (gamificationModel.getStatus()
+            .equalsIgnoreCase("ACTIVE")) {
+          paymentMethodsInteract.saveMaxBonus(gamificationModel.getMaxBonus());
+          fragmentView.showBonus(gamificationModel.getMaxBonus());
+        }
       }
     };
     paymentMethodsInteract.requestMaxBonus(maxBonusListener);
@@ -62,11 +78,17 @@ class PaymentMethodsPresenter {
 
   void onRadioButtonClicked(String selectedRadioButton) {
     fragmentView.setRadioButtonSelected(selectedRadioButton);
-    fragmentView.setPositiveButtonText(selectedRadioButton);
+    if (selectedRadioButton != null) {
+      fragmentView.setPositiveButtonText(selectedRadioButton);
+    }
   }
 
   void onErrorButtonClicked() {
     fragmentView.close();
+  }
+
+  void onDestroy() {
+    paymentMethodsInteract.cancelRequests();
   }
 
   private void provideSkuDetailsInformation(BuyItemProperties buyItemProperties,
@@ -80,29 +102,54 @@ class PaymentMethodsPresenter {
                 skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
                 skuDetails.getSku()));
           } else {
-            fragmentView.showPaymentView();
+            fragmentView.showInstallDialog();
           }
         }
       };
       paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
     } else {
-      fragmentView.showPaymentView();
+      fragmentView.showInstallDialog();
     }
   }
 
   private void loadPaymentsAvailable(String fiatPrice, String fiatCurrency) {
     PaymentMethodsListener paymentMethodsListener = new PaymentMethodsListener() {
       @Override public void onResponse(PaymentMethodsModel paymentMethodsModel) {
-        if (!paymentMethodsModel.hasError()) {
+        if (paymentMethodsModel.hasError() || paymentMethodsModel.getPaymentMethods()
+            .isEmpty()) {
+          paymentMethodsInteract.cancelRequests();
+          fragmentView.showInstallDialog();
+        } else {
           for (PaymentMethod paymentMethod : paymentMethodsModel.getPaymentMethods()) {
             if (paymentMethod.isAvailable()) {
               fragmentView.addPayment(paymentMethod.getName());
             }
           }
+          fragmentView.showPaymentView();
         }
-        fragmentView.showPaymentView();
       }
     };
     paymentMethodsInteract.loadPaymentsAvailable(fiatPrice, fiatCurrency, paymentMethodsListener);
+  }
+
+  private void checkForUnconsumedPurchased(String packageName, final String sku,
+      String walletAddress, String signature, String type) {
+    PurchasesListener purchasesListener = new PurchasesListener() {
+      @Override public void onResponse(PurchasesModel purchasesModel) {
+        if (!purchasesModel.hasError()) {
+          for (SkuPurchase skuPurchase : purchasesModel.getSkuPurchases()) {
+            if (skuPurchase.getProduct()
+                .getName()
+                .equals(sku)) {
+              paymentMethodsInteract.cancelRequests();
+              fragmentView.showItemAlreadyOwnedError(skuPurchase);
+              return;
+            }
+          }
+        }
+      }
+    };
+    paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature,
+        type.toLowerCase(), purchasesListener);
   }
 }

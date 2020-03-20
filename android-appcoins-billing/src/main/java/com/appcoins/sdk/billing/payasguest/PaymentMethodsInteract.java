@@ -4,19 +4,28 @@ import android.os.AsyncTask;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.WalletInteractListener;
+import com.appcoins.sdk.billing.listeners.PurchasesListener;
+import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
+import com.appcoins.sdk.billing.listeners.payasguest.PaymentMethodsListener;
+import java.util.ArrayList;
+import java.util.List;
 
 class PaymentMethodsInteract {
 
   private final PaymentMethodsRepository paymentMethodsRepository;
+  private BillingRepository billingRepository;
   private WalletInteract walletInteract;
   private GamificationInteract gamificationInteract;
+  private List<AsyncTask> asyncTasks;
 
   PaymentMethodsInteract(WalletInteract walletInteract, GamificationInteract gamificationInteract,
-      PaymentMethodsRepository paymentMethodsRepository) {
+      PaymentMethodsRepository paymentMethodsRepository, BillingRepository billingRepository) {
 
     this.walletInteract = walletInteract;
     this.gamificationInteract = gamificationInteract;
     this.paymentMethodsRepository = paymentMethodsRepository;
+    this.billingRepository = billingRepository;
+    this.asyncTasks = new ArrayList<>();
   }
 
   String retrieveWalletId() {
@@ -32,6 +41,7 @@ class PaymentMethodsInteract {
     SingleSkuDetailsAsync singleSkuDetailsAsync =
         new SingleSkuDetailsAsync(buyItemProperties, skuDetailsListener);
     singleSkuDetailsAsync.execute(AsyncTask.THREAD_POOL_EXECUTOR);
+    asyncTasks.add(singleSkuDetailsAsync);
   }
 
   void loadPaymentsAvailable(String fiatPrice, String fiatCurrency,
@@ -41,5 +51,24 @@ class PaymentMethodsInteract {
 
   void requestMaxBonus(MaxBonusListener maxBonusListener) {
     gamificationInteract.loadMaxBonus(maxBonusListener);
+  }
+
+  void saveMaxBonus(int maxBonus) {
+    gamificationInteract.setMaxBonus(maxBonus);
+  }
+
+  void cancelRequests() {
+    for (AsyncTask asyncTask : asyncTasks) {
+      asyncTask.cancel(true);
+    }
+    gamificationInteract.cancelRequests();
+    paymentMethodsRepository.cancelRequests();
+    walletInteract.cancelRequests();
+    billingRepository.cancelRequests();
+  }
+
+  void checkForUnconsumedPurchased(String packageName, String walletAddress, String signature,
+      String type, PurchasesListener purchasesListener) {
+    billingRepository.getPurchases(packageName, walletAddress, signature, type, purchasesListener);
   }
 }

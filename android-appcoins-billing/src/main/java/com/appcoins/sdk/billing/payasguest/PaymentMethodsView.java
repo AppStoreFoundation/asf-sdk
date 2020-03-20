@@ -1,7 +1,9 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.content.Intent;
-import com.appcoins.sdk.billing.models.WalletGenerationModel;
+import com.appcoins.sdk.billing.models.billing.SkuDetailsModel;
+import com.appcoins.sdk.billing.models.billing.SkuPurchase;
+import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 
 interface PaymentMethodsView {
   void setSkuInformation(SkuDetailsModel skuDetailsModel);
@@ -27,6 +29,10 @@ interface PaymentMethodsView {
   void showPaymentView();
 
   void showBonus(int bonus);
+
+  void showInstallDialog();
+
+  void showItemAlreadyOwnedError(SkuPurchase skuPurchase);
 
   void hideDialog();
 }

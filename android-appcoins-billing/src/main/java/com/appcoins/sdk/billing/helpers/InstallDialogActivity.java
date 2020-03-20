@@ -1,6 +1,5 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -12,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -30,20 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
-import com.appcoins.sdk.billing.WebViewActivity;
-import com.appcoins.sdk.billing.listeners.LoadPaymentInfoListener;
-import com.appcoins.sdk.billing.listeners.MakePaymentListener;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
-import com.appcoins.sdk.billing.models.AdyenPaymentParams;
-import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
-import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
-import com.appcoins.sdk.billing.models.TransactionInformation;
-import com.appcoins.sdk.billing.models.TransactionWallets;
-import com.appcoins.sdk.billing.service.BdsService;
-import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
-import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
-import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
-import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -52,6 +39,7 @@ import java.util.Locale;
 import static android.graphics.Typeface.BOLD;
 import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.getUserCountry;
 import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.userFromIran;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
 
 public class InstallDialogActivity extends Activity {
 
@@ -59,7 +47,6 @@ public class InstallDialogActivity extends Activity {
   public final static String LOADING_DIALOG_CARD = "loading_dialog_install";
   public final static int REQUEST_CODE = 10001;
   public final static int ERROR_RESULT_CODE = 6;
-  private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private final static String TRANSLATIONS = "translations";
   private final static int MINIMUM_APTOIDE_VERSION = 9908;
   private final static int RESULT_USER_CANCELED = 1;
@@ -78,14 +65,10 @@ public class InstallDialogActivity extends Activity {
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
   private TranslationsModel translationsModel;
-  private AdyenRepository adyenRepository;
   private RelativeLayout installationDialog;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    adyenRepository = new AdyenRepository(
-        new BdsService(BuildConfig.HOST_WS + "/broker/8.20191202/gateways/adyen_v2/"),
-        new AdyenListenerProvider(new AdyenMapper()));
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
         AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
@@ -152,6 +135,8 @@ public class InstallDialogActivity extends Activity {
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
             RelativeLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+    progressBar.getIndeterminateDrawable()
+        .setColorFilter(Color.parseColor("#fd786b"), PorterDuff.Mode.MULTIPLY);
     progressBar.setLayoutParams(layoutParams);
     dialogLayout.addView(progressBar);
     showInstallationDialog(backgroundLayout);
@@ -160,7 +145,8 @@ public class InstallDialogActivity extends Activity {
   private void makeTheStoredPurchase() {
     Bundle intent = appcoinsBillingStubHelper.getBuyIntent(buyItemProperties.getApiVersion(),
         buyItemProperties.getPackageName(), buyItemProperties.getSku(), buyItemProperties.getType(),
-        buyItemProperties.getDeveloperPayload());
+        buyItemProperties.getDeveloperPayload()
+            .getRawPayload());
 
     PendingIntent pendingIntent = intent.getParcelable(KEY_BUY_INTENT);
     try {
@@ -223,22 +209,19 @@ public class InstallDialogActivity extends Activity {
     setContentView(dialogLayout, layoutParams);
   }
 
-  @SuppressLint("ResourceType") private RelativeLayout buildBackground() {
+  private RelativeLayout buildBackground() {
     int backgroundColor = Color.parseColor("#64000000");
     RelativeLayout backgroundLayout = new RelativeLayout(this);
-    backgroundLayout.setId(1);
     backgroundLayout.setBackgroundColor(backgroundColor);
     return backgroundLayout;
   }
 
-  @SuppressLint("ResourceType")
   private Button buildSkipButton(Button installButton, String skipButtonText) {
     int skipButtonColor = Color.parseColor("#8f000000");
     Button skipButton = new Button(this);
     skipButton.setText(skipButtonText);
     skipButton.setTextSize(12);
     skipButton.setTextColor(skipButtonColor);
-    skipButton.setId(7);
     skipButton.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
     skipButton.setBackgroundColor(Color.TRANSPARENT);
     skipButton.setIncludeFontPadding(false);
@@ -264,14 +247,13 @@ public class InstallDialogActivity extends Activity {
     return skipButton;
   }
 
-  @SuppressLint("ResourceType")
   private Button buildInstallButton(RelativeLayout dialogLayout, String installButtonText,
       final String storeUrl) {
     Button installButton = new Button(this);
     installButton.setText(installButtonText);
     installButton.setTextSize(12);
     installButton.setTextColor(Color.parseColor(INSTALL_BUTTON_TEXT_COLOR));
-    installButton.setId(6);
+    installButton.setId(generateRandomId());
     installButton.setGravity(Gravity.CENTER);
     installButton.setIncludeFontPadding(false);
     installButton.setPadding(0, 0, 0, 0);
@@ -289,81 +271,10 @@ public class InstallDialogActivity extends Activity {
     installButton.setLayoutParams(installButtonParams);
     installButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        //loadPaymentFlow("credit_card");
         redirectToWalletInstallation(storeUrl);
       }
     });
     return installButton;
-  }
-
-  private void loadPaymentFlow(final String method) { //Test method only
-    LoadPaymentInfoListener loadPaymentInfoListener = new LoadPaymentInfoListener() {
-      @Override public void onResponse(PaymentMethodsResponse paymentMethodsResponse) {
-        Log.d("TAG123", "Payment Info: "
-            + paymentMethodsResponse.getValue()
-            + paymentMethodsResponse.getCurrency());
-        if (method.equals("paypal")) {
-          launchPaypal(paymentMethodsResponse);
-        } else {
-          showCreditCardLayout(paymentMethodsResponse);
-        }
-      }
-    };
-    adyenRepository.loadPaymentInfo(method, "9.06", "EUR", "walletAddress",
-        loadPaymentInfoListener);
-  }
-
-  private void makeCreditCardPayment() {
-    MakePaymentListener makePaymentListener = new MakePaymentListener() {
-      @Override public void onResponse(AdyenTransactionResponse adyenTransactionResponse) {
-        if (adyenTransactionResponse != null) {
-          Log.d("TAG123", "Payment Made -> uid: " + adyenTransactionResponse.getUid());
-        }
-        handleTransaction(adyenTransactionResponse);
-      }
-    };
-    CardEncryptorImpl cardEncryptor = new CardEncryptorImpl();
-    String cardPaymentMethod = cardEncryptor.encryptFields("", 0, 0, "",
-        BuildConfig.ADYEN_PUBLIC_KEY); // Use test cards values
-    makePayment(cardPaymentMethod, makePaymentListener);
-  }
-
-  private void launchPaypal(PaymentMethodsResponse paymentMethodsResponse) {
-    final Activity activity = this;
-    MakePaymentListener makePaymentListener = new MakePaymentListener() {
-      @Override public void onResponse(AdyenTransactionResponse adyenTransactionResponse) {
-        if (adyenTransactionResponse == null) {
-          Log.d("TAG123", "NULL");
-        }
-        Log.d("TAG123", "Transaction created: uid -> " + adyenTransactionResponse.getUid());
-        startActivityForResult(WebViewActivity.newIntent(activity, "https://www.google.com"),
-            WEB_VIEW_REQUEST_CODE);
-      }
-    };
-    Log.d("TAG123", "launching webview: " + paymentMethodsResponse);
-    makePayment(paymentMethodsResponse.getPaymentMethod(), makePaymentListener);
-  }
-
-  private void makePayment(String cardPaymentMethod, MakePaymentListener makePaymentListener) {
-    TransactionWallets transactionWallets =
-        new TransactionWallets("walletAddress", "walletAddress", "walletAddress", "walletAddress",
-            "walletAddress"); //Change walletAddress for a correct wallet
-    AdyenPaymentParams adyenPaymentParams =
-        new AdyenPaymentParams(cardPaymentMethod, false, "adyencheckout://com.appcoins.wallet.dev");
-    TransactionInformation transactionInformation =
-        new TransactionInformation("9.06", "EUR", "orderId=1580121791311", "paypal", "BDS",
-            "com.appcoins.trivialdrivesample.test", "developer payload: gas", "gas", null, "INAPP");
-    adyenRepository.makePayment(adyenPaymentParams, transactionInformation, transactionWallets,
-        makePaymentListener); //Change walletAddress for a correct wallet
-  }
-
-  private void handleTransaction(AdyenTransactionResponse adyenTransactionResponse) {
-    //TODO
-  }
-
-  private void showCreditCardLayout(PaymentMethodsResponse paymentMethodsResponse) {
-    Log.d("TAG123", "INSERTING USER CARD");
-    makeCreditCardPayment();
   }
 
   private void redirectToWalletInstallation(final String storeUrl) {
@@ -397,11 +308,9 @@ public class InstallDialogActivity extends Activity {
     }
   }
 
-  @SuppressLint("ResourceType")
   private TextView buildDialogBody(int layoutOrientation, ImageView appIcon) {
     int dialogBodyColor = Color.parseColor("#4a4a4a");
     TextView dialogBody = new TextView(this);
-    dialogBody.setId(5);
     dialogBody.setMaxLines(2);
     dialogBody.setTextColor(dialogBodyColor);
     dialogBody.setTextSize(16);
@@ -453,10 +362,9 @@ public class InstallDialogActivity extends Activity {
     }
   }
 
-  @SuppressLint("ResourceType")
   private ImageView buildAppIcon(int layoutOrientation, RelativeLayout dialogLayout) {
     ImageView appIcon = new ImageView(this);
-    appIcon.setId(4);
+    appIcon.setId(generateRandomId());
     appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
     int appIconMarginTop = dpToPx(85);
     int appIconSize = dpToPx(66);
@@ -473,9 +381,8 @@ public class InstallDialogActivity extends Activity {
     return appIcon;
   }
 
-  @SuppressLint("ResourceType") private ImageView buildAppBanner() {
+  private ImageView buildAppBanner() {
     ImageView appBanner = new ImageView(this);
-    appBanner.setId(3);
     appBanner.setScaleType(ImageView.ScaleType.CENTER_CROP);
     RelativeLayout.LayoutParams appBannerParams =
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dpToPx(120));
@@ -484,11 +391,10 @@ public class InstallDialogActivity extends Activity {
     return appBanner;
   }
 
-  @SuppressLint("ResourceType") private RelativeLayout buildDialogLayout(int layoutOrientation) {
+  private RelativeLayout buildDialogLayout(int layoutOrientation) {
     RelativeLayout dialogLayout = new RelativeLayout(this);
+    dialogLayout.setId(generateRandomId());
     dialogLayout.setClipToPadding(false);
-    dialogLayout.setId(2);
-
     dialogLayout.setBackgroundColor(Color.WHITE);
 
     int dialogLayoutMargins = dpToPx(12);

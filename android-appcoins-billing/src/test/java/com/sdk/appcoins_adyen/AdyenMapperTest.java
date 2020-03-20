@@ -1,8 +1,8 @@
 package com.sdk.appcoins_adyen;
 
-import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
-import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
-import com.appcoins.sdk.billing.models.TransactionResponse;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentMethodsModel;
+import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
+import com.appcoins.sdk.billing.models.billing.TransactionResponse;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
 import java.math.BigDecimal;
@@ -42,19 +42,18 @@ public class AdyenMapperTest {
     String response = "{\"uid\":\"uid\",\"hash\":\"null\",\"reference\":\"reference\","
         + "\"status\":\"SUCCESS\",\"payment\": { \"pspReference\": \"pspReference\", "
         + "\"resultCode\": \"Authorised\", \"merchantReference\": \"merchant\"}}";
-    AdyenTransactionResponse adyenTransactionResponse =
+    AdyenTransactionModel adyenTransactionModel =
         adyenMapper.mapAdyenTransactionResponse(new RequestResponse(200, response, null));
-    Assert.assertFalse(adyenTransactionResponse.hasError());
-    Assert.assertNull(adyenTransactionResponse.getHash());
-    Assert.assertEquals("uid", adyenTransactionResponse.getUid());
-    Assert.assertEquals("reference", adyenTransactionResponse.getOrderReference());
-    Assert.assertEquals("SUCCESS", adyenTransactionResponse.getStatus());
-    Assert.assertEquals("pspReference", adyenTransactionResponse.getPspReference());
-    Assert.assertEquals("Authorised", adyenTransactionResponse.getResultCode());
-    Assert.assertNull(adyenTransactionResponse.getUrl());
-    Assert.assertNull(adyenTransactionResponse.getPaymentData());
-    Assert.assertNull(adyenTransactionResponse.getRefusalReason());
-    Assert.assertNull(adyenTransactionResponse.getRefusalReasonCode());
+    Assert.assertFalse(adyenTransactionModel.hasError());
+    Assert.assertNull(adyenTransactionModel.getHash());
+    Assert.assertEquals("uid", adyenTransactionModel.getUid());
+    Assert.assertEquals("reference", adyenTransactionModel.getOrderReference());
+    Assert.assertEquals("SUCCESS", adyenTransactionModel.getStatus());
+    Assert.assertEquals("pspReference", adyenTransactionModel.getPspReference());
+    Assert.assertEquals("Authorised", adyenTransactionModel.getResultCode());
+    Assert.assertNull(adyenTransactionModel.getUrl());
+    Assert.assertNull(adyenTransactionModel.getPaymentData());
+    Assert.assertNull(adyenTransactionModel.getRefusalReason());
   }
 
   @Test public void adyenPaypalTransactionRequest() {
@@ -64,28 +63,27 @@ public class AdyenMapperTest {
         + "\"url\", \"method\": \"GET\", \"type\": \"redirect\"}, \"details\": [{ \"key\": "
         + "\"payload\", \"type\": \"text\"}], \"paymentData\": \"data\", \"redirect\": { "
         + "\"method\": \"GET\", \"url\": \"url\"}}}";
-    AdyenTransactionResponse adyenTransactionResponse =
+    AdyenTransactionModel adyenTransactionModel =
         adyenMapper.mapAdyenTransactionResponse(new RequestResponse(200, response, null));
-    Assert.assertFalse(adyenTransactionResponse.hasError());
-    Assert.assertNull(adyenTransactionResponse.getHash());
-    Assert.assertEquals("uid", adyenTransactionResponse.getUid());
-    Assert.assertEquals("reference", adyenTransactionResponse.getOrderReference());
-    Assert.assertEquals("SUCCESS", adyenTransactionResponse.getStatus());
-    Assert.assertEquals("url", adyenTransactionResponse.getUrl());
-    Assert.assertEquals("data", adyenTransactionResponse.getPaymentData());
-    Assert.assertNull(adyenTransactionResponse.getPspReference());
-    Assert.assertNull(adyenTransactionResponse.getResultCode());
-    Assert.assertNull(adyenTransactionResponse.getRefusalReason());
-    Assert.assertNull(adyenTransactionResponse.getRefusalReasonCode());
+    Assert.assertFalse(adyenTransactionModel.hasError());
+    Assert.assertNull(adyenTransactionModel.getHash());
+    Assert.assertEquals("uid", adyenTransactionModel.getUid());
+    Assert.assertEquals("reference", adyenTransactionModel.getOrderReference());
+    Assert.assertEquals("SUCCESS", adyenTransactionModel.getStatus());
+    Assert.assertEquals("url", adyenTransactionModel.getUrl());
+    Assert.assertEquals("data", adyenTransactionModel.getPaymentData());
+    Assert.assertNull(adyenTransactionModel.getPspReference());
+    Assert.assertNull(adyenTransactionModel.getResultCode());
+    Assert.assertNull(adyenTransactionModel.getRefusalReason());
   }
 
   @Test public void adyenTransactionRequestErrorTest() {
     String response = "{\"uid\":\"uid\",\"hash\":\"null\",\"reference\":\"reference\","
         + "\"status\":\"FAILED\",\"payment\": { \"resultCode\": \"RedirectShopper\", "
         + "\"action\": { \"paymentData\", \"merchantReference\": \"merchant\"}}";
-    AdyenTransactionResponse adyenTransactionResponse =
+    AdyenTransactionModel adyenTransactionModel =
         adyenMapper.mapAdyenTransactionResponse(new RequestResponse(400, response, null));
-    Assert.assertTrue(adyenTransactionResponse.hasError());
+    Assert.assertTrue(adyenTransactionModel.hasError());
   }
 
   @Test public void adyenCreditCardTransactionWrongCvcRequestTest() {
@@ -93,19 +91,18 @@ public class AdyenMapperTest {
         + "\"status\":\"FAILED\",\"payment\": { \"pspReference\": \"pspReference\", "
         + "\"refusalReason\": \"CVC Declined\", \"refusalReasonCode\": \"24\","
         + "\"resultCode\": \"Refused\", \"merchantReference\": \"merchant\"}}";
-    AdyenTransactionResponse adyenTransactionResponse =
+    AdyenTransactionModel adyenTransactionModel =
         adyenMapper.mapAdyenTransactionResponse(new RequestResponse(200, response, null));
-    Assert.assertFalse(adyenTransactionResponse.hasError());
-    Assert.assertNull(adyenTransactionResponse.getHash());
-    Assert.assertEquals("uid", adyenTransactionResponse.getUid());
-    Assert.assertEquals("reference", adyenTransactionResponse.getOrderReference());
-    Assert.assertEquals("FAILED", adyenTransactionResponse.getStatus());
-    Assert.assertEquals("pspReference", adyenTransactionResponse.getPspReference());
-    Assert.assertEquals("Refused", adyenTransactionResponse.getResultCode());
-    Assert.assertEquals("CVC Declined", adyenTransactionResponse.getRefusalReason());
-    Assert.assertEquals("24", adyenTransactionResponse.getRefusalReasonCode());
-    Assert.assertNull(adyenTransactionResponse.getUrl());
-    Assert.assertNull(adyenTransactionResponse.getPaymentData());
+    Assert.assertFalse(adyenTransactionModel.hasError());
+    Assert.assertNull(adyenTransactionModel.getHash());
+    Assert.assertEquals("uid", adyenTransactionModel.getUid());
+    Assert.assertEquals("reference", adyenTransactionModel.getOrderReference());
+    Assert.assertEquals("FAILED", adyenTransactionModel.getStatus());
+    Assert.assertEquals("pspReference", adyenTransactionModel.getPspReference());
+    Assert.assertEquals("Refused", adyenTransactionModel.getResultCode());
+    Assert.assertEquals("CVC Declined", adyenTransactionModel.getRefusalReason());
+    Assert.assertNull(adyenTransactionModel.getUrl());
+    Assert.assertNull(adyenTransactionModel.getPaymentData());
   }
 
   @Test public void paymentMethodsRequestCreditCardTest() {
@@ -118,7 +115,7 @@ public class AdyenMapperTest {
         + "{\"key\":\"encryptedExpiryMonth\",\"type\":\"cardToken\"},"
         + "{\"key\":\"encryptedExpiryYear\",\"type\":\"cardToken\"},{\"key\":\"holderName\","
         + "\"optional\":true,\"type\":\"text\"}],\"name\":\"Credit Card\",\"type\":\"scheme\"}]}}";
-    PaymentMethodsResponse paymentMethodsResponse =
+    AdyenPaymentMethodsModel paymentMethodsResponse =
         adyenMapper.mapPaymentMethodsResponse(new RequestResponse(200, response, null));
     Assert.assertFalse(paymentMethodsResponse.hasError());
     Assert.assertEquals(new BigDecimal("9.06"), paymentMethodsResponse.getValue());
@@ -137,7 +134,7 @@ public class AdyenMapperTest {
     String response = "{\"price\":{\"value\":\"9.06\",\"currency\":\"EUR\"},"
         + "\"payment\":{\"paymentMethods\":[{\"name\":\"PayPal\",\"supportsRecurring\":true,"
         + "\"type\":\"paypal\"}]}}";
-    PaymentMethodsResponse paymentMethodsResponse =
+    AdyenPaymentMethodsModel paymentMethodsResponse =
         adyenMapper.mapPaymentMethodsResponse(new RequestResponse(200, response, null));
     Assert.assertFalse(paymentMethodsResponse.hasError());
     Assert.assertEquals(new BigDecimal("9.06"), paymentMethodsResponse.getValue());
@@ -150,7 +147,7 @@ public class AdyenMapperTest {
     String response = "{\"price\":{\"value\":\"9.06\",\"currency\":\"EUR\"},"
         + "\"payment\":{\"paymentMethods\":[{\"name\":\"PayPal\",\"supportsRecurring\":true,"
         + "\"type\":\"paypal\"}]}}";
-    PaymentMethodsResponse paymentMethodsResponse =
+    AdyenPaymentMethodsModel paymentMethodsResponse =
         adyenMapper.mapPaymentMethodsResponse(new RequestResponse(400, response, null));
     Assert.assertTrue(paymentMethodsResponse.hasError());
   }
@@ -158,7 +155,7 @@ public class AdyenMapperTest {
   @Test public void paymentMethodsRequestNoPaymentTest() {
     String response = "{\"price\":{\"value\":\"9.06\",\"currency\":\"EUR\"},"
         + "\"payment\":{\"paymentMethods\":[]}}";
-    PaymentMethodsResponse paymentMethodsResponse =
+    AdyenPaymentMethodsModel paymentMethodsResponse =
         adyenMapper.mapPaymentMethodsResponse(new RequestResponse(200, response, null));
     Assert.assertFalse(paymentMethodsResponse.hasError());
     Assert.assertEquals(new BigDecimal("9.06"), paymentMethodsResponse.getValue());

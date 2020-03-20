@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,20 +16,31 @@ import java.util.Map;
 
 public class BdsService implements Service {
 
+  public final static int TIME_OUT_IN_MILLIS = 30000;
   private String baseUrl;
+  private int timeoutInMillis;
+  private List<ServiceAsyncTask> asyncTasks;
 
-  public BdsService(String baseUrl) {
+  public BdsService(String baseUrl, int timeoutInMillis) {
+
     this.baseUrl = baseUrl;
+    this.timeoutInMillis = timeoutInMillis;
+    this.asyncTasks = new ArrayList<>();
   }
 
   RequestResponse createRequest(String baseUrl, String endPoint, String httpMethod,
-      List<String> paths, Map<String, String> queries, Map<String, Object> body) {
+      List<String> paths, Map<String, String> queries, Map<String, String> header,
+      Map<String, Object> body) {
     HttpURLConnection urlConnection = null;
     try {
       String urlBuilder = RequestBuilderUtils.buildUrl(baseUrl, endPoint, paths, queries);
       URL url = new URL(urlBuilder);
       urlConnection = openUrlConnection(url, httpMethod);
 
+      urlConnection.setReadTimeout(timeoutInMillis);
+      if (header != null) {
+        setHeaders(urlConnection, header);
+      }
       if ((httpMethod.equals("POST") || httpMethod.equals("PATCH")) && body != null) {
         if (httpMethod.equals("PATCH")) {
           urlConnection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
@@ -47,11 +57,18 @@ public class BdsService implements Service {
       }
       return readResponse(inputStream, responseCode);
     } catch (Exception firstException) {
+      firstException.printStackTrace();
       return handleException(urlConnection, firstException);
     } finally {
       if (urlConnection != null) {
         urlConnection.disconnect();
       }
+    }
+  }
+
+  private void setHeaders(HttpURLConnection urlConnection, Map<String, String> header) {
+    for (Map.Entry<String, String> entry : header.entrySet()) {
+      urlConnection.setRequestProperty(entry.getKey(), entry.getValue());
     }
   }
 
@@ -81,7 +98,7 @@ public class BdsService implements Service {
     urlConnection.setDoOutput(true);
     OutputStream os = urlConnection.getOutputStream();
     String body = RequestBuilderUtils.buildBody(bodyKeys);
-    byte[] input = body.getBytes(Charset.forName("UTF-8"));
+    byte[] input = body.getBytes(); //Default: UTF-8
     os.write(input, 0, input.length);
   }
 
@@ -100,7 +117,7 @@ public class BdsService implements Service {
   }
 
   public void makeRequest(String endPoint, String httpMethod, List<String> paths,
-      Map<String, String> queries, Map<String, Object> body,
+      Map<String, String> queries, Map<String, String> header, Map<String, Object> body,
       ServiceResponseListener serviceResponseListener) {
     if (paths == null) {
       paths = new ArrayList<>();
@@ -108,9 +125,16 @@ public class BdsService implements Service {
     if (queries == null) {
       queries = new HashMap<>();
     }
-    ServiceAsyncTask asyncTask =
-        new ServiceAsyncTask(this, baseUrl, endPoint, httpMethod, paths, queries, body,
+    ServiceAsyncTask serviceAsyncTask =
+        new ServiceAsyncTask(this, baseUrl, endPoint, httpMethod, paths, queries, header, body,
             serviceResponseListener);
-    asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    serviceAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    asyncTasks.add(serviceAsyncTask);
+  }
+
+  @Override public void cancelRequests() {
+    for (ServiceAsyncTask asyncTask : asyncTasks) {
+      asyncTask.cancel(true);
+    }
   }
 }

@@ -1,8 +1,9 @@
 package com.appcoins.sdk.billing.service.adyen;
 
-import com.appcoins.sdk.billing.models.AdyenTransactionResponse;
-import com.appcoins.sdk.billing.models.PaymentMethodsResponse;
-import com.appcoins.sdk.billing.models.TransactionResponse;
+import com.appcoins.sdk.billing.models.billing.AdyenPaymentMethodsModel;
+import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
+import com.appcoins.sdk.billing.models.billing.TransactionResponse;
+import com.appcoins.sdk.billing.models.payasguest.StoredMethodDetails;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import java.math.BigDecimal;
 import org.json.JSONArray;
@@ -45,9 +46,9 @@ public class AdyenMapper {
     return transactionResponse;
   }
 
-  public AdyenTransactionResponse mapAdyenTransactionResponse(RequestResponse requestResponse) {
+  public AdyenTransactionModel mapAdyenTransactionResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    AdyenTransactionResponse adyenTransactionResponse = new AdyenTransactionResponse();
+    AdyenTransactionModel adyenTransactionModel = new AdyenTransactionModel();
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     String uid;
@@ -79,25 +80,27 @@ public class AdyenMapper {
           paymentData = action.getString("paymentData");
         }
         refusalReason = paymentJson.optString("refusalReason", null);
-        refusalReasonCode = paymentJson.optString("refusalReasonCode", null);
-        adyenTransactionResponse =
-            new AdyenTransactionResponse(uid, hash, orderReference, status, pspReference,
-                resultCode, url, paymentData, refusalReason, refusalReasonCode, !isSuccess(code));
+        refusalReasonCode = paymentJson.optString("refusalReasonCode", "-1");
+        adyenTransactionModel =
+            new AdyenTransactionModel(uid, hash, orderReference, status, pspReference, resultCode,
+                url, paymentData, refusalReason, Integer.parseInt(refusalReasonCode),
+                !isSuccess(code));
       } catch (JSONException e) {
         e.printStackTrace();
       }
     }
-    return adyenTransactionResponse;
+    return adyenTransactionModel;
   }
 
-  public PaymentMethodsResponse mapPaymentMethodsResponse(RequestResponse requestResponse) {
+  public AdyenPaymentMethodsModel mapPaymentMethodsResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    PaymentMethodsResponse paymentMethodsResponse = new PaymentMethodsResponse();
+    AdyenPaymentMethodsModel paymentMethodsResponse = new AdyenPaymentMethodsModel();
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     BigDecimal value;
     String currency;
     String paymentMethodsApiResponse = "";
+    StoredMethodDetails storedMethodDetails = null;
     if (isSuccess(code) && response != null) {
       try {
         jsonObject = new JSONObject(response);
@@ -106,14 +109,29 @@ public class AdyenMapper {
         currency = priceJsonObject.getString("currency");
 
         jsonObject = jsonObject.getJSONObject("payment");
-        JSONArray array = jsonObject.optJSONArray("paymentMethods");
-        JSONObject paymentJSONObject = array.optJSONObject(0);
+        JSONArray paymentsArray = jsonObject.optJSONArray("paymentMethods");
+        JSONArray storedArray = jsonObject.optJSONArray("storedPaymentMethods");
+
+        JSONObject paymentJSONObject = paymentsArray.optJSONObject(0);
         if (paymentJSONObject != null) {
           paymentMethodsApiResponse = paymentJSONObject.toString();
         }
+
+        if (storedArray != null) {
+          JSONObject storedJSONObject = storedArray.optJSONObject(0);
+          if (storedJSONObject != null) {
+            String cardNumber = storedJSONObject.getString("lastFour");
+            int expiryMonth = storedJSONObject.getInt("expiryMonth");
+            int expiryYear = storedJSONObject.getInt("expiryYear");
+            String paymentId = storedJSONObject.getString("id");
+            String type = storedJSONObject.getString("type");
+            storedMethodDetails =
+                new StoredMethodDetails(cardNumber, expiryMonth, expiryYear, paymentId, type);
+          }
+        }
         paymentMethodsResponse =
-            new PaymentMethodsResponse(value, currency, paymentMethodsApiResponse,
-                !isSuccess(code));
+            new AdyenPaymentMethodsModel(value, currency, paymentMethodsApiResponse,
+                storedMethodDetails, !isSuccess(code));
       } catch (JSONException e) {
         e.printStackTrace();
       }

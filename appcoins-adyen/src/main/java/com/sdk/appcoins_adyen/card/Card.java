@@ -9,6 +9,9 @@ import java.util.TimeZone;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Created by andrei on 8/8/16.
+ */
 public class Card {
 
   private static final String tag = Card.class.getSimpleName();
@@ -25,6 +28,61 @@ public class Card {
   private String cardHolderName;
   private String cvc;
   private Date generationTime;
+
+  /**
+   * @deprecated Use {@link Card.Builder} instead.
+   */
+  @Deprecated public Card() {
+
+  }
+
+  public String getNumber() {
+    return number;
+  }
+
+  @Deprecated public void setNumber(String number) {
+    this.number = number;
+  }
+
+  public String getExpiryMonth() {
+    return expiryMonth;
+  }
+
+  @Deprecated public void setExpiryMonth(String expiryMonth) {
+    this.expiryMonth = expiryMonth;
+  }
+
+  public String getExpiryYear() {
+    return expiryYear;
+  }
+
+  @Deprecated public void setExpiryYear(String expiryYear) {
+    this.expiryYear = expiryYear;
+  }
+
+  public String getCardHolderName() {
+    return cardHolderName;
+  }
+
+  @Deprecated public void setCardHolderName(String cardHolderName) {
+    this.cardHolderName = cardHolderName;
+  }
+
+  public String getCvc() {
+    return cvc;
+  }
+
+  @Deprecated public void setCvc(String cvc) {
+    this.cvc = cvc;
+  }
+
+  public Date getGenerationTime() {
+    return generationTime;
+  }
+
+  @Deprecated public void setGenerationTime(Date generationTime) {
+    this.generationTime = generationTime;
+  }
 
   /**
    * Serializes and encrypts the data from the {@link Card}.
@@ -63,8 +121,11 @@ public class Card {
     if (number == null || number.length() < 14) {
       return "";
     }
+    StringBuilder sb = new StringBuilder(number.length());
 
-    return getMaskingChars(number.length()) + getLastFourDigitsFromCardNumber(number);
+    sb.append(getMaskingChars(number.length()))
+        .append(getLastFourDigitsFromCardNumber(number));
+    return sb.toString();
   }
 
   private String getLastFourDigitsFromCardNumber(final String fullCardNumber) {
@@ -91,7 +152,7 @@ public class Card {
    * Helper method that calls the ClientSideEncrypter encrypt method
    * */
   private String encryptData(String data, String publicKey) throws EncrypterException {
-    String encryptedData;
+    String encryptedData = null;
 
     try {
       ClientSideEncrypter encrypter = new ClientSideEncrypter(publicKey);
@@ -253,4 +314,3 @@ public class Card {
     }
   }
 }
-

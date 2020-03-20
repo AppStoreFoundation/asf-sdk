@@ -16,6 +16,7 @@ import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.communication.SyncIpcMessageRequester;
 import com.appcoins.communication.requester.MessageRequesterFactory;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.DeveloperPayload;
 import com.appcoins.sdk.billing.ResponseCode;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
@@ -31,7 +32,7 @@ import java.util.concurrent.CountDownLatch;
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   public final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
-  public static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 35000;
+  private static final int MESSAGE_RESPONSE_WAIT_TIMEOUT = 35000;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
@@ -116,12 +117,21 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         return response;
       }
     } else {
+      DeveloperPayload developerPayloadObject =
+          new DeveloperPayload(developerPayload, PayloadHelper.getPayload(developerPayload),
+              PayloadHelper.getOrderReference(developerPayload),
+              PayloadHelper.getOrigin(developerPayload));
       final BuyItemProperties buyItemProperties =
-          new BuyItemProperties(apiVersion, packageName, sku, type, developerPayload);
+          new BuyItemProperties(apiVersion, packageName, sku, type, developerPayloadObject);
 
       final Context context = WalletUtils.getContext();
-
-      Intent intent = new Intent(context, IabActivity.class);
+      Intent intent;
+      if (type.equalsIgnoreCase("inapp") && sku != null && !sku.isEmpty()) {
+        intent = new Intent(context, IabActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+      } else {
+        intent = new Intent(context, InstallDialogActivity.class);
+      }
       intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
       PendingIntent pendingIntent =
           PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

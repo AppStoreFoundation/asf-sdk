@@ -39,4 +39,8 @@ public class WalletInteract {
     sb.setLength(ID_LENGTH);
     return sb.toString();
   }
+
+  public void cancelRequests() {
+    walletRepository.cancelRequests();
+  }
 }

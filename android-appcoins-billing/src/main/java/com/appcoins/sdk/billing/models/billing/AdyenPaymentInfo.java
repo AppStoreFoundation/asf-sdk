@@ -1,0 +1,55 @@
+package com.appcoins.sdk.billing.models.billing;
+
+import com.appcoins.sdk.billing.BuyItemProperties;
+
+public class AdyenPaymentInfo {
+
+  private final String paymentMethod;
+  private final String walletAddress;
+  private final String fiatPrice;
+  private final String fiatCurrency;
+  private final String appcPrice;
+  private String signature;
+  private BuyItemProperties buyItemProperties;
+
+  public AdyenPaymentInfo(String paymentMethod, String walletAddress, String signature,
+      String fiatPrice, String fiatCurrency, String appcPrice,
+      BuyItemProperties buyItemProperties) {
+
+    this.paymentMethod = paymentMethod;
+    this.walletAddress = walletAddress;
+    this.signature = signature;
+    this.fiatPrice = fiatPrice;
+    this.fiatCurrency = fiatCurrency;
+    this.appcPrice = appcPrice;
+    this.buyItemProperties = buyItemProperties;
+  }
+
+  public String getWalletAddress() {
+    return walletAddress;
+  }
+
+  public String getSignature() {
+    return signature;
+  }
+
+  public String getFiatPrice() {
+    return fiatPrice;
+  }
+
+  public String getFiatCurrency() {
+    return fiatCurrency;
+  }
+
+  public String getAppcPrice() {
+    return appcPrice;
+  }
+
+  public BuyItemProperties getBuyItemProperties() {
+    return buyItemProperties;
+  }
+
+  public String getPaymentMethod() {
+    return paymentMethod;
+  }
+}

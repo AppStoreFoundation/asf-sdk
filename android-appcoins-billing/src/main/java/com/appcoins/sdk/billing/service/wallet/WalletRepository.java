@@ -1,7 +1,7 @@
 package com.appcoins.sdk.billing.service.wallet;
 
 import com.appcoins.sdk.billing.WalletInteractListener;
-import com.appcoins.sdk.billing.models.WalletGenerationModel;
+import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.Service;
 import com.appcoins.sdk.billing.service.ServiceResponseListener;
@@ -29,11 +29,15 @@ public class WalletRepository {
             walletGenerationMapper.mapWalletGenerationResponse(requestResponse);
         WalletGenerationModel walletGenerationModel =
             new WalletGenerationModel(walletGenerationResponse.getAddress(),
-                walletGenerationResponse.getEwt(), walletGenerationResponse.hasError());
+                walletGenerationResponse.getSignature(), walletGenerationResponse.hasError());
         walletInteractListener.walletIdRetrieved(walletGenerationModel);
       }
     };
-    service.makeRequest("/appc/guest_wallet", "GET", new ArrayList<String>(), queries, null,
+    service.makeRequest("/appc/guest_wallet", "GET", new ArrayList<String>(), queries, null, null,
         serviceResponseListener);
+  }
+
+  public void cancelRequests() {
+    service.cancelRequests();
   }
 }
