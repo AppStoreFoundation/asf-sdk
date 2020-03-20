@@ -16,10 +16,6 @@ import static com.appcoins.sdk.billing.utils.ServiceUtils.isSuccess;
 
 public class PurchaseMapper {
 
-  public PurchaseMapper() {
-
-  }
-
   public PurchaseModel map(RequestResponse requestResponse) {
     PurchaseModel purchaseModel = new PurchaseModel();
     String response = requestResponse.getResponse();
@@ -27,28 +23,7 @@ public class PurchaseMapper {
     if (isSuccess(code) && response != null) {
       try {
         JSONObject jsonObject = new JSONObject(response);
-        String uid = jsonObject.optString("uid");
-        JSONObject remoteProduct = jsonObject.optJSONObject("product");
-        String productName = null;
-        if (remoteProduct != null) {
-          productName = remoteProduct.optString("name");
-        }
-        String status = jsonObject.optString("status");
-        String packageName = null;
-        JSONObject packageObject = jsonObject.optJSONObject("package");
-        if (packageObject != null) {
-          packageName = packageObject.optString("name");
-        }
-        JSONObject signature = jsonObject.optJSONObject("signature");
-        String signatureValue = null;
-        JSONObject developerPurchase = null;
-        if (signature != null) {
-          signatureValue = signature.optString("value");
-          developerPurchase = signature.optJSONObject("message");
-        }
-        SkuPurchase skuPurchase =
-            new SkuPurchase(uid, new RemoteProduct(productName), status, packageName,
-                new Signature(signatureValue, developerPurchase));
+        SkuPurchase skuPurchase = mapSkuPurchase(jsonObject);
         purchaseModel = new PurchaseModel(skuPurchase, false);
       } catch (JSONException e) {
         e.printStackTrace();
@@ -68,28 +43,7 @@ public class PurchaseMapper {
         for (int i = 0; i < jsonArray.length(); i++) {
           try {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String uid = jsonObject.optString("uid");
-            JSONObject remoteProduct = jsonObject.optJSONObject("product");
-            String productName = null;
-            if (remoteProduct != null) {
-              productName = remoteProduct.optString("name");
-            }
-            String status = jsonObject.optString("status");
-            String packageName = null;
-            JSONObject packageObject = jsonObject.optJSONObject("package");
-            if (packageObject != null) {
-              packageName = packageObject.optString("name");
-            }
-            JSONObject signature = jsonObject.optJSONObject("signature");
-            String signatureValue = null;
-            JSONObject developerPurchase = null;
-            if (signature != null) {
-              signatureValue = signature.optString("value");
-              developerPurchase = signature.optJSONObject("message");
-            }
-            SkuPurchase skuPurchase =
-                new SkuPurchase(uid, new RemoteProduct(productName), status, packageName,
-                    new Signature(signatureValue, developerPurchase));
+            SkuPurchase skuPurchase = mapSkuPurchase(jsonObject);
             skuPurchases.add(skuPurchase);
           } catch (Exception e) {
             e.printStackTrace();
@@ -103,5 +57,33 @@ public class PurchaseMapper {
       purchasesModel = new PurchasesModel();
     }
     return purchasesModel;
+  }
+
+  private SkuPurchase mapSkuPurchase(JSONObject jsonObject) {
+    String uid = jsonObject.optString("uid");
+    String status = jsonObject.optString("status");
+
+    JSONObject remoteProduct = jsonObject.optJSONObject("product");
+    String productName = null;
+    if (remoteProduct != null) {
+      productName = remoteProduct.optString("name");
+    }
+
+    String packageName = null;
+    JSONObject packageObject = jsonObject.optJSONObject("package");
+    if (packageObject != null) {
+      packageName = packageObject.optString("name");
+    }
+
+    JSONObject signature = jsonObject.optJSONObject("signature");
+    String signatureValue = null;
+    JSONObject developerPurchase = null;
+    if (signature != null) {
+      signatureValue = signature.optString("value");
+      developerPurchase = signature.optJSONObject("message");
+    }
+
+    return new SkuPurchase(uid, new RemoteProduct(productName), status, packageName,
+        new Signature(signatureValue, developerPurchase));
   }
 }

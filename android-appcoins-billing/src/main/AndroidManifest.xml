@@ -10,7 +10,6 @@
         android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
     <activity
         android:name="com.appcoins.sdk.billing.payasguest.IabActivity"
-        android:launchMode="singleInstance"
         android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
     <activity
         android:name="com.appcoins.sdk.billing.WebViewActivity"

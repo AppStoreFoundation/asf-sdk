@@ -1,6 +1,6 @@
 package com.appcoins.sdk.billing.payasguest;
 
-public interface IExtractOemId {
+public interface OemIdExtractor {
 
   String extract(String packageName);
 }

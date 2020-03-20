@@ -77,7 +77,8 @@ public class IabActivity extends Activity implements IabView {
     } else if (requestCode == WEB_VIEW_REQUEST_CODE) {
       if (resultCode == WebViewActivity.SUCCESS) {
         if (activityResultListener != null) {
-          activityResultListener.onActivityResult(data.getData());
+          activityResultListener.onActivityResult(data.getData(),
+              data.getStringExtra(WebViewActivity.TRANSACTION_ID));
         } else {
           Log.w("IabActivity", "ActivityResultListener was not set");
           close(true);
@@ -149,8 +150,8 @@ public class IabActivity extends Activity implements IabView {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
   }
 
-  @Override public void navigateToUri(String url) {
-    startActivityForResult(WebViewActivity.newIntent(this, url), WEB_VIEW_REQUEST_CODE);
+  @Override public void navigateToUri(String url, String uid) {
+    startActivityForResult(WebViewActivity.newIntent(this, url, uid), WEB_VIEW_REQUEST_CODE);
   }
 
   @Override public void finish(Bundle bundle) {

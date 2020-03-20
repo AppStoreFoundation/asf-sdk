@@ -126,17 +126,19 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         return response;
       }
     } else {
+      DeveloperPayload developerPayloadObject =
+          new DeveloperPayload(developerPayload, PayloadHelper.getPayload(developerPayload),
+              PayloadHelper.getOrderReference(developerPayload),
+              PayloadHelper.getOrigin(developerPayload));
       final BuyItemProperties buyItemProperties =
-          new BuyItemProperties(apiVersion, packageName, sku, type,
-              new DeveloperPayload(developerPayload, PayloadHelper.getPayload(developerPayload),
-                  PayloadHelper.getOrderReference(developerPayload),
-                  PayloadHelper.getOrigin(developerPayload)));
+          new BuyItemProperties(apiVersion, packageName, sku, type, developerPayloadObject);
 
       final Context context = WalletUtils.getContext();
       Intent intent;
       if (hasRequiredFields(type, sku) && !WalletUtils.getIabAction()
           .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
         intent = new Intent(context, IabActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
       } else {
         intent = new Intent(context, InstallDialogActivity.class);
       }
