@@ -88,6 +88,7 @@ public class PaymentMethodsFragmentLayout {
   private TranslationsRepository translations;
   private TextView helpText;
   private ViewGroup supportHookView;
+  private TextView appNameView;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
@@ -163,7 +164,7 @@ public class PaymentMethodsFragmentLayout {
     fiatPriceView = createFiatPriceView();
     appcPriceView = createAppcPriceView();
     ImageView iconImageView = createAppIconLayout(icon);
-    TextView appNameView = createAppNameLayout(appName);
+    appNameView = createAppNameLayout(appName);
     TextView skuView = createSkuLayout(buyItemProperties.getSku());
 
     paymentMethodHeaderLayout.addView(iconImageView);
@@ -1133,5 +1134,9 @@ public class PaymentMethodsFragmentLayout {
 
   public ViewGroup getSupportHookView() {
     return supportHookView;
+  }
+
+  public TextView getAppNameView() {
+    return appNameView;
   }
 }

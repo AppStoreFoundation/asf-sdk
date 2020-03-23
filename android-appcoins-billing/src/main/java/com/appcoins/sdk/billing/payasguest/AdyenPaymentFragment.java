@@ -371,9 +371,11 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void redirectToSupportEmail(String walletAddress, String packageName, String sku,
       String sdkVersionName, int mobileVersion) {
-    String title = "Support title";
+    String appName = layout.getAppNameView()
+        .getText()
+        .toString();
     EmailInfo emailInfo =
-        new EmailInfo(walletAddress, packageName, sku, sdkVersionName, mobileVersion, title);
+        new EmailInfo(walletAddress, packageName, sku, sdkVersionName, mobileVersion, appName);
     iabView.redirectToSupportEmail(emailInfo);
   }
 

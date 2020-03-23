@@ -128,8 +128,7 @@ public class TranslationsModel {
         put(purchase_card_error_CVV, "Wrong CVV/CVC");
         put(error_contac_us_body, "If the problem persists please contact us.");
         put(iab_purchase_support_1, "Need help?");
-        put(iab_purchase_support_2_link,
-            "Contact Support.dsoihndgndgnhndfgoinhoidfgnoifgodboidfni");
+        put(iab_purchase_support_2_link, "Contact Support.");
       }
     };
   }

@@ -6,17 +6,17 @@ class EmailInfo {
   private final String sku;
   private final String sdkVersionName;
   private final int mobileVersion;
-  private final String title;
+  private final String appName;
 
   public EmailInfo(String walletAddress, String packageName, String sku, String sdkVersionName,
-      int mobileVersion, String title) {
+      int mobileVersion, String appName) {
 
     this.walletAddress = walletAddress;
     this.packageName = packageName;
     this.sku = sku;
     this.sdkVersionName = sdkVersionName;
     this.mobileVersion = mobileVersion;
-    this.title = title;
+    this.appName = appName;
   }
 
   public String getWalletAddress() {
@@ -39,7 +39,7 @@ class EmailInfo {
     return mobileVersion;
   }
 
-  public String getTitle() {
-    return title;
+  public String getAppName() {
+    return appName;
   }
 }

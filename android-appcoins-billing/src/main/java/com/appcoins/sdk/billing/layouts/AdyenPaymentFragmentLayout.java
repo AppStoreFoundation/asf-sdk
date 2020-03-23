@@ -88,6 +88,7 @@ public class AdyenPaymentFragmentLayout {
   private ViewGroup completedPurchaseView;
   private TextView helpText;
   private ViewGroup supportHookView;
+  private TextView appNameView;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -694,7 +695,7 @@ public class AdyenPaymentFragmentLayout {
     fiatPriceView = createFiatPriceView(fiatPrice, fiatCurrency);
     TextView appcPriceView = createAppcPriceView(appcPrice);
     ImageView iconImageView = createAppIconLayout(icon);
-    TextView appNameView = createAppNameLayout(appName);
+    appNameView = createAppNameLayout(appName);
     TextView skuView = createSkuLayout(sku);
 
     paymentMethodHeaderLayout.addView(iconImageView);
@@ -897,5 +898,9 @@ public class AdyenPaymentFragmentLayout {
 
   public ViewGroup getSupportHookView() {
     return supportHookView;
+  }
+
+  public TextView getAppNameView() {
+    return appNameView;
   }
 }

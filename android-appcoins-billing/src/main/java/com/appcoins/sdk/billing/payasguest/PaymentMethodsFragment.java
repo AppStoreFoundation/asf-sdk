@@ -383,11 +383,13 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override
   public void redirectToSupportEmail(String packageName, String sku, String sdkVersionName,
       int mobileVersion) {
-    String title = "Support title";
+    String appName = layout.getAppNameView()
+        .getText()
+        .toString();
     if (walletGenerationModel != null) {
       EmailInfo emailInfo =
           new EmailInfo(walletGenerationModel.getWalletAddress(), packageName, sku, sdkVersionName,
-              mobileVersion, title);
+              mobileVersion, appName);
       iabView.redirectToSupportEmail(emailInfo);
     }
   }
