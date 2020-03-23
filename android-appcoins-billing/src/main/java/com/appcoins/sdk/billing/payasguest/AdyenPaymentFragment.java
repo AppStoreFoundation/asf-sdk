@@ -99,17 +99,15 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
     TranslationsModel translationsModel = TranslationsRepository.getInstance(getActivity())
         .getTranslationsModel();
     adyenPaymentInfo = extractBundleInfo();
-    int timeoutInMillis = 30000;
-    AdyenRepository adyenRepository =
-        new AdyenRepository(new BdsService(BuildConfig.HOST_WS + "/broker/", 30000),
-            new AdyenListenerProvider(new AdyenMapper()));
-    Service apiService = new BdsService(BuildConfig.HOST_WS, timeoutInMillis);
-    Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, timeoutInMillis);
-    IExtractOemId extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
+    AdyenRepository adyenRepository = new AdyenRepository(
+        new BdsService(BuildConfig.HOST_WS + "/broker/", BdsService.TIME_OUT_IN_MILLIS),
+        new AdyenListenerProvider(new AdyenMapper()));
+    Service apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
+    Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, BdsService.TIME_OUT_IN_MILLIS);
+    OemIdExtractor extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
 
     AddressService addressService = new AddressService(getActivity().getApplicationContext(),
         new WalletAddressService(apiService, BuildConfig.DEFAULT_STORE_ADDRESS,
@@ -143,6 +141,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     super.onViewCreated(view, savedInstanceState);
     Button positiveButton = layout.getPositiveButton();
     setFieldChangeListener(positiveButton);
+    setOnActivityResultListener();
     if (savedInstanceState != null) {
       onSavedInstance(savedInstanceState);
 
@@ -155,14 +154,19 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     TextView changeCardView = layout.getChangeCardView();
     TextView morePaymentsText = layout.getMorePaymentsText();
     TextView helpText = layout.getHelpText();
+    ViewGroup supportHook = layout.getSupportHookView();
 
     onPositiveButtonClick(positiveButton);
     onCancelButtonClick(cancelButton);
     onErrorButtonClick(errorButton);
     onChangeCardClick(changeCardView);
     onMorePaymentsClick(morePaymentsText);
-    createSpannableString(helpText);
-
+    if (iabView.hasEmailApplication()) {
+      supportHook.setVisibility(View.VISIBLE);
+      createSpannableString(helpText);
+    } else {
+      supportHook.setVisibility(View.GONE);
+    }
     presenter.loadPaymentInfo();
   }
 
@@ -182,6 +186,15 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     presenter.onDestroy();
     presenter = null;
     super.onDestroy();
+  }
+
+  private void setOnActivityResultListener() {
+    ActivityResultListener activityResultListener = new ActivityResultListener() {
+      @Override public void onActivityResult(Uri data, String uid, boolean success) {
+        presenter.onActivityResult(data, uid, success);
+      }
+    };
+    iabView.setOnActivityResultListener(activityResultListener);
   }
 
   private void onSavedInstance(Bundle savedInstanceState) {
@@ -238,8 +251,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         });
   }
 
-  @Override public void close() {
-    iabView.close();
+  @Override public void close(boolean withError) {
+    iabView.close(withError);
   }
 
   @Override public void showError() {
@@ -293,14 +306,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     iabView.unlockRotation();
   }
 
-  @Override public void navigateToUri(String url, final String uid) {
-    ActivityResultListener activityResultListener = new ActivityResultListener() {
-      @Override public void onActivityResult(Uri data, boolean success) {
-        presenter.onActivityResult(data, uid, success);
-      }
-    };
-    iabView.setOnActivityResultListener(activityResultListener);
-    iabView.navigateToUri(url);
+  @Override public void navigateToUri(String url, String uid) {
+    iabView.navigateToUri(url, uid);
   }
 
   @Override public void finish(Bundle bundle) {

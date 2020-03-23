@@ -23,8 +23,7 @@ public class GamificationMapper {
         jsonObject = new JSONObject(response);
         JSONArray jsonArray = jsonObject.getJSONArray("result");
         JSONObject level = jsonArray.getJSONObject(jsonArray.length() - 1);
-        double maxBonusEntity = level.getInt("bonus");
-        int maxBonus = (int) maxBonusEntity;
+        int maxBonus = level.getInt("bonus");
         String status = jsonObject.getString("status");
         gamificationModel = new GamificationModel(maxBonus, status, false);
       } catch (JSONException e) {

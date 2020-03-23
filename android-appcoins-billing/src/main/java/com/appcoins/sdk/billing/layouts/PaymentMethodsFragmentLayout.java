@@ -82,6 +82,7 @@ public class PaymentMethodsFragmentLayout {
   private PaymentErrorViewLayout paymentErrorViewLayout;
   private TranslationsModel translationModel;
   private TextView helpText;
+  private ViewGroup supportHookView;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
@@ -292,13 +293,13 @@ public class PaymentMethodsFragmentLayout {
     paymentMethodsLayout = buildPaymentMethodsLayout();
     paymentMethodsLayout.setVisibility(View.INVISIBLE);
     LinearLayout buttonsView = buildButtonsView();
-    LinearLayout supportHook = buildSupportHook();
+    supportHookView = buildSupportHook();
 
     dialogLayout.addView(paymentMethodsHeaderLayout);
     dialogLayout.addView(headerSeparator);
     dialogLayout.addView(paymentMethodsLayout);
     dialogLayout.addView(buttonsView);
-    dialogLayout.addView(supportHook);
+    dialogLayout.addView(supportHookView);
     return dialogLayout;
   }
 
@@ -1124,5 +1125,9 @@ public class PaymentMethodsFragmentLayout {
 
   public TextView getHelpText() {
     return helpText;
+  }
+
+  public ViewGroup getSupportHookView() {
+    return supportHookView;
   }
 }

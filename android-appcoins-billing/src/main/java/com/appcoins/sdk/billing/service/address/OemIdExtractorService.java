@@ -1,12 +1,12 @@
 package com.appcoins.sdk.billing.service.address;
 
-import com.appcoins.sdk.billing.payasguest.IExtractOemId;
+import com.appcoins.sdk.billing.payasguest.OemIdExtractor;
 
 public class OemIdExtractorService {
 
-  private final IExtractOemId extractorV1;
+  private final OemIdExtractor extractorV1;
 
-  public OemIdExtractorService(IExtractOemId extractorV1) {
+  public OemIdExtractorService(OemIdExtractor extractorV1) {
 
     this.extractorV1 = extractorV1;
   }
