@@ -24,7 +24,6 @@ import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
-import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.layouts.PaymentMethodsFragmentLayout;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
@@ -40,6 +39,11 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.KEY_BUY_INTENT;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_no_connection_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.install_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.next_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_error_item_owned;
 
 public class PaymentMethodsFragment extends Fragment implements PaymentMethodsView {
 
@@ -56,7 +60,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private WalletGenerationModel walletGenerationModel;
   private AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private SkuPurchase itemAlreadyOwnedPurchase;
-  private TranslationsModel translationsModel;
+  private TranslationsRepository translations;
 
   public static PaymentMethodsFragment newInstance(BuyItemProperties buyItemProperties) {
     PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
@@ -79,8 +83,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    translationsModel = TranslationsRepository.getInstance(getActivity())
-        .getTranslationsModel();
+    translations = TranslationsRepository.getInstance(getActivity());
     BdsService backendService =
         new BdsService(BuildConfig.BACKEND_BASE, BdsService.TIME_OUT_IN_MILLIS);
     BdsService apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
@@ -309,9 +312,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void setPositiveButtonText(String selectedRadioButton) {
     Button positiveButton = layout.getPositiveButton();
     if (selectedRadioButton.equals(PaymentMethodsFragment.INSTALL_RADIO)) {
-      positiveButton.setText(translationsModel.getInstallButton());
+      positiveButton.setText(translations.getString(install_button));
     } else {
-      positiveButton.setText(translationsModel.getNextButton());
+      positiveButton.setText(translations.getString(next_button));
     }
   }
 
@@ -348,10 +351,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void showBonus(int bonus) {
     TextView bonusText = layout.getInstallSecondaryText();
     if (bonus > 0) {
-      bonusText.setText(String.format(translationsModel.getWalletRewardTitle(), bonus));
+      bonusText.setText(
+          String.format(translations.getString(iab_pay_with_wallet_reward_title), bonus));
       bonusText.setVisibility(View.VISIBLE);
     } else if (bonus == -1) { //-1 -> Request fail code
-      bonusText.setText(translationsModel.getNoConnectionWalletRewardBody());
+      bonusText.setText(translations.getString(iab_pay_with_wallet_reward_no_connection_body));
       bonusText.setVisibility(View.VISIBLE);
     }
   }
@@ -363,7 +367,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override public void showItemAlreadyOwnedError(SkuPurchase skuPurchase) {
     itemAlreadyOwnedPurchase = skuPurchase;
     iabView.disableBack();
-    layout.setErrorMessage(translationsModel.getItemAlreadyOwned());
+    layout.setErrorMessage(translations.getString(purchase_error_item_owned));
     showError();
   }
 
@@ -399,7 +403,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         .getVisibility() == View.VISIBLE) {
       selectedRadioButton = INSTALL_RADIO;
       layout.getPositiveButton()
-          .setText(translationsModel.getInstallButton());
+          .setText(translations.getString(install_button));
       layout.selectRadioButton(selectedRadioButton);
     }
   }

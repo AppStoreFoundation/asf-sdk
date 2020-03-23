@@ -1,265 +1,155 @@
 package com.appcoins.sdk.billing.helpers.translations;
 
-import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.appcoins_wallet;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.button_ok;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.buy_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.cancel_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.error_contac_us_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_best_deal;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_card_cvv;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_card_cvv_cvc;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_card_expiry;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_card_number;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_change_card_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_as_guest_credit_card;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_as_guest_paypal;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_as_guest_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_no_connection_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_change_payment_method_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_reward_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_reward_no_connection_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_reward_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_title_long;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_switch_to_credit_card;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_switch_to_paypal;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_wallet_not_installed_popup_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_wallet_not_installed_popup_close_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_wallet_not_installed_popup_close_install;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.install_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.next_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.poa_wallet_not_installed_notification_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.poa_wallet_not_installed_notification_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_CVV;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_expired;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_general_1;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_general_2;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_invalid_details;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_no_funds;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_not_supported;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_security;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_wrong_CVV;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_error_item_owned;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.title_dialog_error;
+
+//Class covered with AndroidTest. Run them if you change this class
 public class TranslationsModel {
 
-  public static final int NUMBER_OF_TRANSLATED_STRINGS = 47;
-  private List<String> stringsList;
+  private Map<TranslationsKeys, String> stringMap;
 
   public TranslationsModel() {
-    stringsList = Arrays.asList("To buy this item you first need to get the %s.",//0
-        "AppCoins Wallet", //1
-        "CLOSE", //2
-        "You need the AppCoins Wallet to make this purchase. Download it from Aptoide or Play "
-            + "Store"
-            + " and come back to complete your purchase!", //3
-        "GOT IT!", //4
-        "You need the AppCoins Wallet!", //5
-        "To get your reward you need the AppCoins Wallet.", //6
-        "Pay as a guest", //7
-        "Credit Card", //8
-        "PayPal", //9
-        "PAY USING PAYPAL", //10
-        "PAY USING CREDIT CARD", //11
-        "Card number", //12
-        "MM/YY", //13
-        "CVV", //14
-        "CVC/CVV", //15
-        "CHANGE CARD", //16
-        "Pay with AppCoins Wallet", //17
-        "Get up to %s%% Bonus!", //18
-        "You\'ll receive %s on this purchase.", //19
-        "You'll receive a Bonus on this purchase.", //20
-        "BEST DEAL", //21
-        "DONE!", //22
-        "Next time, get up to %s%% Bonus with the AppCoins Wallet!", //23
-        "Next time, get a Bonus with the AppCoins Wallet!", //24
-        "You could have received %s on this purchase.", //25
-        "Purchase completed!", //26
-        "MORE PAYMENT METHODS", //27
-        "NEXT", //28
-        "CANCEL", //29
-        "BUY", //30
-        "INSTALL WALLET", //31
-        "OK", //32
-        "Install", //33
-        "Error", //34
-        "You already own this item!", //35
-        "Oops, something went wrong.", //36
-        "There was a problem with your card. Please try again or contact us.", //37
-        "The transaction has been rejected by your bank. Please try with a different card or "
-            + "contact us.", //38
-        "It seems you don't have enough funds or there's a limit on your card. Please try "
-            + "with a "
-            + "different one.", //39
-        "It seems your card has expired. Please try with a different one.", //40
-        "Are you sure your card number is correct? Please check and try again.", //41
-        "Your card type is not supported yet. Try with a different one.", //42
-        "Are you sure the security information is correct? Please try again.", //43
-        "Your CVV/CVC code seems to be wrong. Please try again.", //44
-        "Wrong CVV/CVC", //45
-        "If the problem persists please contact us." //46
-    );
+    stringMap = new LinkedHashMap<TranslationsKeys, String>() {
+      {
+        put(iab_wallet_not_installed_popup_body, "To buy this item you first need to get the %s.");
+        put(appcoins_wallet, "AppCoins Wallet");
+        put(iab_wallet_not_installed_popup_close_button, "CLOSE");
+        put(iap_wallet_and_appstore_not_installed_popup_body,
+            "You need the AppCoins Wallet to make this purchase. Download it from Aptoide or Play "
+                + "Store"
+                + " and come back to complete your purchase!");
+        put(iap_wallet_and_appstore_not_installed_popup_button, "GOT IT!");
+        put(poa_wallet_not_installed_notification_title, "You need the AppCoins Wallet!");
+        put(poa_wallet_not_installed_notification_body,
+            "To get your reward you need the AppCoins Wallet.");
+        put(iab_pay_as_guest_title, "Pay as a guest");
+        put(iab_pay_as_guest_credit_card, "Credit Card");
+        put(iab_pay_as_guest_paypal, "PayPal");
+        put(iab_switch_to_paypal, "PAY USING PAYPAL");
+        put(iab_switch_to_credit_card, "PAY USING CREDIT CARD");
+        put(iab_card_number, "Card number");
+        put(iab_card_expiry, "MM/YY");
+        put(iab_card_cvv, "CVV");
+        put(iab_card_cvv_cvc, "CVC/CVV");
+        put(iab_change_card_button, "CHANGE CARD");
+        put(iab_pay_with_wallet_title, "Pay with AppCoins Wallet");
+        put(iab_pay_with_wallet_reward_title, "Get up to %s%% Bonus!");
+        put(iab_pay_with_wallet_reward_body, "You\'ll receive %s on this purchase.");
+        put(iab_pay_with_wallet_reward_no_connection_body,
+            "You'll receive a Bonus on this purchase.");
+        put(iab_best_deal, "BEST DEAL");
+        put(iab_purchase_done_title, "DONE!");
+        put(iab_purchase_done_reward_title,
+            "Next time, get up to %s%% Bonus with the AppCoins Wallet!");
+        put(iab_purchase_done_reward_no_connection_title,
+            "Next time, get a Bonus with the AppCoins Wallet!");
+        put(iab_purchase_done_reward_body, "You could have received %s on this purchase.");
+        put(iab_purchase_done_title_long, "Purchase completed!");
+        put(iab_purchase_change_payment_method_button, "MORE PAYMENT METHODS");
+        put(next_button, "NEXT");
+        put(cancel_button, "CANCEL");
+        put(buy_button, "BUY");
+        put(iab_wallet_not_installed_popup_close_install, "INSTALL WALLET");
+        put(button_ok, "OK");
+        put(install_button, "Install");
+        put(title_dialog_error, "Error");
+        put(purchase_error_item_owned, "You already own this item!");
+        put(purchase_card_error_title, "Oops, something went wrong.");
+        put(purchase_card_error_general_1,
+            "There was a problem with your card. Please try again or contact us.");
+        put(purchase_card_error_general_2,
+            "The transaction has been rejected by your bank. Please try with a different card or "
+                + "contact us.");
+        put(purchase_card_error_no_funds,
+            "It seems you don't have enough funds or there's a limit on your card. Please try "
+                + "with a "
+                + "different one.");
+        put(purchase_card_error_expired,
+            "It seems your card has expired. Please try with a different one.");
+        put(purchase_card_error_invalid_details,
+            "Are you sure your card number is correct? Please check and try again.");
+        put(purchase_card_error_not_supported,
+            "Your card type is not supported yet. Try with a different one.");
+        put(purchase_card_error_security,
+            "Are you sure the security information is correct? Please try again.");
+        put(purchase_card_error_wrong_CVV,
+            "Your CVV/CVC code seems to be wrong. Please try again.");
+        put(purchase_card_error_CVV, "Wrong CVV/CVC");
+        put(error_contac_us_body, "If the problem persists please contact us.");
+      }
+    };
   }
 
   public void mapStrings(List<String> list) {
-    for (int i = 0; i < list.size(); i++) {
-      stringsList.set(i, list.get(i));
+    int position = 0;
+    int listSize = list.size();
+    for (Map.Entry<TranslationsKeys, String> entry : stringMap.entrySet()) {
+      if (position >= listSize) {
+        return;
+      }
+      entry.setValue(list.get(position));
+      position++;
     }
   }
 
-  public String getInstallationDialogBody() {
-    return stringsList.get(0);
+  public String getString(TranslationsKeys key) {
+    return stringMap.get(key);
   }
 
-  public String getDialogStringHighlight() {
-    return stringsList.get(1);
+  public Map<TranslationsKeys, String> getStringMap() {
+    return stringMap;
   }
 
-  public String getSkipButtonString() {
-    return stringsList.get(2);
-  }
-
-  public String getAlertDialogMessage() {
-    return stringsList.get(3);
-  }
-
-  public String getAlertDialogDismissButton() {
-    return stringsList.get(4);
-  }
-
-  public String getPoaNotificationTitle() {
-    return stringsList.get(5);
-  }
-
-  public String getPoaNotificationBody() {
-    return stringsList.get(6);
-  }
-
-  public String getPayAsGuestTitle() {
-    return stringsList.get(7);
-  }
-
-  public String getCreditCard() {
-    return stringsList.get(8);
-  }
-
-  public String getPaypal() {
-    return stringsList.get(9);
-  }
-
-  public String getSwitchToPaypal() {
-    return stringsList.get(10);
-  }
-
-  public String getSwitchToCreditCard() {
-    return stringsList.get(11);
-  }
-
-  public String getCardNumber() {
-    return stringsList.get(12);
-  }
-
-  public String getExpiryDate() {
-    return stringsList.get(13);
-  }
-
-  public String getCardCvv() {
-    return stringsList.get(14);
-  }
-
-  public String getCardCvvCvc() {
-    return stringsList.get(15);
-  }
-
-  public String getChangeCard() {
-    return stringsList.get(16);
-  }
-
-  public String getPayWithWalletTitle() {
-    return stringsList.get(17);
-  }
-
-  public String getWalletRewardTitle() {
-    return stringsList.get(18);
-  }
-
-  public String getWalletRewardBody() {
-    return stringsList.get(19);
-  }
-
-  public String getNoConnectionWalletRewardBody() {
-    return stringsList.get(20);
-  }
-
-  public String getBestDeal() {
-    return stringsList.get(21);
-  }
-
-  public String getDoneTitle() {
-    return stringsList.get(22);
-  }
-
-  public String getPurchaseDoneRewardTitle() {
-    return stringsList.get(23);
-  }
-
-  public String getNoConnectionDoneRewardTitle() {
-    return stringsList.get(24);
-  }
-
-  public String getDoneRewardBody() {
-    return stringsList.get(25);
-  }
-
-  public String getDoneTitleLong() {
-    return stringsList.get(26);
-  }
-
-  public String getMorePaymentMethods() {
-    return stringsList.get(27);
-  }
-
-  public String getNextButton() {
-    return stringsList.get(28);
-  }
-
-  public String getCancelButton() {
-    return stringsList.get(29);
-  }
-
-  public String getBuyButton() {
-    return stringsList.get(30);
-  }
-
-  public String getInstallationButtonString() {
-    return stringsList.get(31);
-  }
-
-  public String getOkButton() {
-    return stringsList.get(32);
-  }
-
-  public String getInstallButton() {
-    return stringsList.get(33)
-        .toUpperCase();
-  }
-
-  public String getErrorTitle() {
-    return stringsList.get(34);
-  }
-
-  public String getItemAlreadyOwned() {
-    return stringsList.get(35);
-  }
-
-  public String getGenericError() {
-    return stringsList.get(36);
-  }
-
-  public String getAdyenGeneralError1() {
-    return stringsList.get(37);
-  }
-
-  public String getAdyenGeneralError2() {
-    return stringsList.get(38);
-  }
-
-  public String getNoFundsError() {
-    return stringsList.get(39);
-  }
-
-  public String getExpiredError() {
-    return stringsList.get(40);
-  }
-
-  public String getInvalidDetailsError() {
-    return stringsList.get(41);
-  }
-
-  public String getCardNotSupportedError() {
-    return stringsList.get(42);
-  }
-
-  public String getSecurityError() {
-    return stringsList.get(43);
-  }
-
-  public String getWrongCVVError() {
-    return stringsList.get(44);
-  }
-
-  public String getCvvError() {
-    return stringsList.get(45);
-  }
-
-  public String getContactUsError() {
-    return stringsList.get(46);
-  }
-
-  public List<String> getStringsList() {
-    return stringsList;
+  public int getNumberOfTranslations() {
+    return stringMap.size();
   }
 }

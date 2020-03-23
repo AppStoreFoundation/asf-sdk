@@ -17,12 +17,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.poa_wallet_not_installed_notification_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.poa_wallet_not_installed_notification_title;
 
 public class WalletUtils {
 
@@ -253,14 +255,13 @@ public class WalletUtils {
     builder = new Notification.Builder(context, channelId);
     builder.setContentIntent(pendingIntent);
 
-    TranslationsModel translationsModel = TranslationsRepository.getInstance(context)
-        .getTranslationsModel();
+    TranslationsRepository translations = TranslationsRepository.getInstance(context);
 
     builder.setSmallIcon(intent.getExtras()
         .getInt(IDENTIFIER_KEY))
         .setAutoCancel(true)
-        .setContentTitle(translationsModel.getPoaNotificationTitle())
-        .setContentText(translationsModel.getPoaNotificationBody());
+        .setContentTitle(translations.getString(poa_wallet_not_installed_notification_title))
+        .setContentText(translations.getString(poa_wallet_not_installed_notification_body));
     return builder.build();
   }
 
@@ -307,14 +308,13 @@ public class WalletUtils {
     builder.setContentIntent(pendingIntent);
     builder.setVibrate(new long[0]);
 
-    TranslationsModel translationsModel = TranslationsRepository.getInstance(context)
-        .getTranslationsModel();
+    TranslationsRepository translations = TranslationsRepository.getInstance(context);
 
     builder.setSmallIcon(intent.getExtras()
         .getInt(IDENTIFIER_KEY))
         .setAutoCancel(true)
-        .setContentTitle(translationsModel.getPoaNotificationTitle())
-        .setContentText(translationsModel.getPoaNotificationBody());
+        .setContentTitle(translations.getString(poa_wallet_not_installed_notification_title))
+        .setContentText(translations.getString(poa_wallet_not_installed_notification_body));
 
     return builder.build();
   }
