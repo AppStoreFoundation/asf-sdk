@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
         translationsXmlParser.parseTranslationXmlWithPath(
             "appcoins-wallet/resources/translations/values/external_strings.xml"));
     TranslationsModel translationsModel = new TranslationsModel();
-    Map<TranslationsKeys, String> defaultStrings = translationsModel.getStringMap();
+    Map<TranslationsKeys, String> defaultStrings = translationsModel.getDefaultStringsMap();
     assertEquals(defaultStrings.size(), xmlDefaultStrings.size());
     int position = 0;
     for (Map.Entry<TranslationsKeys, String> entry : defaultStrings.entrySet()) {
@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
         translationsXmlParser.parseTranslationXmlWithPath(
             "appcoins-wallet/resources/translations/values-pt/external_strings.xml"));
     TranslationsModel translationsModel = new TranslationsModel();
-    Map<TranslationsKeys, String> defaultStrings = translationsModel.getStringMap();
+    Map<TranslationsKeys, String> defaultStrings = translationsModel.getDefaultStringsMap();
     assertEquals(defaultStrings.size(), xmlDefaultStrings.size());
     translationsModel.mapStrings(xmlDefaultStrings);
     int position = 0;
