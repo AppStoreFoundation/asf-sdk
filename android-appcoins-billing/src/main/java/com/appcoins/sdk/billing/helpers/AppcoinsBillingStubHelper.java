@@ -137,7 +137,6 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       if (hasRequiredFields(type, sku) && !WalletUtils.getIabAction()
           .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
         intent = IabActivity.newIntent(context, buyItemProperties);
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
       } else {
         intent = InstallDialogActivity.newIntent(context, buyItemProperties);
       }

@@ -49,6 +49,7 @@ public class IabActivity extends Activity implements IabView {
   public static Intent newIntent(Context context, BuyItemProperties buyItemProperties) {
     Intent intent = new Intent(context, IabActivity.class);
     intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
+    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
     return intent;
   }
 
