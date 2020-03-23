@@ -440,10 +440,10 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   }
 
   private void handleLayoutVisibility(String paymentMethod) {
-    if (paymentMethod.equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
+    if (paymentMethod.equals(IabActivity.CREDIT_CARD)) {
       layout.getButtonsView()
           .setVisibility(View.VISIBLE);
-    } else if (paymentMethod.equals(PaymentMethodsFragment.PAYPAL_RADIO)) {
+    } else if (paymentMethod.equals(IabActivity.PAYPAL)) {
       layout.getDialogLayout()
           .setVisibility(View.INVISIBLE);
       layout.getLoadingView()

@@ -8,6 +8,7 @@ import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.DeveloperPayload;
 import com.appcoins.sdk.billing.analytics.AdyenAnalyticsInteract;
+import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.listeners.NoInfoResponseListener;
 import com.appcoins.sdk.billing.listeners.billing.GetTransactionListener;
 import com.appcoins.sdk.billing.listeners.billing.LoadPaymentInfoListener;
@@ -103,12 +104,12 @@ class AdyenPaymentPresenter {
     } else {
       encryptedCard = cardEncryptor.encryptStoredPaymentFields(cvv, storedPaymentId, "scheme");
     }
-    analytics.sendConfirmationEvent(adyenPaymentInfo, "buy");
+    analytics.sendConfirmationEvent(adyenPaymentInfo, BillingAnalytics.EVENT_BUY);
     makePayment(encryptedCard, serverFiatPrice, serverCurrency);
   }
 
   void onCancelClick() {
-    analytics.sendConfirmationEvent(adyenPaymentInfo, "cancel");
+    analytics.sendConfirmationEvent(adyenPaymentInfo, BillingAnalytics.EVENT_CANCEL);
     fragmentView.close(false);
   }
 
@@ -159,7 +160,7 @@ class AdyenPaymentPresenter {
 
   private void launchPayment(AdyenPaymentMethodsModel adyenPaymentMethodsModel) {
     if (adyenPaymentInfo.getPaymentMethod()
-        .equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
+        .equals(IabActivity.CREDIT_CARD)) {
       fragmentView.showCreditCardView(adyenPaymentMethodsModel.getStoredMethodDetails());
     } else {
       fragmentView.showLoading();
@@ -213,7 +214,7 @@ class AdyenPaymentPresenter {
           makePaymentListener);
       fragmentView.disableBack();
     } else {
-      analytics.sendConfirmationEvent(adyenPaymentInfo, "cancel");
+      analytics.sendConfirmationEvent(adyenPaymentInfo, BillingAnalytics.EVENT_CANCEL);
       fragmentView.close(false);
     }
   }
@@ -244,10 +245,13 @@ class AdyenPaymentPresenter {
   private void handlePaymentResult(String uid, String resultCode, int refusalReasonCode,
       String refusalReason, String status) {
     if (status.equalsIgnoreCase(Status.CANCELED.toString())) {
-      analytics.sendConfirmationEvent(adyenPaymentInfo, "cancel");
+      analytics.sendConfirmationEvent(adyenPaymentInfo, BillingAnalytics.EVENT_CANCEL);
       fragmentView.close(false);
     } else {
-      analytics.sendConfirmationEvent(adyenPaymentInfo, "buy");
+      if (adyenPaymentInfo.getPaymentMethod()
+          .equals(IabActivity.PAYPAL)) {
+        analytics.sendConfirmationEvent(adyenPaymentInfo, BillingAnalytics.EVENT_BUY);
+      }
       if (resultCode.equalsIgnoreCase("AUTHORISED")) {
         handleSuccessAdyenTransaction(uid);
       } else if (refusalReason != null && refusalReasonCode != -1) {
@@ -329,7 +333,7 @@ class AdyenPaymentPresenter {
   }
 
   private AdyenPaymentMethod mapPaymentToService(String paymentType) {
-    if (paymentType.equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
+    if (paymentType.equals(IabActivity.CREDIT_CARD)) {
       return AdyenPaymentMethod.CREDIT_CARD;
     } else {
       return AdyenPaymentMethod.PAYPAL;

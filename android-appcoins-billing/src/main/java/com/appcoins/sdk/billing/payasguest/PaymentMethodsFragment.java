@@ -43,13 +43,13 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.KEY_BUY_INTENT;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.CREDIT_CARD;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.INSTALL_WALLET;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.PAYPAL;
 
 public class PaymentMethodsFragment extends Fragment implements PaymentMethodsView {
 
   private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
-  public static String CREDIT_CARD_RADIO = "credit_card";
-  public static String PAYPAL_RADIO = "paypal";
-  public static String INSTALL_RADIO = "install_wallet";
   private static String SELECTED_RADIO_KEY = "selected_radio";
   private IabView iabView;
   private BuyItemProperties buyItemProperties;
@@ -219,12 +219,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private void onRadioButtonClicked(RadioButton creditCardButton, RadioButton paypalButton,
       RadioButton installRadioButton, ViewGroup creditWrapper, ViewGroup paypalWrapper,
       ViewGroup installWrapper) {
-    RadioButtonClickListener creditCardListener =
-        new RadioButtonClickListener(PaymentMethodsFragment.CREDIT_CARD_RADIO);
-    RadioButtonClickListener paypalListener =
-        new RadioButtonClickListener(PaymentMethodsFragment.PAYPAL_RADIO);
-    RadioButtonClickListener installListener =
-        new RadioButtonClickListener(PaymentMethodsFragment.INSTALL_RADIO);
+    RadioButtonClickListener creditCardListener = new RadioButtonClickListener(CREDIT_CARD);
+    RadioButtonClickListener paypalListener = new RadioButtonClickListener(PAYPAL);
+    RadioButtonClickListener installListener = new RadioButtonClickListener(INSTALL_WALLET);
 
     creditCardButton.setOnClickListener(creditCardListener);
     paypalButton.setOnClickListener(paypalListener);
@@ -319,7 +316,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void setPositiveButtonText(String selectedRadioButton) {
     Button positiveButton = layout.getPositiveButton();
-    if (selectedRadioButton.equals(PaymentMethodsFragment.INSTALL_RADIO)) {
+    if (selectedRadioButton.equals(INSTALL_WALLET)) {
       positiveButton.setText(translationsModel.getInstallButton());
     } else {
       positiveButton.setText(translationsModel.getNextButton());
@@ -331,7 +328,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   @Override public void addPayment(String name) {
-    if (name.equalsIgnoreCase(CREDIT_CARD_RADIO)) {
+    if (name.equalsIgnoreCase(CREDIT_CARD)) {
       layout.getCreditCardWrapperLayout()
           .setVisibility(View.VISIBLE);
     } else {
@@ -404,15 +401,15 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private void setInitialRadioButtonSelected() {
     if (layout.getCreditCardWrapperLayout()
         .getVisibility() == View.VISIBLE) {
-      selectedRadioButton = CREDIT_CARD_RADIO;
+      selectedRadioButton = CREDIT_CARD;
       layout.selectRadioButton(selectedRadioButton);
     } else if (layout.getPaypalWrapperLayout()
         .getVisibility() == View.VISIBLE) {
-      selectedRadioButton = PAYPAL_RADIO;
+      selectedRadioButton = PAYPAL;
       layout.selectRadioButton(selectedRadioButton);
     } else if (layout.getInstallWrapperLayout()
         .getVisibility() == View.VISIBLE) {
-      selectedRadioButton = INSTALL_RADIO;
+      selectedRadioButton = INSTALL_WALLET;
       layout.getPositiveButton()
           .setText(translationsModel.getInstallButton());
       layout.selectRadioButton(selectedRadioButton);

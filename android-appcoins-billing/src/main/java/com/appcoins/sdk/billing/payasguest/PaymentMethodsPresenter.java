@@ -19,6 +19,9 @@ import com.appcoins.sdk.billing.models.payasguest.PaymentMethod;
 import com.appcoins.sdk.billing.models.payasguest.PaymentMethodsModel;
 import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 
+import static com.appcoins.sdk.billing.payasguest.IabActivity.CREDIT_CARD;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.PAYPAL;
+
 class PaymentMethodsPresenter {
 
   private final PaymentMethodsView fragmentView;
@@ -63,16 +66,16 @@ class PaymentMethodsPresenter {
   }
 
   void onCancelButtonClicked(String selectedRadioButton) {
-    sendRakamPaymentMethodEvent(selectedRadioButton, "cancel");
+    sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_CANCEL);
     fragmentView.close(false);
   }
 
   void onPositiveButtonClicked(String selectedRadioButton) {
-    if (selectedRadioButton.equals("paypal") || selectedRadioButton.equals("credit_card")) {
-      sendRakamPaymentMethodEvent(selectedRadioButton, "next");
+    if (selectedRadioButton.equals(PAYPAL) || selectedRadioButton.equals(CREDIT_CARD)) {
+      sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       fragmentView.navigateToAdyen(selectedRadioButton);
     } else {
-      sendRakamPaymentMethodEvent(selectedRadioButton, "next");
+      sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
       if (intent != null) {
         if (intent.getPackage() != null && intent.getPackage()

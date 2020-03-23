@@ -31,6 +31,9 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
 public class IabActivity extends Activity implements IabView {
 
   public final static int LAUNCH_INSTALL_BILLING_FLOW_REQUEST_CODE = 10001;
+  public final static String CREDIT_CARD = "credit_card";
+  public final static String PAYPAL = "paypal";
+  public final static String INSTALL_WALLET = "install_wallet";
   private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private final static String FIRST_IMPRESSION_KEY = "first_impression";
   private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
