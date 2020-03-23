@@ -24,6 +24,7 @@ import com.appcoins.sdk.billing.analytics.AdyenAnalyticsInteract;
 import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
+import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.layouts.AdyenPaymentFragmentLayout;
 import com.appcoins.sdk.billing.layouts.CardNumberEditText;
@@ -99,8 +100,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    TranslationsModel translationsModel = TranslationsRepository.getInstance(getActivity())
-        .getTranslationsModel();
+    TranslationsRepository translations = TranslationsRepository.getInstance(getActivity());
     adyenPaymentInfo = extractBundleInfo();
     AdyenRepository adyenRepository = new AdyenRepository(
         new BdsService(BuildConfig.HOST_WS + "/broker/", BdsService.TIME_OUT_IN_MILLIS),
@@ -123,7 +123,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         new AdyenPaymentInteract(adyenRepository, billingRepository, addressService);
 
     presenter = new AdyenPaymentPresenter(this, adyenPaymentInfo, adyenPaymentInteract,
-        adyenAnalyticsInteract, new AdyenErrorCodeMapper(translationsModel),
+        adyenAnalyticsInteract, new AdyenErrorCodeMapper(translations),
         RedirectUtils.getReturnUrl(getActivity().getApplicationContext()));
   }
 

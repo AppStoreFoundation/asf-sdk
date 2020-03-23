@@ -29,8 +29,8 @@ public class TranslationsRepository {
     return translationsRepositoryInstance;
   }
 
-  public TranslationsModel getTranslationsModel() {
-    return translationsModel;
+  public String getString(TranslationsKeys key) {
+    return translationsModel.getString(key);
   }
 
   private void fetchTranslations() {

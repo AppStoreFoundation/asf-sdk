@@ -25,7 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.CardNumberFocusChangeListener;
 import com.appcoins.sdk.billing.listeners.payasguest.CardNumberTextWatcher;
@@ -38,6 +37,14 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.buy_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.cancel_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_card_cvv;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_card_expiry;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_card_number;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_change_card_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_as_guest_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_change_payment_method_button;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.IMAGES_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.SUPPORT_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
@@ -77,7 +84,7 @@ public class AdyenPaymentFragmentLayout {
   private EditText expiryDateEditText;
   private EditText cvvEditText;
   private CreditCardLayout creditCardEditTextLayout;
-  private TranslationsModel translationModel;
+  private TranslationsRepository translations;
   private ViewGroup completedPurchaseView;
   private TextView helpText;
   private ViewGroup supportHookView;
@@ -89,8 +96,7 @@ public class AdyenPaymentFragmentLayout {
 
   public View build(String fiatPrice, String fiatCurrency, String appcPrice, String sku,
       String packageName) {
-    translationModel = TranslationsRepository.getInstance(activity)
-        .getTranslationsModel();
+    translations = TranslationsRepository.getInstance(activity);
     DisplayMetrics displayMetrics = new DisplayMetrics();
     activity.getWindowManager()
         .getDefaultDisplay()
@@ -329,7 +335,7 @@ public class AdyenPaymentFragmentLayout {
     setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.WHITE);
     button.setTextSize(14);
-    button.setText(translationModel.getBuyButton());
+    button.setText(translations.getString(buy_button));
     button.setLayoutParams(layoutParams);
     return button;
   }
@@ -352,7 +358,7 @@ public class AdyenPaymentFragmentLayout {
     setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.parseColor("#8a000000"));
     button.setTextSize(14);
-    button.setText(translationModel.getCancelButton());
+    button.setText(translations.getString(cancel_button));
     button.setLayoutParams(layoutParams);
     return button;
   }
@@ -402,7 +408,7 @@ public class AdyenPaymentFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#fd786b"));
     textView.setTextSize(12);
-    textView.setText(translationModel.getChangeCard());
+    textView.setText(translations.getString(iab_change_card_button));
     textView.setLayoutParams(layoutParams);
 
     return textView;
@@ -433,7 +439,7 @@ public class AdyenPaymentFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#fd786b"));
     textView.setTextSize(12);
-    textView.setText(translationModel.getMorePaymentMethods());
+    textView.setText(translations.getString(iab_purchase_change_payment_method_button));
     textView.setLayoutParams(layoutParams);
 
     return textView;
@@ -511,7 +517,7 @@ public class AdyenPaymentFragmentLayout {
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, 0, 12, 0);
-    editText.setHint(translationModel.getCardCvv());
+    editText.setHint(translations.getString(iab_card_cvv));
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
     editText.setLayoutParams(layoutParams);
@@ -531,7 +537,7 @@ public class AdyenPaymentFragmentLayout {
     editText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.DATE_MAX_LENGTH)
     });
-    editText.setHint(translationModel.getExpiryDate());
+    editText.setHint(translations.getString(iab_card_expiry));
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
@@ -563,7 +569,7 @@ public class AdyenPaymentFragmentLayout {
     cardNumberEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     cardNumberEditText.setTextColor(Color.parseColor("#292929"));
     cardNumberEditText.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
-    cardNumberEditText.setHint(translationModel.getCardNumber());
+    cardNumberEditText.setHint(translations.getString(iab_card_number));
     cardNumberEditText.setHintTextColor(Color.parseColor("#9d9d9d"));
     cardNumberEditText.setLayoutParams(layoutParams);
     cardNumberEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -636,7 +642,7 @@ public class AdyenPaymentFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#000000"));
     textView.setTextSize(14);
-    textView.setText(translationModel.getPayAsGuestTitle());
+    textView.setText(translations.getString(iab_pay_as_guest_title));
     textView.setLayoutParams(layoutParams);
     return textView;
   }

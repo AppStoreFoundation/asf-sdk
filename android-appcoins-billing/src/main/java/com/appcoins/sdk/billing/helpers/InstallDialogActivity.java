@@ -33,7 +33,6 @@ import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
-import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import java.io.IOException;
@@ -43,6 +42,12 @@ import java.util.Arrays;
 import static android.graphics.Typeface.BOLD;
 import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.getUserCountry;
 import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.userFromIran;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.appcoins_wallet;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_wallet_not_installed_popup_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_wallet_not_installed_popup_close_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_wallet_not_installed_popup_close_install;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_button;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
 
 public class InstallDialogActivity extends Activity {
@@ -69,7 +74,7 @@ public class InstallDialogActivity extends Activity {
   private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
-  private TranslationsModel translationsModel;
+  private TranslationsRepository translations;
   private boolean firstImpression = true;
 
   public static Intent newIntent(Context context, BuyItemProperties buyItemProperties) {
@@ -84,8 +89,7 @@ public class InstallDialogActivity extends Activity {
         new BillingAnalytics(AnalyticsManagerProvider.provideAnalyticsManager());
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(BUY_ITEM_PROPERTIES);
-    translationsModel = TranslationsRepository.getInstance(this)
-        .getTranslationsModel();
+    translations = TranslationsRepository.getInstance(this);
     if (savedInstanceState != null) {
       firstImpression = savedInstanceState.getBoolean(FIRST_IMPRESSION_KEY, true);
     }
@@ -210,11 +214,12 @@ public class InstallDialogActivity extends Activity {
     TextView dialogBody = buildDialogBody(layoutOrientation, appIcon);
     backgroundLayout.addView(dialogBody);
 
-    Button installButton =
-        buildInstallButton(dialogLayout, translationsModel.getInstallationButtonString(), storeUrl);
+    Button installButton = buildInstallButton(dialogLayout,
+        translations.getString(iab_wallet_not_installed_popup_close_install), storeUrl);
     backgroundLayout.addView(installButton);
 
-    Button skipButton = buildSkipButton(installButton, translationsModel.getSkipButtonString());
+    Button skipButton = buildSkipButton(installButton,
+        translations.getString(iab_wallet_not_installed_popup_close_button));
     backgroundLayout.addView(skipButton);
 
     showAppRelatedImagery(appIcon, appBanner, dialogBody);
@@ -353,14 +358,13 @@ public class InstallDialogActivity extends Activity {
   }
 
   private SpannableStringBuilder setHighlightDialogBody() {
-    String dialogBody = String.format(translationsModel.getInstallationDialogBody(),
-        translationsModel.getDialogStringHighlight());
+    String highlightedString = translations.getString(appcoins_wallet);
+    String dialogBody = String.format(translations.getString(iab_wallet_not_installed_popup_body),
+        highlightedString);
     SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialogBody);
-    messageStylized.setSpan(new StyleSpan(BOLD),
-        dialogBody.indexOf(translationsModel.getDialogStringHighlight()),
-        dialogBody.indexOf(translationsModel.getDialogStringHighlight())
-            + translationsModel.getDialogStringHighlight()
-            .length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+    messageStylized.setSpan(new StyleSpan(BOLD), dialogBody.indexOf(highlightedString),
+        dialogBody.indexOf(highlightedString) + highlightedString.length(),
+        Spannable.SPAN_INCLUSIVE_INCLUSIVE);
     return messageStylized;
   }
 
@@ -496,8 +500,9 @@ public class InstallDialogActivity extends Activity {
 
   private void buildAlertNoBrowserAndStores() {
     AlertDialog.Builder alert = new AlertDialog.Builder(this);
-    String value = translationsModel.getAlertDialogMessage();
-    String dismissValue = translationsModel.getAlertDialogDismissButton();
+    String value = translations.getString(iap_wallet_and_appstore_not_installed_popup_body);
+    String dismissValue =
+        translations.getString(iap_wallet_and_appstore_not_installed_popup_button);
     alert.setMessage(value);
     alert.setCancelable(true);
     alert.setPositiveButton(dismissValue, new DialogInterface.OnClickListener() {

@@ -12,11 +12,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_title_long;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.COMPLETED_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
@@ -26,7 +26,7 @@ class CompletedPurchaseLayout {
   private final Activity activity;
   private final int orientation;
   private String densityPath;
-  private TranslationsModel translationModel;
+  private TranslationsRepository translations;
 
   CompletedPurchaseLayout(Activity activity, int orientation, String densityPath) {
 
@@ -36,8 +36,7 @@ class CompletedPurchaseLayout {
   }
 
   ViewGroup buildView(String fiatPrice, String fiatCurrency, String sku) {
-    translationModel = TranslationsRepository.getInstance(activity)
-        .getTranslationsModel();
+    translations = TranslationsRepository.getInstance(activity);
     LinearLayout purchaseLayout = new LinearLayout(activity);
     purchaseLayout.setClipToPadding(false);
 
@@ -103,7 +102,7 @@ class CompletedPurchaseLayout {
       top = 24;
     }
     setMargins(layoutParams, 0, top, 0, 0);
-    textView.setText(translationModel.getDoneTitleLong());
+    textView.setText(translations.getString(iab_purchase_done_title_long));
     textView.setTextColor(Color.parseColor("#de000000"));
     textView.setTypeface(null, Typeface.BOLD);
     textView.setTextSize(18);

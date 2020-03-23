@@ -20,12 +20,13 @@ import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
 import com.appcoins.sdk.billing.helpers.Utils;
-import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.ERROR_RESULT_CODE;
 import static com.appcoins.sdk.billing.helpers.Utils.RESPONSE_CODE;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_button;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
 
 public class IabActivity extends Activity implements IabView {
@@ -38,7 +39,7 @@ public class IabActivity extends Activity implements IabView {
   private final static String FIRST_IMPRESSION_KEY = "first_impression";
   private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static int IAB_ACTIVITY_ID;
-  private TranslationsRepository translationsRepository;
+  private TranslationsRepository translations;
   private FrameLayout frameLayout;
   private BuyItemProperties buyItemProperties;
   private ActivityResultListener activityResultListener;
@@ -70,7 +71,7 @@ public class IabActivity extends Activity implements IabView {
     setContentView(frameLayout);
 
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(BUY_ITEM_PROPERTIES);
-    translationsRepository = TranslationsRepository.getInstance(this);
+    translations = TranslationsRepository.getInstance(this);
     if (savedInstanceState == null) {
       navigateToPaymentSelection();
     }
@@ -255,9 +256,9 @@ public class IabActivity extends Activity implements IabView {
 
   private void buildAlertNoBrowserAndStores() {
     AlertDialog.Builder alert = new AlertDialog.Builder(this);
-    TranslationsModel translationsModel = translationsRepository.getTranslationsModel();
-    String value = translationsModel.getAlertDialogMessage();
-    String dismissValue = translationsModel.getAlertDialogDismissButton();
+    String value = translations.getString(iap_wallet_and_appstore_not_installed_popup_body);
+    String dismissValue =
+        translations.getString(iap_wallet_and_appstore_not_installed_popup_button);
     alert.setMessage(value);
     alert.setCancelable(true);
     alert.setPositiveButton(dismissValue, new DialogInterface.OnClickListener() {
