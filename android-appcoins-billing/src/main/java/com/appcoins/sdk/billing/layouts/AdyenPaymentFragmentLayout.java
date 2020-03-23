@@ -315,10 +315,10 @@ public class AdyenPaymentFragmentLayout {
 
     int top, constraint;
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-      constraint = RelativeLayout.ALIGN_END;
+      constraint = RelativeLayout.ALIGN_RIGHT;
       top = 26;
     } else {
-      constraint = RelativeLayout.ALIGN_START;
+      constraint = RelativeLayout.ALIGN_LEFT;
       top = 16;
     }
     layoutParams.addRule(RelativeLayout.BELOW, creditCardInputId);
@@ -353,7 +353,7 @@ public class AdyenPaymentFragmentLayout {
       textView.setGravity(Gravity.CENTER);
     }
     layoutParams.addRule(RelativeLayout.BELOW, belowId);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, top, end, 0);
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#fd786b"));

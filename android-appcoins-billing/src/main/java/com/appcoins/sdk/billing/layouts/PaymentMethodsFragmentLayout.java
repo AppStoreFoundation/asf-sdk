@@ -551,7 +551,7 @@ public class PaymentMethodsFragmentLayout {
 
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
       rule = RelativeLayout.CENTER_VERTICAL;
-      setConstraint(layoutParams, RelativeLayout.ALIGN_START, installMainTextId);
+      setConstraint(layoutParams, RelativeLayout.ALIGN_LEFT, installMainTextId);
     } else {
       rule = RelativeLayout.CENTER_HORIZONTAL;
     }
