@@ -54,14 +54,21 @@ import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.pur
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_error_item_owned;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.title_dialog_error;
 
-//Class covered with AndroidTest. Run them if you change this class
+//Class covered with AndroidTests. Always run them if you change this class
 public class TranslationsModel {
 
-  private Map<TranslationsKeys, String> stringMap;
+  //This is needed as there may be an error parsing the Xml.
+  private Map<TranslationsKeys, String> defaultStringsMap;
 
+  /**
+   * Whenever you add a string to an xml file, you should create the enum with the key name in
+   * the TranslationsKeys.java and then add it to the defaultStringsMap in the position as in the
+   * xml. After this you should run the AndroidTests to confirm that you add it correctly.
+   */
   public TranslationsModel() {
-    stringMap = new LinkedHashMap<TranslationsKeys, String>() {
-      {
+    defaultStringsMap = new LinkedHashMap<TranslationsKeys, String>() {
+      { //This list needs to be in the same order as the string xml file. If not the androidTests
+        // will fail.
         put(iab_wallet_not_installed_popup_body, "To buy this item you first need to get the %s.");
         put(appcoins_wallet, "AppCoins Wallet");
         put(iab_wallet_not_installed_popup_close_button, "CLOSE");
@@ -136,7 +143,7 @@ public class TranslationsModel {
   public void mapStrings(List<String> list) {
     int position = 0;
     int listSize = list.size();
-    for (Map.Entry<TranslationsKeys, String> entry : stringMap.entrySet()) {
+    for (Map.Entry<TranslationsKeys, String> entry : defaultStringsMap.entrySet()) {
       if (position >= listSize) {
         return;
       }
@@ -146,14 +153,16 @@ public class TranslationsModel {
   }
 
   public String getString(TranslationsKeys key) {
-    return stringMap.get(key);
+    return defaultStringsMap.get(key);
   }
 
-  public Map<TranslationsKeys, String> getStringMap() {
-    return stringMap;
+  //Test only methods. The following methods are only to support tests.
+
+  public Map<TranslationsKeys, String> getDefaultStringsMap() {
+    return defaultStringsMap;
   }
 
   public int getNumberOfTranslations() {
-    return stringMap.size();
+    return defaultStringsMap.size();
   }
 }

@@ -23,7 +23,7 @@ public class TranslationsTest {
 
   @Before public void setupTest() {
     translationsModel = new TranslationsModel();
-    defaultValues = translationsModel.getStringMap();
+    defaultValues = translationsModel.getDefaultStringsMap();
     correctSizeList = new ArrayList<>();
     wrongAboveSizeList = new ArrayList<>();
     wrongBelowSizeList = Arrays.asList("value", "value2");
