@@ -61,8 +61,8 @@ public class CampaignService implements Runnable {
 
     HttpURLConnection connection = (HttpURLConnection) urlConnection.openConnection();
     connection.setRequestMethod("GET");
-    Map<String, List<String>> requestProperties = connection.getRequestProperties();
     connection.setRequestProperty("User-Agent", WalletUtils.getUserAgent());
+    Map<String, List<String>> requestProperties = connection.getRequestProperties();
 
     connection.connect();
 
