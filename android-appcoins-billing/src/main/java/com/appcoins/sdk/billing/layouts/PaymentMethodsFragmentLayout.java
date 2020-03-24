@@ -323,6 +323,7 @@ public class PaymentMethodsFragmentLayout {
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(32));
       radius = getCornerRadiusArray(16, 16, 16, 16);
       layoutParams.addRule(RelativeLayout.BELOW, paymentMethodsId);
+      setConstraint(layoutParams, RelativeLayout.LEFT_OF, buttonsViewId);
       setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_LEFT);
       setMargins(layoutParams, 18, 24, 0, 16);
     }

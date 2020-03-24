@@ -221,6 +221,7 @@ public class AdyenPaymentFragmentLayout {
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(32));
       radius = getCornerRadiusArray(16, 16, 16, 16);
       layoutParams.addRule(RelativeLayout.BELOW, creditCardViewId);
+      setConstraint(layoutParams, RelativeLayout.LEFT_OF, buttonsViewId);
       setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_LEFT);
       setMargins(layoutParams, 18, 42, 0, 16);
     }
@@ -271,10 +272,10 @@ public class AdyenPaymentFragmentLayout {
     buttonsViewId = generateRandomId();
     linearLayout.setId(buttonsViewId);
     RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.BELOW, creditCardViewId);
-
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     int end, top, bottom;
 
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
