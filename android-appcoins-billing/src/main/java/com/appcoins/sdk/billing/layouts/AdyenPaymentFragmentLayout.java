@@ -3,7 +3,6 @@ package com.appcoins.sdk.billing.layouts;
 import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -57,7 +56,7 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
 
 public class AdyenPaymentFragmentLayout {
   private final Activity activity;
-  private final int orientation;
+  private final boolean isPortrait;
   private int buttonsViewId;
   private int genericCardId;
   private int creditCardInputId;
@@ -90,9 +89,9 @@ public class AdyenPaymentFragmentLayout {
   private ViewGroup supportHookView;
   private TextView appNameView;
 
-  public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
+  public AdyenPaymentFragmentLayout(Activity activity, boolean isPortrait) {
     this.activity = activity;
-    this.orientation = orientation;
+    this.isPortrait = isPortrait;
   }
 
   public View build(String fiatPrice, String fiatCurrency, String appcPrice, String sku,
@@ -105,12 +104,12 @@ public class AdyenPaymentFragmentLayout {
     densityPath = mapDisplayMetrics(displayMetrics);
 
     RelativeLayout mainLayout = buildMainLayout();
-    paymentErrorViewLayout = new PaymentErrorViewLayout(activity, orientation);
+    paymentErrorViewLayout = new PaymentErrorViewLayout(activity, isPortrait);
     errorView = paymentErrorViewLayout.buildErrorView();
     errorView.setVisibility(View.INVISIBLE);
 
     CompletedPurchaseLayout completedPurchaseLayout =
-        new CompletedPurchaseLayout(activity, orientation, densityPath);
+        new CompletedPurchaseLayout(activity, isPortrait, densityPath);
     completedPurchaseView = completedPurchaseLayout.buildView(fiatPrice, fiatCurrency, sku);
     completedPurchaseView.setVisibility(View.INVISIBLE);
 
@@ -174,7 +173,7 @@ public class AdyenPaymentFragmentLayout {
     dialogLayout.setBackground(gradientDrawable);
 
     int width;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       width = dpToPx(340);
     } else {
       width = dpToPx(544);
@@ -210,7 +209,7 @@ public class AdyenPaymentFragmentLayout {
 
     float[] radius;
     RelativeLayout.LayoutParams layoutParams;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       layoutParams =
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(32));
       radius = getCornerRadiusArray(0, 0, 8, 8);
@@ -277,7 +276,7 @@ public class AdyenPaymentFragmentLayout {
     setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     int end, top, bottom;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       end = 12;
       top = 60;
       bottom = 24;
@@ -397,7 +396,7 @@ public class AdyenPaymentFragmentLayout {
             ViewGroup.LayoutParams.WRAP_CONTENT);
 
     int top, constraint;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       constraint = RelativeLayout.ALIGN_RIGHT;
       top = 26;
     } else {
@@ -424,7 +423,7 @@ public class AdyenPaymentFragmentLayout {
             ViewGroup.LayoutParams.WRAP_CONTENT);
 
     int end, top, belowId;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       belowId = creditCardInputId;
       end = 14;
       top = 88;
@@ -591,7 +590,7 @@ public class AdyenPaymentFragmentLayout {
 
     int top, start, end;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       top = 8;
       start = 14;
       end = 18;
@@ -616,7 +615,7 @@ public class AdyenPaymentFragmentLayout {
     ImageView imageView = new ImageView(activity);
 
     int height;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       height = 10;
     } else {
       height = 12;
@@ -656,7 +655,7 @@ public class AdyenPaymentFragmentLayout {
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(1));
     int start, top, end;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       start = 16;
       top = 20;
       end = 16;
@@ -790,7 +789,7 @@ public class AdyenPaymentFragmentLayout {
         new RelativeLayout.LayoutParams(dpToPx(48), dpToPx(48));
 
     int start;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       start = 12;
     } else {
       start = 20;

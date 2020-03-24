@@ -1,7 +1,6 @@
 package com.appcoins.sdk.billing.layouts;
 
 import android.app.Activity;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -24,14 +23,14 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
 class CompletedPurchaseLayout {
 
   private final Activity activity;
-  private final int orientation;
+  private final boolean isPortrait;
   private String densityPath;
   private TranslationsRepository translations;
 
-  CompletedPurchaseLayout(Activity activity, int orientation, String densityPath) {
+  CompletedPurchaseLayout(Activity activity, boolean isPortrait, String densityPath) {
 
     this.activity = activity;
-    this.orientation = orientation;
+    this.isPortrait = isPortrait;
     this.densityPath = densityPath;
   }
 
@@ -46,7 +45,7 @@ class CompletedPurchaseLayout {
     purchaseLayout.setBackground(gradientDrawable);
 
     int width;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       width = dpToPx(340);
     } else {
       width = dpToPx(544);
@@ -75,7 +74,7 @@ class CompletedPurchaseLayout {
             LinearLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
     int bottom;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       bottom = 106;
     } else {
       bottom = 56;
@@ -96,7 +95,7 @@ class CompletedPurchaseLayout {
             LinearLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
     int top;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       top = 20;
     } else {
       top = 24;
@@ -121,7 +120,7 @@ class CompletedPurchaseLayout {
 
     imageParams.gravity = Gravity.CENTER_HORIZONTAL;
     int top;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       top = 76;
     } else {
       top = 48;

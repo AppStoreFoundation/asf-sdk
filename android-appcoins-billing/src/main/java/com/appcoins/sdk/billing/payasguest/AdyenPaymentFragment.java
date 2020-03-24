@@ -3,6 +3,7 @@ package com.appcoins.sdk.billing.payasguest;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -131,8 +132,9 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
-    layout = new AdyenPaymentFragmentLayout(getActivity(),
-        getResources().getConfiguration().orientation);
+    boolean isPortrait =
+        getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+    layout = new AdyenPaymentFragmentLayout(getActivity(), isPortrait);
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();
     return layout.build(adyenPaymentInfo.getFiatPrice(), adyenPaymentInfo.getFiatCurrency(),
         adyenPaymentInfo.getAppcPrice(), buyItemProperties.getSku(),
@@ -242,8 +244,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         .setFieldValidationListener(new FieldValidationListener() {
           @Override public void onFieldChanged(boolean isCardNumberValid, boolean isExpiryDateValid,
               boolean isCvvValid, String paymentId) {
-            if ((isCardNumberValid && isExpiryDateValid && isCvvValid)
-                || !paymentId.equals("") && isCvvValid) {
+            if (areFieldsValid(isCardNumberValid, isExpiryDateValid, isCvvValid, paymentId)) {
               hideKeyboard();
               positiveButton.setEnabled(true);
             } else {
@@ -542,7 +543,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private void setDate(ExpiryDate expiryDate, EditText editText) {
     SimpleDateFormat simpleDateFormat =
         new SimpleDateFormat(CardValidationUtils.DATE_FORMAT, Locale.ROOT);
-    if (expiryDate != null && expiryDate != ExpiryDate.EMPTY_DATE) {
+    if (isNotEmptyDate(expiryDate)) {
       final Calendar calendar = GregorianCalendar.getInstance();
       calendar.clear();
       // first day of month, GregorianCalendar month is 0 based.
@@ -551,5 +552,24 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     } else {
       editText.setText("");
     }
+  }
+
+  private boolean isNotEmptyDate(ExpiryDate expiryDate) {
+    return expiryDate != null && expiryDate != ExpiryDate.EMPTY_DATE;
+  }
+
+  private boolean areFieldsValid(boolean isCardNumberValid, boolean isExpiryDateValid,
+      boolean isCvvValid, String paymentId) {
+    return areNotSavedCardFieldsValid(isCardNumberValid, isExpiryDateValid, isCvvValid)
+        || areSavedCardFieldsValid(isCvvValid, paymentId);
+  }
+
+  private boolean areNotSavedCardFieldsValid(boolean isCardNumberValid, boolean isExpiryDateValid,
+      boolean isCvvValid) {
+    return isCardNumberValid && isExpiryDateValid && isCvvValid;
+  }
+
+  private boolean areSavedCardFieldsValid(boolean isCvvValid, String paymentId) {
+    return !paymentId.equals("") && isCvvValid;
   }
 }

@@ -100,23 +100,12 @@ public class IabActivity extends Activity implements IabView {
       finish();
     } else if (requestCode == WEB_VIEW_REQUEST_CODE) {
       if (activityResultListener != null) {
-        if (resultCode == WebViewActivity.SUCCESS) {
-          activityResultListener.onActivityResult(data.getData(),
-              data.getStringExtra(WebViewActivity.TRANSACTION_ID), true);
-        } else {
-          activityResultListener.onActivityResult(null, "", false);
-        }
+        handleResultCode(resultCode, data);
       } else {
         Log.w("IabActivity", "ActivityResultListener was not set");
         close(true);
       }
     }
-  }
-
-  private void navigateTo(Fragment fragment) {
-    getFragmentManager().beginTransaction()
-        .replace(frameLayout.getId(), fragment)
-        .commit();
   }
 
   @Override public void close(boolean withError) {
@@ -277,5 +266,20 @@ public class IabActivity extends Activity implements IabView {
     });
     AlertDialog alertDialog = alert.create();
     alertDialog.show();
+  }
+
+  private void handleResultCode(int resultCode, Intent data) {
+    if (resultCode == WebViewActivity.SUCCESS) {
+      activityResultListener.onActivityResult(data.getData(),
+          data.getStringExtra(WebViewActivity.TRANSACTION_ID), true);
+    } else {
+      activityResultListener.onActivityResult(null, "", false);
+    }
+  }
+
+  private void navigateTo(Fragment fragment) {
+    getFragmentManager().beginTransaction()
+        .replace(frameLayout.getId(), fragment)
+        .commit();
   }
 }

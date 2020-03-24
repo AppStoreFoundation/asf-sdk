@@ -41,15 +41,8 @@ public class BdsService implements Service {
       urlConnection.setReadTimeout(timeoutInMillis);
 
       setUserAgent(urlConnection);
-      if (header != null) {
-        setHeaders(urlConnection, header);
-      }
-      if ((httpMethod.equals("POST") || httpMethod.equals("PATCH")) && body != null) {
-        if (httpMethod.equals("PATCH")) {
-          urlConnection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
-        }
-        setPostOutput(urlConnection, body);
-      }
+      setHeaders(urlConnection, header);
+      handlePostPatchRequests(urlConnection, httpMethod, body);
 
       int responseCode = urlConnection.getResponseCode();
       InputStream inputStream;
@@ -69,13 +62,29 @@ public class BdsService implements Service {
     }
   }
 
+  private void handlePostPatchRequests(HttpURLConnection urlConnection, String httpMethod,
+      Map<String, Object> body) throws IOException {
+    if (isValidPostPatchRequest(httpMethod, body)) {
+      if (httpMethod.equals("PATCH")) {
+        urlConnection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
+      }
+      setPostOutput(urlConnection, body);
+    }
+  }
+
+  private boolean isValidPostPatchRequest(String httpMethod, Map<String, Object> body) {
+    return (httpMethod.equals("POST") || httpMethod.equals("PATCH")) && body != null;
+  }
+
   private void setUserAgent(HttpURLConnection urlConnection) {
     urlConnection.setRequestProperty("User-Agent", WalletUtils.getUserAgent());
   }
 
   private void setHeaders(HttpURLConnection urlConnection, Map<String, String> header) {
-    for (Map.Entry<String, String> entry : header.entrySet()) {
-      urlConnection.setRequestProperty(entry.getKey(), entry.getValue());
+    if (header != null) {
+      for (Map.Entry<String, String> entry : header.entrySet()) {
+        urlConnection.setRequestProperty(entry.getKey(), entry.getValue());
+      }
     }
   }
 

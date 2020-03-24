@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -42,9 +43,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.KEY_BUY_INTENT;
-import static com.appcoins.sdk.billing.payasguest.IabActivity.CREDIT_CARD;
-import static com.appcoins.sdk.billing.payasguest.IabActivity.INSTALL_WALLET;
-import static com.appcoins.sdk.billing.payasguest.IabActivity.PAYPAL;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_no_connection_body;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_title;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_1;
@@ -52,6 +50,9 @@ import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.install_button;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.next_button;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_error_item_owned;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.CREDIT_CARD;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.INSTALL_WALLET;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.PAYPAL;
 
 public class PaymentMethodsFragment extends Fragment implements PaymentMethodsView {
 
@@ -125,8 +126,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
-    layout = new PaymentMethodsFragmentLayout(getActivity(),
-        getResources().getConfiguration().orientation, buyItemProperties);
+    boolean isPortrait =
+        getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+    layout = new PaymentMethodsFragmentLayout(getActivity(), isPortrait, buyItemProperties);
 
     return layout.build();
   }
@@ -407,21 +409,16 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   private void setInitialRadioButtonSelected() {
-    if (layout.getCreditCardWrapperLayout()
-        .getVisibility() == View.VISIBLE) {
+    if (isVisible(layout.getCreditCardWrapperLayout())) {
       selectedRadioButton = CREDIT_CARD;
-      layout.selectRadioButton(selectedRadioButton);
-    } else if (layout.getPaypalWrapperLayout()
-        .getVisibility() == View.VISIBLE) {
+    } else if (isVisible(layout.getPaypalWrapperLayout())) {
       selectedRadioButton = PAYPAL;
-      layout.selectRadioButton(selectedRadioButton);
-    } else if (layout.getInstallWrapperLayout()
-        .getVisibility() == View.VISIBLE) {
+    } else if (isVisible(layout.getInstallWrapperLayout())) {
       selectedRadioButton = INSTALL_WALLET;
       layout.getPositiveButton()
           .setText(translations.getString(install_button));
-      layout.selectRadioButton(selectedRadioButton);
     }
+    layout.selectRadioButton(selectedRadioButton);
   }
 
   private void attach(Context context) {
@@ -446,6 +443,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     } else {
       iabView.finishWithError();
     }
+  }
+
+  private boolean isVisible(View view) {
+    return view.getVisibility() == View.VISIBLE;
   }
 
   public class RadioButtonClickListener implements View.OnClickListener {
