@@ -130,36 +130,45 @@ public class WalletUtils {
 
   public static String getUserAgent() {
     if (userAgent == null) {
-      WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-      Display display = wm.getDefaultDisplay();
-      DisplayMetrics displayMetrics = new DisplayMetrics();
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-        display.getRealMetrics(displayMetrics);
-      } else {
-        display.getMetrics(displayMetrics);
-      }
-      userAgent = "AppCoinsGuestSDK/"
-          + BuildConfig.VERSION_NAME
-          + " (Linux; Android "
-          + Build.VERSION.RELEASE.replaceAll(";", " ")
-          + "; "
-          + Build.VERSION.SDK_INT
-          + "; "
-          + Build.MODEL.replaceAll(";", " ")
-          + " Build/"
-          + Build.PRODUCT.replace(";", " ")
-          + "; "
-          + System.getProperty("os.arch")
-          + "; "
-          + context.getPackageName()
-          + "; "
-          + BuildConfig.VERSION_CODE
-          + "; "
-          + displayMetrics.widthPixels
-          + "x"
-          + displayMetrics.heightPixels
-          + ")";
+      DisplayMetrics displayMetrics = getDisplayMetrics();
+      userAgent = buildUserAgent(displayMetrics.widthPixels, displayMetrics.heightPixels);
     }
     return userAgent;
+  }
+
+  private static String buildUserAgent(int widthPixels, int heightPixels) {
+    return "AppCoinsGuestSDK/"
+        + BuildConfig.VERSION_NAME
+        + " (Linux; Android "
+        + Build.VERSION.RELEASE.replaceAll(";", " ")
+        + "; "
+        + Build.VERSION.SDK_INT
+        + "; "
+        + Build.MODEL.replaceAll(";", " ")
+        + " Build/"
+        + Build.PRODUCT.replace(";", " ")
+        + "; "
+        + System.getProperty("os.arch")
+        + "; "
+        + context.getPackageName()
+        + "; "
+        + BuildConfig.VERSION_CODE
+        + "; "
+        + widthPixels
+        + "x"
+        + heightPixels
+        + ")";
+  }
+
+  private static DisplayMetrics getDisplayMetrics() {
+    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    Display display = wm.getDefaultDisplay();
+    DisplayMetrics displayMetrics = new DisplayMetrics();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      display.getRealMetrics(displayMetrics);
+    } else {
+      display.getMetrics(displayMetrics);
+    }
+    return displayMetrics;
   }
 }
