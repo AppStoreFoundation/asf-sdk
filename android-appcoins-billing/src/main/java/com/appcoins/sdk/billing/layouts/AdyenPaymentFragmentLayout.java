@@ -88,6 +88,7 @@ public class AdyenPaymentFragmentLayout {
   private ViewGroup completedPurchaseView;
   private TextView helpText;
   private ViewGroup supportHookView;
+  private TextView appNameView;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
     this.activity = activity;
@@ -219,6 +220,7 @@ public class AdyenPaymentFragmentLayout {
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(32));
       radius = getCornerRadiusArray(16, 16, 16, 16);
       layoutParams.addRule(RelativeLayout.BELOW, creditCardViewId);
+      setConstraint(layoutParams, RelativeLayout.LEFT_OF, buttonsViewId);
       setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_LEFT);
       setMargins(layoutParams, 18, 42, 0, 16);
     }
@@ -269,10 +271,10 @@ public class AdyenPaymentFragmentLayout {
     buttonsViewId = generateRandomId();
     linearLayout.setId(buttonsViewId);
     RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.BELOW, creditCardViewId);
-
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     int end, top, bottom;
 
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -396,10 +398,10 @@ public class AdyenPaymentFragmentLayout {
 
     int top, constraint;
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-      constraint = RelativeLayout.ALIGN_END;
+      constraint = RelativeLayout.ALIGN_RIGHT;
       top = 26;
     } else {
-      constraint = RelativeLayout.ALIGN_START;
+      constraint = RelativeLayout.ALIGN_LEFT;
       top = 16;
     }
     layoutParams.addRule(RelativeLayout.BELOW, creditCardInputId);
@@ -434,7 +436,7 @@ public class AdyenPaymentFragmentLayout {
       textView.setGravity(Gravity.CENTER);
     }
     layoutParams.addRule(RelativeLayout.BELOW, belowId);
-    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_END);
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, top, end, 0);
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#fd786b"));
@@ -693,7 +695,7 @@ public class AdyenPaymentFragmentLayout {
     fiatPriceView = createFiatPriceView(fiatPrice, fiatCurrency);
     TextView appcPriceView = createAppcPriceView(appcPrice);
     ImageView iconImageView = createAppIconLayout(icon);
-    TextView appNameView = createAppNameLayout(appName);
+    appNameView = createAppNameLayout(appName);
     TextView skuView = createSkuLayout(sku);
 
     paymentMethodHeaderLayout.addView(iconImageView);
@@ -896,5 +898,9 @@ public class AdyenPaymentFragmentLayout {
 
   public ViewGroup getSupportHookView() {
     return supportHookView;
+  }
+
+  public TextView getAppNameView() {
+    return appNameView;
   }
 }

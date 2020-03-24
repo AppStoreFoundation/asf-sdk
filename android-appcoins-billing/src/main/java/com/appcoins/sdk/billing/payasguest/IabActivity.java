@@ -210,29 +210,32 @@ public class IabActivity extends Activity implements IabView {
     String[] extraEmail = new String[] {
         "info@appcoins.io"
     };
-    String body = "Package Name: "
-        + emailInfo.getPackageName()
-        + "\n"
-        + "SDK version: "
-        + emailInfo.getSdkVersionName()
-        + "\n"
-        + "Item name: "
-        + emailInfo.getSku()
-        + "\n"
-        + "Mobile Version: "
-        + emailInfo.getMobileVersion()
-        + "\n"
-        + "Wallet Address: "
-        + emailInfo.getWalletAddress();
+    String body =
+        "We currently offer support in English language only. Also, please don't delete the "
+            + "details below so it's easier for us to look into your issue.\n"
+            + "Package Name: "
+            + emailInfo.getPackageName()
+            + "\n"
+            + "SDK version: "
+            + emailInfo.getSdkVersionName()
+            + "\n"
+            + "Item name: "
+            + emailInfo.getSku()
+            + "\n"
+            + "Mobile Version: "
+            + emailInfo.getMobileVersion()
+            + "\n"
+            + "Wallet Address: "
+            + emailInfo.getWalletAddress();
     Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
     intent.setType("message/rfc822");
-    intent.putExtra(Intent.EXTRA_SUBJECT, emailInfo.getTitle());
+    intent.putExtra(Intent.EXTRA_SUBJECT, "Pay as Guest - " + emailInfo.getAppName());
     intent.putExtra(Intent.EXTRA_EMAIL, extraEmail);
     intent.putExtra(Intent.EXTRA_TEXT, body);
     PackageManager packageManager = getPackageManager();
     ActivityInfo activityInfo = intent.resolveActivityInfo(packageManager, 0);
     if (activityInfo != null) {
-      startActivity(Intent.createChooser(intent, "Select email application."));
+      startActivity(Intent.createChooser(intent, ""));
     }
   }
 

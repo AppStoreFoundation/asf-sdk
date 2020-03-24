@@ -23,8 +23,6 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.analytics.AdyenAnalyticsInteract;
 import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
-import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
-import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.layouts.AdyenPaymentFragmentLayout;
 import com.appcoins.sdk.billing.layouts.CardNumberEditText;
@@ -51,6 +49,9 @@ import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_1;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_2_link;
+
 public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   private static final String CARD_NUMBER_KEY = "credit_card";
@@ -70,6 +71,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private AdyenPaymentFragmentLayout layout;
   private String serverCurrency;
   private BigDecimal serverFiatPrice;
+  private TranslationsRepository translations;
 
   public static AdyenPaymentFragment newInstance(String selectedRadioButton, String walletAddress,
       String signature, String fiatPrice, String fiatPriceCurrencyCode, String appcPrice,
@@ -100,7 +102,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    TranslationsRepository translations = TranslationsRepository.getInstance(getActivity());
+    translations = TranslationsRepository.getInstance(getActivity());
     adyenPaymentInfo = extractBundleInfo();
     AdyenRepository adyenRepository = new AdyenRepository(
         new BdsService(BuildConfig.HOST_WS + "/broker/", BdsService.TIME_OUT_IN_MILLIS),
@@ -376,15 +378,17 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void redirectToSupportEmail(String walletAddress, String packageName, String sku,
       String sdkVersionName, int mobileVersion) {
-    String title = "Support title";
+    String appName = layout.getAppNameView()
+        .getText()
+        .toString();
     EmailInfo emailInfo =
-        new EmailInfo(walletAddress, packageName, sku, sdkVersionName, mobileVersion, title);
+        new EmailInfo(walletAddress, packageName, sku, sdkVersionName, mobileVersion, appName);
     iabView.redirectToSupportEmail(emailInfo);
   }
 
   private void createSpannableString(TextView helpText) {
-    String helpString = "Need help?";
-    String contactString = "Contact Support";
+    String helpString = translations.getString(iab_purchase_support_1);
+    String contactString = translations.getString(iab_purchase_support_2_link);
     String concatenatedString = helpString + ' ' + contactString;
     SpannableString spannableString = new SpannableString(concatenatedString);
     ClickableSpan clickableSpan = new ClickableSpan() {
