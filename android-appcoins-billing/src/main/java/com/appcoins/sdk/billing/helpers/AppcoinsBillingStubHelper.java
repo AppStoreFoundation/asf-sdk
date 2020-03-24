@@ -57,25 +57,19 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   }
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
-
+    int responseCode = ResponseCode.SERVICE_UNAVAILABLE.getValue();
     if (WalletUtils.hasWalletInstalled()) {
       try {
-        return serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
+        responseCode = serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
       } catch (RemoteException e) {
         e.printStackTrace();
-        return ResponseCode.SERVICE_UNAVAILABLE.getValue();
       }
     } else {
-      if (type.equalsIgnoreCase("inapp")) {
-        if (apiVersion == SUPPORTED_API_VERSION) {
-          return ResponseCode.OK.getValue();
-        } else {
-          return ResponseCode.BILLING_UNAVAILABLE.getValue();
-        }
-      } else {
-        return ResponseCode.BILLING_UNAVAILABLE.getValue();
+      if (isSupported(type, apiVersion)) {
+        responseCode = ResponseCode.OK.getValue();
       }
     }
+    return responseCode;
   }
 
   @Override
@@ -180,21 +174,23 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   }
 
   @Override public int consumePurchase(int apiVersion, String packageName, String purchaseToken) {
+    int responseCode = ResponseCode.SERVICE_UNAVAILABLE.getValue();
     try {
       if (WalletUtils.hasWalletInstalled()) {
-        return serviceAppcoinsBilling.consumePurchase(apiVersion, packageName, purchaseToken);
+        responseCode =
+            serviceAppcoinsBilling.consumePurchase(apiVersion, packageName, purchaseToken);
       } else {
         String walletId = getWalletId();
         if (walletId != null && apiVersion == SUPPORTED_API_VERSION) {
-          return consumeGuestPurchase(walletId, apiVersion, packageName, purchaseToken);
+          responseCode = consumeGuestPurchase(walletId, apiVersion, packageName, purchaseToken);
         } else {
-          return ResponseCode.OK.getValue();
+          responseCode = ResponseCode.OK.getValue();
         }
       }
     } catch (RemoteException e) {
       e.printStackTrace();
-      return ResponseCode.SERVICE_UNAVAILABLE.getValue();
     }
+    return responseCode;
   }
 
   private int consumeGuestPurchase(String walletId, int apiVersion, String packageName,
@@ -311,6 +307,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         new SharedPreferencesRepository(WalletUtils.getContext(),
             SharedPreferencesRepository.TTL_IN_SECONDS);
     return sharedPreferencesRepository.getWalletId();
+  }
+
+  private boolean isSupported(String type, int apiVersion) {
+    return type.equalsIgnoreCase("inapp") && apiVersion == SUPPORTED_API_VERSION;
   }
 
   public static abstract class Stub {
