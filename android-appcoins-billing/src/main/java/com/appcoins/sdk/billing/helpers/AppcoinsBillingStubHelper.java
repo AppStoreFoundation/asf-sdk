@@ -188,7 +188,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       } else {
         String walletId = getWalletId();
         if (walletId != null && apiVersion == SUPPORTED_API_VERSION) {
-          return consumeGuestPurchase(walletId, apiVersion, packageName, purchaseToken);
+          return consumeGuestPurchase(walletId, packageName, purchaseToken);
         } else {
           return ResponseCode.OK.getValue();
         }
@@ -199,8 +199,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     }
   }
 
-  private int consumeGuestPurchase(String walletId, int apiVersion, String packageName,
-      String purchaseToken) {
+  private int consumeGuestPurchase(String walletId, String packageName, String purchaseToken) {
     int[] responseCode = new int[1]; //Generic error
     CountDownLatch countDownLatch = new CountDownLatch(1);
     BillingRepository billingRepository =
