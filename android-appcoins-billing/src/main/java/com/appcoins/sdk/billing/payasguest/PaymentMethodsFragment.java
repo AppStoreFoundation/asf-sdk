@@ -42,9 +42,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.KEY_BUY_INTENT;
-import static com.appcoins.sdk.billing.payasguest.IabActivity.CREDIT_CARD;
-import static com.appcoins.sdk.billing.payasguest.IabActivity.INSTALL_WALLET;
-import static com.appcoins.sdk.billing.payasguest.IabActivity.PAYPAL;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_no_connection_body;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_title;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_1;
@@ -52,6 +49,9 @@ import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.install_button;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.next_button;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_error_item_owned;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.CREDIT_CARD;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.INSTALL_WALLET;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.PAYPAL;
 
 public class PaymentMethodsFragment extends Fragment implements PaymentMethodsView {
 
@@ -336,7 +336,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     if (name.equalsIgnoreCase(CREDIT_CARD)) {
       layout.getCreditCardWrapperLayout()
           .setVisibility(View.VISIBLE);
-    } else {
+    } else if (name.equalsIgnoreCase(PAYPAL)) {
       layout.getPaypalWrapperLayout()
           .setVisibility(View.VISIBLE);
     }
