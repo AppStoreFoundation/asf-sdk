@@ -41,6 +41,8 @@ import java.text.DecimalFormat;
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.KEY_BUY_INTENT;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_no_connection_body;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_1;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_2_link;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.install_button;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.next_button;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_error_item_owned;
@@ -183,8 +185,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   private void createSpannableString(TextView helpText) {
-    String helpString = "Need help?";
-    String contactString = "Contact Support";
+    String helpString = translations.getString(iab_purchase_support_1);
+    String contactString = translations.getString(iab_purchase_support_2_link);
     String concatenatedString = helpString + ' ' + contactString;
     SpannableString spannableString = new SpannableString(concatenatedString);
     ClickableSpan clickableSpan = new ClickableSpan() {
@@ -381,11 +383,13 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   @Override
   public void redirectToSupportEmail(String packageName, String sku, String sdkVersionName,
       int mobileVersion) {
-    String title = "Support title";
+    String appName = layout.getAppNameView()
+        .getText()
+        .toString();
     if (walletGenerationModel != null) {
       EmailInfo emailInfo =
           new EmailInfo(walletGenerationModel.getWalletAddress(), packageName, sku, sdkVersionName,
-              mobileVersion, title);
+              mobileVersion, appName);
       iabView.redirectToSupportEmail(emailInfo);
     }
   }
