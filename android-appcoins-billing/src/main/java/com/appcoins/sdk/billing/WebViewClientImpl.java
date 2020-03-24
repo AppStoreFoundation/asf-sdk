@@ -38,8 +38,4 @@ public class WebViewClientImpl extends WebViewClient {
   @Override public void onPageFinished(WebView view, String url) {
     super.onPageFinished(view, url);
   }
-
-  @Override public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-    handler.proceed();
-  }
 }
