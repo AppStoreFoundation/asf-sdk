@@ -196,7 +196,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       skuSendList.add(sku.get(i - 1));
       if (i % MAX_SKUS_SEND_WS == 0 || i == sku.size()) {
         String response =
-            WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuSendList);
+            WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuSendList,
+                WalletUtils.getUserAgent());
         skuDetailsList.addAll(AndroidBillingMapper.mapSkuDetailsFromWS(type, response));
         skuSendList.clear();
       }

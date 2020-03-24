@@ -1,6 +1,7 @@
 package com.appcoins.sdk.billing.service;
 
 import android.os.AsyncTask;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.utils.RequestBuilderUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,6 +39,8 @@ public class BdsService implements Service {
       urlConnection = openUrlConnection(url, httpMethod);
 
       urlConnection.setReadTimeout(timeoutInMillis);
+
+      setUserAgent(urlConnection);
       if (header != null) {
         setHeaders(urlConnection, header);
       }
@@ -64,6 +67,10 @@ public class BdsService implements Service {
         urlConnection.disconnect();
       }
     }
+  }
+
+  private void setUserAgent(HttpURLConnection urlConnection) {
+    urlConnection.setRequestProperty("User-Agent", WalletUtils.getUserAgent());
   }
 
   private void setHeaders(HttpURLConnection urlConnection, Map<String, String> header) {
