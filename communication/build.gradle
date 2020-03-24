@@ -26,7 +26,7 @@ android {
 dependencies {
   implementation fileTree(dir: "libs", include: ["*.jar"])
   testImplementation 'junit:junit:4.12'
-  androidTestImplementation "org.mockito:mockito-android:2.19.0"
+  androidTestImplementation "org.mockito:mockito-android:2.28.2"
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

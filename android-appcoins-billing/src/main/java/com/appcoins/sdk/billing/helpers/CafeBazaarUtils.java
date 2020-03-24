@@ -4,11 +4,10 @@ import android.content.Context;
 import android.telephony.TelephonyManager;
 import java.util.Locale;
 
-public class CafeBazaarUtils {
+class CafeBazaarUtils {
 
   static boolean userFromIran(String userCountry) {
-    String loweredUserCountry = userCountry.toLowerCase();
-    return loweredUserCountry.equals("ir") || loweredUserCountry.equals("iran");
+    return userCountry.equalsIgnoreCase("ir") || userCountry.equalsIgnoreCase("iran");
   }
 
   static String getUserCountry(Context context) {

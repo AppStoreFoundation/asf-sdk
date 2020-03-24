@@ -172,8 +172,8 @@ class PaymentMethodsPresenter {
         }
       }
     };
-    paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature,
-        type.toLowerCase(), purchasesListener);
+    paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature, type,
+        purchasesListener);
   }
 
   private void sendRakamPaymentMethodEvent(String selectedRadioButton, String action) {

@@ -152,8 +152,7 @@ class AdyenPaymentPresenter {
         new TransactionInformation(serverFiatPrice.toString(), serverCurrency,
             developerPayload.getOrderReference(), method.getTransactionType(), "BDS", packageName,
             developerPayload.getDeveloperPayload(), buyItemProperties.getSku(), null,
-            buyItemProperties.getType()
-                .toUpperCase());
+            buyItemProperties.getType());
     adyenPaymentInteract.makePayment(adyenPaymentParams, transactionInformation,
         adyenPaymentInfo.getWalletAddress(), packageName, makePaymentListener);
   }
@@ -187,8 +186,7 @@ class AdyenPaymentPresenter {
         paymentMethod.getValue()
             .toString(), paymentMethod.getCurrency(), developerPayload.getOrderReference(),
         method.getTransactionType(), "BDS", packageName, developerPayload.getDeveloperPayload(),
-        buyItemProperties.getSku(), null, buyItemProperties.getType()
-        .toUpperCase());
+        buyItemProperties.getSku(), null, buyItemProperties.getType());
     adyenPaymentInteract.makePayment(adyenPaymentParams, transactionInformation,
         adyenPaymentInfo.getWalletAddress(), packageName, makePaymentListener);
   }

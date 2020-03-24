@@ -120,7 +120,8 @@ public class AdyenRepository {
     putIfNotNull(body, "payment.return_url", adyenPaymentParams.getReturnUrl());
     body.put("payment.store_method", adyenPaymentParams.shouldStorePaymentMethod());
     putIfNotNull(body, "product", transactionInformation.getSku());
-    body.put("type", transactionInformation.getTransactionType());
+    body.put("type", transactionInformation.getTransactionType()
+        .toUpperCase());
     body.put("price.value", transactionInformation.getValue());
     putIfNotNull(body, "wallets.oem", transactionWallets.getOemWalletAddress());
     putIfNotNull(body, "wallets.store", transactionWallets.getStoreWalletAddress());

@@ -164,8 +164,7 @@ public class WalletUtils {
   }
 
   private static boolean userFromIran(String userCountry) {
-    String loweredUserCountry = userCountry.toLowerCase();
-    return loweredUserCountry.equals("ir") || loweredUserCountry.equals("iran");
+    return userCountry.equalsIgnoreCase("ir") || userCountry.equalsIgnoreCase("iran");
   }
 
   private static String getUserCountry(Context context) {
