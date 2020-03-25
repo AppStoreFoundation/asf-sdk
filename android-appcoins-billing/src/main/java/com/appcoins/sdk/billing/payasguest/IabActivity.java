@@ -42,7 +42,6 @@ public class IabActivity extends Activity implements IabView {
 
     //This log is necessary for the automatic test that validates the wallet installation dialog
     Log.d("InstallDialog", "com.appcoins.sdk.billing.helpers.InstallDialogActivity started");
-    Log.d("TAG123", "HERE");
     int backgroundColor = Color.parseColor("#64000000");
     frameLayout = new FrameLayout(this);
     if (savedInstanceState == null) {
