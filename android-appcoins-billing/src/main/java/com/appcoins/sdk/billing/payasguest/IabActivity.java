@@ -20,6 +20,7 @@ import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
 import com.appcoins.sdk.billing.helpers.Utils;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 
@@ -35,6 +36,7 @@ public class IabActivity extends Activity implements IabView {
   public final static String CREDIT_CARD = "credit_card";
   public final static String PAYPAL = "paypal";
   public final static String INSTALL_WALLET = "install_wallet";
+  private final static int BILLING_UNAVAILABLE = 3;
   private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private final static String FIRST_IMPRESSION_KEY = "first_impression";
   private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
@@ -188,10 +190,19 @@ public class IabActivity extends Activity implements IabView {
   }
 
   @Override public void navigateToInstallDialog() {
-    Intent intent =
-        InstallDialogActivity.newIntent(this.getApplicationContext(), buyItemProperties);
-    finish();
-    startActivity(intent);
+    if (WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
+      Intent intent =
+          InstallDialogActivity.newIntent(this.getApplicationContext(), buyItemProperties);
+      finish();
+      startActivity(intent);
+    } else {
+      Bundle bundle = new Bundle();
+      bundle.putInt(RESPONSE_CODE, BILLING_UNAVAILABLE);
+      Intent intent = new Intent();
+      intent.putExtras(bundle);
+      setResult(Activity.RESULT_OK, intent);
+      finish();
+    }
   }
 
   @Override public void disableBack() {
