@@ -34,7 +34,7 @@ class PaymentMethodsPresenter {
   void prepareUi(final BuyItemProperties buyItemProperties) {
     String id = paymentMethodsInteract.retrieveWalletId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
-      @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
+      @Override public void walletAddressRetrieved(WalletGenerationModel walletGenerationModel) {
         fragmentView.saveWalletInformation(walletGenerationModel);
         provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
         checkForUnconsumedPurchased(buyItemProperties.getPackageName(), buyItemProperties.getSku(),

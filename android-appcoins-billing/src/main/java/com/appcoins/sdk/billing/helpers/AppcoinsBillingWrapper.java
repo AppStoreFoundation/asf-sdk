@@ -9,15 +9,13 @@ import com.appcoins.sdk.billing.payasguest.BillingRepository;
 import com.appcoins.sdk.billing.service.BdsService;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_DATA_SIGNATURE_LIST;
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_PURCHASE_DATA_LIST;
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_PURCHASE_ID_LIST;
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.INAPP_PURCHASE_ITEM_LIST;
-import static com.appcoins.sdk.billing.helpers.GuestPurchasesInteract.RESPONSE_ERROR;
-import static com.appcoins.sdk.billing.helpers.GuestPurchasesInteract.RESPONSE_SUCCESS;
+import static com.appcoins.sdk.billing.payasguest.BillingRepository.RESPONSE_ERROR;
+import static com.appcoins.sdk.billing.payasguest.BillingRepository.RESPONSE_SUCCESS;
 
 class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
 
@@ -56,12 +54,11 @@ class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
       ArrayList<String> dataList = bundle.getStringArrayList(INAPP_PURCHASE_DATA_LIST);
       ArrayList<String> signatureDataList = bundle.getStringArrayList(INAPP_DATA_SIGNATURE_LIST);
       BillingRepository billingRepository =
-          new BillingRepository(new BdsService(BuildConfig.HOST_WS, 30000));
+          new BillingRepository(new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS));
       GuestPurchasesInteract guestPurchasesInteract = new GuestPurchasesInteract(billingRepository);
-      CountDownLatch countDownLatch = new CountDownLatch(1);
-      guestPurchasesInteract.mapGuestPurchases(bundle, walletId, packageName, type, countDownLatch,
-          idsList, skuList, dataList, signatureDataList);
-      waitForPurchases(countDownLatch);
+      bundle =
+          guestPurchasesInteract.mapGuestPurchases(bundle, walletId, packageName, type, idsList,
+              skuList, dataList, signatureDataList);
     }
     return bundle;
   }
@@ -69,15 +66,11 @@ class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
   @Override public int consumePurchase(int apiVersion, String packageName, String purchaseToken)
       throws RemoteException {
     int responseCode = appcoinsBilling.consumePurchase(apiVersion, packageName, purchaseToken);
-    if (walletId != null && apiVersion == 3) {
-      int guestResponseCode = consumeGuestPurchase(packageName, purchaseToken);
-      if (responseCode == RESPONSE_SUCCESS || guestResponseCode == RESPONSE_SUCCESS) {
-        return RESPONSE_SUCCESS;
-      } else {
-        return RESPONSE_ERROR;
-      }
+    int guestResponseCode = consumeGuestPurchase(walletId, apiVersion, packageName, purchaseToken);
+    if (responseCode == RESPONSE_SUCCESS || guestResponseCode == RESPONSE_SUCCESS) {
+      return RESPONSE_SUCCESS;
     } else {
-      return responseCode;
+      return RESPONSE_ERROR;
     }
   }
 
@@ -85,29 +78,16 @@ class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
     return appcoinsBilling.asBinder();
   }
 
-  private void waitForPurchases(CountDownLatch countDownLatch) {
-    try {
-      countDownLatch.await(timeoutInMillis, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+  private int consumeGuestPurchase(String walletId, int apiVersion, String packageName,
+      String purchaseToken) {
+    int responseCode = RESPONSE_ERROR;
+    if (walletId != null && apiVersion == 3) {
+      BillingRepository billingRepository =
+          new BillingRepository(new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS));
+      GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract(billingRepository);
+      responseCode =
+          guestPurchaseInteract.consumeGuestPurchase(this.walletId, packageName, purchaseToken);
     }
-  }
-
-  private int consumeGuestPurchase(String packageName, String purchaseToken) {
-    int[] responseCode = new int[1]; //Generic error
-    CountDownLatch countDownLatch = new CountDownLatch(1);
-    BillingRepository billingRepository =
-        new BillingRepository(new BdsService(BuildConfig.HOST_WS, 30000));
-    GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract(billingRepository);
-
-    guestPurchaseInteract.consumeGuestPurchase(walletId, packageName, purchaseToken, responseCode,
-        countDownLatch);
-
-    try {
-      countDownLatch.await(timeoutInMillis, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    return responseCode[0];
+    return responseCode;
   }
 }

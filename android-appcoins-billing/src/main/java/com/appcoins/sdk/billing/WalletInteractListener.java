@@ -4,5 +4,5 @@ import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 
 public interface WalletInteractListener {
 
-  void walletIdRetrieved(WalletGenerationModel walletGenerationModel);
+  void walletAddressRetrieved(WalletGenerationModel walletGenerationModel);
 }

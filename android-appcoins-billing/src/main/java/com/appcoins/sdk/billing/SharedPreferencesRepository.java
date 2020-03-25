@@ -10,13 +10,13 @@ public class SharedPreferencesRepository {
   private static final String WALLET_ID_KEY = "WALLET_ID";
   private static final String MAX_BONUS_KEY = "MAX_BONUS";
   private static final String MAX_BONUS_TTL_SECONDS_KEY = "MAX_BONUS_TTL";
-  private final int ttlValueInDays;
+  private final int ttlValueInSeconds;
   private SharedPreferences sharedPreferences;
 
-  public SharedPreferencesRepository(Context context, int ttlValueInDays) {
+  public SharedPreferencesRepository(Context context, int ttlValueInSeconds) {
 
     this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-    this.ttlValueInDays = ttlValueInDays;
+    this.ttlValueInSeconds = ttlValueInSeconds;
   }
 
   public String getWalletId() {
@@ -45,11 +45,9 @@ public class SharedPreferencesRepository {
   }
 
   public boolean hasSavedBonus(long timeInMillis) {
-    if (sharedPreferences.contains(MAX_BONUS_KEY)) {
-      if (sharedPreferences.contains(MAX_BONUS_TTL_SECONDS_KEY)) {
-        return (timeInMillis / 1000 - sharedPreferences.getLong(MAX_BONUS_TTL_SECONDS_KEY, 0))
-            < ttlValueInDays;
-      }
+    long savedTtlInSeconds = sharedPreferences.getLong(MAX_BONUS_TTL_SECONDS_KEY, -1);
+    if (sharedPreferences.contains(MAX_BONUS_KEY) && savedTtlInSeconds != -1) {
+      return (timeInMillis / 1000 - savedTtlInSeconds) < ttlValueInSeconds;
     }
     return false;
   }
