@@ -69,7 +69,7 @@ public class UriCommunicationAppcoinsBilling implements AppcoinsBilling, Seriali
     try {
       return ((Bundle) messageRequester.sendMessage(methodId, arguments));
     } catch (Exception e) {
-      throw new RemoteException(e.getMessage());
+      throw new RemoteException();
     }
   }
 

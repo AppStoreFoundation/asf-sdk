@@ -1,5 +1,6 @@
 package com.asf.appcoins.sdk.ads;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
@@ -10,9 +11,14 @@ import android.os.Bundle;
  * Created by Joao Raimundo on 09/04/2018.
  */
 
+@SuppressLint("NewApi") //No requiresApi annotation
 public class LifeCycleListener implements Application.ActivityLifecycleCallbacks {
 
+  private static final String TAG = LifeCycleListener.class.getSimpleName();
   private static LifeCycleListener instance;
+  private int started = -1;
+  private int resumed = -1;
+  private Listener listener;
 
   /**
    * Method to initialize the lifecycle listener.
@@ -39,9 +45,6 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
     return instance;
   }
 
-  private int started = -1;
-  private int resumed = -1;
-
   private boolean isAppStarted() {
     return started != -1;
   }
@@ -53,14 +56,6 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
   public void setListener(Listener listener) {
     this.listener = listener;
   }
-
-  public interface Listener {
-    void onBecameForeground(Activity activity);
-
-    void onBecameBackground();
-  }
-
-  private Listener listener;
 
   @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
   }
@@ -78,8 +73,6 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
     }
     resumed = activity.hashCode();
   }
-
-  private static final String TAG = LifeCycleListener.class.getSimpleName();
 
   @Override public void onActivityPaused(Activity activity) {
     if (resumed == activity.hashCode()) {
@@ -101,5 +94,11 @@ public class LifeCycleListener implements Application.ActivityLifecycleCallbacks
 
   @Override public void onActivityDestroyed(Activity activity) {
 
+  }
+
+  public interface Listener {
+    void onBecameForeground(Activity activity);
+
+    void onBecameBackground();
   }
 }

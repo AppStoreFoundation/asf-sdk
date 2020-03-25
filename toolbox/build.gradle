@@ -6,7 +6,7 @@ android {
   defaultConfig {
     applicationId "com.appcoins.toolbox"
 
-    minSdkVersion MIN_SDK_VERSION
+    minSdkVersion 16
     targetSdkVersion TARGET_SDK_VERSION
 
     versionCode 1
