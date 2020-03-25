@@ -70,7 +70,7 @@ public class UriCommunicationAppcoinsBilling implements AppcoinsBilling, Seriali
     try {
       return ((Bundle) messageRequester.sendMessage(methodId, arguments));
     } catch (Exception e) {
-      throw handleException(e);
+      throw handleRemoteExceptionThrow(e);
     }
   }
 
@@ -78,7 +78,7 @@ public class UriCommunicationAppcoinsBilling implements AppcoinsBilling, Seriali
     return null;
   }
 
-  private RemoteException handleException(Exception e) {
+  private RemoteException handleRemoteExceptionThrow(Exception e) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
       return new RemoteException(e.getLocalizedMessage());
     } else {
