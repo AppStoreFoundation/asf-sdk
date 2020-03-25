@@ -8,6 +8,7 @@ import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.listeners.PurchasesListener;
 import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
@@ -146,6 +147,9 @@ class PaymentMethodsPresenter {
             if (paymentMethod.isAvailable()) {
               fragmentView.addPayment(paymentMethod.getName());
             }
+          }
+          if (!WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
+            fragmentView.hideInstall();
           }
           fragmentView.sendPurchaseStartEvent(paymentMethodsInteract.getCachedAppcPrice());
           fragmentView.showPaymentView();

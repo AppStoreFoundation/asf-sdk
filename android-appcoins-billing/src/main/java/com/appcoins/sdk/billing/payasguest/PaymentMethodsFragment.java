@@ -388,6 +388,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         .setVisibility(View.VISIBLE);
   }
 
+  @Override public void hideInstall() {
+    layout.getInstallWrapperLayout()
+        .setVisibility(View.GONE);
+  }
+
   @Override
   public void redirectToSupportEmail(String packageName, String sku, String sdkVersionName,
       int mobileVersion) {

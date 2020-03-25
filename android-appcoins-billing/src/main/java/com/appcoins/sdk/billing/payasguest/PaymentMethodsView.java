@@ -36,6 +36,8 @@ interface PaymentMethodsView {
 
   void hideDialog();
 
+  void hideInstall();
+
   void redirectToSupportEmail(String packageName, String sku, String sdkVersionName,
       int mobileVersion);
 
