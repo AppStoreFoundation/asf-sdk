@@ -67,7 +67,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
           e.printStackTrace();
         }
       } else {
-        if (isSupported(type, apiVersion)) {
+        if (isTypeSupported(type, apiVersion)) {
           responseCode = ResponseCode.OK.getValue();
         }
       }
@@ -305,7 +305,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     return sharedPreferencesRepository.getWalletId();
   }
 
-  private boolean isSupported(String type, int apiVersion) {
+  private boolean isTypeSupported(String type, int apiVersion) {
     return type.equalsIgnoreCase("inapp") && apiVersion == SUPPORTED_API_VERSION;
   }
 
