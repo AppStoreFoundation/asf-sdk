@@ -3,6 +3,7 @@ package com.asf.appcoins.sdk.ads;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.manager.PoAManager;
@@ -53,8 +54,10 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
   @Override public void init(Application application) throws PackageManager.NameNotFoundException {
     this.context = application;
 
-    PoAManager.init(application, poaConnector, networkId);
-    LifeCycleListener.get(application)
-        .setListener(PoAManager.get());
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      PoAManager.init(application, poaConnector, networkId);
+      LifeCycleListener.get(application)
+          .setListener(PoAManager.get());
+    }
   }
 }

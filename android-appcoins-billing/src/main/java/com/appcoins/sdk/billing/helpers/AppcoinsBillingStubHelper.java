@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
@@ -57,8 +58,9 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   }
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
-
-    if (WalletUtils.hasWalletInstalled()) {
+    if (!isDeviceVersionSupported()) {
+      return ResponseCode.BILLING_UNAVAILABLE.getValue();
+    } else if (WalletUtils.hasWalletInstalled()) {
       try {
         return serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
       } catch (RemoteException e) {
@@ -138,7 +140,13 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
           .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
         intent = IabActivity.newIntent(context, buyItemProperties);
       } else {
-        intent = InstallDialogActivity.newIntent(context, buyItemProperties);
+        if (WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
+          intent = InstallDialogActivity.newIntent(context, buyItemProperties);
+        } else {
+          Bundle bundle = new Bundle();
+          bundle.putInt(Utils.RESPONSE_CODE, ResponseCode.BILLING_UNAVAILABLE.getValue());
+          return bundle;
+        }
       }
       WalletUtils.setPayAsGuestSessionId();
       PendingIntent pendingIntent =
@@ -298,6 +306,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         new SharedPreferencesRepository(WalletUtils.getContext(),
             SharedPreferencesRepository.TTL_IN_SECONDS);
     return sharedPreferencesRepository.getWalletId();
+  }
+
+  private boolean isDeviceVersionSupported() {
+    return Build.VERSION.SDK_INT >= BuildConfig.MIN_SDK_VERSION;
   }
 
   public static abstract class Stub {

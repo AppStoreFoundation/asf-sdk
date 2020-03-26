@@ -8,6 +8,7 @@ import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.listeners.PurchasesListener;
 import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
@@ -124,13 +125,13 @@ class PaymentMethodsPresenter {
                 skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
                 skuDetails.getSku()));
           } else {
-            fragmentView.showInstallDialog();
+            handleShowInstallDialog();
           }
         }
       };
       paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
     } else {
-      fragmentView.showInstallDialog();
+      handleShowInstallDialog();
     }
   }
 
@@ -140,12 +141,15 @@ class PaymentMethodsPresenter {
         if (paymentMethodsModel.hasError() || paymentMethodsModel.getPaymentMethods()
             .isEmpty()) {
           paymentMethodsInteract.cancelRequests();
-          fragmentView.showInstallDialog();
+          handleShowInstallDialog();
         } else {
           for (PaymentMethod paymentMethod : paymentMethodsModel.getPaymentMethods()) {
             if (paymentMethod.isAvailable()) {
               fragmentView.addPayment(paymentMethod.getName());
             }
+          }
+          if (!WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
+            fragmentView.hideInstallOption();
           }
           fragmentView.sendPurchaseStartEvent(paymentMethodsInteract.getCachedAppcPrice());
           fragmentView.showPaymentView();
@@ -174,6 +178,14 @@ class PaymentMethodsPresenter {
     };
     paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature,
         type.toLowerCase(), purchasesListener);
+  }
+
+  private void handleShowInstallDialog() {
+    if (WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
+      fragmentView.showInstallDialog();
+    } else {
+      fragmentView.closeWithBillingUnavailable();
+    }
   }
 
   private void sendPaymentMethodEvent(String selectedRadioButton, String action) {

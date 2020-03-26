@@ -304,7 +304,9 @@ public class WalletUtils {
     pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
     builder = new Notification.Builder(context);
-    builder.setPriority(Notification.PRIORITY_MAX);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+      builder.setPriority(Notification.PRIORITY_MAX);
+    }
     builder.setContentIntent(pendingIntent);
     builder.setVibrate(new long[0]);
 
@@ -316,6 +318,12 @@ public class WalletUtils {
         .setContentTitle(translations.getString(poa_wallet_not_installed_notification_title))
         .setContentText(translations.getString(poa_wallet_not_installed_notification_body));
 
-    return builder.build();
+    Notification notification;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+      notification = builder.build();
+    } else {
+      notification = builder.getNotification();
+    }
+    return notification;
   }
 }

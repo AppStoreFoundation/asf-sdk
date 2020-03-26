@@ -12,6 +12,8 @@ interface PaymentMethodsView {
 
   void close(boolean withError);
 
+  void closeWithBillingUnavailable();
+
   void showAlertNoBrowserAndStores();
 
   void redirectToWalletInstallation(Intent intent);
@@ -35,6 +37,8 @@ interface PaymentMethodsView {
   void showItemAlreadyOwnedError(SkuPurchase skuPurchase);
 
   void hideDialog();
+
+  void hideInstallOption();
 
   void redirectToSupportEmail(String packageName, String sku, String sdkVersionName,
       int mobileVersion);

@@ -201,20 +201,20 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   private void onSavedInstance(Bundle savedInstanceState) {
     layout.getCardNumberEditText()
-        .setText(savedInstanceState.getString(CARD_NUMBER_KEY, ""));
-    String expiryDate = savedInstanceState.getString(EXPIRY_DATE_KEY, "");
-    if (!expiryDate.equals("")) {
+        .setText(getString(savedInstanceState, CARD_NUMBER_KEY, ""));
+    String expiryDate = savedInstanceState.getString(EXPIRY_DATE_KEY);
+    if (expiryDate != null) {
       EditText expiryEditText = layout.getExpiryDateEditText();
       expiryEditText.setVisibility(View.VISIBLE);
       expiryEditText.setText(expiryDate);
       expiryEditText.setSelection(expiryEditText.getText()
           .length());
     }
-    String cvv = savedInstanceState.getString(CVV_KEY, "");
-    if (!cvv.equals("")) {
+    String cvv = savedInstanceState.getString(CVV_KEY);
+    if (cvv != null) {
       EditText cvvEditText = layout.getCvvEditText();
       cvvEditText.setVisibility(View.VISIBLE);
-      cvvEditText.setText(savedInstanceState.getString(CVV_KEY, ""));
+      cvvEditText.setText(cvv);
       cvvEditText.setSelection(cvvEditText.getText()
           .length());
     }
@@ -551,5 +551,11 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     } else {
       editText.setText("");
     }
+  }
+
+  private String getString(Bundle savedInstance, String key, String defaultValue) {
+    String value = savedInstance.getString(key);
+    if (value == null) value = defaultValue;
+    return value;
   }
 }

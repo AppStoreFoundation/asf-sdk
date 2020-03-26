@@ -34,6 +34,7 @@ public class IabActivity extends Activity implements IabView {
   public final static String PAYPAL = "paypal";
   public final static String INSTALL_WALLET = "install_wallet";
   private final static int USER_CANCELED = 1;
+  private final static int BILLING_UNAVAILABLE = 3;
   private final static int ERROR = 6;
   private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private final static String FIRST_IMPRESSION_KEY = "first_impression";
@@ -58,6 +59,7 @@ public class IabActivity extends Activity implements IabView {
 
     //This log is necessary for the automatic test that validates the wallet installation dialog
     Log.d("InstallDialog", "com.appcoins.sdk.billing.helpers.InstallDialogActivity started");
+
     int backgroundColor = Color.parseColor("#64000000");
     frameLayout = new FrameLayout(this);
     if (savedInstanceState == null) {
@@ -121,9 +123,9 @@ public class IabActivity extends Activity implements IabView {
   @Override public void close(boolean withError) {
     Bundle bundle = new Bundle();
     if (withError) {
-      bundle.putInt(RESPONSE_CODE, ERROR); //ERROR
+      bundle.putInt(RESPONSE_CODE, ERROR);
     } else {
-      bundle.putInt(RESPONSE_CODE, USER_CANCELED); //CANCEL
+      bundle.putInt(RESPONSE_CODE, USER_CANCELED);
     }
     Intent intent = new Intent();
     intent.putExtras(bundle);
@@ -191,6 +193,15 @@ public class IabActivity extends Activity implements IabView {
         InstallDialogActivity.newIntent(this.getApplicationContext(), buyItemProperties);
     finish();
     startActivity(intent);
+  }
+
+  @Override public void closeWithBillingUnavailable() {
+    Bundle bundle = new Bundle();
+    bundle.putInt(RESPONSE_CODE, BILLING_UNAVAILABLE);
+    Intent intent = new Intent();
+    intent.putExtras(bundle);
+    setResult(Activity.RESULT_OK, intent);
+    finish();
   }
 
   @Override public void disableBack() {

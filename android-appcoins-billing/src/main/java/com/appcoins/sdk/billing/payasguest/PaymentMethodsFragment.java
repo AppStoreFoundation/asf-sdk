@@ -304,6 +304,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     }
   }
 
+  @Override public void closeWithBillingUnavailable() {
+    iabView.closeWithBillingUnavailable();
+  }
+
   @Override public void showAlertNoBrowserAndStores() {
     iabView.showAlertNoBrowserAndStores();
   }
@@ -395,6 +399,11 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         .setVisibility(View.INVISIBLE);
     layout.getIntentLoadingView()
         .setVisibility(View.VISIBLE);
+  }
+
+  @Override public void hideInstallOption() {
+    layout.getInstallWrapperLayout()
+        .setVisibility(View.GONE);
   }
 
   @Override
