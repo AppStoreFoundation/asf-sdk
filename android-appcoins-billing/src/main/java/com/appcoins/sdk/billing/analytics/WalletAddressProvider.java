@@ -20,6 +20,10 @@ public class WalletAddressProvider {
     this.walletAddress = walletAddress;
   }
 
+  /**
+   * This method may return a null Wallet Address
+   * @return Previously saved wallet address
+   */
   String getWalletAddress() {
     return walletAddress;
   }
