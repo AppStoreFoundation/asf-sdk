@@ -19,11 +19,9 @@ import com.appcoins.sdk.billing.WebViewActivity;
 import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
-import com.appcoins.sdk.billing.helpers.Utils;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 
-import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.ERROR_RESULT_CODE;
 import static com.appcoins.sdk.billing.helpers.Utils.RESPONSE_CODE;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_body;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_button;
@@ -35,7 +33,9 @@ public class IabActivity extends Activity implements IabView {
   public final static String CREDIT_CARD = "credit_card";
   public final static String PAYPAL = "paypal";
   public final static String INSTALL_WALLET = "install_wallet";
+  private final static int USER_CANCELED = 1;
   private final static int BILLING_UNAVAILABLE = 3;
+  private final static int ERROR = 6;
   private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private final static String FIRST_IMPRESSION_KEY = "first_impression";
   private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
@@ -123,9 +123,9 @@ public class IabActivity extends Activity implements IabView {
   @Override public void close(boolean withError) {
     Bundle bundle = new Bundle();
     if (withError) {
-      bundle.putInt(RESPONSE_CODE, 6); //ERROR
+      bundle.putInt(RESPONSE_CODE, ERROR);
     } else {
-      bundle.putInt(RESPONSE_CODE, 1); //CANCEL
+      bundle.putInt(RESPONSE_CODE, USER_CANCELED);
     }
     Intent intent = new Intent();
     intent.putExtras(bundle);
@@ -135,8 +135,8 @@ public class IabActivity extends Activity implements IabView {
 
   @Override public void finishWithError() {
     Intent response = new Intent();
-    response.putExtra("RESPONSE_CODE", ERROR_RESULT_CODE);
-    setResult(ERROR_RESULT_CODE, response);
+    response.putExtra(RESPONSE_CODE, ERROR);
+    setResult(ERROR, response);
     finish();
   }
 
@@ -263,7 +263,7 @@ public class IabActivity extends Activity implements IabView {
           new BillingAnalytics(AnalyticsManagerProvider.provideAnalyticsManager());
       billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
           buyItemProperties.getSku(), appcPrice, buyItemProperties.getType(),
-          BillingAnalytics.RAKAM_START_PAYMENT_METHOD);
+          BillingAnalytics.START_PAYMENT_METHOD);
       firstImpression = false;
     }
   }
@@ -278,7 +278,7 @@ public class IabActivity extends Activity implements IabView {
     alert.setPositiveButton(dismissValue, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int id) {
         Bundle response = new Bundle();
-        response.putInt(Utils.RESPONSE_CODE, 1);
+        response.putInt(RESPONSE_CODE, 1);
         Intent intent = new Intent();
         intent.putExtras(response);
         setResult(Activity.RESULT_CANCELED, intent);

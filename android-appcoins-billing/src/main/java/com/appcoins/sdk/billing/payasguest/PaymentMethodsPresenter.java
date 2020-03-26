@@ -45,7 +45,7 @@ class PaymentMethodsPresenter {
   void prepareUi() {
     String id = paymentMethodsInteract.retrieveWalletId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
-      @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
+      @Override public void walletAddressRetrieved(WalletGenerationModel walletGenerationModel) {
         fragmentView.saveWalletInformation(walletGenerationModel);
         provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
         checkForUnconsumedPurchased(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
@@ -67,16 +67,16 @@ class PaymentMethodsPresenter {
   }
 
   void onCancelButtonClicked(String selectedRadioButton) {
-    sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_CANCEL);
+    sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_CANCEL);
     fragmentView.close(false);
   }
 
   void onPositiveButtonClicked(String selectedRadioButton) {
     if (selectedRadioButton.equals(PAYPAL) || selectedRadioButton.equals(CREDIT_CARD)) {
-      sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
+      sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       fragmentView.navigateToAdyen(selectedRadioButton);
     } else {
-      sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
+      sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
       if (intent != null) {
         if (intent.getPackage() != null && intent.getPackage()
@@ -188,7 +188,7 @@ class PaymentMethodsPresenter {
     }
   }
 
-  private void sendRakamPaymentMethodEvent(String selectedRadioButton, String action) {
+  private void sendPaymentMethodEvent(String selectedRadioButton, String action) {
     billingAnalytics.sendPaymentMethodEvent(buyItemProperties.getPackageName(),
         buyItemProperties.getSku(), paymentMethodsInteract.getCachedAppcPrice(),
         selectedRadioButton, buyItemProperties.getType(), action);

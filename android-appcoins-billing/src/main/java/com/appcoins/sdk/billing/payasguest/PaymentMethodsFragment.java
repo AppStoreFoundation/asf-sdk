@@ -24,6 +24,7 @@ import com.appcoins.sdk.billing.SharedPreferencesRepository;
 import com.appcoins.sdk.billing.WalletInteract;
 import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
+import com.appcoins.sdk.billing.analytics.WalletAddressProvider;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
@@ -67,6 +68,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private SkuPurchase itemAlreadyOwnedPurchase;
   private TranslationsRepository translations;
+  private Context context;
 
   public static PaymentMethodsFragment newInstance(BuyItemProperties buyItemProperties) {
     PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
@@ -90,15 +92,16 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     super.onCreate(savedInstanceState);
 
     translations = TranslationsRepository.getInstance(getActivity());
-    Activity activity = getActivity();
     BdsService backendService =
         new BdsService(BuildConfig.BACKEND_BASE, BdsService.TIME_OUT_IN_MILLIS);
     BdsService apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
 
     SharedPreferencesRepository sharedPreferencesRepository =
         new SharedPreferencesRepository(getActivity(), SharedPreferencesRepository.TTL_IN_SECONDS);
+    WalletAddressProvider walletAddressProvider =
+        WalletAddressProvider.provideWalletAddressProvider();
     WalletRepository walletRepository =
-        new WalletRepository(backendService, new WalletGenerationMapper());
+        new WalletRepository(backendService, new WalletGenerationMapper(), walletAddressProvider);
     PaymentMethodsRepository paymentMethodsRepository = new PaymentMethodsRepository(apiService);
     BillingRepository billingRepository = new BillingRepository(apiService);
     AnalyticsManager analyticsManager = AnalyticsManagerProvider.provideAnalyticsManager();
@@ -113,8 +116,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository,
             billingRepository);
     WalletInstallationIntentBuilder walletInstallationIntentBuilder =
-        new WalletInstallationIntentBuilder(activity.getPackageManager(), activity.getPackageName(),
-            activity.getApplicationContext());
+        new WalletInstallationIntentBuilder(context.getPackageManager(), context.getPackageName(),
+            context.getApplicationContext());
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
     buyItemProperties = (BuyItemProperties) getArguments().getSerializable(BUY_ITEM_PROPERTIES);
 
@@ -193,6 +196,12 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     paymentMethodsPresenter.onDestroy();
     paymentMethodsPresenter = null;
     super.onDestroy();
+  }
+
+  @Override public void onDetach() {
+    super.onDetach();
+    context = null;
+    iabView = null;
   }
 
   private void createSpannableString(TextView helpText) {
@@ -437,6 +446,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     if (!(context instanceof IabView)) {
       throw new IllegalStateException("PaymentMethodsFragment must be attached to IabActivity");
     }
+    this.context = context;
     iabView = (IabView) context;
   }
 

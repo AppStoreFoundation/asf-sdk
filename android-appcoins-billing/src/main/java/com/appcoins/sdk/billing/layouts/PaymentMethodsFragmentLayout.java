@@ -326,7 +326,7 @@ public class PaymentMethodsFragmentLayout {
       layoutParams.addRule(RelativeLayout.BELOW, paymentMethodsId);
       setConstraint(layoutParams, RelativeLayout.LEFT_OF, buttonsViewId);
       setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_LEFT);
-      setMargins(layoutParams, 18, 24, 0, 16);
+      setMargins(layoutParams, 18, 24, 96, 16);
     }
 
     GradientDrawable gradientDrawable = new GradientDrawable();
@@ -354,6 +354,8 @@ public class PaymentMethodsFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#202020"));
     textView.setTextSize(12);
+    textView.setEllipsize(TextUtils.TruncateAt.END);
+    textView.setMaxLines(2);
     textView.setLayoutParams(layoutParams);
     return textView;
   }

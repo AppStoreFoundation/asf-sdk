@@ -5,17 +5,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BillingAnalytics implements EventSender {
-  public static final String RAKAM_START_PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
-  public static final String RAKAM_START_INSTALL = "appcoins_guest_sdk_install_wallet";
+  public static final String START_PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
+  public static final String START_INSTALL = "appcoins_guest_sdk_install_wallet";
   public static final String EVENT_CANCEL = "cancel";
   public static final String EVENT_BUY = "buy";
   public static final String EVENT_NEXT = "next";
   static final String PAYMENT_METHOD_CC = "credit_card";
   static final String PAYMENT_METHOD_PAYPAL = "paypal";
-  static final String RAKAM_PAYMENT_START = "appcoins_guest_sdk_payment_start";
-  static final String RAKAM_PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
-  static final String RAKAM_PAYMENT_CONFIRMATION = "appcoins_guest_sdk_payment_confirmation";
-  static final String RAKAM_PAYMENT_CONCLUSION = "appcoins_guest_sdk_payment_conclusion";
+  static final String PAYMENT_START = "appcoins_guest_sdk_payment_start";
+  static final String PAYMENT_METHOD = "appcoins_guest_sdk_payment_method";
+  static final String PAYMENT_CONFIRMATION = "appcoins_guest_sdk_payment_confirmation";
+  static final String PAYMENT_CONCLUSION = "appcoins_guest_sdk_payment_conclusion";
   private static final String SDK = "AppCoinsGuestSDK";
   private static final String EVENT_PACKAGE_NAME = "package_name";
   private static final String EVENT_SKU = "sku";
@@ -41,7 +41,7 @@ public class BillingAnalytics implements EventSender {
         createBaseRakamEventMap(packageName, skuDetails, value, purchaseDetails, transactionType,
             action);
 
-    analytics.logEvent(eventData, RAKAM_PAYMENT_METHOD, AnalyticsManager.Action.CLICK, SDK);
+    analytics.logEvent(eventData, PAYMENT_METHOD, AnalyticsManager.Action.CLICK, SDK);
   }
 
   @Override
@@ -51,7 +51,7 @@ public class BillingAnalytics implements EventSender {
         createBaseRakamEventMap(packageName, skuDetails, value, purchaseDetails, transactionType,
             action);
 
-    analytics.logEvent(eventData, RAKAM_PAYMENT_CONFIRMATION, AnalyticsManager.Action.CLICK, SDK);
+    analytics.logEvent(eventData, PAYMENT_CONFIRMATION, AnalyticsManager.Action.CLICK, SDK);
   }
 
   @Override public void sendPaymentErrorEvent(String packageName, String skuDetails, String value,
@@ -62,7 +62,7 @@ public class BillingAnalytics implements EventSender {
 
     eventData.put(EVENT_ERROR_CODE, errorCode);
 
-    analytics.logEvent(eventData, RAKAM_PAYMENT_CONCLUSION, AnalyticsManager.Action.CLICK, SDK);
+    analytics.logEvent(eventData, PAYMENT_CONCLUSION, AnalyticsManager.Action.CLICK, SDK);
   }
 
   @Override public void sendAdyenErrorEvent(String packageName, String skuDetails, String value,
@@ -74,7 +74,7 @@ public class BillingAnalytics implements EventSender {
     eventData.put(EVENT_ERROR_CODE, errorCode);
     eventData.put(EVENT_ERROR_DETAILS, errorDetails);
 
-    analytics.logEvent(eventData, RAKAM_PAYMENT_CONCLUSION, AnalyticsManager.Action.CLICK, SDK);
+    analytics.logEvent(eventData, PAYMENT_CONCLUSION, AnalyticsManager.Action.CLICK, SDK);
   }
 
   @Override public void sendPaymentSuccessEvent(String packageName, String skuDetails, String value,
@@ -83,7 +83,7 @@ public class BillingAnalytics implements EventSender {
         createConclusionRakamEventMap(packageName, skuDetails, value, purchaseDetails,
             transactionType, EVENT_SUCCESS);
 
-    analytics.logEvent(eventData, RAKAM_PAYMENT_CONCLUSION, AnalyticsManager.Action.CLICK, SDK);
+    analytics.logEvent(eventData, PAYMENT_CONCLUSION, AnalyticsManager.Action.CLICK, SDK);
   }
 
   @Override public void sendPurchaseStartEvent(String packageName, String skuDetails, String value,
@@ -96,7 +96,7 @@ public class BillingAnalytics implements EventSender {
     eventData.put(EVENT_TRANSACTION_TYPE, transactionType);
     eventData.put(EVENT_CONTEXT, context);
 
-    analytics.logEvent(eventData, RAKAM_PAYMENT_START, AnalyticsManager.Action.CLICK, SDK);
+    analytics.logEvent(eventData, PAYMENT_START, AnalyticsManager.Action.CLICK, SDK);
   }
 
   private Map<String, Object> createBaseRakamEventMap(String packageName, String skuDetails,

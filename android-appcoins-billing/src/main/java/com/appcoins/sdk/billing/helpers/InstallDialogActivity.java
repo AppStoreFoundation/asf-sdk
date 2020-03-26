@@ -144,7 +144,7 @@ public class InstallDialogActivity extends Activity {
     if (firstImpression) {
       billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
           buyItemProperties.getSku(), "0.0", buyItemProperties.getType(),
-          BillingAnalytics.RAKAM_START_INSTALL);
+          BillingAnalytics.START_INSTALL);
       firstImpression = false;
     }
   }
