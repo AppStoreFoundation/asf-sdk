@@ -16,6 +16,7 @@ android {
     versionCode VERSION_CODE
     versionName VERSION_NAME
     buildConfigField 'String', 'RAKAM_API_KEY', project.RAKAM_API_KEY
+    buildConfigField "int", "MIN_SDK_VERSION", "$minSdkVersion.apiLevel"
   }
 
   buildTypes {

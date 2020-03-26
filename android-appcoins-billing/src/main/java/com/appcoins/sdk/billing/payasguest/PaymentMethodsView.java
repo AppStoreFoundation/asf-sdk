@@ -12,6 +12,8 @@ interface PaymentMethodsView {
 
   void close(boolean withError);
 
+  void closeWithBillingUnavailable();
+
   void showAlertNoBrowserAndStores();
 
   void redirectToWalletInstallation(Intent intent);

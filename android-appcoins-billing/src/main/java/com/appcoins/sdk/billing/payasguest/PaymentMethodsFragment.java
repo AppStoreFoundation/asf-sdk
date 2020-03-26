@@ -295,6 +295,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     }
   }
 
+  @Override public void closeWithBillingUnavailable() {
+    iabView.closeWithBillingUnavailable();
+  }
+
   @Override public void showAlertNoBrowserAndStores() {
     iabView.showAlertNoBrowserAndStores();
   }

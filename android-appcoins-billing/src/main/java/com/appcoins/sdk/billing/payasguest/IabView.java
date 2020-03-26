@@ -32,6 +32,8 @@ interface IabView {
 
   void navigateToInstallDialog();
 
+  void closeWithBillingUnavailable();
+
   void disableBack();
 
   void enableBack();

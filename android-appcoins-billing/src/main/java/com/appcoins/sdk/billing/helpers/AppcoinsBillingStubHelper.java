@@ -58,24 +58,27 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   }
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
-
-    if (WalletUtils.hasWalletInstalled()) {
-      try {
-        return serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
-      } catch (RemoteException e) {
-        e.printStackTrace();
-        return ResponseCode.SERVICE_UNAVAILABLE.getValue();
-      }
-    } else {
-      if (type.equalsIgnoreCase("inapp")) {
-        if (apiVersion == SUPPORTED_API_VERSION) {
-          return ResponseCode.OK.getValue();
+    if (isDeviceVersionSupported()) {
+      if (WalletUtils.hasWalletInstalled()) {
+        try {
+          return serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
+        } catch (RemoteException e) {
+          e.printStackTrace();
+          return ResponseCode.SERVICE_UNAVAILABLE.getValue();
+        }
+      } else {
+        if (type.equalsIgnoreCase("inapp")) {
+          if (apiVersion == SUPPORTED_API_VERSION) {
+            return ResponseCode.OK.getValue();
+          } else {
+            return ResponseCode.BILLING_UNAVAILABLE.getValue();
+          }
         } else {
           return ResponseCode.BILLING_UNAVAILABLE.getValue();
         }
-      } else {
-        return ResponseCode.BILLING_UNAVAILABLE.getValue();
       }
+    } else {
+      return ResponseCode.BILLING_UNAVAILABLE.getValue();
     }
   }
 
@@ -318,6 +321,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         new SharedPreferencesRepository(WalletUtils.getContext(),
             SharedPreferencesRepository.TTL_IN_SECONDS);
     return sharedPreferencesRepository.getWalletId();
+  }
+
+  private boolean isDeviceVersionSupported() {
+    return Build.VERSION.SDK_INT >= BuildConfig.MIN_SDK_VERSION;
   }
 
   public static abstract class Stub {

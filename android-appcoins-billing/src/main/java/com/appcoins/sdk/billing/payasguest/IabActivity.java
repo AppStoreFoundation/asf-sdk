@@ -20,7 +20,6 @@ import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
 import com.appcoins.sdk.billing.helpers.Utils;
-import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 
@@ -190,19 +189,19 @@ public class IabActivity extends Activity implements IabView {
   }
 
   @Override public void navigateToInstallDialog() {
-    if (WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
-      Intent intent =
-          InstallDialogActivity.newIntent(this.getApplicationContext(), buyItemProperties);
-      finish();
-      startActivity(intent);
-    } else {
-      Bundle bundle = new Bundle();
-      bundle.putInt(RESPONSE_CODE, BILLING_UNAVAILABLE);
-      Intent intent = new Intent();
-      intent.putExtras(bundle);
-      setResult(Activity.RESULT_OK, intent);
-      finish();
-    }
+    Intent intent =
+        InstallDialogActivity.newIntent(this.getApplicationContext(), buyItemProperties);
+    finish();
+    startActivity(intent);
+  }
+
+  @Override public void closeWithBillingUnavailable() {
+    Bundle bundle = new Bundle();
+    bundle.putInt(RESPONSE_CODE, BILLING_UNAVAILABLE);
+    Intent intent = new Intent();
+    intent.putExtras(bundle);
+    setResult(Activity.RESULT_OK, intent);
+    finish();
   }
 
   @Override public void disableBack() {

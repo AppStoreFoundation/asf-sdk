@@ -125,13 +125,13 @@ class PaymentMethodsPresenter {
                 skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
                 skuDetails.getSku()));
           } else {
-            fragmentView.showInstallDialog();
+            handleShowInstallDialog();
           }
         }
       };
       paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
     } else {
-      fragmentView.showInstallDialog();
+      handleShowInstallDialog();
     }
   }
 
@@ -141,7 +141,7 @@ class PaymentMethodsPresenter {
         if (paymentMethodsModel.hasError() || paymentMethodsModel.getPaymentMethods()
             .isEmpty()) {
           paymentMethodsInteract.cancelRequests();
-          fragmentView.showInstallDialog();
+          handleShowInstallDialog();
         } else {
           for (PaymentMethod paymentMethod : paymentMethodsModel.getPaymentMethods()) {
             if (paymentMethod.isAvailable()) {
@@ -178,6 +178,14 @@ class PaymentMethodsPresenter {
     };
     paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature,
         type.toLowerCase(), purchasesListener);
+  }
+
+  private void handleShowInstallDialog() {
+    if (WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
+      fragmentView.showInstallDialog();
+    } else {
+      fragmentView.closeWithBillingUnavailable();
+    }
   }
 
   private void sendRakamPaymentMethodEvent(String selectedRadioButton, String action) {
