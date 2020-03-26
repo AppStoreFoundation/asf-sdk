@@ -25,24 +25,24 @@ public class LayoutUtils {
         densityPath = "drawable-ldpi";
         break;
       case DisplayMetrics.DENSITY_MEDIUM:
+      case DisplayMetrics.DENSITY_TV:
         densityPath = "drawable-mdpi";
         break;
       case DisplayMetrics.DENSITY_HIGH:
-      case DisplayMetrics.DENSITY_TV:
       case DisplayMetrics.DENSITY_260:
       case DisplayMetrics.DENSITY_280:
+      case DisplayMetrics.DENSITY_300:
         densityPath = "drawable-hdpi/";
         break;
       case DisplayMetrics.DENSITY_XHIGH:
-      case DisplayMetrics.DENSITY_300:
       case DisplayMetrics.DENSITY_360:
       case DisplayMetrics.DENSITY_340:
       case DisplayMetrics.DENSITY_400:
+      case DisplayMetrics.DENSITY_440:
+      case DisplayMetrics.DENSITY_420:
         densityPath = "drawable-xhdpi/";
         break;
       case DisplayMetrics.DENSITY_XXHIGH:
-      case DisplayMetrics.DENSITY_440:
-      case DisplayMetrics.DENSITY_420:
         densityPath = "drawable-xxhdpi/";
         break;
       case DisplayMetrics.DENSITY_XXXHIGH:
