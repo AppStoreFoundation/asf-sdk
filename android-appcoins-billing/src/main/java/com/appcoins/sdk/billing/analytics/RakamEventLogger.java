@@ -20,11 +20,14 @@ import java.util.UUID;
 class RakamEventLogger implements EventLogger {
 
   private BdsService rakamService;
+  private WalletAddressProvider walletAddressProvider;
   private Context context;
 
-  RakamEventLogger(BdsService rakamService, Context context) {
+  RakamEventLogger(BdsService rakamService, WalletAddressProvider walletAddressProvider,
+      Context context) {
 
     this.rakamService = rakamService;
+    this.walletAddressProvider = walletAddressProvider;
     this.context = context;
   }
 
@@ -64,6 +67,7 @@ class RakamEventLogger implements EventLogger {
     properties.put("_os_version", Build.VERSION.RELEASE);
     properties.put("_platform", "Android");
     properties.put("_session_id", WalletUtils.getPayAsGuestSessionId());
+    putIfNotNull(properties, "_user", walletAddressProvider.getWalletAddress());
     putIfNotNull(properties, "_version_name", getVersionName());
     properties.put("version_code", getVersionCode());
     addData(properties, data);

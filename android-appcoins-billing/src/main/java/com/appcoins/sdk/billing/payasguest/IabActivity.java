@@ -253,7 +253,7 @@ public class IabActivity extends Activity implements IabView {
           new BillingAnalytics(AnalyticsManagerProvider.provideAnalyticsManager());
       billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
           buyItemProperties.getSku(), appcPrice, buyItemProperties.getType(),
-          BillingAnalytics.RAKAM_START_PAYMENT_METHOD);
+          BillingAnalytics.START_PAYMENT_METHOD);
       firstImpression = false;
     }
   }

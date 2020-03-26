@@ -7,6 +7,7 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
+import com.appcoins.sdk.billing.analytics.WalletAddressProvider;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.listeners.PurchasesListener;
 import com.appcoins.sdk.billing.listeners.PurchasesModel;
@@ -28,16 +29,19 @@ class PaymentMethodsPresenter {
   private PaymentMethodsInteract paymentMethodsInteract;
   private WalletInstallationIntentBuilder walletInstallationIntentBuilder;
   private BillingAnalytics billingAnalytics;
+  private WalletAddressProvider walletAddressProvider;
   private BuyItemProperties buyItemProperties;
 
   PaymentMethodsPresenter(PaymentMethodsView view, PaymentMethodsInteract paymentMethodsInteract,
       WalletInstallationIntentBuilder walletInstallationIntentBuilder,
-      BillingAnalytics billingAnalytics, BuyItemProperties buyItemProperties) {
+      BillingAnalytics billingAnalytics, WalletAddressProvider walletAddressProvider,
+      BuyItemProperties buyItemProperties) {
 
     this.fragmentView = view;
     this.paymentMethodsInteract = paymentMethodsInteract;
     this.walletInstallationIntentBuilder = walletInstallationIntentBuilder;
     this.billingAnalytics = billingAnalytics;
+    this.walletAddressProvider = walletAddressProvider;
     this.buyItemProperties = buyItemProperties;
   }
 
@@ -46,6 +50,7 @@ class PaymentMethodsPresenter {
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
         fragmentView.saveWalletInformation(walletGenerationModel);
+        walletAddressProvider.saveWalletAddress(walletGenerationModel.getWalletAddress());
         provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
         checkForUnconsumedPurchased(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
             walletGenerationModel.getWalletAddress(), walletGenerationModel.getSignature(),
@@ -66,16 +71,16 @@ class PaymentMethodsPresenter {
   }
 
   void onCancelButtonClicked(String selectedRadioButton) {
-    sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_CANCEL);
+    sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_CANCEL);
     fragmentView.close(false);
   }
 
   void onPositiveButtonClicked(String selectedRadioButton) {
     if (selectedRadioButton.equals(PAYPAL) || selectedRadioButton.equals(CREDIT_CARD)) {
-      sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
+      sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       fragmentView.navigateToAdyen(selectedRadioButton);
     } else {
-      sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
+      sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
       if (intent != null) {
         if (intent.getPackage() != null && intent.getPackage()
@@ -176,7 +181,7 @@ class PaymentMethodsPresenter {
         type.toLowerCase(), purchasesListener);
   }
 
-  private void sendRakamPaymentMethodEvent(String selectedRadioButton, String action) {
+  private void sendPaymentMethodEvent(String selectedRadioButton, String action) {
     billingAnalytics.sendPaymentMethodEvent(buyItemProperties.getPackageName(),
         buyItemProperties.getSku(), paymentMethodsInteract.getCachedAppcPrice(),
         selectedRadioButton, buyItemProperties.getType(), action);
