@@ -12,9 +12,8 @@ public class AnalyticsManagerProvider {
 
   public static AnalyticsManager provideAnalyticsManager() {
     if (analyticsManagerInstance == null) {
-      int timeout = 30000; // should later be updated for static variable in BdsService
-      BdsService rakamService =
-          new BdsService("https://rakam-api.aptoide.com/event/collect", timeout);
+      BdsService rakamService = new BdsService("https://rakam-api.aptoide.com/event/collect",
+          BdsService.TIME_OUT_IN_MILLIS);
       WalletAddressProvider walletAddressProvider =
           WalletAddressProvider.provideWalletAddressProvider();
       RakamEventLogger rakamEventLogger =
