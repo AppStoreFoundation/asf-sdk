@@ -59,7 +59,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
     int responseCode = ResponseCode.SERVICE_UNAVAILABLE.getValue();
-    if (!isDeviceVersionSupported()) {
+    if (isDeviceVersionSupported()) {
       if (WalletUtils.hasWalletInstalled()) {
         try {
           responseCode = serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
