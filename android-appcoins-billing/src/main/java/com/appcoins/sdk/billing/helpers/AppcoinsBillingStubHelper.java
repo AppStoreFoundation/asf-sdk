@@ -58,27 +58,25 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   }
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
-    if (isDeviceVersionSupported()) {
-      if (WalletUtils.hasWalletInstalled()) {
-        try {
-          return serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
-        } catch (RemoteException e) {
-          e.printStackTrace();
-          return ResponseCode.SERVICE_UNAVAILABLE.getValue();
-        }
-      } else {
-        if (type.equalsIgnoreCase("inapp")) {
-          if (apiVersion == SUPPORTED_API_VERSION) {
-            return ResponseCode.OK.getValue();
-          } else {
-            return ResponseCode.BILLING_UNAVAILABLE.getValue();
-          }
+    if (!isDeviceVersionSupported()) {
+      return ResponseCode.BILLING_UNAVAILABLE.getValue();
+    } else if (WalletUtils.hasWalletInstalled()) {
+      try {
+        return serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
+      } catch (RemoteException e) {
+        e.printStackTrace();
+        return ResponseCode.SERVICE_UNAVAILABLE.getValue();
+      }
+    } else {
+      if (type.equalsIgnoreCase("inapp")) {
+        if (apiVersion == SUPPORTED_API_VERSION) {
+          return ResponseCode.OK.getValue();
         } else {
           return ResponseCode.BILLING_UNAVAILABLE.getValue();
         }
+      } else {
+        return ResponseCode.BILLING_UNAVAILABLE.getValue();
       }
-    } else {
-      return ResponseCode.BILLING_UNAVAILABLE.getValue();
     }
   }
 

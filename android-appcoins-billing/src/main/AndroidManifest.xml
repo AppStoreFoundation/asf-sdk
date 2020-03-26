@@ -4,7 +4,7 @@
   <uses-permission android:name="android.permission.WAKE_LOCK"/>
   <uses-permission android:name="com.appcoins.BILLING"/>
 
-  <application>
+  <application android:networkSecurityConfig="@xml/network_security_config">
     <activity
         android:name="com.appcoins.sdk.billing.helpers.InstallDialogActivity"
         android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
