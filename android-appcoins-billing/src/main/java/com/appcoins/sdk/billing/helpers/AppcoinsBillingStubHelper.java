@@ -66,10 +66,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         } catch (RemoteException e) {
           e.printStackTrace();
         }
-      } else {
-        if (isTypeSupported(type, apiVersion)) {
-          responseCode = ResponseCode.OK.getValue();
-        }
+      } else if (isTypeSupported(type, apiVersion)) {
+        responseCode = ResponseCode.OK.getValue();
       }
     }
     return responseCode;
