@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -128,8 +129,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
-    layout = new PaymentMethodsFragmentLayout(getActivity(),
-        getResources().getConfiguration().orientation, buyItemProperties);
+    boolean isPortrait =
+        getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+    layout = new PaymentMethodsFragmentLayout(getActivity(), isPortrait, buyItemProperties);
 
     return layout.build();
   }
@@ -425,21 +427,16 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   private void setInitialRadioButtonSelected() {
-    if (layout.getCreditCardWrapperLayout()
-        .getVisibility() == View.VISIBLE) {
+    if (isVisible(layout.getCreditCardWrapperLayout())) {
       selectedRadioButton = CREDIT_CARD;
-      layout.selectRadioButton(selectedRadioButton);
-    } else if (layout.getPaypalWrapperLayout()
-        .getVisibility() == View.VISIBLE) {
+    } else if (isVisible(layout.getPaypalWrapperLayout())) {
       selectedRadioButton = PAYPAL;
-      layout.selectRadioButton(selectedRadioButton);
-    } else if (layout.getInstallWrapperLayout()
-        .getVisibility() == View.VISIBLE) {
+    } else if (isVisible(layout.getInstallWrapperLayout())) {
       selectedRadioButton = INSTALL_WALLET;
       layout.getPositiveButton()
           .setText(translations.getString(install_button));
-      layout.selectRadioButton(selectedRadioButton);
     }
+    layout.selectRadioButton(selectedRadioButton);
   }
 
   private void attach(Context context) {
@@ -465,6 +462,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     } else {
       iabView.finishWithError();
     }
+  }
+
+  private boolean isVisible(View view) {
+    return view.getVisibility() == View.VISIBLE;
   }
 
   public class RadioButtonClickListener implements View.OnClickListener {

@@ -9,7 +9,6 @@ public class SkuDetailsAsync implements Runnable {
   private final Repository repository;
   private SkuDetailsResponseListener skuDetailsResponseListener;
   private SkuDetailsParams skuDetailsParams;
-  private static final String DETAILS_LIST = "DETAILS_LIST";
 
   public SkuDetailsAsync(SkuDetailsParams skuDetailsParams,
       SkuDetailsResponseListener skuDetailsResponseListener, Repository repository) {

@@ -3,7 +3,6 @@ package com.appcoins.sdk.billing.layouts;
 import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -49,6 +48,7 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
 
 public class PaymentMethodsFragmentLayout {
 
+  private final boolean isPortrait;
   private int buttonsViewId;
   private int installMainTextId;
   private int installPaypalId;
@@ -65,7 +65,6 @@ public class PaymentMethodsFragmentLayout {
   private int appNameId;
   private int appIconId;
   private Activity activity;
-  private int orientation;
   private BuyItemProperties buyItemProperties;
   private TextView fiatPriceView;
   private TextView appcPriceView;
@@ -91,10 +90,10 @@ public class PaymentMethodsFragmentLayout {
   private ViewGroup supportHookView;
   private TextView appNameView;
 
-  public PaymentMethodsFragmentLayout(Activity activity, int orientation,
+  public PaymentMethodsFragmentLayout(Activity activity, boolean isPortrait,
       BuyItemProperties buyItemProperties) {
     this.activity = activity;
-    this.orientation = orientation;
+    this.isPortrait = isPortrait;
     this.buyItemProperties = buyItemProperties;
   }
 
@@ -108,7 +107,7 @@ public class PaymentMethodsFragmentLayout {
 
     RelativeLayout mainLayout = buildMainLayout();
 
-    paymentErrorViewLayout = new PaymentErrorViewLayout(activity, orientation);
+    paymentErrorViewLayout = new PaymentErrorViewLayout(activity, isPortrait);
     errorView = paymentErrorViewLayout.buildErrorView();
     errorView.setVisibility(View.INVISIBLE);
 
@@ -249,14 +248,12 @@ public class PaymentMethodsFragmentLayout {
     ImageView imageView = new ImageView(activity);
     appIconId = generateRandomId();
     imageView.setId(appIconId);
-    if (icon != null) {
-      imageView.setImageDrawable(icon);
-    }
+    setIcon(imageView, icon);
     RelativeLayout.LayoutParams imageParams =
         new RelativeLayout.LayoutParams(dpToPx(48), dpToPx(48));
 
     int start;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       start = 12;
     } else {
       start = 20;
@@ -265,6 +262,12 @@ public class PaymentMethodsFragmentLayout {
     setMargins(imageParams, start, 12, 0, 0);
     imageView.setLayoutParams(imageParams);
     return imageView;
+  }
+
+  private void setIcon(ImageView imageView, Drawable icon) {
+    if (icon != null) {
+      imageView.setImageDrawable(icon);
+    }
   }
 
   private RelativeLayout buildMainLayout() {
@@ -284,7 +287,7 @@ public class PaymentMethodsFragmentLayout {
     setBackground(dialogLayout, gradientDrawable);
 
     int width;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       width = dpToPx(340);
     } else {
       width = dpToPx(544);
@@ -314,7 +317,7 @@ public class PaymentMethodsFragmentLayout {
 
     float[] radius;
     RelativeLayout.LayoutParams layoutParams;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       layoutParams =
           new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(32));
       radius = getCornerRadiusArray(0, 0, 8, 8);
@@ -413,7 +416,7 @@ public class PaymentMethodsFragmentLayout {
     linearLayout.setId(buttonsViewId);
     int end, top, bottom;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       end = 12;
       top = 24;
       bottom = 24;
@@ -506,7 +509,7 @@ public class PaymentMethodsFragmentLayout {
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       radioGroup.setOrientation(LinearLayout.VERTICAL);
     } else {
       radioGroup.setOrientation(LinearLayout.HORIZONTAL);
@@ -515,7 +518,7 @@ public class PaymentMethodsFragmentLayout {
 
     layoutParams.addRule(RelativeLayout.BELOW, payAsGuestTextId);
     int start, end, top;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       start = 12;
       top = 12;
       end = 12;
@@ -546,7 +549,7 @@ public class PaymentMethodsFragmentLayout {
 
     int width, height, top, start;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       width = ViewGroup.LayoutParams.MATCH_PARENT;
       height = dpToPx(52);
       top = 12;
@@ -596,7 +599,7 @@ public class PaymentMethodsFragmentLayout {
 
     int start, top, end, textSize;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       start = 10;
       top = 12;
       end = 8;
@@ -631,7 +634,7 @@ public class PaymentMethodsFragmentLayout {
 
     int rule;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       rule = RelativeLayout.CENTER_VERTICAL;
       setConstraint(layoutParams, RelativeLayout.ALIGN_LEFT, installMainTextId);
     } else {
@@ -658,7 +661,7 @@ public class PaymentMethodsFragmentLayout {
 
     int start, top;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       start = 8;
       top = 0;
       layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
@@ -683,7 +686,7 @@ public class PaymentMethodsFragmentLayout {
         new RelativeLayout.LayoutParams(dpToPx(20), dpToPx(20));
 
     int top;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       top = 0;
       layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     } else {
@@ -705,7 +708,7 @@ public class PaymentMethodsFragmentLayout {
 
     int width, height, top, start;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       width = ViewGroup.LayoutParams.MATCH_PARENT;
       height = dpToPx(52);
       top = 12;
@@ -745,7 +748,7 @@ public class PaymentMethodsFragmentLayout {
 
     int start, top, rule, textSize;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       start = 20;
       top = 0;
       textSize = 12;
@@ -778,7 +781,7 @@ public class PaymentMethodsFragmentLayout {
         new RelativeLayout.LayoutParams(dpToPx(25), dpToPx(25));
 
     int start, top, rule;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       start = 18;
       top = 0;
       rule = RelativeLayout.CENTER_VERTICAL;
@@ -801,7 +804,7 @@ public class PaymentMethodsFragmentLayout {
     RelativeLayout relativeLayout = new RelativeLayout(activity);
     int width, height;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       width = ViewGroup.LayoutParams.MATCH_PARENT;
       height = dpToPx(52);
     } else {
@@ -836,7 +839,7 @@ public class PaymentMethodsFragmentLayout {
             ViewGroup.LayoutParams.WRAP_CONTENT);
 
     int rule, end, bottom;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       rule = RelativeLayout.CENTER_VERTICAL;
       end = 20;
       bottom = 0;
@@ -874,7 +877,7 @@ public class PaymentMethodsFragmentLayout {
     int width, height, start, rule, top;
     String path;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       width = 25;
       height = 25;
       start = 18;
@@ -909,7 +912,7 @@ public class PaymentMethodsFragmentLayout {
 
     int start, top, rule, textSize;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       rule = RelativeLayout.CENTER_VERTICAL;
       start = 20;
       top = 0;
@@ -942,7 +945,7 @@ public class PaymentMethodsFragmentLayout {
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     int top, start;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       top = 12;
       start = 12;
     } else {
@@ -965,7 +968,7 @@ public class PaymentMethodsFragmentLayout {
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(1));
     int start, top, end;
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       start = 16;
       top = 20;
       end = 16;
@@ -995,26 +998,29 @@ public class PaymentMethodsFragmentLayout {
 
   public void selectRadioButton(String selectedRadioButton) {
     if (selectedRadioButton != null) {
+      GradientDrawable selectedGradientDrawable = getSelectedGradientDrawable();
+      GradientDrawable defaultGradientDrawable = getDefaultGradientDrawable();
+
       if (selectedRadioButton.equals(IabActivity.CREDIT_CARD)) {
-        setBackground(creditCardWrapperLayout, getSelectedGradientDrawable());
-        setBackground(paypalWrapperLayout, getDefaultGradientDrawable());
-        setBackground(installWrapperLayout, getDefaultGradientDrawable());
+        setBackground(creditCardWrapperLayout, selectedGradientDrawable);
+        setBackground(paypalWrapperLayout, defaultGradientDrawable);
+        setBackground(installWrapperLayout, defaultGradientDrawable);
 
         creditCardRadioButton.setChecked(true);
         paypalRadioButton.setChecked(false);
         installRadioButton.setChecked(false);
       } else if (selectedRadioButton.equals(IabActivity.PAYPAL)) {
-        setBackground(paypalWrapperLayout, getSelectedGradientDrawable());
-        setBackground(creditCardWrapperLayout, getDefaultGradientDrawable());
-        setBackground(installWrapperLayout, getDefaultGradientDrawable());
+        setBackground(paypalWrapperLayout, selectedGradientDrawable);
+        setBackground(creditCardWrapperLayout, defaultGradientDrawable);
+        setBackground(installWrapperLayout, defaultGradientDrawable);
 
         creditCardRadioButton.setChecked(false);
         paypalRadioButton.setChecked(true);
         installRadioButton.setChecked(false);
       } else {
-        setBackground(installWrapperLayout, getSelectedGradientDrawable());
-        setBackground(creditCardWrapperLayout, getDefaultGradientDrawable());
-        setBackground(paypalWrapperLayout, getDefaultGradientDrawable());
+        setBackground(installWrapperLayout, selectedGradientDrawable);
+        setBackground(creditCardWrapperLayout, defaultGradientDrawable);
+        setBackground(paypalWrapperLayout, defaultGradientDrawable);
 
         creditCardRadioButton.setChecked(false);
         paypalRadioButton.setChecked(false);

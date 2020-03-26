@@ -1,7 +1,6 @@
 package com.appcoins.sdk.billing.utils;
 
 import android.app.Activity;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -25,15 +24,15 @@ public class PaymentErrorViewLayout {
 
   private static int ERROR_TITLE_ID;
   private final Activity activity;
-  private final int orientation;
+  private final boolean isPortrait;
   private Button errorPositiveButton;
   private TextView errorMessage;
   private TranslationsRepository translations;
 
-  public PaymentErrorViewLayout(Activity activity, int orientation) {
+  public PaymentErrorViewLayout(Activity activity, boolean isPortrait) {
 
     this.activity = activity;
-    this.orientation = orientation;
+    this.isPortrait = isPortrait;
   }
 
   public ViewGroup buildErrorView() {
@@ -52,7 +51,7 @@ public class PaymentErrorViewLayout {
 
     int start, end;
 
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+    if (isPortrait) {
       start = 16;
       end = 16;
     } else {

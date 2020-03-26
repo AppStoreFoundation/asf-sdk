@@ -150,11 +150,11 @@ public class InstallDialogActivity extends Activity {
   }
 
   private void showLoadingDialog() {
-    int layoutOrientation = getLayoutOrientation();
+    boolean isLandscape = getLayoutOrientation() == Configuration.ORIENTATION_LANDSCAPE;
 
     RelativeLayout backgroundLayout = buildBackground();
 
-    RelativeLayout dialogLayout = buildDialogLayout(layoutOrientation);
+    RelativeLayout dialogLayout = buildDialogLayout(isLandscape);
     backgroundLayout.addView(dialogLayout);
     ProgressBar progressBar = new ProgressBar(this);
     RelativeLayout.LayoutParams layoutParams =
@@ -199,20 +199,20 @@ public class InstallDialogActivity extends Activity {
   }
 
   private RelativeLayout setupInstallationDialog(String storeUrl) {
-    int layoutOrientation = getLayoutOrientation();
+    boolean isLandscape = getLayoutOrientation() == Configuration.ORIENTATION_LANDSCAPE;
 
     RelativeLayout backgroundLayout = buildBackground();
 
-    RelativeLayout dialogLayout = buildDialogLayout(layoutOrientation);
+    RelativeLayout dialogLayout = buildDialogLayout(isLandscape);
     backgroundLayout.addView(dialogLayout);
 
     ImageView appBanner = buildAppBanner();
     dialogLayout.addView(appBanner);
 
-    ImageView appIcon = buildAppIcon(layoutOrientation, dialogLayout);
+    ImageView appIcon = buildAppIcon(isLandscape, dialogLayout);
     backgroundLayout.addView(appIcon);
 
-    TextView dialogBody = buildDialogBody(layoutOrientation, appIcon);
+    TextView dialogBody = buildDialogBody(isLandscape, appIcon);
     backgroundLayout.addView(dialogBody);
 
     Button installButton = buildInstallButton(dialogLayout,
@@ -335,7 +335,7 @@ public class InstallDialogActivity extends Activity {
     }
   }
 
-  private TextView buildDialogBody(int layoutOrientation, ImageView appIcon) {
+  private TextView buildDialogBody(boolean isLandscape, ImageView appIcon) {
     int dialogBodyColor = Color.parseColor("#4a4a4a");
     TextView dialogBody = new TextView(this);
     dialogBody.setMaxLines(2);
@@ -344,7 +344,7 @@ public class InstallDialogActivity extends Activity {
     dialogBody.setGravity(Gravity.CENTER_HORIZONTAL);
     int dialogBodyWidth = RelativeLayout.LayoutParams.MATCH_PARENT;
     int textMarginTop = dpToPx(20);
-    if (layoutOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+    if (isLandscape) {
       dialogBodyWidth = dpToPx(384);
       textMarginTop = dpToPx(10);
     }
@@ -369,13 +369,13 @@ public class InstallDialogActivity extends Activity {
     return messageStylized;
   }
 
-  private ImageView buildAppIcon(int layoutOrientation, RelativeLayout dialogLayout) {
+  private ImageView buildAppIcon(boolean isLandscape, RelativeLayout dialogLayout) {
     ImageView appIcon = new ImageView(this);
     appIcon.setId(generateRandomId());
     appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
     int appIconMarginTop = dpToPx(85);
     int appIconSize = dpToPx(66);
-    if (layoutOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+    if (isLandscape) {
       appIconMarginTop = dpToPx(80);
       appIconSize = dpToPx(80);
     }
@@ -398,7 +398,7 @@ public class InstallDialogActivity extends Activity {
     return appBanner;
   }
 
-  private RelativeLayout buildDialogLayout(int layoutOrientation) {
+  private RelativeLayout buildDialogLayout(boolean isLandscape) {
     RelativeLayout dialogLayout = new RelativeLayout(this);
     dialogLayout.setId(generateRandomId());
     dialogLayout.setClipToPadding(false);
@@ -406,7 +406,7 @@ public class InstallDialogActivity extends Activity {
 
     int dialogLayoutMargins = dpToPx(12);
     int cardWidth = RelativeLayout.LayoutParams.MATCH_PARENT;
-    if (layoutOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+    if (isLandscape) {
       cardWidth = dpToPx(384);
     }
     RelativeLayout.LayoutParams dialogLayoutParams =

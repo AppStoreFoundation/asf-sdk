@@ -14,6 +14,7 @@ import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
 import com.appcoins.sdk.billing.listeners.payasguest.PaymentMethodsListener;
 import com.appcoins.sdk.billing.models.GamificationModel;
+import com.appcoins.sdk.billing.models.billing.RemoteProduct;
 import com.appcoins.sdk.billing.models.billing.SkuDetailsModel;
 import com.appcoins.sdk.billing.models.billing.SkuPurchase;
 import com.appcoins.sdk.billing.models.payasguest.PaymentMethod;
@@ -44,20 +45,11 @@ class PaymentMethodsPresenter {
 
   void prepareUi() {
     String id = paymentMethodsInteract.retrieveWalletId();
-    WalletInteractListener walletInteractListener = new WalletInteractListener() {
-      @Override public void walletAddressRetrieved(WalletGenerationModel walletGenerationModel) {
-        fragmentView.saveWalletInformation(walletGenerationModel);
-        provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
-        checkForUnconsumedPurchased(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
-            walletGenerationModel.getWalletAddress(), walletGenerationModel.getSignature(),
-            "INAPP");
-      }
-    };
+    WalletInteractListener walletInteractListener = createWalletInteractListener();
     paymentMethodsInteract.requestWallet(id, walletInteractListener);
     MaxBonusListener maxBonusListener = new MaxBonusListener() {
       @Override public void onBonusReceived(GamificationModel gamificationModel) {
-        if (gamificationModel.getStatus()
-            .equalsIgnoreCase("ACTIVE")) {
+        if (isGamificationActive(gamificationModel)) {
           paymentMethodsInteract.saveMaxBonus(gamificationModel.getMaxBonus());
           fragmentView.showBonus(gamificationModel.getMaxBonus());
         }
@@ -72,21 +64,13 @@ class PaymentMethodsPresenter {
   }
 
   void onPositiveButtonClicked(String selectedRadioButton) {
-    if (selectedRadioButton.equals(PAYPAL) || selectedRadioButton.equals(CREDIT_CARD)) {
+    if (isAdyen(selectedRadioButton)) {
       sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       fragmentView.navigateToAdyen(selectedRadioButton);
     } else {
       sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
-      if (intent != null) {
-        if (intent.getPackage() != null && intent.getPackage()
-            .equals(BuildConfig.APTOIDE_PACKAGE_NAME)) {
-          fragmentView.hideDialog();
-        }
-        fragmentView.redirectToWalletInstallation(intent);
-      } else {
-        fragmentView.showAlertNoBrowserAndStores();
-      }
+      handleIntent(intent);
     }
   }
 
@@ -165,9 +149,7 @@ class PaymentMethodsPresenter {
       @Override public void onResponse(PurchasesModel purchasesModel) {
         if (!purchasesModel.hasError()) {
           for (SkuPurchase skuPurchase : purchasesModel.getSkuPurchases()) {
-            if (skuPurchase.getProduct()
-                .getName()
-                .equals(sku)) {
+            if (isSelectedItem(skuPurchase.getProduct(), sku)) {
               paymentMethodsInteract.cancelRequests();
               fragmentView.showItemAlreadyOwnedError(skuPurchase);
               return;
@@ -176,8 +158,13 @@ class PaymentMethodsPresenter {
         }
       }
     };
-    paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature,
-        type.toLowerCase(), purchasesListener);
+    paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature, type,
+        purchasesListener);
+  }
+
+  private boolean isSelectedItem(RemoteProduct product, String sku) {
+    return product.getName()
+        .equals(sku);
   }
 
   private void handleShowInstallDialog() {
@@ -192,5 +179,42 @@ class PaymentMethodsPresenter {
     billingAnalytics.sendPaymentMethodEvent(buyItemProperties.getPackageName(),
         buyItemProperties.getSku(), paymentMethodsInteract.getCachedAppcPrice(),
         selectedRadioButton, buyItemProperties.getType(), action);
+  }
+
+  private boolean isGamificationActive(GamificationModel gamificationModel) {
+    return gamificationModel.getStatus()
+        .equalsIgnoreCase("ACTIVE");
+  }
+
+  private WalletInteractListener createWalletInteractListener() {
+    return new WalletInteractListener() {
+      @Override public void walletAddressRetrieved(WalletGenerationModel walletGenerationModel) {
+        fragmentView.saveWalletInformation(walletGenerationModel);
+        provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
+        checkForUnconsumedPurchased(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
+            walletGenerationModel.getWalletAddress(), walletGenerationModel.getSignature(),
+            buyItemProperties.getType());
+      }
+    };
+  }
+
+  private boolean isAdyen(String selectedRadioButton) {
+    return selectedRadioButton.equals(PAYPAL) || selectedRadioButton.equals(CREDIT_CARD);
+  }
+
+  private void handleIntent(Intent intent) {
+    if (intent != null) {
+      if (isAptoideRedirect(intent)) {
+        fragmentView.hideDialog();
+      }
+      fragmentView.redirectToWalletInstallation(intent);
+    } else {
+      fragmentView.showAlertNoBrowserAndStores();
+    }
+  }
+
+  private boolean isAptoideRedirect(Intent intent) {
+    return intent.getPackage() != null && intent.getPackage()
+        .equals(BuildConfig.APTOIDE_PACKAGE_NAME);
   }
 }

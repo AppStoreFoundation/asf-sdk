@@ -69,7 +69,7 @@ public class BillingRepository {
     Map<String, String> queries = new HashMap<>();
     queries.put("wallet.address", walletAddress);
     queries.put("wallet.signature", signedWallet);
-    queries.put("type", type);
+    queries.put("type", type.toLowerCase());
 
     service.makeRequest("/inapp/8.20180518/packages", "GET", path, queries,
         new HashMap<String, String>(), new HashMap<String, Object>(), serviceResponseListener);
