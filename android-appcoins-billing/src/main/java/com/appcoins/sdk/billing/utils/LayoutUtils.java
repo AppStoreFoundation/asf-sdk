@@ -13,6 +13,7 @@ public class LayoutUtils {
 
   public static final String BUTTONS_RESOURCE_PATH = "appcoins-wallet/resources/buttons/";
   public static final String IMAGES_RESOURCE_PATH = "appcoins-wallet/resources/images/";
+  public static final String SUPPORT_RESOURCE_PATH = IMAGES_RESOURCE_PATH + "support/";
   private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
   public static String mapDisplayMetrics(DisplayMetrics displayMetrics) {
@@ -60,6 +61,7 @@ public class LayoutUtils {
   }
 
   public static int dpToPx(int dp) {
+    if (dp == 0) return 0;
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem()
         .getDisplayMetrics());
   }
@@ -115,5 +117,17 @@ public class LayoutUtils {
         return result;
       }
     }
+  }
+
+  public static float[] getCornerRadiusArray(int topLeft, int topRight, int bottomRight,
+      int bottomLeft) {
+    int pxTopLeft = dpToPx(topLeft);
+    int pxTopRight = dpToPx(topRight);
+    int pxBottomRight = dpToPx(bottomRight);
+    int pxBottomLeft = dpToPx(bottomLeft);
+    return new float[] {
+        pxTopLeft, pxTopLeft, pxTopRight, pxTopRight, pxBottomRight, pxBottomRight, pxBottomLeft,
+        pxBottomLeft
+    };
   }
 }

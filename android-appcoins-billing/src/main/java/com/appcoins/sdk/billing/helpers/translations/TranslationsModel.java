@@ -28,6 +28,8 @@ import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_reward_title;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_title;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_title_long;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_1;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_2_link;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_switch_to_credit_card;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_switch_to_paypal;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_wallet_not_installed_popup_body;
@@ -132,6 +134,8 @@ public class TranslationsModel {
             "Your CVV/CVC code seems to be wrong. Please try again.");
         put(purchase_card_error_CVV, "Wrong CVV/CVC");
         put(error_contac_us_body, "If the problem persists please contact us.");
+        put(iab_purchase_support_1, "Need help?");
+        put(iab_purchase_support_2_link, "Contact Support.");
       }
     };
   }

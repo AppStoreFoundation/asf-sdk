@@ -37,8 +37,10 @@ import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.next_button;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.BUTTONS_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.IMAGES_RESOURCE_PATH;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.SUPPORT_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.getCornerRadiusArray;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.mapDisplayMetrics;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setConstraint;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
@@ -46,6 +48,7 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
 
 public class PaymentMethodsFragmentLayout {
 
+  private int buttonsViewId;
   private int installMainTextId;
   private int installPaypalId;
   private int installCreditCardId;
@@ -83,6 +86,9 @@ public class PaymentMethodsFragmentLayout {
   private ViewGroup intentLoadingView;
   private PaymentErrorViewLayout paymentErrorViewLayout;
   private TranslationsRepository translations;
+  private TextView helpText;
+  private ViewGroup supportHookView;
+  private TextView appNameView;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
@@ -158,7 +164,7 @@ public class PaymentMethodsFragmentLayout {
     fiatPriceView = createFiatPriceView();
     appcPriceView = createAppcPriceView();
     ImageView iconImageView = createAppIconLayout(icon);
-    TextView appNameView = createAppNameLayout(appName);
+    appNameView = createAppNameLayout(appName);
     TextView skuView = createSkuLayout(buyItemProperties.getSku());
 
     paymentMethodHeaderLayout.addView(iconImageView);
@@ -292,12 +298,76 @@ public class PaymentMethodsFragmentLayout {
     paymentMethodsLayout = buildPaymentMethodsLayout();
     paymentMethodsLayout.setVisibility(View.INVISIBLE);
     LinearLayout buttonsView = buildButtonsView();
+    supportHookView = buildSupportHook();
 
     dialogLayout.addView(paymentMethodsHeaderLayout);
     dialogLayout.addView(headerSeparator);
     dialogLayout.addView(paymentMethodsLayout);
     dialogLayout.addView(buttonsView);
+    dialogLayout.addView(supportHookView);
     return dialogLayout;
+  }
+
+  private LinearLayout buildSupportHook() {
+    LinearLayout linearLayout = new LinearLayout(activity);
+
+    float[] radius;
+    RelativeLayout.LayoutParams layoutParams;
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      layoutParams =
+          new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(32));
+      radius = getCornerRadiusArray(0, 0, 8, 8);
+      layoutParams.addRule(RelativeLayout.BELOW, buttonsViewId);
+    } else {
+      layoutParams =
+          new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(32));
+      radius = getCornerRadiusArray(16, 16, 16, 16);
+      layoutParams.addRule(RelativeLayout.BELOW, paymentMethodsId);
+      setConstraint(layoutParams, RelativeLayout.LEFT_OF, buttonsViewId);
+      setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_LEFT);
+      setMargins(layoutParams, 18, 24, 96, 16);
+    }
+
+    GradientDrawable gradientDrawable = new GradientDrawable();
+    gradientDrawable.setColor(Color.parseColor("#f0f0f0"));
+    gradientDrawable.setCornerRadii(radius);
+    linearLayout.setBackground(gradientDrawable);
+
+    linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+    linearLayout.setGravity(Gravity.CENTER);
+    ImageView supportImage = buildSupportImage();
+    helpText = buildHelpText();
+
+    linearLayout.addView(supportImage);
+    linearLayout.addView(helpText);
+    linearLayout.setLayoutParams(layoutParams);
+    return linearLayout;
+  }
+
+  private TextView buildHelpText() {
+    TextView textView = new TextView(activity);
+    LinearLayout.LayoutParams layoutParams =
+        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT);
+    setMargins(layoutParams, 0, 0, 14, 0);
+    textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+    textView.setTextColor(Color.parseColor("#202020"));
+    textView.setTextSize(12);
+    textView.setEllipsize(TextUtils.TruncateAt.END);
+    textView.setMaxLines(2);
+    textView.setLayoutParams(layoutParams);
+    return textView;
+  }
+
+  private ImageView buildSupportImage() {
+    ImageView imageView = new ImageView(activity);
+    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(dpToPx(18), dpToPx(18));
+    setMargins(layoutParams, 14, 0, 8, 0);
+    Drawable supportImage =
+        convertAssetDrawable(SUPPORT_RESOURCE_PATH + densityPath + "ic_settings_support.png");
+    imageView.setImageDrawable(supportImage);
+    imageView.setLayoutParams(layoutParams);
+    return imageView;
   }
 
   private ProgressBar buildProgressBar() {
@@ -334,10 +404,12 @@ public class PaymentMethodsFragmentLayout {
   private LinearLayout buildButtonsView() {
     LinearLayout linearLayout = new LinearLayout(activity);
     RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.BELOW, paymentMethodsId);
-
+    setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
+    buttonsViewId = generateRandomId();
+    linearLayout.setId(buttonsViewId);
     int end, top, bottom;
 
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -351,7 +423,6 @@ public class PaymentMethodsFragmentLayout {
     }
 
     setMargins(layoutParams, 0, top, end, bottom);
-    linearLayout.setGravity(Gravity.END);
     linearLayout.setOrientation(LinearLayout.HORIZONTAL);
     linearLayout.setClipChildren(false);
     linearLayout.setClipToPadding(false);
@@ -1058,5 +1129,17 @@ public class PaymentMethodsFragmentLayout {
 
   public ViewGroup getIntentLoadingView() {
     return intentLoadingView;
+  }
+
+  public TextView getHelpText() {
+    return helpText;
+  }
+
+  public ViewGroup getSupportHookView() {
+    return supportHookView;
+  }
+
+  public TextView getAppNameView() {
+    return appNameView;
   }
 }

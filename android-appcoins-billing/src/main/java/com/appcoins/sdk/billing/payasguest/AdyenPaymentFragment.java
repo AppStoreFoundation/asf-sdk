@@ -7,6 +7,10 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +48,8 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_1;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_2_link;
 
 public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
@@ -63,6 +69,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private AdyenPaymentFragmentLayout layout;
   private String serverCurrency;
   private BigDecimal serverFiatPrice;
+  private TranslationsRepository translations;
 
   public static AdyenPaymentFragment newInstance(String selectedRadioButton, String walletAddress,
       String signature, String fiatPrice, String fiatPriceCurrencyCode, String appcPrice,
@@ -93,7 +100,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    TranslationsRepository translations = TranslationsRepository.getInstance(getActivity());
+    translations = TranslationsRepository.getInstance(getActivity());
     adyenPaymentInfo = extractBundleInfo();
     AdyenRepository adyenRepository = new AdyenRepository(
         new BdsService(BuildConfig.HOST_WS + "/broker/", BdsService.TIME_OUT_IN_MILLIS),
@@ -141,12 +148,20 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         .getErrorPositiveButton();
     TextView changeCardView = layout.getChangeCardView();
     TextView morePaymentsText = layout.getMorePaymentsText();
+    TextView helpText = layout.getHelpText();
+    ViewGroup supportHook = layout.getSupportHookView();
+
     onPositiveButtonClick(positiveButton);
     onCancelButtonClick(cancelButton);
     onErrorButtonClick(errorButton);
     onChangeCardClick(changeCardView);
     onMorePaymentsClick(morePaymentsText);
-
+    if (iabView.hasEmailApplication()) {
+      supportHook.setVisibility(View.VISIBLE);
+      createSpannableString(helpText);
+    } else {
+      supportHook.setVisibility(View.GONE);
+    }
     presenter.loadPaymentInfo();
   }
 
@@ -352,6 +367,34 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   @Override public void enableBack() {
     iabView.enableBack();
+  }
+
+  @Override public void redirectToSupportEmail(String walletAddress, String packageName, String sku,
+      String sdkVersionName, int mobileVersion) {
+    String appName = layout.getAppNameView()
+        .getText()
+        .toString();
+    EmailInfo emailInfo =
+        new EmailInfo(walletAddress, packageName, sku, sdkVersionName, mobileVersion, appName);
+    iabView.redirectToSupportEmail(emailInfo);
+  }
+
+  private void createSpannableString(TextView helpText) {
+    String helpString = translations.getString(iab_purchase_support_1);
+    String contactString = translations.getString(iab_purchase_support_2_link);
+    String concatenatedString = helpString + ' ' + contactString;
+    SpannableString spannableString = new SpannableString(concatenatedString);
+    ClickableSpan clickableSpan = new ClickableSpan() {
+      @Override public void onClick(View widget) {
+        presenter.onHelpTextClicked();
+      }
+    };
+    spannableString.setSpan(clickableSpan, helpString.length() + 1, concatenatedString.length(),
+        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+    helpText.setText(spannableString);
+    helpText.setMovementMethod(LinkMovementMethod.getInstance());
+    helpText.setLinkTextColor(Color.parseColor("#fe6e76"));
+    helpText.setHighlightColor(Color.TRANSPARENT);
   }
 
   private void setStoredPaymentMethodDetails(StoredMethodDetails storedMethodDetails) {

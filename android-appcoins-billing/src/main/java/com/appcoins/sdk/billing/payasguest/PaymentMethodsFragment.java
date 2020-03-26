@@ -5,7 +5,12 @@ import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +41,8 @@ import java.text.DecimalFormat;
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.KEY_BUY_INTENT;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_no_connection_body;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_reward_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_1;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_2_link;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.install_button;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.next_button;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_error_item_owned;
@@ -124,12 +131,21 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     ViewGroup paypalWrapper = layout.getPaypalWrapperLayout();
     ViewGroup installWrapper = layout.getInstallWrapperLayout();
     Button errorButton = layout.getErrorPositiveButton();
+    ViewGroup supportHook = layout.getSupportHookView();
+    TextView helpText = layout.getHelpText();
+
     onRotation(savedInstanceState);
     onCancelButtonClicked(cancelButton);
     onPositiveButtonClicked(positiveButton);
     onErrorButtonClicked(errorButton);
     onRadioButtonClicked(creditCardButton, paypalButton, installRadioButton, creditWrapper,
         paypalWrapper, installWrapper);
+    if (iabView.hasEmailApplication()) {
+      supportHook.setVisibility(View.VISIBLE);
+      createSpannableString(helpText);
+    } else {
+      supportHook.setVisibility(View.GONE);
+    }
   }
 
   @Override public void onResume() {
@@ -166,6 +182,24 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     paymentMethodsPresenter.onDestroy();
     paymentMethodsPresenter = null;
     super.onDestroy();
+  }
+
+  private void createSpannableString(TextView helpText) {
+    String helpString = translations.getString(iab_purchase_support_1);
+    String contactString = translations.getString(iab_purchase_support_2_link);
+    String concatenatedString = helpString + ' ' + contactString;
+    SpannableString spannableString = new SpannableString(concatenatedString);
+    ClickableSpan clickableSpan = new ClickableSpan() {
+      @Override public void onClick(View widget) {
+        paymentMethodsPresenter.onHelpTextClicked(buyItemProperties);
+      }
+    };
+    spannableString.setSpan(clickableSpan, helpString.length() + 1, concatenatedString.length(),
+        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+    helpText.setText(spannableString);
+    helpText.setMovementMethod(LinkMovementMethod.getInstance());
+    helpText.setLinkTextColor(Color.parseColor("#fe6e76"));
+    helpText.setHighlightColor(Color.TRANSPARENT);
   }
 
   private void onErrorButtonClicked(Button errorButton) {
@@ -344,6 +378,20 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         .setVisibility(View.INVISIBLE);
     layout.getIntentLoadingView()
         .setVisibility(View.VISIBLE);
+  }
+
+  @Override
+  public void redirectToSupportEmail(String packageName, String sku, String sdkVersionName,
+      int mobileVersion) {
+    String appName = layout.getAppNameView()
+        .getText()
+        .toString();
+    if (walletGenerationModel != null) {
+      EmailInfo emailInfo =
+          new EmailInfo(walletGenerationModel.getWalletAddress(), packageName, sku, sdkVersionName,
+              mobileVersion, appName);
+      iabView.redirectToSupportEmail(emailInfo);
+    }
   }
 
   private void setInitialRadioButtonSelected() {

@@ -36,4 +36,7 @@ interface AdyenPaymentView {
   void disableBack();
 
   void enableBack();
+
+  void redirectToSupportEmail(String walletAddress, String packageName, String sku,
+      String sdkVersionName, int mobileVersion);
 }

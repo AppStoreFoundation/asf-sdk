@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -180,6 +181,47 @@ public class IabActivity extends Activity implements IabView {
 
   @Override public void setOnActivityResultListener(ActivityResultListener activityResultListener) {
     this.activityResultListener = activityResultListener;
+  }
+
+  @Override public void redirectToSupportEmail(EmailInfo emailInfo) {
+    String[] extraEmail = new String[] {
+        "info@appcoins.io"
+    };
+    String body =
+        "We currently offer support in English language only. Also, please don't delete the "
+            + "details below so it's easier for us to look into your issue.\n"
+            + "Package Name: "
+            + emailInfo.getPackageName()
+            + "\n"
+            + "SDK version: "
+            + emailInfo.getSdkVersionName()
+            + "\n"
+            + "Item name: "
+            + emailInfo.getSku()
+            + "\n"
+            + "Mobile Version: "
+            + emailInfo.getMobileVersion()
+            + "\n"
+            + "Wallet Address: "
+            + emailInfo.getWalletAddress();
+    Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+    intent.setType("message/rfc822");
+    intent.putExtra(Intent.EXTRA_SUBJECT, "Pay as Guest - " + emailInfo.getAppName());
+    intent.putExtra(Intent.EXTRA_EMAIL, extraEmail);
+    intent.putExtra(Intent.EXTRA_TEXT, body);
+    PackageManager packageManager = getPackageManager();
+    ActivityInfo activityInfo = intent.resolveActivityInfo(packageManager, 0);
+    if (activityInfo != null) {
+      startActivity(Intent.createChooser(intent, ""));
+    }
+  }
+
+  @Override public boolean hasEmailApplication() {
+    PackageManager packageManager = getPackageManager();
+    Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+    intent.setType("message/rfc822");
+    ActivityInfo activityInfo = intent.resolveActivityInfo(packageManager, 0);
+    return activityInfo != null;
   }
 
   private void buildAlertNoBrowserAndStores() {

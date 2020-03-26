@@ -1,6 +1,7 @@
 package com.appcoins.sdk.billing.payasguest;
 
 import android.content.Intent;
+import android.os.Build;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
@@ -85,6 +86,14 @@ class PaymentMethodsPresenter {
 
   void onErrorButtonClicked() {
     fragmentView.close(true);
+  }
+
+  void onHelpTextClicked(BuyItemProperties buyItemProperties) {
+    String packageName = buyItemProperties.getPackageName();
+    String sku = buyItemProperties.getSku();
+    String sdkVersionName = BuildConfig.VERSION_NAME;
+    int mobileVersion = Build.VERSION.SDK_INT;
+    fragmentView.redirectToSupportEmail(packageName, sku, sdkVersionName, mobileVersion);
   }
 
   void onDestroy() {
