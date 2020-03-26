@@ -15,12 +15,10 @@ import android.widget.FrameLayout;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WebViewActivity;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
-import com.appcoins.sdk.billing.helpers.Utils;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES;
-import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.ERROR_RESULT_CODE;
 import static com.appcoins.sdk.billing.helpers.Utils.RESPONSE_CODE;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_body;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_button;
@@ -29,6 +27,8 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
 public class IabActivity extends Activity implements IabView {
 
   public final static int LAUNCH_INSTALL_BILLING_FLOW_REQUEST_CODE = 10001;
+  private final static int USER_CANCELED = 1;
+  private final static int ERROR = 6;
   private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private static int IAB_ACTIVITY_ID;
   private TranslationsRepository translations;
@@ -42,7 +42,6 @@ public class IabActivity extends Activity implements IabView {
 
     //This log is necessary for the automatic test that validates the wallet installation dialog
     Log.d("InstallDialog", "com.appcoins.sdk.billing.helpers.InstallDialogActivity started");
-
     int backgroundColor = Color.parseColor("#64000000");
     frameLayout = new FrameLayout(this);
     if (savedInstanceState == null) {
@@ -67,7 +66,7 @@ public class IabActivity extends Activity implements IabView {
 
   @Override public void onBackPressed() {
     if (backEnabled) {
-      close();
+      close(false);
     }
   }
 
@@ -82,10 +81,10 @@ public class IabActivity extends Activity implements IabView {
               data.getStringExtra(WebViewActivity.TRANSACTION_ID));
         } else {
           Log.w("IabActivity", "ActivityResultListener was not set");
-          close();
+          close(true);
         }
       } else {
-        close();
+        close(true);
       }
     }
   }
@@ -96,9 +95,13 @@ public class IabActivity extends Activity implements IabView {
         .commit();
   }
 
-  @Override public void close() {
+  @Override public void close(boolean withError) {
     Bundle bundle = new Bundle();
-    bundle.putInt(RESPONSE_CODE, 1); //CANCEL
+    if (withError) {
+      bundle.putInt(RESPONSE_CODE, ERROR); //ERROR
+    } else {
+      bundle.putInt(RESPONSE_CODE, USER_CANCELED); //CANCEL
+    }
     Intent intent = new Intent();
     intent.putExtras(bundle);
     setResult(Activity.RESULT_CANCELED, intent);
@@ -107,8 +110,8 @@ public class IabActivity extends Activity implements IabView {
 
   @Override public void finishWithError() {
     Intent response = new Intent();
-    response.putExtra("RESPONSE_CODE", ERROR_RESULT_CODE);
-    setResult(ERROR_RESULT_CODE, response);
+    response.putExtra(RESPONSE_CODE, ERROR);
+    setResult(ERROR, response);
     finish();
   }
 
@@ -189,7 +192,7 @@ public class IabActivity extends Activity implements IabView {
     alert.setPositiveButton(dismissValue, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int id) {
         Bundle response = new Bundle();
-        response.putInt(Utils.RESPONSE_CODE, 1);
+        response.putInt(RESPONSE_CODE, 1);
         Intent intent = new Intent();
         intent.putExtras(response);
         setResult(Activity.RESULT_CANCELED, intent);

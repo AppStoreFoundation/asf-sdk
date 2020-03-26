@@ -104,11 +104,11 @@ class AdyenPaymentPresenter {
   }
 
   void onCancelClick() {
-    fragmentView.close();
+    fragmentView.close(false);
   }
 
   void onErrorButtonClick() {
-    fragmentView.close();
+    fragmentView.close(true);
   }
 
   void onChangeCardClick() {
@@ -225,7 +225,7 @@ class AdyenPaymentPresenter {
     if (resultCode.equalsIgnoreCase("AUTHORISED")) {
       handleSuccessAdyenTransaction(uid);
     } else if (status.equalsIgnoreCase(Status.CANCELED.toString())) {
-      fragmentView.close();
+      fragmentView.close(false);
     } else if (refusalReason != null && refusalReasonCode != -1) {
       if (refusalReasonCode == 24) {
         fragmentView.unlockRotation();
@@ -264,18 +264,22 @@ class AdyenPaymentPresenter {
   private void createBundle(final TransactionResponse transactionResponse) {
     PurchaseListener purchaseListener = new PurchaseListener() {
       @Override public void onResponse(PurchaseModel purchaseModel) {
-        BillingMapper billingMapper = new BillingMapper();
-        final Bundle bundle =
-            billingMapper.map(purchaseModel, transactionResponse.getOrderReference());
-        fragmentView.showCompletedPurchase();
-        Handler handler = new Handler();
-        Runnable runnable = new Runnable() {
-          @Override public void run() {
-            fragmentView.finish(bundle);
-          }
-        };
-        handlerRunnableMap.put(handler, runnable);
-        handler.postDelayed(runnable, 3000);
+        if (purchaseModel.hasError()) {
+          fragmentView.showError();
+        } else {
+          BillingMapper billingMapper = new BillingMapper();
+          final Bundle bundle =
+              billingMapper.map(purchaseModel, transactionResponse.getOrderReference());
+          fragmentView.showCompletedPurchase();
+          Handler handler = new Handler();
+          Runnable runnable = new Runnable() {
+            @Override public void run() {
+              fragmentView.finish(bundle);
+            }
+          };
+          handlerRunnableMap.put(handler, runnable);
+          handler.postDelayed(runnable, 3000);
+        }
       }
     };
     BuyItemProperties buyItemProperties = adyenPaymentInfo.getBuyItemProperties();

@@ -5,7 +5,7 @@ import com.appcoins.sdk.billing.models.payasguest.StoredMethodDetails;
 import java.math.BigDecimal;
 
 interface AdyenPaymentView {
-  void close();
+  void close(boolean withError);
 
   void showError();
 

@@ -84,7 +84,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     BdsService apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
 
     SharedPreferencesRepository sharedPreferencesRepository =
-        new SharedPreferencesRepository(getActivity(), 86400 * 30); //86400 = 24h
+        new SharedPreferencesRepository(getActivity(), SharedPreferencesRepository.TTL_IN_SECONDS);
     WalletRepository walletRepository =
         new WalletRepository(backendService, new WalletGenerationMapper());
     WalletInteract walletInteract =
@@ -242,14 +242,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     errorLayout.setVisibility(View.VISIBLE);
   }
 
-  @Override public void close() {
+  @Override public void close(boolean withError) {
     if (itemAlreadyOwnedPurchase != null) {
       BillingMapper billingMapper = new BillingMapper();
       Bundle bundle = billingMapper.mapAlreadyOwned(itemAlreadyOwnedPurchase);
       itemAlreadyOwnedPurchase = null;
       iabView.finish(bundle);
     } else {
-      iabView.close();
+      iabView.close(withError);
     }
   }
 

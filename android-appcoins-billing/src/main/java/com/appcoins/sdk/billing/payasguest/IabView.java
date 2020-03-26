@@ -7,7 +7,7 @@ import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 
 interface IabView {
 
-  void close();
+  void close(boolean withError);
 
   void finishWithError();
 
