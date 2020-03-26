@@ -7,7 +7,6 @@ import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
-import com.appcoins.sdk.billing.analytics.WalletAddressProvider;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.listeners.PurchasesListener;
 import com.appcoins.sdk.billing.listeners.PurchasesModel;
@@ -29,19 +28,16 @@ class PaymentMethodsPresenter {
   private PaymentMethodsInteract paymentMethodsInteract;
   private WalletInstallationIntentBuilder walletInstallationIntentBuilder;
   private BillingAnalytics billingAnalytics;
-  private WalletAddressProvider walletAddressProvider;
   private BuyItemProperties buyItemProperties;
 
   PaymentMethodsPresenter(PaymentMethodsView view, PaymentMethodsInteract paymentMethodsInteract,
       WalletInstallationIntentBuilder walletInstallationIntentBuilder,
-      BillingAnalytics billingAnalytics, WalletAddressProvider walletAddressProvider,
-      BuyItemProperties buyItemProperties) {
+      BillingAnalytics billingAnalytics, BuyItemProperties buyItemProperties) {
 
     this.fragmentView = view;
     this.paymentMethodsInteract = paymentMethodsInteract;
     this.walletInstallationIntentBuilder = walletInstallationIntentBuilder;
     this.billingAnalytics = billingAnalytics;
-    this.walletAddressProvider = walletAddressProvider;
     this.buyItemProperties = buyItemProperties;
   }
 
@@ -50,7 +46,6 @@ class PaymentMethodsPresenter {
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletAddressRetrieved(WalletGenerationModel walletGenerationModel) {
         fragmentView.saveWalletInformation(walletGenerationModel);
-        walletAddressProvider.saveWalletAddress(walletGenerationModel.getWalletAddress());
         provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
         checkForUnconsumedPurchased(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
             walletGenerationModel.getWalletAddress(), walletGenerationModel.getSignature(),

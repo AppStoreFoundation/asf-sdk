@@ -98,14 +98,14 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
     SharedPreferencesRepository sharedPreferencesRepository =
         new SharedPreferencesRepository(getActivity(), SharedPreferencesRepository.TTL_IN_SECONDS);
+    WalletAddressProvider walletAddressProvider =
+        WalletAddressProvider.provideWalletAddressProvider();
     WalletRepository walletRepository =
-        new WalletRepository(backendService, new WalletGenerationMapper());
+        new WalletRepository(backendService, new WalletGenerationMapper(), walletAddressProvider);
     PaymentMethodsRepository paymentMethodsRepository = new PaymentMethodsRepository(apiService);
     BillingRepository billingRepository = new BillingRepository(apiService);
     AnalyticsManager analyticsManager = AnalyticsManagerProvider.provideAnalyticsManager();
     BillingAnalytics billingAnalytics = new BillingAnalytics(analyticsManager);
-    WalletAddressProvider walletAddressProvider =
-        WalletAddressProvider.provideWalletAddressProvider();
 
     WalletInteract walletInteract =
         new WalletInteract(sharedPreferencesRepository, walletRepository);
@@ -123,7 +123,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
     paymentMethodsPresenter =
         new PaymentMethodsPresenter(this, paymentMethodsInteract, walletInstallationIntentBuilder,
-            billingAnalytics, walletAddressProvider, buyItemProperties);
+            billingAnalytics, buyItemProperties);
   }
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
