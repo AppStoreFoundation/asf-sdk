@@ -149,7 +149,7 @@ class PaymentMethodsPresenter {
             }
           }
           if (!WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
-            fragmentView.hideInstall();
+            fragmentView.hideInstallOption();
           }
           fragmentView.sendPurchaseStartEvent(paymentMethodsInteract.getCachedAppcPrice());
           fragmentView.showPaymentView();

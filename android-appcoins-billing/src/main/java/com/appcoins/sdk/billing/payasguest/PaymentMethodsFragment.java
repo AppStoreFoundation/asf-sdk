@@ -401,7 +401,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         .setVisibility(View.VISIBLE);
   }
 
-  @Override public void hideInstall() {
+  @Override public void hideInstallOption() {
     layout.getInstallWrapperLayout()
         .setVisibility(View.GONE);
   }
