@@ -56,12 +56,12 @@ class CompletedPurchaseLayout {
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
     purchaseLayout.setOrientation(LinearLayout.VERTICAL);
 
-    ImageView appIcon = createAppIconLayout();
+    ImageView completedImage = createCompletedImageLayout();
     TextView purchaseDoneView = createPurchaseDoneView();
     TextView purchaseDetailsView = createPurchaseDetailsView(fiatPrice, fiatCurrency, sku);
 
     purchaseLayout.setLayoutParams(layoutParams);
-    purchaseLayout.addView(appIcon);
+    purchaseLayout.addView(completedImage);
     purchaseLayout.addView(purchaseDoneView);
     purchaseLayout.addView(purchaseDetailsView);
 
@@ -110,7 +110,7 @@ class CompletedPurchaseLayout {
     return textView;
   }
 
-  private ImageView createAppIconLayout() {
+  private ImageView createCompletedImageLayout() {
 
     ImageView imageView = new ImageView(activity);
 

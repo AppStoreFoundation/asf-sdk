@@ -222,7 +222,7 @@ public class AdyenPaymentFragmentLayout {
       layoutParams.addRule(RelativeLayout.BELOW, creditCardViewId);
       setConstraint(layoutParams, RelativeLayout.LEFT_OF, buttonsViewId);
       setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_LEFT);
-      setMargins(layoutParams, 18, 42, 0, 16);
+      setMargins(layoutParams, 18, 42, 96, 16);
     }
 
     GradientDrawable gradientDrawable = new GradientDrawable();

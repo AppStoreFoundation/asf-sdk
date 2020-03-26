@@ -165,15 +165,13 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     } else {
       String walletId = getWalletId();
       if (walletId != null && type.equalsIgnoreCase("INAPP")) {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
         BillingRepository billingRepository =
             new BillingRepository(new BdsService(BuildConfig.HOST_WS, 30000));
         GuestPurchasesInteract guestPurchaseInteract =
             new GuestPurchasesInteract(billingRepository);
 
-        guestPurchaseInteract.mapGuestPurchases(bundleResponse, walletId, packageName, type,
-            countDownLatch);
-        waitForPurchases(countDownLatch);
+        bundleResponse =
+            guestPurchaseInteract.mapGuestPurchases(bundleResponse, walletId, packageName, type);
       }
     }
     return bundleResponse;
@@ -186,7 +184,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       } else {
         String walletId = getWalletId();
         if (walletId != null && apiVersion == SUPPORTED_API_VERSION) {
-          return consumeGuestPurchase(walletId, apiVersion, packageName, purchaseToken);
+          return consumeGuestPurchase(walletId, packageName, purchaseToken);
         } else {
           return ResponseCode.OK.getValue();
         }
@@ -197,23 +195,12 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     }
   }
 
-  private int consumeGuestPurchase(String walletId, int apiVersion, String packageName,
-      String purchaseToken) {
-    int[] responseCode = new int[1]; //Generic error
-    CountDownLatch countDownLatch = new CountDownLatch(1);
+  private int consumeGuestPurchase(String walletId, String packageName, String purchaseToken) {
     BillingRepository billingRepository =
-        new BillingRepository(new BdsService(BuildConfig.HOST_WS, 30000));
+        new BillingRepository(new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS));
     GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract(billingRepository);
 
-    guestPurchaseInteract.consumeGuestPurchase(walletId, packageName, purchaseToken, responseCode,
-        countDownLatch);
-
-    try {
-      countDownLatch.await(MESSAGE_RESPONSE_WAIT_TIMEOUT_IN_MILLIS, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    return responseCode[0];
+    return guestPurchaseInteract.consumeGuestPurchase(walletId, packageName, purchaseToken);
   }
 
   private void waitForPurchases(CountDownLatch countDownLatch) {

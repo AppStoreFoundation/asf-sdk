@@ -48,7 +48,7 @@ class PaymentMethodsPresenter {
   void prepareUi() {
     String id = paymentMethodsInteract.retrieveWalletId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
-      @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
+      @Override public void walletAddressRetrieved(WalletGenerationModel walletGenerationModel) {
         fragmentView.saveWalletInformation(walletGenerationModel);
         walletAddressProvider.saveWalletAddress(walletGenerationModel.getWalletAddress());
         provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
