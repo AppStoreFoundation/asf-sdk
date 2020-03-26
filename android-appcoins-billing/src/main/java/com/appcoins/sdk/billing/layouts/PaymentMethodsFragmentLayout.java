@@ -24,7 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
-import com.appcoins.sdk.billing.payasguest.PaymentMethodsFragment;
+import com.appcoins.sdk.billing.payasguest.IabActivity;
 import com.appcoins.sdk.billing.utils.PaymentErrorViewLayout;
 import java.io.IOException;
 import java.io.InputStream;
@@ -994,7 +994,7 @@ public class PaymentMethodsFragmentLayout {
 
   public void selectRadioButton(String selectedRadioButton) {
     if (selectedRadioButton != null) {
-      if (selectedRadioButton.equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
+      if (selectedRadioButton.equals(IabActivity.CREDIT_CARD)) {
         creditCardWrapperLayout.setBackground(getSelectedGradientDrawable());
         paypalWrapperLayout.setBackground(getDefaultGradientDrawable());
         installWrapperLayout.setBackground(getDefaultGradientDrawable());
@@ -1002,7 +1002,7 @@ public class PaymentMethodsFragmentLayout {
         creditCardRadioButton.setChecked(true);
         paypalRadioButton.setChecked(false);
         installRadioButton.setChecked(false);
-      } else if (selectedRadioButton.equals(PaymentMethodsFragment.PAYPAL_RADIO)) {
+      } else if (selectedRadioButton.equals(IabActivity.PAYPAL)) {
         paypalWrapperLayout.setBackground(getSelectedGradientDrawable());
         creditCardWrapperLayout.setBackground(getDefaultGradientDrawable());
         installWrapperLayout.setBackground(getDefaultGradientDrawable());

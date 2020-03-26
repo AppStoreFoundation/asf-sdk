@@ -1,6 +1,7 @@
 package com.appcoins.sdk.billing.service.wallet;
 
 import com.appcoins.sdk.billing.WalletInteractListener;
+import com.appcoins.sdk.billing.analytics.WalletAddressProvider;
 import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.RequestResponse;
@@ -16,11 +17,14 @@ public class WalletRepository {
 
   private final Service service;
   private WalletGenerationMapper walletGenerationMapper;
+  private WalletAddressProvider walletAddressProvider;
 
-  public WalletRepository(Service service, WalletGenerationMapper walletGenerationMapper) {
+  public WalletRepository(Service service, WalletGenerationMapper walletGenerationMapper,
+      WalletAddressProvider walletAddressProvider) {
 
     this.service = service;
     this.walletGenerationMapper = walletGenerationMapper;
+    this.walletAddressProvider = walletAddressProvider;
   }
 
   public void requestWallet(String id, final WalletInteractListener walletInteractListener) {
@@ -33,6 +37,7 @@ public class WalletRepository {
         WalletGenerationModel walletGenerationModel =
             new WalletGenerationModel(walletGenerationResponse.getAddress(),
                 walletGenerationResponse.getSignature(), walletGenerationResponse.hasError());
+        saveWalletAddress(walletGenerationModel);
         walletInteractListener.walletAddressRetrieved(walletGenerationModel);
       }
     };
@@ -53,6 +58,7 @@ public class WalletRepository {
             walletGenerationMapper.mapWalletGenerationResponse(requestResponse);
         walletGenerationModel[0] = new WalletGenerationModel(walletGenerationResponse.getAddress(),
             walletGenerationResponse.getSignature(), walletGenerationResponse.hasError());
+        saveWalletAddress(walletGenerationModel[0]);
         countDownLatch.countDown();
       }
     };
@@ -69,5 +75,11 @@ public class WalletRepository {
 
   public void cancelRequests() {
     service.cancelRequests();
+  }
+
+  private void saveWalletAddress(WalletGenerationModel walletGenerationModel) {
+    if (!walletGenerationModel.hasError()) {
+      walletAddressProvider.saveWalletAddress(walletGenerationModel.getWalletAddress());
+    }
   }
 }

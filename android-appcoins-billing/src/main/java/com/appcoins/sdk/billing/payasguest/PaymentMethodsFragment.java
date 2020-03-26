@@ -17,10 +17,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import cm.aptoide.analytics.AnalyticsManager;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SharedPreferencesRepository;
 import com.appcoins.sdk.billing.WalletInteract;
+import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
+import com.appcoins.sdk.billing.analytics.BillingAnalytics;
+import com.appcoins.sdk.billing.analytics.WalletAddressProvider;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
@@ -46,12 +50,13 @@ import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.install_button;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.next_button;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_error_item_owned;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.CREDIT_CARD;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.INSTALL_WALLET;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.PAYPAL;
 
 public class PaymentMethodsFragment extends Fragment implements PaymentMethodsView {
 
-  public static String CREDIT_CARD_RADIO = "credit_card";
-  public static String PAYPAL_RADIO = "paypal";
-  public static String INSTALL_RADIO = "install";
+  private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static String SELECTED_RADIO_KEY = "selected_radio";
   private IabView iabView;
   private BuyItemProperties buyItemProperties;
@@ -63,11 +68,12 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private SkuPurchase itemAlreadyOwnedPurchase;
   private TranslationsRepository translations;
+  private Context context;
 
   public static PaymentMethodsFragment newInstance(BuyItemProperties buyItemProperties) {
     PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
     Bundle bundle = new Bundle();
-    bundle.putSerializable(AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES, buyItemProperties);
+    bundle.putSerializable(BUY_ITEM_PROPERTIES, buyItemProperties);
     paymentMethodsFragment.setArguments(bundle);
     return paymentMethodsFragment;
   }
@@ -92,24 +98,32 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
     SharedPreferencesRepository sharedPreferencesRepository =
         new SharedPreferencesRepository(getActivity(), SharedPreferencesRepository.TTL_IN_SECONDS);
+    WalletAddressProvider walletAddressProvider =
+        WalletAddressProvider.provideWalletAddressProvider();
     WalletRepository walletRepository =
-        new WalletRepository(backendService, new WalletGenerationMapper());
+        new WalletRepository(backendService, new WalletGenerationMapper(), walletAddressProvider);
+    PaymentMethodsRepository paymentMethodsRepository = new PaymentMethodsRepository(apiService);
+    BillingRepository billingRepository = new BillingRepository(apiService);
+    AnalyticsManager analyticsManager = AnalyticsManagerProvider.provideAnalyticsManager();
+    BillingAnalytics billingAnalytics = new BillingAnalytics(analyticsManager);
+
     WalletInteract walletInteract =
         new WalletInteract(sharedPreferencesRepository, walletRepository);
     GamificationInteract gamificationInteract =
         new GamificationInteract(sharedPreferencesRepository, new GamificationMapper(),
             backendService);
-    PaymentMethodsRepository paymentMethodsRepository = new PaymentMethodsRepository(apiService);
-    BillingRepository billingRepository = new BillingRepository(apiService);
-
-    appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
-    buyItemProperties = (BuyItemProperties) getArguments().getSerializable(
-        AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
-    paymentMethodsPresenter = new PaymentMethodsPresenter(this,
+    PaymentMethodsInteract paymentMethodsInteract =
         new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository,
-            billingRepository),
-        new WalletInstallationIntentBuilder(getActivity().getPackageManager(),
-            getActivity().getPackageName(), getActivity().getApplicationContext()));
+            billingRepository);
+    WalletInstallationIntentBuilder walletInstallationIntentBuilder =
+        new WalletInstallationIntentBuilder(context.getPackageManager(), context.getPackageName(),
+            context.getApplicationContext());
+    appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
+    buyItemProperties = (BuyItemProperties) getArguments().getSerializable(BUY_ITEM_PROPERTIES);
+
+    paymentMethodsPresenter =
+        new PaymentMethodsPresenter(this, paymentMethodsInteract, walletInstallationIntentBuilder,
+            billingAnalytics, buyItemProperties);
   }
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -161,7 +175,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         }
       });
     } else {
-      paymentMethodsPresenter.prepareUi(buyItemProperties);
+      paymentMethodsPresenter.prepareUi();
     }
   }
 
@@ -182,6 +196,12 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     paymentMethodsPresenter.onDestroy();
     paymentMethodsPresenter = null;
     super.onDestroy();
+  }
+
+  @Override public void onDetach() {
+    super.onDetach();
+    context = null;
+    iabView = null;
   }
 
   private void createSpannableString(TextView helpText) {
@@ -213,12 +233,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private void onRadioButtonClicked(RadioButton creditCardButton, RadioButton paypalButton,
       RadioButton installRadioButton, ViewGroup creditWrapper, ViewGroup paypalWrapper,
       ViewGroup installWrapper) {
-    RadioButtonClickListener creditCardListener =
-        new RadioButtonClickListener(PaymentMethodsFragment.CREDIT_CARD_RADIO);
-    RadioButtonClickListener paypalListener =
-        new RadioButtonClickListener(PaymentMethodsFragment.PAYPAL_RADIO);
-    RadioButtonClickListener installListener =
-        new RadioButtonClickListener(PaymentMethodsFragment.INSTALL_RADIO);
+    RadioButtonClickListener creditCardListener = new RadioButtonClickListener(CREDIT_CARD);
+    RadioButtonClickListener paypalListener = new RadioButtonClickListener(PAYPAL);
+    RadioButtonClickListener installListener = new RadioButtonClickListener(INSTALL_WALLET);
 
     creditCardButton.setOnClickListener(creditCardListener);
     paypalButton.setOnClickListener(paypalListener);
@@ -242,7 +259,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private void onCancelButtonClicked(Button cancelButton) {
     cancelButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        paymentMethodsPresenter.onCancelButtonClicked();
+        paymentMethodsPresenter.onCancelButtonClicked(selectedRadioButton);
       }
     });
   }
@@ -313,7 +330,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void setPositiveButtonText(String selectedRadioButton) {
     Button positiveButton = layout.getPositiveButton();
-    if (selectedRadioButton.equals(PaymentMethodsFragment.INSTALL_RADIO)) {
+    if (selectedRadioButton.equals(INSTALL_WALLET)) {
       positiveButton.setText(translations.getString(install_button));
     } else {
       positiveButton.setText(translations.getString(next_button));
@@ -325,10 +342,10 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   }
 
   @Override public void addPayment(String name) {
-    if (name.equalsIgnoreCase(CREDIT_CARD_RADIO)) {
+    if (name.equalsIgnoreCase(CREDIT_CARD)) {
       layout.getCreditCardWrapperLayout()
           .setVisibility(View.VISIBLE);
-    } else {
+    } else if (name.equalsIgnoreCase(PAYPAL)) {
       layout.getPaypalWrapperLayout()
           .setVisibility(View.VISIBLE);
     }
@@ -394,18 +411,22 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     }
   }
 
+  @Override public void sendPurchaseStartEvent(String appcPrice) {
+    iabView.sendPurchaseStartEvent(appcPrice);
+  }
+
   private void setInitialRadioButtonSelected() {
     if (layout.getCreditCardWrapperLayout()
         .getVisibility() == View.VISIBLE) {
-      selectedRadioButton = CREDIT_CARD_RADIO;
+      selectedRadioButton = CREDIT_CARD;
       layout.selectRadioButton(selectedRadioButton);
     } else if (layout.getPaypalWrapperLayout()
         .getVisibility() == View.VISIBLE) {
-      selectedRadioButton = PAYPAL_RADIO;
+      selectedRadioButton = PAYPAL;
       layout.selectRadioButton(selectedRadioButton);
     } else if (layout.getInstallWrapperLayout()
         .getVisibility() == View.VISIBLE) {
-      selectedRadioButton = INSTALL_RADIO;
+      selectedRadioButton = INSTALL_WALLET;
       layout.getPositiveButton()
           .setText(translations.getString(install_button));
       layout.selectRadioButton(selectedRadioButton);
@@ -416,6 +437,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     if (!(context instanceof IabView)) {
       throw new IllegalStateException("PaymentMethodsFragment must be attached to IabActivity");
     }
+    this.context = context;
     iabView = (IabView) context;
   }
 

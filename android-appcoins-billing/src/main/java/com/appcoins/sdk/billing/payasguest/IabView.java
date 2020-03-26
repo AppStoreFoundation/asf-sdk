@@ -41,4 +41,6 @@ interface IabView {
   void redirectToSupportEmail(EmailInfo emailInfo);
 
   boolean hasEmailApplication();
+
+  void sendPurchaseStartEvent(String appcPrice);
 }

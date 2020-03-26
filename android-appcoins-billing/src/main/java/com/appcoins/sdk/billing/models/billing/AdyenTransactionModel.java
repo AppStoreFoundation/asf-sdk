@@ -13,10 +13,11 @@ public class AdyenTransactionModel {
   private final String refusalReason;
   private final int refusalReasonCode;
   private final boolean error;
+  private int responseCode;
 
   public AdyenTransactionModel(String uid, String hash, String orderReference, String status,
       String pspReference, String resultCode, String url, String paymentData, String refusalReason,
-      int refusalReasonCode, boolean error) {
+      int refusalReasonCode, boolean error, int responseCode) {
 
     this.uid = uid;
     this.hash = hash;
@@ -29,9 +30,10 @@ public class AdyenTransactionModel {
     this.refusalReason = refusalReason;
     this.refusalReasonCode = refusalReasonCode;
     this.error = error;
+    this.responseCode = responseCode;
   }
 
-  public AdyenTransactionModel() {
+  public AdyenTransactionModel(int responseCode) {
     this.uid = "";
     this.hash = "";
     this.orderReference = "";
@@ -43,6 +45,7 @@ public class AdyenTransactionModel {
     this.refusalReason = null;
     this.refusalReasonCode = -1;
     this.error = true;
+    this.responseCode = responseCode;
   }
 
   public String getUid() {
@@ -87,5 +90,9 @@ public class AdyenTransactionModel {
 
   public String getPaymentData() {
     return paymentData;
+  }
+
+  public int getResponseCode() {
+    return responseCode;
   }
 }

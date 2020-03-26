@@ -5,12 +5,17 @@ apply plugin: 'com.jfrog.bintray'
 android {
   compileSdkVersion COMPILE_SDK_VERSION
 
+  repositories {
+    maven { url "https://dl.bintray.com/aptoide/Aptoide" }
+  }
+
   defaultConfig {
     minSdkVersion MIN_SDK_VERSION
     targetSdkVersion TARGET_SDK_VERSION
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     versionCode VERSION_CODE
     versionName VERSION_NAME
+    buildConfigField 'String', 'RAKAM_API_KEY', project.RAKAM_API_KEY
   }
 
   buildTypes {
@@ -89,6 +94,7 @@ android {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation 'aptoide-client-v8:aptoide-analytics-core:1.0.3'
 
   testImplementation 'junit:junit:4.12'
   testImplementation 'org.mockito:mockito-core:2.28.2'

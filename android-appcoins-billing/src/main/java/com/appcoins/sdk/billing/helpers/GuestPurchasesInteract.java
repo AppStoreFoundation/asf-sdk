@@ -3,6 +3,7 @@ package com.appcoins.sdk.billing.helpers;
 import android.os.Bundle;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.ResponseCode;
+import com.appcoins.sdk.billing.analytics.WalletAddressProvider;
 import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.models.billing.SkuPurchase;
 import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
@@ -77,7 +78,7 @@ class GuestPurchasesInteract {
   private WalletGenerationModel requestWallet(String walletId) {
     WalletRepository walletRepository = new WalletRepository(
         new BdsService(BuildConfig.BACKEND_BASE, BdsService.TIME_OUT_IN_MILLIS),
-        new WalletGenerationMapper());
+        new WalletGenerationMapper(), WalletAddressProvider.provideWalletAddressProvider());
 
     return walletRepository.requestWalletSync(walletId);
   }

@@ -7,6 +7,8 @@ import android.os.Handler;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.DeveloperPayload;
+import com.appcoins.sdk.billing.analytics.AdyenAnalyticsInteract;
+import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.listeners.NoInfoResponseListener;
 import com.appcoins.sdk.billing.listeners.billing.GetTransactionListener;
 import com.appcoins.sdk.billing.listeners.billing.LoadPaymentInfoListener;
@@ -39,17 +41,19 @@ class AdyenPaymentPresenter {
   private final AdyenPaymentInfo adyenPaymentInfo;
   private final AdyenPaymentInteract adyenPaymentInteract;
   private AdyenErrorCodeMapper adyenErrorCodeMapper;
+  private AdyenAnalyticsInteract analytics;
   private String returnUrl;
   private boolean waitingResult;
   private Map<Handler, Runnable> handlerRunnableMap;
 
   AdyenPaymentPresenter(AdyenPaymentView fragmentView, AdyenPaymentInfo adyenPaymentInfo,
-      AdyenPaymentInteract adyenPaymentInteract, AdyenErrorCodeMapper adyenErrorCodeMapper,
-      String returnUrl) {
+      AdyenPaymentInteract adyenPaymentInteract, AdyenAnalyticsInteract adyenAnalyticsInteract,
+      AdyenErrorCodeMapper adyenErrorCodeMapper, String returnUrl) {
     this.fragmentView = fragmentView;
     this.adyenPaymentInfo = adyenPaymentInfo;
     this.adyenPaymentInteract = adyenPaymentInteract;
     this.adyenErrorCodeMapper = adyenErrorCodeMapper;
+    this.analytics = adyenAnalyticsInteract;
     this.returnUrl = returnUrl;
     this.handlerRunnableMap = new HashMap<>();
     waitingResult = false;
@@ -100,11 +104,12 @@ class AdyenPaymentPresenter {
     } else {
       encryptedCard = cardEncryptor.encryptStoredPaymentFields(cvv, storedPaymentId, "scheme");
     }
-
+    analytics.sendConfirmationEvent(adyenPaymentInfo, BillingAnalytics.EVENT_BUY);
     makePayment(encryptedCard, serverFiatPrice, serverCurrency);
   }
 
   void onCancelClick() {
+    analytics.sendConfirmationEvent(adyenPaymentInfo, BillingAnalytics.EVENT_CANCEL);
     fragmentView.close(false);
   }
 
@@ -155,7 +160,7 @@ class AdyenPaymentPresenter {
 
   private void launchPayment(AdyenPaymentMethodsModel adyenPaymentMethodsModel) {
     if (adyenPaymentInfo.getPaymentMethod()
-        .equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
+        .equals(IabActivity.CREDIT_CARD)) {
       fragmentView.showCreditCardView(adyenPaymentMethodsModel.getStoredMethodDetails());
     } else {
       fragmentView.showLoading();
@@ -194,20 +199,24 @@ class AdyenPaymentPresenter {
     } else {
       fragmentView.navigateToUri(adyenTransactionModel.getUrl(), adyenTransactionModel.getUid());
       waitingResult = true;
-      //Analytics
     }
   }
 
-  void onActivityResult(Uri data, String uid) {
-    JSONObject details = RedirectUtils.parseRedirectResult(data);
-    MakePaymentListener makePaymentListener = new MakePaymentListener() {
-      @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
-        onMakePaymentResponse(adyenTransactionModel);
-      }
-    };
-    adyenPaymentInteract.submitRedirect(uid, adyenPaymentInfo.getWalletAddress(), details, null,
-        makePaymentListener);
-    fragmentView.disableBack();
+  void onActivityResult(Uri data, String uid, boolean success) {
+    if (success) {
+      JSONObject details = RedirectUtils.parseRedirectResult(data);
+      MakePaymentListener makePaymentListener = new MakePaymentListener() {
+        @Override public void onResponse(AdyenTransactionModel adyenTransactionModel) {
+          onMakePaymentResponse(adyenTransactionModel);
+        }
+      };
+      adyenPaymentInteract.submitRedirect(uid, adyenPaymentInfo.getWalletAddress(), details, null,
+          makePaymentListener);
+      fragmentView.disableBack();
+    } else {
+      analytics.sendConfirmationEvent(adyenPaymentInfo, BillingAnalytics.EVENT_CANCEL);
+      fragmentView.close(false);
+    }
   }
 
   void onHelpTextClicked() {
@@ -223,6 +232,7 @@ class AdyenPaymentPresenter {
 
   private void onMakePaymentResponse(AdyenTransactionModel adyenTransactionModel) {
     if (adyenTransactionModel.hasError()) {
+      sendGenericErrorEvent(String.valueOf(adyenTransactionModel.getResponseCode()));
       fragmentView.showError();
       fragmentView.enableBack();
     } else {
@@ -234,21 +244,34 @@ class AdyenPaymentPresenter {
 
   private void handlePaymentResult(String uid, String resultCode, int refusalReasonCode,
       String refusalReason, String status) {
-    if (resultCode.equalsIgnoreCase("AUTHORISED")) {
-      handleSuccessAdyenTransaction(uid);
-    } else if (status.equalsIgnoreCase(Status.CANCELED.toString())) {
+    if (status.equalsIgnoreCase(Status.CANCELED.toString())) {
+      analytics.sendConfirmationEvent(adyenPaymentInfo, BillingAnalytics.EVENT_CANCEL);
       fragmentView.close(false);
-    } else if (refusalReason != null && refusalReasonCode != -1) {
-      if (refusalReasonCode == 24) {
-        fragmentView.unlockRotation();
-        fragmentView.enableBack();
-        fragmentView.showCvvError();
-      } else {
-        String errorMessage = adyenErrorCodeMapper.map(refusalReasonCode);
-        fragmentView.showError(errorMessage);
-      }
     } else {
-      fragmentView.showError();
+      if (adyenPaymentInfo.getPaymentMethod()
+          .equals(IabActivity.PAYPAL)) {
+        analytics.sendConfirmationEvent(adyenPaymentInfo, BillingAnalytics.EVENT_BUY);
+      }
+      if (resultCode.equalsIgnoreCase("AUTHORISED")) {
+        handleSuccessAdyenTransaction(uid);
+      } else if (refusalReason != null && refusalReasonCode != -1) {
+        handleAdyenTransactionError(refusalReason, refusalReasonCode);
+      } else {
+        sendGenericErrorEvent("UNKNOWN ADYEN ERROR");
+        fragmentView.showError();
+      }
+    }
+  }
+
+  private void handleAdyenTransactionError(String refusalReason, int refusalReasonCode) {
+    sendAdyenPaymentErrorEvent(String.valueOf(refusalReasonCode), refusalReason);
+    if (refusalReasonCode == 24) {
+      fragmentView.unlockRotation();
+      fragmentView.enableBack();
+      fragmentView.showCvvError();
+    } else {
+      String errorMessage = adyenErrorCodeMapper.map(refusalReasonCode);
+      fragmentView.showError(errorMessage);
     }
   }
 
@@ -256,12 +279,15 @@ class AdyenPaymentPresenter {
     GetTransactionListener getTransactionListener = new GetTransactionListener() {
       @Override public void onResponse(TransactionResponse transactionResponse) {
         if (transactionResponse.hasError()) {
+          sendGenericErrorEvent(String.valueOf(transactionResponse.getResponseCode()));
           fragmentView.showError();
         } else {
           if (transactionResponse.getStatus()
               .equalsIgnoreCase(String.valueOf(Status.COMPLETED))) {
+            analytics.sendPaymentSuccessEvent(adyenPaymentInfo);
             createBundle(transactionResponse);
           } else if (paymentFailed(transactionResponse.getStatus())) {
+            sendGenericErrorEvent("Transaction Status: " + transactionResponse.getStatus());
             fragmentView.showError();
           } else {
             requestTransaction(uid, 5000, this);
@@ -307,7 +333,7 @@ class AdyenPaymentPresenter {
   }
 
   private AdyenPaymentMethod mapPaymentToService(String paymentType) {
-    if (paymentType.equals(PaymentMethodsFragment.CREDIT_CARD_RADIO)) {
+    if (paymentType.equals(IabActivity.CREDIT_CARD)) {
       return AdyenPaymentMethod.CREDIT_CARD;
     } else {
       return AdyenPaymentMethod.PAYPAL;
@@ -326,6 +352,14 @@ class AdyenPaymentPresenter {
     };
     handlerRunnableMap.put(handler, runnable);
     handler.postDelayed(runnable, delayInMillis);
+  }
+
+  private void sendAdyenPaymentErrorEvent(String refusalCode, String refusalDetails) {
+    analytics.sendPaymentErrorEvent(adyenPaymentInfo, null, refusalCode, refusalDetails);
+  }
+
+  private void sendGenericErrorEvent(String errorCode) {
+    analytics.sendPaymentErrorEvent(adyenPaymentInfo, errorCode, null, null);
   }
 
   void onDestroy() {

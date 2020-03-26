@@ -10,6 +10,9 @@ public class RequestBuilderUtils {
   public static String buildUrl(String baseUrl, String endPoint, List<String> paths,
       Map<String, String> queries) {
     boolean hasQueries = !queries.isEmpty();
+    if (endPoint == null) {
+      endPoint = "";
+    }
     StringBuilder urlBuilder = new StringBuilder(baseUrl + endPoint);
     for (String path : paths) {
       if (path != null) {
@@ -50,6 +53,8 @@ public class RequestBuilderUtils {
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
+    //Encoder transforms "=" into %3D, but it's not needed for paths
+    encodedPath = encodedPath.replaceAll("%3D", "=");
     urlBuilder.append("/")
         .append(encodedPath);
   }
@@ -64,16 +69,23 @@ public class RequestBuilderUtils {
           if (isString(entry.getValue())) {
             value = "\"" + value + "\"";
           }
+          if (isMap(entry.getValue())) {
+            value = buildBody((Map) entry.getValue());
+          }
           builder.append("\"" + entry.getKey() + "\"" + ":" + value)
               .append(",");
         }
       }
-    }
-    if (!bodyKeys.isEmpty()) {
-      builder.deleteCharAt(builder.length() - 1);
+      if (!bodyKeys.isEmpty()) {
+        builder.deleteCharAt(builder.length() - 1);
+      }
     }
     builder.append("}");
     return builder.toString();
+  }
+
+  private static boolean isMap(Object value) {
+    return value instanceof Map;
   }
 
   private static boolean isString(Object value) {

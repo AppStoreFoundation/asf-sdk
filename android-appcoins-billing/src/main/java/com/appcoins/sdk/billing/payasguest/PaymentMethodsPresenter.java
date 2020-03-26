@@ -6,6 +6,7 @@ import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
+import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
 import com.appcoins.sdk.billing.listeners.PurchasesListener;
 import com.appcoins.sdk.billing.listeners.PurchasesModel;
@@ -18,21 +19,29 @@ import com.appcoins.sdk.billing.models.payasguest.PaymentMethod;
 import com.appcoins.sdk.billing.models.payasguest.PaymentMethodsModel;
 import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
 
+import static com.appcoins.sdk.billing.payasguest.IabActivity.CREDIT_CARD;
+import static com.appcoins.sdk.billing.payasguest.IabActivity.PAYPAL;
+
 class PaymentMethodsPresenter {
 
   private final PaymentMethodsView fragmentView;
   private PaymentMethodsInteract paymentMethodsInteract;
   private WalletInstallationIntentBuilder walletInstallationIntentBuilder;
+  private BillingAnalytics billingAnalytics;
+  private BuyItemProperties buyItemProperties;
 
   PaymentMethodsPresenter(PaymentMethodsView view, PaymentMethodsInteract paymentMethodsInteract,
-      WalletInstallationIntentBuilder walletInstallationIntentBuilder) {
+      WalletInstallationIntentBuilder walletInstallationIntentBuilder,
+      BillingAnalytics billingAnalytics, BuyItemProperties buyItemProperties) {
 
     this.fragmentView = view;
     this.paymentMethodsInteract = paymentMethodsInteract;
     this.walletInstallationIntentBuilder = walletInstallationIntentBuilder;
+    this.billingAnalytics = billingAnalytics;
+    this.buyItemProperties = buyItemProperties;
   }
 
-  void prepareUi(final BuyItemProperties buyItemProperties) {
+  void prepareUi() {
     String id = paymentMethodsInteract.retrieveWalletId();
     WalletInteractListener walletInteractListener = new WalletInteractListener() {
       @Override public void walletAddressRetrieved(WalletGenerationModel walletGenerationModel) {
@@ -56,14 +65,17 @@ class PaymentMethodsPresenter {
     paymentMethodsInteract.requestMaxBonus(maxBonusListener);
   }
 
-  void onCancelButtonClicked() {
+  void onCancelButtonClicked(String selectedRadioButton) {
+    sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_CANCEL);
     fragmentView.close(false);
   }
 
   void onPositiveButtonClicked(String selectedRadioButton) {
-    if (selectedRadioButton.equals("paypal") || selectedRadioButton.equals("credit_card")) {
+    if (selectedRadioButton.equals(PAYPAL) || selectedRadioButton.equals(CREDIT_CARD)) {
+      sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       fragmentView.navigateToAdyen(selectedRadioButton);
     } else {
+      sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
       if (intent != null) {
         if (intent.getPackage() != null && intent.getPackage()
@@ -106,6 +118,7 @@ class PaymentMethodsPresenter {
       SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
         @Override public void onResponse(boolean error, SkuDetails skuDetails) {
           if (!error) {
+            paymentMethodsInteract.cacheAppcPrice(skuDetails.getAppcPrice());
             loadPaymentsAvailable(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode());
             fragmentView.setSkuInformation(new SkuDetailsModel(skuDetails.getFiatPrice(),
                 skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
@@ -121,7 +134,7 @@ class PaymentMethodsPresenter {
     }
   }
 
-  private void loadPaymentsAvailable(String fiatPrice, String fiatCurrency) {
+  private void loadPaymentsAvailable(final String fiatPrice, String fiatCurrency) {
     PaymentMethodsListener paymentMethodsListener = new PaymentMethodsListener() {
       @Override public void onResponse(PaymentMethodsModel paymentMethodsModel) {
         if (paymentMethodsModel.hasError() || paymentMethodsModel.getPaymentMethods()
@@ -134,6 +147,7 @@ class PaymentMethodsPresenter {
               fragmentView.addPayment(paymentMethod.getName());
             }
           }
+          fragmentView.sendPurchaseStartEvent(paymentMethodsInteract.getCachedAppcPrice());
           fragmentView.showPaymentView();
         }
       }
@@ -160,5 +174,11 @@ class PaymentMethodsPresenter {
     };
     paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature,
         type.toLowerCase(), purchasesListener);
+  }
+
+  private void sendPaymentMethodEvent(String selectedRadioButton, String action) {
+    billingAnalytics.sendPaymentMethodEvent(buyItemProperties.getPackageName(),
+        buyItemProperties.getSku(), paymentMethodsInteract.getCachedAppcPrice(),
+        selectedRadioButton, buyItemProperties.getType(), action);
   }
 }
