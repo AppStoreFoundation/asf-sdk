@@ -41,6 +41,7 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.getCornerRadiusArray;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.mapDisplayMetrics;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.setBackground;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setConstraint;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
@@ -132,7 +133,7 @@ public class PaymentMethodsFragmentLayout {
     GradientDrawable gradientDrawable = new GradientDrawable();
     gradientDrawable.setColor(Color.WHITE);
     gradientDrawable.setCornerRadius(dpToPx(8));
-    relativeLayout.setBackground(gradientDrawable);
+    setBackground(relativeLayout, gradientDrawable);
 
     ProgressBar progressBar = buildProgressBar();
 
@@ -283,7 +284,7 @@ public class PaymentMethodsFragmentLayout {
     GradientDrawable gradientDrawable = new GradientDrawable();
     gradientDrawable.setColor(Color.WHITE);
     gradientDrawable.setCornerRadius(dpToPx(8));
-    dialogLayout.setBackground(gradientDrawable);
+    setBackground(dialogLayout, gradientDrawable);
 
     int width;
     if (isPortrait) {
@@ -328,13 +329,13 @@ public class PaymentMethodsFragmentLayout {
       layoutParams.addRule(RelativeLayout.BELOW, paymentMethodsId);
       setConstraint(layoutParams, RelativeLayout.LEFT_OF, buttonsViewId);
       setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_LEFT);
-      setMargins(layoutParams, 18, 24, 0, 16);
+      setMargins(layoutParams, 18, 24, 96, 16);
     }
 
     GradientDrawable gradientDrawable = new GradientDrawable();
     gradientDrawable.setColor(Color.parseColor("#f0f0f0"));
     gradientDrawable.setCornerRadii(radius);
-    linearLayout.setBackground(gradientDrawable);
+    setBackground(linearLayout, gradientDrawable);
 
     linearLayout.setOrientation(LinearLayout.HORIZONTAL);
     linearLayout.setGravity(Gravity.CENTER);
@@ -356,6 +357,8 @@ public class PaymentMethodsFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#202020"));
     textView.setTextSize(12);
+    textView.setEllipsize(TextUtils.TruncateAt.END);
+    textView.setMaxLines(2);
     textView.setLayoutParams(layoutParams);
     return textView;
   }
@@ -450,7 +453,7 @@ public class PaymentMethodsFragmentLayout {
     enableBackground.setStroke(dpToPx(1), Color.WHITE);
     enableBackground.setCornerRadius(dpToPx(16));
     button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-    button.setBackground(enableBackground);
+    setBackground(button, enableBackground);
 
     GradientDrawable disableBackground = new GradientDrawable();
     disableBackground.setShape(GradientDrawable.RECTANGLE);
@@ -464,7 +467,7 @@ public class PaymentMethodsFragmentLayout {
     stateListDrawable.addState(new int[] { android.R.attr.state_enabled }, enableBackground);
     stateListDrawable.addState(new int[] { -android.R.attr.state_enabled }, disableBackground);
 
-    button.setBackground(stateListDrawable);
+    setBackground(button, stateListDrawable);
 
     button.setMaxWidth(dpToPx(142));
     button.setMinWidth(dpToPx(96));
@@ -488,7 +491,7 @@ public class PaymentMethodsFragmentLayout {
     background.setStroke(dpToPx(1), Color.WHITE);
     background.setCornerRadius(dpToPx(6));
     button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-    button.setBackground(background);
+    setBackground(button, background);
     button.setMaxWidth(dpToPx(126));
     button.setMinWidth(dpToPx(80));
 
@@ -564,7 +567,7 @@ public class PaymentMethodsFragmentLayout {
     background.setShape(GradientDrawable.RECTANGLE);
     background.setStroke(dpToPx(1), Color.parseColor("#e3e3e3"));
     background.setCornerRadius(dpToPx(6));
-    relativeLayout.setBackground(background);
+    setBackground(relativeLayout, background);
     setMargins(layoutParams, start, top, 0, 0);
     relativeLayout.setLayoutParams(layoutParams);
 
@@ -723,7 +726,7 @@ public class PaymentMethodsFragmentLayout {
     background.setShape(GradientDrawable.RECTANGLE);
     background.setStroke(dpToPx(1), Color.parseColor("#e3e3e3"));
     background.setCornerRadius(dpToPx(6));
-    relativeLayout.setBackground(background);
+    setBackground(relativeLayout, background);
     setMargins(layoutParams, start, top, 0, 0);
     relativeLayout.setLayoutParams(layoutParams);
 
@@ -815,7 +818,7 @@ public class PaymentMethodsFragmentLayout {
     background.setShape(GradientDrawable.RECTANGLE);
     background.setStroke(dpToPx(1), Color.parseColor("#e3e3e3"));
     background.setCornerRadius(dpToPx(6));
-    relativeLayout.setBackground(background);
+    setBackground(relativeLayout, background);
     relativeLayout.setLayoutParams(layoutParams);
 
     ImageView creditCardImage = buildCreditCardImage();
@@ -999,25 +1002,25 @@ public class PaymentMethodsFragmentLayout {
       GradientDrawable defaultGradientDrawable = getDefaultGradientDrawable();
 
       if (selectedRadioButton.equals(IabActivity.CREDIT_CARD)) {
-        creditCardWrapperLayout.setBackground(selectedGradientDrawable);
-        paypalWrapperLayout.setBackground(defaultGradientDrawable);
-        installWrapperLayout.setBackground(defaultGradientDrawable);
+        setBackground(creditCardWrapperLayout, selectedGradientDrawable);
+        setBackground(paypalWrapperLayout, defaultGradientDrawable);
+        setBackground(installWrapperLayout, defaultGradientDrawable);
 
         creditCardRadioButton.setChecked(true);
         paypalRadioButton.setChecked(false);
         installRadioButton.setChecked(false);
       } else if (selectedRadioButton.equals(IabActivity.PAYPAL)) {
-        paypalWrapperLayout.setBackground(selectedGradientDrawable);
-        creditCardWrapperLayout.setBackground(defaultGradientDrawable);
-        installWrapperLayout.setBackground(defaultGradientDrawable);
+        setBackground(paypalWrapperLayout, selectedGradientDrawable);
+        setBackground(creditCardWrapperLayout, defaultGradientDrawable);
+        setBackground(installWrapperLayout, defaultGradientDrawable);
 
         creditCardRadioButton.setChecked(false);
         paypalRadioButton.setChecked(true);
         installRadioButton.setChecked(false);
       } else {
-        installWrapperLayout.setBackground(selectedGradientDrawable);
-        creditCardWrapperLayout.setBackground(defaultGradientDrawable);
-        paypalWrapperLayout.setBackground(defaultGradientDrawable);
+        setBackground(installWrapperLayout, selectedGradientDrawable);
+        setBackground(creditCardWrapperLayout, defaultGradientDrawable);
+        setBackground(paypalWrapperLayout, defaultGradientDrawable);
 
         creditCardRadioButton.setChecked(false);
         paypalRadioButton.setChecked(false);

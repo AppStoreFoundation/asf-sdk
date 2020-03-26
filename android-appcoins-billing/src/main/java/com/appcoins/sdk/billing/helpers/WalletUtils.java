@@ -183,4 +183,8 @@ public class WalletUtils {
     }
     return displayMetrics;
   }
+
+  public static boolean deviceSupportsWallet(int sdkInt) {
+    return sdkInt >= Build.VERSION_CODES.LOLLIPOP;
+  }
 }

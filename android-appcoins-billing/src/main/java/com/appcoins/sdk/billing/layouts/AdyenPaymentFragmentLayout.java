@@ -50,6 +50,7 @@ import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.getCornerRadiusArray;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.mapDisplayMetrics;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.setBackground;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setConstraint;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
@@ -154,7 +155,7 @@ public class AdyenPaymentFragmentLayout {
     GradientDrawable gradientDrawable = new GradientDrawable();
     gradientDrawable.setColor(Color.WHITE);
     gradientDrawable.setCornerRadius(dpToPx(8));
-    relativeLayout.setBackground(gradientDrawable);
+    setBackground(relativeLayout, gradientDrawable);
 
     ProgressBar progressBar = buildProgressBar();
 
@@ -170,7 +171,7 @@ public class AdyenPaymentFragmentLayout {
     GradientDrawable gradientDrawable = new GradientDrawable();
     gradientDrawable.setColor(Color.WHITE);
     gradientDrawable.setCornerRadius(dpToPx(8));
-    dialogLayout.setBackground(gradientDrawable);
+    setBackground(dialogLayout, gradientDrawable);
 
     int width;
     if (isPortrait) {
@@ -221,13 +222,13 @@ public class AdyenPaymentFragmentLayout {
       layoutParams.addRule(RelativeLayout.BELOW, creditCardViewId);
       setConstraint(layoutParams, RelativeLayout.LEFT_OF, buttonsViewId);
       setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_LEFT);
-      setMargins(layoutParams, 18, 42, 0, 16);
+      setMargins(layoutParams, 18, 42, 96, 16);
     }
 
     GradientDrawable gradientDrawable = new GradientDrawable();
     gradientDrawable.setColor(Color.parseColor("#f0f0f0"));
     gradientDrawable.setCornerRadii(radius);
-    linearLayout.setBackground(gradientDrawable);
+    setBackground(linearLayout, gradientDrawable);
 
     linearLayout.setOrientation(LinearLayout.HORIZONTAL);
     linearLayout.setGravity(Gravity.CENTER);
@@ -313,8 +314,6 @@ public class AdyenPaymentFragmentLayout {
     enableBackground.setShape(GradientDrawable.RECTANGLE);
     enableBackground.setStroke(dpToPx(1), Color.WHITE);
     enableBackground.setCornerRadius(dpToPx(16));
-    button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-    button.setBackground(enableBackground);
 
     GradientDrawable disableBackground = new GradientDrawable();
     disableBackground.setShape(GradientDrawable.RECTANGLE);
@@ -328,7 +327,7 @@ public class AdyenPaymentFragmentLayout {
     stateListDrawable.addState(new int[] { android.R.attr.state_enabled }, enableBackground);
     stateListDrawable.addState(new int[] { -android.R.attr.state_enabled }, disableBackground);
 
-    button.setBackground(stateListDrawable);
+    setBackground(button, stateListDrawable);
 
     button.setMaxWidth(dpToPx(142));
     button.setMinWidth(dpToPx(96));
@@ -352,7 +351,7 @@ public class AdyenPaymentFragmentLayout {
     background.setStroke(dpToPx(1), Color.WHITE);
     background.setCornerRadius(dpToPx(6));
     button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-    button.setBackground(background);
+    setBackground(button, background);
     button.setMaxWidth(dpToPx(126));
     button.setMinWidth(dpToPx(80));
 
@@ -462,7 +461,7 @@ public class AdyenPaymentFragmentLayout {
     background.setShape(GradientDrawable.RECTANGLE);
     background.setStroke(dpToPx(1), Color.parseColor("#fd7a6a"));
     background.setCornerRadius(dpToPx(6));
-    creditCardLayout.setBackground(background);
+    setBackground(creditCardLayout, background);
 
     ImageView genericCardView = buildGenericCardView();
     cardNumberEditText = buildCardNumberEditText();

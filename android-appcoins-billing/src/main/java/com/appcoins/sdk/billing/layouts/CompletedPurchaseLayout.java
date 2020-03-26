@@ -18,6 +18,7 @@ import java.io.InputStream;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_title_long;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.COMPLETED_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.setBackground;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
 
 class CompletedPurchaseLayout {
@@ -42,7 +43,7 @@ class CompletedPurchaseLayout {
     GradientDrawable gradientDrawable = new GradientDrawable();
     gradientDrawable.setColor(Color.WHITE);
     gradientDrawable.setCornerRadius(dpToPx(8));
-    purchaseLayout.setBackground(gradientDrawable);
+    setBackground(purchaseLayout, gradientDrawable);
 
     int width;
     if (isPortrait) {
@@ -55,12 +56,12 @@ class CompletedPurchaseLayout {
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
     purchaseLayout.setOrientation(LinearLayout.VERTICAL);
 
-    ImageView appIcon = createAppIconLayout();
+    ImageView completedImage = createCompletedImageLayout();
     TextView purchaseDoneView = createPurchaseDoneView();
     TextView purchaseDetailsView = createPurchaseDetailsView(fiatPrice, fiatCurrency, sku);
 
     purchaseLayout.setLayoutParams(layoutParams);
-    purchaseLayout.addView(appIcon);
+    purchaseLayout.addView(completedImage);
     purchaseLayout.addView(purchaseDoneView);
     purchaseLayout.addView(purchaseDetailsView);
 
@@ -109,7 +110,7 @@ class CompletedPurchaseLayout {
     return textView;
   }
 
-  private ImageView createAppIconLayout() {
+  private ImageView createCompletedImageLayout() {
 
     ImageView imageView = new ImageView(activity);
 

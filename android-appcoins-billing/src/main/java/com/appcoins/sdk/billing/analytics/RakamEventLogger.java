@@ -20,11 +20,14 @@ import java.util.UUID;
 class RakamEventLogger implements EventLogger {
 
   private BdsService rakamService;
+  private WalletAddressProvider walletAddressProvider;
   private Context context;
 
-  RakamEventLogger(BdsService rakamService, Context context) {
+  RakamEventLogger(BdsService rakamService, WalletAddressProvider walletAddressProvider,
+      Context context) {
 
     this.rakamService = rakamService;
+    this.walletAddressProvider = walletAddressProvider;
     this.context = context;
   }
 
@@ -64,6 +67,7 @@ class RakamEventLogger implements EventLogger {
     properties.put("_os_version", Build.VERSION.RELEASE);
     properties.put("_platform", "Android");
     properties.put("_session_id", WalletUtils.getPayAsGuestSessionId());
+    putIfNotNull(properties, "_user", walletAddressProvider.getWalletAddress());
     putIfNotNull(properties, "_version_name", getVersionName());
     properties.put("version_code", getVersionCode());
     addData(properties, data);
@@ -97,13 +101,14 @@ class RakamEventLogger implements EventLogger {
   }
 
   private String getCarrier() {
+    String carrier = null;
     try {
       TelephonyManager manager =
           (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-      return manager.getNetworkOperatorName();
+      carrier = manager.getNetworkOperatorName();
     } catch (Exception ignored) {
     }
-    return null;
+    return carrier;
   }
 
   private String getLanguage() {
@@ -118,28 +123,31 @@ class RakamEventLogger implements EventLogger {
   }
 
   private String getVersionName() {
-    PackageInfo packageInfo;
+    String versionName = null;
     try {
-      packageInfo = context.getPackageManager()
-          .getPackageInfo(context.getPackageName(), 0);
-      return packageInfo.versionName;
+      PackageInfo packageInfo = getPackageInfo(context);
+      versionName = packageInfo.versionName;
     } catch (PackageManager.NameNotFoundException ignored) {
     }
-    return null;
+    return versionName;
   }
 
   private long getVersionCode() {
-    PackageInfo packageInfo;
+    long versionCode = -1;
     try {
-      packageInfo = context.getPackageManager()
-          .getPackageInfo(context.getPackageName(), 0);
+      PackageInfo packageInfo = getPackageInfo(context);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        return packageInfo.getLongVersionCode();
+        versionCode = packageInfo.getLongVersionCode();
       } else {
-        return packageInfo.versionCode;
+        versionCode = packageInfo.versionCode;
       }
     } catch (PackageManager.NameNotFoundException ignored) {
     }
-    return -1;
+    return versionCode;
+  }
+
+  private PackageInfo getPackageInfo(Context context) throws PackageManager.NameNotFoundException {
+    return context.getPackageManager()
+        .getPackageInfo(context.getPackageName(), 0);
   }
 }

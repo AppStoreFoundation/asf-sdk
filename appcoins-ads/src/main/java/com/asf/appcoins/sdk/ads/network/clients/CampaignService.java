@@ -19,7 +19,6 @@ public class CampaignService implements Runnable {
 
   public static final String PACKAGE_NAME = "packageName";
   public static final String VER_CODE = "vercode";
-  public static final String COUNTRY_CODE = "countryCode";
   public static final String SORT = "sort";
   public static final String BY = "by";
   public static final String VALID = "valid";
@@ -29,7 +28,6 @@ public class CampaignService implements Runnable {
   protected final Interceptor interceptor;
   protected GetResponseHandler getResponseHandler;
   protected URL urlConnection;
-  protected String concat;
   private String packageName;
   private int versionCode;
 
@@ -63,8 +61,8 @@ public class CampaignService implements Runnable {
 
     HttpURLConnection connection = (HttpURLConnection) urlConnection.openConnection();
     connection.setRequestMethod("GET");
-    Map<String, List<String>> requestProperties = connection.getRequestProperties();
     connection.setRequestProperty("User-Agent", WalletUtils.getUserAgent());
+    Map<String, List<String>> requestProperties = connection.getRequestProperties();
 
     connection.connect();
 

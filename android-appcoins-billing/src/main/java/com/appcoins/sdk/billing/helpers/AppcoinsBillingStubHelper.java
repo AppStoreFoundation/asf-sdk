@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
@@ -58,15 +59,17 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
 
   @Override public int isBillingSupported(int apiVersion, String packageName, String type) {
     int responseCode = ResponseCode.SERVICE_UNAVAILABLE.getValue();
-    if (WalletUtils.hasWalletInstalled()) {
-      try {
-        responseCode = serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
-      } catch (RemoteException e) {
-        e.printStackTrace();
-      }
-    } else {
-      if (isSupported(type, apiVersion)) {
-        responseCode = ResponseCode.OK.getValue();
+    if (!isDeviceVersionSupported()) {
+      if (WalletUtils.hasWalletInstalled()) {
+        try {
+          responseCode = serviceAppcoinsBilling.isBillingSupported(apiVersion, packageName, type);
+        } catch (RemoteException e) {
+          e.printStackTrace();
+        }
+      } else {
+        if (isSupported(type, apiVersion)) {
+          responseCode = ResponseCode.OK.getValue();
+        }
       }
     }
     return responseCode;
@@ -132,7 +135,13 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
           .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
         intent = IabActivity.newIntent(context, buyItemProperties);
       } else {
-        intent = InstallDialogActivity.newIntent(context, buyItemProperties);
+        if (WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
+          intent = InstallDialogActivity.newIntent(context, buyItemProperties);
+        } else {
+          Bundle bundle = new Bundle();
+          bundle.putInt(Utils.RESPONSE_CODE, ResponseCode.BILLING_UNAVAILABLE.getValue());
+          return bundle;
+        }
       }
       WalletUtils.setPayAsGuestSessionId();
       PendingIntent pendingIntent =
@@ -159,15 +168,13 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     } else {
       String walletId = getWalletId();
       if (walletId != null && type.equalsIgnoreCase("INAPP")) {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
         BillingRepository billingRepository =
             new BillingRepository(new BdsService(BuildConfig.HOST_WS, 30000));
         GuestPurchasesInteract guestPurchaseInteract =
             new GuestPurchasesInteract(billingRepository);
 
-        guestPurchaseInteract.mapGuestPurchases(bundleResponse, walletId, packageName, type,
-            countDownLatch);
-        waitForPurchases(countDownLatch);
+        bundleResponse =
+            guestPurchaseInteract.mapGuestPurchases(bundleResponse, walletId, packageName, type);
       }
     }
     return bundleResponse;
@@ -182,7 +189,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       } else {
         String walletId = getWalletId();
         if (walletId != null && apiVersion == SUPPORTED_API_VERSION) {
-          responseCode = consumeGuestPurchase(walletId, apiVersion, packageName, purchaseToken);
+          responseCode = consumeGuestPurchase(walletId, packageName, purchaseToken);
         } else {
           responseCode = ResponseCode.OK.getValue();
         }
@@ -193,23 +200,12 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     return responseCode;
   }
 
-  private int consumeGuestPurchase(String walletId, int apiVersion, String packageName,
-      String purchaseToken) {
-    int[] responseCode = new int[1]; //Generic error
-    CountDownLatch countDownLatch = new CountDownLatch(1);
+  private int consumeGuestPurchase(String walletId, String packageName, String purchaseToken) {
     BillingRepository billingRepository =
-        new BillingRepository(new BdsService(BuildConfig.HOST_WS, 30000));
+        new BillingRepository(new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS));
     GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract(billingRepository);
 
-    guestPurchaseInteract.consumeGuestPurchase(walletId, packageName, purchaseToken, responseCode,
-        countDownLatch);
-
-    try {
-      countDownLatch.await(MESSAGE_RESPONSE_WAIT_TIMEOUT_IN_MILLIS, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    return responseCode[0];
+    return guestPurchaseInteract.consumeGuestPurchase(walletId, packageName, purchaseToken);
   }
 
   private void waitForPurchases(CountDownLatch countDownLatch) {
@@ -311,6 +307,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
 
   private boolean isSupported(String type, int apiVersion) {
     return type.equalsIgnoreCase("inapp") && apiVersion == SUPPORTED_API_VERSION;
+  }
+
+  private boolean isDeviceVersionSupported() {
+    return Build.VERSION.SDK_INT >= BuildConfig.MIN_SDK_VERSION;
   }
 
   public static abstract class Stub {

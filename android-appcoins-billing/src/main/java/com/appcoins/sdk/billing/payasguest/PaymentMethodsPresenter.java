@@ -8,6 +8,7 @@ import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WalletInteractListener;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.WalletInstallationIntentBuilder;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.listeners.PurchasesListener;
 import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
@@ -58,16 +59,16 @@ class PaymentMethodsPresenter {
   }
 
   void onCancelButtonClicked(String selectedRadioButton) {
-    sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_CANCEL);
+    sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_CANCEL);
     fragmentView.close(false);
   }
 
   void onPositiveButtonClicked(String selectedRadioButton) {
     if (isAdyen(selectedRadioButton)) {
-      sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
+      sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       fragmentView.navigateToAdyen(selectedRadioButton);
     } else {
-      sendRakamPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
+      sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
       handleIntent(intent);
     }
@@ -108,13 +109,13 @@ class PaymentMethodsPresenter {
                 skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
                 skuDetails.getSku()));
           } else {
-            fragmentView.showInstallDialog();
+            handleShowInstallDialog();
           }
         }
       };
       paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
     } else {
-      fragmentView.showInstallDialog();
+      handleShowInstallDialog();
     }
   }
 
@@ -124,12 +125,15 @@ class PaymentMethodsPresenter {
         if (paymentMethodsModel.hasError() || paymentMethodsModel.getPaymentMethods()
             .isEmpty()) {
           paymentMethodsInteract.cancelRequests();
-          fragmentView.showInstallDialog();
+          handleShowInstallDialog();
         } else {
           for (PaymentMethod paymentMethod : paymentMethodsModel.getPaymentMethods()) {
             if (paymentMethod.isAvailable()) {
               fragmentView.addPayment(paymentMethod.getName());
             }
+          }
+          if (!WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
+            fragmentView.hideInstallOption();
           }
           fragmentView.sendPurchaseStartEvent(paymentMethodsInteract.getCachedAppcPrice());
           fragmentView.showPaymentView();
@@ -163,7 +167,15 @@ class PaymentMethodsPresenter {
         .equals(sku);
   }
 
-  private void sendRakamPaymentMethodEvent(String selectedRadioButton, String action) {
+  private void handleShowInstallDialog() {
+    if (WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
+      fragmentView.showInstallDialog();
+    } else {
+      fragmentView.closeWithBillingUnavailable();
+    }
+  }
+
+  private void sendPaymentMethodEvent(String selectedRadioButton, String action) {
     billingAnalytics.sendPaymentMethodEvent(buyItemProperties.getPackageName(),
         buyItemProperties.getSku(), paymentMethodsInteract.getCachedAppcPrice(),
         selectedRadioButton, buyItemProperties.getType(), action);
@@ -176,7 +188,7 @@ class PaymentMethodsPresenter {
 
   private WalletInteractListener createWalletInteractListener() {
     return new WalletInteractListener() {
-      @Override public void walletIdRetrieved(WalletGenerationModel walletGenerationModel) {
+      @Override public void walletAddressRetrieved(WalletGenerationModel walletGenerationModel) {
         fragmentView.saveWalletInformation(walletGenerationModel);
         provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
         checkForUnconsumedPurchased(buyItemProperties.getPackageName(), buyItemProperties.getSku(),

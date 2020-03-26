@@ -15,25 +15,27 @@ public class AnalyticsManagerProvider {
       int timeout = 30000; // should later be updated for static variable in BdsService
       BdsService rakamService =
           new BdsService("https://rakam-api.aptoide.com/event/collect", timeout);
+      WalletAddressProvider walletAddressProvider =
+          WalletAddressProvider.provideWalletAddressProvider();
+      RakamEventLogger rakamEventLogger =
+          new RakamEventLogger(rakamService, walletAddressProvider, WalletUtils.context);
 
-      RakamEventLogger rakamEventLogger = new RakamEventLogger(rakamService, WalletUtils.context);
-
-      return new AnalyticsManager.Builder().addLogger(rakamEventLogger, provideRakamEventList())
-          .setAnalyticsNormalizer(new KeysNormalizer())
-          .setKnockLogger(new EmptyKnockLogger())
-          .setDebugLogger(new DebugLogger())
-          .build();
-    } else {
-      return analyticsManagerInstance;
+      analyticsManagerInstance =
+          new AnalyticsManager.Builder().addLogger(rakamEventLogger, provideRakamEventList())
+              .setAnalyticsNormalizer(new KeysNormalizer())
+              .setKnockLogger(new EmptyKnockLogger())
+              .setDebugLogger(new DebugLogger())
+              .build();
     }
+    return analyticsManagerInstance;
   }
 
   private static List<String> provideRakamEventList() {
     List<String> list = new ArrayList<>();
-    list.add(BillingAnalytics.RAKAM_PAYMENT_METHOD);
-    list.add(BillingAnalytics.RAKAM_PAYMENT_CONFIRMATION);
-    list.add(BillingAnalytics.RAKAM_PAYMENT_CONCLUSION);
-    list.add(BillingAnalytics.RAKAM_PAYMENT_START);
+    list.add(BillingAnalytics.PAYMENT_METHOD);
+    list.add(BillingAnalytics.PAYMENT_CONFIRMATION);
+    list.add(BillingAnalytics.PAYMENT_CONCLUSION);
+    list.add(BillingAnalytics.PAYMENT_START);
     return list;
   }
 }

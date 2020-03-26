@@ -49,6 +49,7 @@ import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_body;
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_button;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.setBackground;
 
 public class InstallDialogActivity extends Activity {
 
@@ -143,7 +144,7 @@ public class InstallDialogActivity extends Activity {
     if (firstImpression) {
       billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
           buyItemProperties.getSku(), "0.0", buyItemProperties.getType(),
-          BillingAnalytics.RAKAM_START_INSTALL);
+          BillingAnalytics.START_INSTALL);
       firstImpression = false;
     }
   }
@@ -287,7 +288,7 @@ public class InstallDialogActivity extends Activity {
     GradientDrawable installButtonDrawable = new GradientDrawable();
     installButtonDrawable.setColor(Color.parseColor(INSTALL_BUTTON_COLOR));
     installButtonDrawable.setCornerRadius(dpToPx(16));
-    installButton.setBackground(installButtonDrawable);
+    setBackground(installButton, installButtonDrawable);
 
     RelativeLayout.LayoutParams installButtonParams =
         new RelativeLayout.LayoutParams(dpToPx(110), dpToPx(36));

@@ -15,6 +15,7 @@ import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.pur
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.title_dialog_error;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.setBackground;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setConstraint;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setPadding;
@@ -44,7 +45,7 @@ public class PaymentErrorViewLayout {
     GradientDrawable gradientDrawable = new GradientDrawable();
     gradientDrawable.setColor(Color.WHITE);
     gradientDrawable.setCornerRadius(dpToPx(8));
-    relativeLayout.setBackground(gradientDrawable);
+    setBackground(relativeLayout, gradientDrawable);
 
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
 
@@ -87,7 +88,7 @@ public class PaymentErrorViewLayout {
     enableBackground.setStroke(dpToPx(1), Color.WHITE);
     enableBackground.setCornerRadius(dpToPx(16));
     button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-    button.setBackground(enableBackground);
+    setBackground(button, enableBackground);
 
     button.setMaxWidth(dpToPx(126));
     button.setMinWidth(dpToPx(80));
