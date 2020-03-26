@@ -23,11 +23,18 @@ import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.payasguest.PaymentMethodsFragment;
 import com.appcoins.sdk.billing.utils.PaymentErrorViewLayout;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.cancel_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_as_guest_credit_card;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_as_guest_paypal;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_as_guest_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_with_wallet_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.next_button;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.BUTTONS_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.IMAGES_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
@@ -75,6 +82,7 @@ public class PaymentMethodsFragmentLayout {
   private TextView installSecondaryText;
   private ViewGroup intentLoadingView;
   private PaymentErrorViewLayout paymentErrorViewLayout;
+  private TranslationsRepository translations;
 
   public PaymentMethodsFragmentLayout(Activity activity, int orientation,
       BuyItemProperties buyItemProperties) {
@@ -84,6 +92,7 @@ public class PaymentMethodsFragmentLayout {
   }
 
   public View build() {
+    translations = TranslationsRepository.getInstance(activity);
     DisplayMetrics displayMetrics = new DisplayMetrics();
     activity.getWindowManager()
         .getDefaultDisplay()
@@ -391,7 +400,7 @@ public class PaymentMethodsFragmentLayout {
     setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.WHITE);
     button.setTextSize(14);
-    button.setText("NEXT".toUpperCase());
+    button.setText(translations.getString(next_button));
     button.setLayoutParams(layoutParams);
     return button;
   }
@@ -401,6 +410,7 @@ public class PaymentMethodsFragmentLayout {
     LinearLayout.LayoutParams layoutParams =
         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(36));
     layoutParams.gravity = Gravity.CENTER_VERTICAL;
+    setMargins(layoutParams, 0, 0, 16, 0);
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
     background.setStroke(dpToPx(1), Color.WHITE);
@@ -413,7 +423,7 @@ public class PaymentMethodsFragmentLayout {
     setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.parseColor("#8a000000"));
     button.setTextSize(14);
-    button.setText("Cancel".toUpperCase());
+    button.setText(translations.getString(cancel_button));
     button.setLayoutParams(layoutParams);
     return button;
   }
@@ -536,7 +546,7 @@ public class PaymentMethodsFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.BLACK);
     textView.setTextSize(textSize);
-    textView.setText("Pay with AppCoins Wallet");
+    textView.setText(translations.getString(iab_pay_with_wallet_title));
     textView.setLayoutParams(layoutParams);
     return textView;
   }
@@ -683,7 +693,7 @@ public class PaymentMethodsFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.BLACK);
     textView.setTextSize(textSize);
-    textView.setText("Using Paypal");
+    textView.setText(translations.getString(iab_pay_as_guest_paypal));
     textView.setLayoutParams(layoutParams);
     return textView;
   }
@@ -847,7 +857,7 @@ public class PaymentMethodsFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.BLACK);
     textView.setTextSize(textSize);
-    textView.setText("Using Credit Card");
+    textView.setText(translations.getString(iab_pay_as_guest_credit_card));
     textView.setLayoutParams(layoutParams);
     return textView;
   }
@@ -871,7 +881,7 @@ public class PaymentMethodsFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#000000"));
     textView.setTextSize(14);
-    textView.setText("Pay as Guest");
+    textView.setText(translations.getString(iab_pay_as_guest_title));
     textView.setLayoutParams(layoutParams);
     return textView;
   }

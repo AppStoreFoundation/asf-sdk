@@ -1,9 +1,21 @@
 package com.appcoins.sdk.billing.payasguest;
 
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
+
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_expired;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_general_1;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_general_2;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_invalid_details;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_no_funds;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_not_supported;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.purchase_card_error_security;
+
 public class AdyenErrorCodeMapper {
 
-  public AdyenErrorCodeMapper() {
+  private TranslationsRepository translations;
 
+  AdyenErrorCodeMapper(TranslationsRepository translations) {
+    this.translations = translations;
   }
 
   public String map(int errorCode) {
@@ -16,28 +28,25 @@ public class AdyenErrorCodeMapper {
       case 26: //Revocation of Auth
       case 27: //Declined non generic
       case 31: //Issuer suspected fraud
-        return "The transaction has been rejected by your bank. Please try with a different card "
-            + "or contact us.";
+        return translations.getString(purchase_card_error_general_2);
       case 3: //Referral
       case 4: //Acquirer error
       case 9: //Issuer unavailable
-        return "There was a problem with your card. Please try again or contact us.";
+        return translations.getString(purchase_card_error_general_1);
       case 6: //Expired Card
-        return "It seems your card has expired. Please try with a different one.";
+        return translations.getString(purchase_card_error_expired);
       case 7: //Invalid amount
       case 12: //Not enough balance
       case 25: //Restricted Card
-        return "It seems you don\\'t have enough funds or there\\'s a limit on your card. Please "
-            + "try with a different one.";
-      case 8: //Invalid card number
-        return "Are you sure your card number is correct? Please check and try again.";
+        return translations.getString(purchase_card_error_no_funds);
       case 10: //Not supported
-        return "Your card type is not supported yet. Try with a different one.";
+        return translations.getString(purchase_card_error_not_supported);
       case 17: //Incorrect online pin
       case 18: //Pin tries exceeded
-        return "Are you sure the security information is correct? Please try again.";
+        return translations.getString(purchase_card_error_security);
+      case 8: //Invalid card number
       default:
-        return "Are you sure your card number is correct? Please check and try again.";
+        return translations.getString(purchase_card_error_invalid_details);
     }
   }
 }

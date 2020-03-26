@@ -17,12 +17,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import com.appcoins.sdk.billing.helpers.TranslationsModel;
-import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.poa_wallet_not_installed_notification_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.poa_wallet_not_installed_notification_title;
 
 public class WalletUtils {
 
@@ -253,23 +255,14 @@ public class WalletUtils {
     builder = new Notification.Builder(context, channelId);
     builder.setContentIntent(pendingIntent);
 
-    TranslationsModel translationsModel = fetchTranslations();
+    TranslationsRepository translations = TranslationsRepository.getInstance(context);
 
     builder.setSmallIcon(intent.getExtras()
         .getInt(IDENTIFIER_KEY))
         .setAutoCancel(true)
-        .setContentTitle(translationsModel.getPoaNotificationTitle())
-        .setContentText(translationsModel.getPoaNotificationBody());
+        .setContentTitle(translations.getString(poa_wallet_not_installed_notification_title))
+        .setContentText(translations.getString(poa_wallet_not_installed_notification_body));
     return builder.build();
-  }
-
-  private static TranslationsModel fetchTranslations() {
-    Locale locale = Locale.getDefault();
-    TranslationsXmlParser translationsParser = new TranslationsXmlParser(context);
-    if (iabAction.equals(com.appcoins.billing.sdk.BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
-      return translationsParser.parseTranslationXml("fa", "IR");
-    }
-    return translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
   }
 
   private static boolean isAppInstalled(String packageName, PackageManager packageManager) {
@@ -315,13 +308,13 @@ public class WalletUtils {
     builder.setContentIntent(pendingIntent);
     builder.setVibrate(new long[0]);
 
-    TranslationsModel translationsModel = fetchTranslations();
+    TranslationsRepository translations = TranslationsRepository.getInstance(context);
 
     builder.setSmallIcon(intent.getExtras()
         .getInt(IDENTIFIER_KEY))
         .setAutoCancel(true)
-        .setContentTitle(translationsModel.getPoaNotificationTitle())
-        .setContentText(translationsModel.getPoaNotificationBody());
+        .setContentTitle(translations.getString(poa_wallet_not_installed_notification_title))
+        .setContentText(translations.getString(poa_wallet_not_installed_notification_body));
 
     return builder.build();
   }

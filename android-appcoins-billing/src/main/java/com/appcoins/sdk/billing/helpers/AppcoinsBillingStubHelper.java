@@ -126,7 +126,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
 
       final Context context = WalletUtils.getContext();
       Intent intent;
-      if (type.equalsIgnoreCase("inapp") && sku != null && !sku.isEmpty()) {
+      if (hasRequiredFields(type, sku) && !WalletUtils.getIabAction()
+          .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
         intent = new Intent(context, IabActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
       } else {
@@ -244,6 +245,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       }, Context.BIND_AUTO_CREATE);
     }
     return false;
+  }
+
+  private boolean hasRequiredFields(String type, String sku) {
+    return type.equalsIgnoreCase("inapp") && sku != null && !sku.isEmpty();
   }
 
   public static abstract class Stub {

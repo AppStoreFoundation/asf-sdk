@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.CardNumberFocusChangeListener;
 import com.appcoins.sdk.billing.listeners.payasguest.CardNumberTextWatcher;
 import com.appcoins.sdk.billing.listeners.payasguest.CvvTextWatcher;
@@ -36,6 +37,14 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.buy_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.cancel_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_card_cvv;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_card_expiry;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_card_number;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_change_card_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_pay_as_guest_title;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_change_payment_method_button;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.IMAGES_RESOURCE_PATH;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
@@ -72,6 +81,7 @@ public class AdyenPaymentFragmentLayout {
   private EditText expiryDateEditText;
   private EditText cvvEditText;
   private CreditCardLayout creditCardEditTextLayout;
+  private TranslationsRepository translations;
   private ViewGroup completedPurchaseView;
 
   public AdyenPaymentFragmentLayout(Activity activity, int orientation) {
@@ -81,6 +91,7 @@ public class AdyenPaymentFragmentLayout {
 
   public View build(String fiatPrice, String fiatCurrency, String appcPrice, String sku,
       String packageName) {
+    translations = TranslationsRepository.getInstance(activity);
     DisplayMetrics displayMetrics = new DisplayMetrics();
     activity.getWindowManager()
         .getDefaultDisplay()
@@ -255,7 +266,7 @@ public class AdyenPaymentFragmentLayout {
     setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.WHITE);
     button.setTextSize(14);
-    button.setText("BUY".toUpperCase());
+    button.setText(translations.getString(buy_button));
     button.setLayoutParams(layoutParams);
     return button;
   }
@@ -265,6 +276,7 @@ public class AdyenPaymentFragmentLayout {
     LinearLayout.LayoutParams layoutParams =
         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dpToPx(36));
     layoutParams.gravity = Gravity.CENTER_VERTICAL;
+    setMargins(layoutParams, 0, 0, 16, 0);
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
     background.setStroke(dpToPx(1), Color.WHITE);
@@ -277,7 +289,7 @@ public class AdyenPaymentFragmentLayout {
     setPadding(button, 0, 0, 4, 0);
     button.setTextColor(Color.parseColor("#8a000000"));
     button.setTextSize(14);
-    button.setText("Cancel".toUpperCase());
+    button.setText(translations.getString(cancel_button));
     button.setLayoutParams(layoutParams);
     return button;
   }
@@ -327,7 +339,7 @@ public class AdyenPaymentFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#fd786b"));
     textView.setTextSize(12);
-    textView.setText("CHANGE CARD");
+    textView.setText(translations.getString(iab_change_card_button));
     textView.setLayoutParams(layoutParams);
 
     return textView;
@@ -358,7 +370,7 @@ public class AdyenPaymentFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#fd786b"));
     textView.setTextSize(12);
-    textView.setText("MORE PAYMENTS METHODS");
+    textView.setText(translations.getString(iab_purchase_change_payment_method_button));
     textView.setLayoutParams(layoutParams);
 
     return textView;
@@ -436,7 +448,7 @@ public class AdyenPaymentFragmentLayout {
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, 0, 12, 0);
-    editText.setHint("CVV");
+    editText.setHint(translations.getString(iab_card_cvv));
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
     editText.setLayoutParams(layoutParams);
@@ -456,7 +468,7 @@ public class AdyenPaymentFragmentLayout {
     editText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.DATE_MAX_LENGTH)
     });
-    editText.setHint("MM/YY");
+    editText.setHint(translations.getString(iab_card_expiry));
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
@@ -488,7 +500,7 @@ public class AdyenPaymentFragmentLayout {
     cardNumberEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     cardNumberEditText.setTextColor(Color.parseColor("#292929"));
     cardNumberEditText.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
-    cardNumberEditText.setHint("Card Number");
+    cardNumberEditText.setHint(translations.getString(iab_card_number));
     cardNumberEditText.setHintTextColor(Color.parseColor("#9d9d9d"));
     cardNumberEditText.setLayoutParams(layoutParams);
     cardNumberEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -561,7 +573,7 @@ public class AdyenPaymentFragmentLayout {
     textView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
     textView.setTextColor(Color.parseColor("#000000"));
     textView.setTextSize(14);
-    textView.setText("Pay as Guest");
+    textView.setText(translations.getString(iab_pay_as_guest_title));
     textView.setLayoutParams(layoutParams);
     return textView;
   }

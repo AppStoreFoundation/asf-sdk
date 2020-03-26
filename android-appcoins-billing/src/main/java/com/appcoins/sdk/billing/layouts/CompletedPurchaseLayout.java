@@ -13,7 +13,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_done_title_long;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.dpToPx;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.setMargins;
 
@@ -21,6 +23,7 @@ class CompletedPurchaseLayout {
 
   private final Activity activity;
   private final int orientation;
+  private TranslationsRepository translations;
 
   CompletedPurchaseLayout(Activity activity, int orientation) {
 
@@ -29,6 +32,7 @@ class CompletedPurchaseLayout {
   }
 
   ViewGroup buildView(String fiatPrice, String fiatCurrency, String sku, String packageName) {
+    translations = TranslationsRepository.getInstance(activity);
     LinearLayout purchaseLayout = new LinearLayout(activity);
     purchaseLayout.setClipToPadding(false);
 
@@ -82,7 +86,7 @@ class CompletedPurchaseLayout {
             LinearLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
     setMargins(layoutParams, 0, 16, 0, 0);
-    textView.setText("PURCHASE COMPLETED");
+    textView.setText(translations.getString(iab_purchase_done_title_long));
     textView.setTextColor(Color.parseColor("#de000000"));
     textView.setTypeface(null, Typeface.BOLD);
     textView.setTextSize(18);

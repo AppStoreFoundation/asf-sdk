@@ -15,24 +15,23 @@ import android.widget.FrameLayout;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.WebViewActivity;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
-import com.appcoins.sdk.billing.helpers.TranslationsModel;
-import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
 import com.appcoins.sdk.billing.helpers.Utils;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
-import java.util.Locale;
 
 import static com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES;
 import static com.appcoins.sdk.billing.helpers.InstallDialogActivity.ERROR_RESULT_CODE;
 import static com.appcoins.sdk.billing.helpers.Utils.RESPONSE_CODE;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_button;
 import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
 
 public class IabActivity extends Activity implements IabView {
 
   public final static int LAUNCH_INSTALL_BILLING_FLOW_REQUEST_CODE = 10001;
-  private final static String TRANSLATIONS = "translations";
   private final static int WEB_VIEW_REQUEST_CODE = 1234;
   private static int IAB_ACTIVITY_ID;
-  private TranslationsModel translationsModel;
+  private TranslationsRepository translations;
   private FrameLayout frameLayout;
   private BuyItemProperties buyItemProperties;
   private ActivityResultListener activityResultListener;
@@ -55,11 +54,8 @@ public class IabActivity extends Activity implements IabView {
     setContentView(frameLayout);
 
     buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(BUY_ITEM_PROPERTIES);
-
-    if (savedInstanceState != null) {
-      translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
-    } else {
-      fetchTranslations();
+    translations = TranslationsRepository.getInstance(this);
+    if (savedInstanceState == null) {
       navigateToPaymentSelection();
     }
   }
@@ -94,25 +90,10 @@ public class IabActivity extends Activity implements IabView {
     }
   }
 
-  private void fetchTranslations() {
-    Locale locale = Locale.getDefault();
-    if (translationsModel == null || !translationsModel.getLanguageCode()
-        .equalsIgnoreCase(locale.getLanguage()) || !translationsModel.getCountryCode()
-        .equalsIgnoreCase(locale.getCountry())) {
-      TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
-      translationsModel =
-          translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
-    }
-  }
-
   private void navigateTo(Fragment fragment) {
     getFragmentManager().beginTransaction()
         .replace(frameLayout.getId(), fragment)
         .commit();
-  }
-
-  @Override public TranslationsModel getTranslationsModel() {
-    return translationsModel;
   }
 
   @Override public void close() {
@@ -200,8 +181,9 @@ public class IabActivity extends Activity implements IabView {
 
   private void buildAlertNoBrowserAndStores() {
     AlertDialog.Builder alert = new AlertDialog.Builder(this);
-    String value = translationsModel.getAlertDialogMessage();
-    String dismissValue = translationsModel.getAlertDialogDismissButton();
+    String value = translations.getString(iap_wallet_and_appstore_not_installed_popup_body);
+    String dismissValue =
+        translations.getString(iap_wallet_and_appstore_not_installed_popup_button);
     alert.setMessage(value);
     alert.setCancelable(true);
     alert.setPositiveButton(dismissValue, new DialogInterface.OnClickListener() {
