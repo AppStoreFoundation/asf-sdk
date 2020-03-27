@@ -1,8 +1,8 @@
 package com.sdk.appcoins_adyen;
 
 import android.content.Context;
-import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
-import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsKeys;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsModel;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsXmlParser;
@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(AndroidJUnit4ClassRunner.class) public class TranslationsValuesTest {
+@RunWith(AndroidJUnit4.class) public class TranslationsValuesTest {
 
   @Test public void testDefaultStringMap() {
     Context context = InstrumentationRegistry.getInstrumentation()
