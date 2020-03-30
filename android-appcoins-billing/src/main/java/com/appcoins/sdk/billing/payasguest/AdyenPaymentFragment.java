@@ -205,7 +205,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     layout.getCardNumberEditText()
         .setText(getString(savedInstanceState, CARD_NUMBER_KEY, ""));
     String expiryDate = savedInstanceState.getString(EXPIRY_DATE_KEY);
-    if (expiryDate != null) {
+    if (expiryDate != null && !expiryDate.equals("")) {
       EditText expiryEditText = layout.getExpiryDateEditText();
       expiryEditText.setVisibility(View.VISIBLE);
       expiryEditText.setText(expiryDate);
@@ -213,7 +213,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
           .length());
     }
     String cvv = savedInstanceState.getString(CVV_KEY);
-    if (cvv != null) {
+    if (cvv != null && !cvv.equals("")) {
       EditText cvvEditText = layout.getCvvEditText();
       cvvEditText.setVisibility(View.VISIBLE);
       cvvEditText.setText(cvv);

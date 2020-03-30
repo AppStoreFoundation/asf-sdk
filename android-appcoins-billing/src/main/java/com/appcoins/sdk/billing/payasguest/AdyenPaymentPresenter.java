@@ -80,8 +80,8 @@ class AdyenPaymentPresenter {
 
   void onPositiveClick(String cardNumber, String expiryDate, String cvv, String storedPaymentId,
       BigDecimal serverFiatPrice, String serverCurrency) {
-    fragmentView.showLoading();
     fragmentView.lockRotation();
+    fragmentView.showLoading();
     fragmentView.disableBack();
     CardEncryptorImpl cardEncryptor = new CardEncryptorImpl(BuildConfig.ADYEN_PUBLIC_KEY);
     ExpiryDate mExpiryDate = CardValidationUtils.getDate(expiryDate);
@@ -152,8 +152,8 @@ class AdyenPaymentPresenter {
         .equals(IabActivity.CREDIT_CARD)) {
       fragmentView.showCreditCardView(adyenPaymentMethodsModel.getStoredMethodDetails());
     } else {
-      fragmentView.showLoading();
       fragmentView.lockRotation();
+      fragmentView.showLoading();
       launchPaypal(adyenPaymentMethodsModel);
     }
   }
