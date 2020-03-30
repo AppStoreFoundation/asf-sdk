@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.CardNumberFocusChangeListener;
 import com.appcoins.sdk.billing.listeners.payasguest.CardNumberTextWatcher;
+import com.appcoins.sdk.billing.listeners.payasguest.CreditCardOnKeyListener;
 import com.appcoins.sdk.billing.listeners.payasguest.CvvTextWatcher;
 import com.appcoins.sdk.billing.listeners.payasguest.ExpiryDateTextWatcher;
 import com.appcoins.sdk.billing.utils.PaymentErrorViewLayout;
@@ -479,9 +480,11 @@ public class AdyenPaymentFragmentLayout {
     expiryDateEditText.addTextChangedListener(
         new ExpiryDateTextWatcher(creditCardLayout, expiryDateEditText, cvvEditText,
             cardNumberEditText));
+    expiryDateEditText.setOnKeyListener(
+        new CreditCardOnKeyListener(cardNumberEditText, expiryDateEditText));
     cvvEditText.addTextChangedListener(
         new CvvTextWatcher(creditCardLayout, cvvEditText, expiryDateEditText));
-
+    cvvEditText.setOnKeyListener(new CreditCardOnKeyListener(expiryDateEditText, cvvEditText));
     expiryDateEditText.setVisibility(View.INVISIBLE);
     cvvEditText.setVisibility(View.INVISIBLE);
     creditCardLayout.addView(genericCardView);
