@@ -14,6 +14,7 @@ import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
 import com.appcoins.sdk.billing.listeners.payasguest.PaymentMethodsListener;
 import com.appcoins.sdk.billing.models.GamificationModel;
+import com.appcoins.sdk.billing.models.Transaction;
 import com.appcoins.sdk.billing.models.TransactionsListModel;
 import com.appcoins.sdk.billing.models.billing.RemoteProduct;
 import com.appcoins.sdk.billing.models.billing.SkuDetailsModel;
@@ -204,11 +205,12 @@ class PaymentMethodsPresenter {
     TransactionsListener transactionsListener = new TransactionsListener() {
       @Override public void onResponse(TransactionsListModel transactionsListModel) {
         List<TransactionModel> transactionModels = transactionsListModel.getTransactionModelList();
-        if (transactionModels.isEmpty()) {
-          checkForUnconsumedPurchased(walletGenerationModel, buyItemProperties);
-        } else {
+        if (!transactionModels.isEmpty() && shouldResumeTransaction(transactionModels.get(0)
+            .getTransaction())) {
           fragmentView.resumeTransaction(transactionModels.get(0)
               .getUid());
+        } else {
+          checkForUnconsumedPurchased(walletGenerationModel, buyItemProperties);
         }
       }
     };
@@ -235,5 +237,10 @@ class PaymentMethodsPresenter {
   private boolean isAptoideRedirect(Intent intent) {
     return intent.getPackage() != null && intent.getPackage()
         .equals(BuildConfig.APTOIDE_PACKAGE_NAME);
+  }
+
+  private boolean shouldResumeTransaction(Transaction transaction) {
+    String status = transaction.getStatus();
+    return status.equalsIgnoreCase(Transaction.Status.PROCESSING.toString());
   }
 }

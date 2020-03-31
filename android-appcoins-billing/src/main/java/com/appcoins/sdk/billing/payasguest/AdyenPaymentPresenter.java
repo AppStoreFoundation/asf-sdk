@@ -370,6 +370,7 @@ class AdyenPaymentPresenter {
   }
 
   private void resumeTransaction(String toResumeTransactionId) {
+    fragmentView.lockRotation();
     handleSuccessAdyenTransaction(toResumeTransactionId);
   }
 
