@@ -16,7 +16,8 @@ interface IabView {
   void redirectToWalletInstallation(Intent intent);
 
   void navigateToAdyen(String selectedRadioButton, String walletAddress, String signature,
-      String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku);
+      String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku,
+      boolean shouldResume, String uid);
 
   void startIntentSenderForResult(IntentSender intentSender, int requestCode);
 

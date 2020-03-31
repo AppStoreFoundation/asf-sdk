@@ -41,13 +41,9 @@ public class PurchaseMapper {
       try {
         JSONArray jsonArray = new JSONObject(response).optJSONArray("items");
         for (int i = 0; i < jsonArray.length(); i++) {
-          try {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            SkuPurchase skuPurchase = mapSkuPurchase(jsonObject);
-            skuPurchases.add(skuPurchase);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
+          JSONObject jsonObject = jsonArray.getJSONObject(i);
+          SkuPurchase skuPurchase = mapSkuPurchase(jsonObject);
+          skuPurchases.add(skuPurchase);
         }
       } catch (JSONException e) {
         e.printStackTrace();

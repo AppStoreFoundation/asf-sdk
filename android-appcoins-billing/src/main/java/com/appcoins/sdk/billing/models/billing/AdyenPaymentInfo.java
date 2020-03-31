@@ -10,11 +10,13 @@ public class AdyenPaymentInfo {
   private final String fiatCurrency;
   private final String appcPrice;
   private String signature;
+  private boolean shouldResume;
+  private String toResumeTransactionId;
   private BuyItemProperties buyItemProperties;
 
   public AdyenPaymentInfo(String paymentMethod, String walletAddress, String signature,
-      String fiatPrice, String fiatCurrency, String appcPrice,
-      BuyItemProperties buyItemProperties) {
+      String fiatPrice, String fiatCurrency, String appcPrice, boolean shouldResume,
+      String toResumeTransactionId, BuyItemProperties buyItemProperties) {
 
     this.paymentMethod = paymentMethod;
     this.walletAddress = walletAddress;
@@ -22,6 +24,8 @@ public class AdyenPaymentInfo {
     this.fiatPrice = fiatPrice;
     this.fiatCurrency = fiatCurrency;
     this.appcPrice = appcPrice;
+    this.shouldResume = shouldResume;
+    this.toResumeTransactionId = toResumeTransactionId;
     this.buyItemProperties = buyItemProperties;
   }
 
@@ -51,5 +55,13 @@ public class AdyenPaymentInfo {
 
   public String getPaymentMethod() {
     return paymentMethod;
+  }
+
+  public boolean shouldResumeTransaction() {
+    return shouldResume;
+  }
+
+  public String getToResumeTransactionId() {
+    return toResumeTransactionId;
   }
 }

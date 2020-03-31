@@ -73,6 +73,12 @@ class PaymentMethodsInteract {
     billingRepository.getPurchases(packageName, walletAddress, signature, type, purchasesListener);
   }
 
+  void checkForUnfinishedTransaction(String walletAddress, String signature, String skuId,
+      String packageName, TransactionsListener transactionsListener) {
+    billingRepository.getSkuTransaction(walletAddress, signature, skuId, packageName,
+        transactionsListener);
+  }
+
   void cacheAppcPrice(String appcPrice) {
     this.cacheAppcPrice = appcPrice;
   }

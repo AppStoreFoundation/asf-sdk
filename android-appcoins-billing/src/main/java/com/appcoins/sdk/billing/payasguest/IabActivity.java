@@ -139,10 +139,11 @@ public class IabActivity extends Activity implements IabView {
 
   @Override
   public void navigateToAdyen(String selectedRadioButton, String walletAddress, String signature,
-      String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku) {
+      String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku,
+      boolean shouldResume, String uid) {
     AdyenPaymentFragment adyenPaymentFragment =
         AdyenPaymentFragment.newInstance(selectedRadioButton, walletAddress, signature, fiatPrice,
-            fiatPriceCurrencyCode, appcPrice, sku, buyItemProperties);
+            fiatPriceCurrencyCode, appcPrice, sku, shouldResume, uid, buyItemProperties);
     navigateTo(adyenPaymentFragment);
   }
 

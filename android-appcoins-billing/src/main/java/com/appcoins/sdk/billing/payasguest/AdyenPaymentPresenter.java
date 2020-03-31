@@ -22,7 +22,7 @@ import com.appcoins.sdk.billing.models.billing.AdyenPaymentParams;
 import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
 import com.appcoins.sdk.billing.models.billing.PurchaseModel;
 import com.appcoins.sdk.billing.models.billing.TransactionInformation;
-import com.appcoins.sdk.billing.models.billing.TransactionResponse;
+import com.appcoins.sdk.billing.models.billing.TransactionModel;
 import com.appcoins.sdk.billing.service.adyen.AdyenPaymentMethod;
 import com.sdk.appcoins_adyen.card.EncryptedCard;
 import com.sdk.appcoins_adyen.encryption.CardEncryptorImpl;
@@ -60,13 +60,17 @@ class AdyenPaymentPresenter {
   }
 
   void loadPaymentInfo() {
-    if (!waitingResult) {
-      fragmentView.showLoading();
-      AdyenPaymentMethod method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
-      LoadPaymentInfoListener loadPaymentInfoListener = createLoadPaymentInfoListener();
-      adyenPaymentInteract.loadPaymentInfo(method, adyenPaymentInfo.getFiatPrice(),
-          adyenPaymentInfo.getFiatCurrency(), adyenPaymentInfo.getWalletAddress(),
-          loadPaymentInfoListener);
+    if (!adyenPaymentInfo.shouldResumeTransaction()) {
+      if (!waitingResult) {
+        fragmentView.showLoading();
+        AdyenPaymentMethod method = mapPaymentToService(adyenPaymentInfo.getPaymentMethod());
+        LoadPaymentInfoListener loadPaymentInfoListener = createLoadPaymentInfoListener();
+        adyenPaymentInteract.loadPaymentInfo(method, adyenPaymentInfo.getFiatPrice(),
+            adyenPaymentInfo.getFiatCurrency(), adyenPaymentInfo.getWalletAddress(),
+            loadPaymentInfoListener);
+      }
+    } else {
+      resumeTransaction(adyenPaymentInfo.getToResumeTransactionId());
     }
   }
 
@@ -273,16 +277,16 @@ class AdyenPaymentPresenter {
 
   private void handleSuccessAdyenTransaction(final String uid) {
     GetTransactionListener getTransactionListener = new GetTransactionListener() {
-      @Override public void onResponse(TransactionResponse transactionResponse) {
-        if (transactionResponse.hasError()) {
-          sendGenericErrorEvent(String.valueOf(transactionResponse.getResponseCode()));
+      @Override public void onResponse(TransactionModel transactionModel) {
+        if (transactionModel.hasError()) {
+          sendGenericErrorEvent(String.valueOf(transactionModel.getResponseCode()));
           fragmentView.showError();
         } else {
-          if (isTransactionCompleted(transactionResponse.getStatus())) {
+          if (isTransactionCompleted(transactionModel.getStatus())) {
             analytics.sendPaymentSuccessEvent(adyenPaymentInfo);
-            createBundle(transactionResponse);
-          } else if (paymentFailed(transactionResponse.getStatus())) {
-            sendGenericErrorEvent("Transaction Status: " + transactionResponse.getStatus());
+            createBundle(transactionModel);
+          } else if (paymentFailed(transactionModel.getStatus())) {
+            sendGenericErrorEvent("Transaction Status: " + transactionModel.getStatus());
             fragmentView.showError();
           } else {
             requestTransaction(uid, 5000, this);
@@ -298,7 +302,7 @@ class AdyenPaymentPresenter {
     return status.equalsIgnoreCase(String.valueOf(Status.COMPLETED));
   }
 
-  private void createBundle(final TransactionResponse transactionResponse) {
+  private void createBundle(final TransactionModel transactionModel) {
     PurchaseListener purchaseListener = new PurchaseListener() {
       @Override public void onResponse(PurchaseModel purchaseModel) {
         if (purchaseModel.hasError()) {
@@ -306,7 +310,7 @@ class AdyenPaymentPresenter {
         } else {
           BillingMapper billingMapper = new BillingMapper();
           final Bundle bundle =
-              billingMapper.map(purchaseModel, transactionResponse.getOrderReference());
+              billingMapper.map(purchaseModel, transactionModel.getOrderReference());
           handleCompletedPurchaseScreen(bundle);
         }
       }
@@ -363,6 +367,10 @@ class AdyenPaymentPresenter {
 
   private void sendGenericErrorEvent(String errorCode) {
     analytics.sendPaymentErrorEvent(adyenPaymentInfo, errorCode, null, null);
+  }
+
+  private void resumeTransaction(String toResumeTransactionId) {
+    handleSuccessAdyenTransaction(toResumeTransactionId);
   }
 
   private LoadPaymentInfoListener createLoadPaymentInfoListener() {

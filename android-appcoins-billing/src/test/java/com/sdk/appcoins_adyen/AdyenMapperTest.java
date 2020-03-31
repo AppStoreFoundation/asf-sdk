@@ -1,8 +1,9 @@
 package com.sdk.appcoins_adyen;
 
+import com.appcoins.sdk.billing.mappers.TransactionMapper;
 import com.appcoins.sdk.billing.models.billing.AdyenPaymentMethodsModel;
 import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
-import com.appcoins.sdk.billing.models.billing.TransactionResponse;
+import com.appcoins.sdk.billing.models.billing.TransactionModel;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
 import java.math.BigDecimal;
@@ -15,27 +16,27 @@ public class AdyenMapperTest {
   private AdyenMapper adyenMapper;
 
   @Before public void setupTest() {
-    adyenMapper = new AdyenMapper();
+    adyenMapper = new AdyenMapper(new TransactionMapper());
   }
 
   @Test public void transactionRequestTest() {
     String response = "{\"uid\":\"uid\",\"hash\":\"null\",\"reference\":\"reference\","
         + "\"status\":\"SUCCESS\"}";
-    TransactionResponse transactionResponse =
+    TransactionModel transactionModel =
         adyenMapper.mapTransactionResponse(new RequestResponse(200, response, null));
-    Assert.assertFalse(transactionResponse.hasError());
-    Assert.assertNull(transactionResponse.getHash());
-    Assert.assertEquals("uid", transactionResponse.getUid());
-    Assert.assertEquals("reference", transactionResponse.getOrderReference());
-    Assert.assertEquals("SUCCESS", transactionResponse.getStatus());
+    Assert.assertFalse(transactionModel.hasError());
+    Assert.assertNull(transactionModel.getHash());
+    Assert.assertEquals("uid", transactionModel.getUid());
+    Assert.assertEquals("reference", transactionModel.getOrderReference());
+    Assert.assertEquals("SUCCESS", transactionModel.getStatus());
   }
 
   @Test public void transactionRequestErrorTest() {
     String response = "{\"uid\":\"uid\",\"hash\":\"null\",\"reference\":\"reference\","
         + "\"status\":\"FAIlED\"}";
-    TransactionResponse transactionResponse =
+    TransactionModel transactionModel =
         adyenMapper.mapTransactionResponse(new RequestResponse(400, response, null));
-    Assert.assertTrue(transactionResponse.hasError());
+    Assert.assertTrue(transactionModel.hasError());
   }
 
   @Test public void adyenCreditCardTransactionRequestTest() {

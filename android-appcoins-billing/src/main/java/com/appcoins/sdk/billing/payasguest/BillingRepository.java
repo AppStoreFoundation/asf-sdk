@@ -4,6 +4,8 @@ import com.appcoins.sdk.billing.listeners.PurchasesListener;
 import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.listeners.billing.PurchaseListener;
 import com.appcoins.sdk.billing.mappers.PurchaseMapper;
+import com.appcoins.sdk.billing.mappers.TransactionMapper;
+import com.appcoins.sdk.billing.models.TransactionsListModel;
 import com.appcoins.sdk.billing.models.billing.PurchaseModel;
 import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.RequestResponse;
@@ -136,6 +138,31 @@ public class BillingRepository {
 
     waitForCountDown(countDownLatch);
     return responseCode[0];
+  }
+
+  void getSkuTransaction(String address, String signature, String skuId, String packageName,
+      final TransactionsListener transactionsListener) {
+    ServiceResponseListener serviceResponseListener = new ServiceResponseListener() {
+      @Override public void onResponseReceived(RequestResponse requestResponse) {
+        TransactionMapper transactionMapper = new TransactionMapper();
+        TransactionsListModel transactionsListModel =
+            transactionMapper.mapTransactionListResponse(requestResponse);
+        transactionsListener.onResponse(transactionsListModel);
+      }
+    };
+    Map<String, String> queries = new HashMap<>();
+    queries.put("wallet.address", address);
+    queries.put("wallet.signature", signature);
+    queries.put("cursor", "0");
+    queries.put("type", "INAPP");
+    queries.put("limit", "1");
+    queries.put("sort.name", "latest");
+    queries.put("sort.reverse", "false");
+    if (skuId != null) queries.put("product", skuId);
+    queries.put("domain", packageName);
+
+    service.makeRequest("/broker/8.20180518/transactions", "GET", new ArrayList<String>(), queries,
+        new HashMap<String, String>(), new HashMap<String, Object>(), serviceResponseListener);
   }
 
   private void handleConsumeResponse(RequestResponse requestResponse, CountDownLatch countDownLatch,

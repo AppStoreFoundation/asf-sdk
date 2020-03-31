@@ -29,6 +29,7 @@ import com.appcoins.sdk.billing.layouts.AdyenPaymentFragmentLayout;
 import com.appcoins.sdk.billing.layouts.CardNumberEditText;
 import com.appcoins.sdk.billing.layouts.FieldValidationListener;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
+import com.appcoins.sdk.billing.mappers.TransactionMapper;
 import com.appcoins.sdk.billing.models.billing.AdyenPaymentInfo;
 import com.appcoins.sdk.billing.models.payasguest.StoredMethodDetails;
 import com.appcoins.sdk.billing.service.BdsService;
@@ -65,6 +66,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private final static String FIAT_CURRENCY_KEY = "fiat_currency";
   private final static String APPC_VALUE_KEY = "appc_value";
   private final static String SKU_KEY = "sku_key";
+  private final static String SHOULD_RESUME_KEY = "resume_key";
+  private final static String TRANSACTION_UID = "transaction_uid";
   private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private IabView iabView;
   private AdyenPaymentInfo adyenPaymentInfo;
@@ -76,7 +79,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
 
   public static AdyenPaymentFragment newInstance(String selectedRadioButton, String walletAddress,
       String signature, String fiatPrice, String fiatPriceCurrencyCode, String appcPrice,
-      String sku, BuyItemProperties buyItemProperties) {
+      String sku, boolean shouldResume, String uid, BuyItemProperties buyItemProperties) {
     AdyenPaymentFragment adyenPaymentFragment = new AdyenPaymentFragment();
     Bundle bundle = new Bundle();
     bundle.putString(PAYMENT_METHOD_KEY, selectedRadioButton);
@@ -86,6 +89,8 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     bundle.putString(FIAT_CURRENCY_KEY, fiatPriceCurrencyCode);
     bundle.putString(APPC_VALUE_KEY, appcPrice);
     bundle.putString(SKU_KEY, sku);
+    bundle.putBoolean(SHOULD_RESUME_KEY, shouldResume);
+    bundle.putString(TRANSACTION_UID, uid);
     bundle.putSerializable(BUY_ITEM_PROPERTIES, buyItemProperties);
     adyenPaymentFragment.setArguments(bundle);
     return adyenPaymentFragment;
@@ -107,7 +112,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     adyenPaymentInfo = extractBundleInfo();
     AdyenRepository adyenRepository = new AdyenRepository(
         new BdsService(BuildConfig.HOST_WS + "/broker/", BdsService.TIME_OUT_IN_MILLIS),
-        new AdyenListenerProvider(new AdyenMapper()));
+        new AdyenListenerProvider(new AdyenMapper(new TransactionMapper())));
     Service apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
     Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, BdsService.TIME_OUT_IN_MILLIS);
     OemIdExtractor extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
@@ -431,10 +436,12 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     String fiatPrice = getBundleString(FIAT_VALUE_KEY);
     String fiatCurrency = getBundleString(FIAT_CURRENCY_KEY);
     String appcPrice = getBundleString(APPC_VALUE_KEY);
+    boolean shouldResume = getBundleBoolean(SHOULD_RESUME_KEY);
+    String toResumeTransactionId = getBundleString(TRANSACTION_UID);
     BuyItemProperties buyItemProperties = getBundleBuyItemProperties(BUY_ITEM_PROPERTIES);
 
     return new AdyenPaymentInfo(paymentMethod, walletAddress, signature, fiatPrice, fiatCurrency,
-        appcPrice, buyItemProperties);
+        appcPrice, shouldResume, toResumeTransactionId, buyItemProperties);
   }
 
   private void attach(Context context) {
@@ -510,6 +517,13 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private String getBundleString(String key) {
     if (getArguments().containsKey(key)) {
       return getArguments().getString(key);
+    }
+    throw new IllegalArgumentException(key + "data not found");
+  }
+
+  private boolean getBundleBoolean(String key) {
+    if (getArguments().containsKey(key)) {
+      return getArguments().getBoolean(key);
     }
     throw new IllegalArgumentException(key + "data not found");
   }

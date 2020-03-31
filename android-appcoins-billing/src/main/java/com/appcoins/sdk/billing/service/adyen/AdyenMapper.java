@@ -1,8 +1,9 @@
 package com.appcoins.sdk.billing.service.adyen;
 
+import com.appcoins.sdk.billing.mappers.TransactionMapper;
 import com.appcoins.sdk.billing.models.billing.AdyenPaymentMethodsModel;
 import com.appcoins.sdk.billing.models.billing.AdyenTransactionModel;
-import com.appcoins.sdk.billing.models.billing.TransactionResponse;
+import com.appcoins.sdk.billing.models.billing.TransactionModel;
 import com.appcoins.sdk.billing.models.payasguest.StoredMethodDetails;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import java.math.BigDecimal;
@@ -14,36 +15,15 @@ import static com.appcoins.sdk.billing.utils.ServiceUtils.isSuccess;
 
 public class AdyenMapper {
 
-  public AdyenMapper() {
+  private TransactionMapper transactionMapper;
 
+  public AdyenMapper(TransactionMapper transactionMapper) {
+
+    this.transactionMapper = transactionMapper;
   }
 
-  public TransactionResponse mapTransactionResponse(RequestResponse requestResponse) {
-    JSONObject jsonObject;
-    String response = requestResponse.getResponse();
-    int code = requestResponse.getResponseCode();
-    TransactionResponse transactionResponse = new TransactionResponse(code);
-    String uid;
-    String hash;
-    String orderReference;
-    String status;
-    if (isSuccess(code) && response != null) {
-      try {
-        jsonObject = new JSONObject(response);
-        uid = jsonObject.getString("uid");
-        hash = jsonObject.getString("hash");
-        if (hash.equals("null")) {
-          hash = null;
-        }
-        orderReference = jsonObject.getString("reference");
-        status = jsonObject.getString("status");
-        transactionResponse =
-            new TransactionResponse(uid, hash, orderReference, status, !isSuccess(code), code);
-      } catch (JSONException e) {
-        e.printStackTrace();
-      }
-    }
-    return transactionResponse;
+  public TransactionModel mapTransactionResponse(RequestResponse requestResponse) {
+    return transactionMapper.mapTransactionResponse(requestResponse);
   }
 
   public AdyenTransactionModel mapAdyenTransactionResponse(RequestResponse requestResponse) {
