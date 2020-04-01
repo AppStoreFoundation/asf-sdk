@@ -70,7 +70,7 @@ class PaymentMethodsPresenter {
   void onPositiveButtonClicked(String selectedRadioButton) {
     if (isAdyen(selectedRadioButton)) {
       sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
-      fragmentView.navigateToAdyen(selectedRadioButton, false, "");
+      fragmentView.navigateToAdyen(selectedRadioButton, null);
     } else {
       sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
@@ -101,12 +101,13 @@ class PaymentMethodsPresenter {
     paymentMethodsInteract.cancelRequests();
   }
 
-  private void provideSkuDetailsInformation(BuyItemProperties buyItemProperties) {
+  private void provideSkuDetailsInformation(final WalletGenerationModel walletGenerationModel,
+      final BuyItemProperties buyItemProperties) {
     SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
       @Override public void onResponse(boolean error, SkuDetails skuDetails) {
         if (!error) {
           paymentMethodsInteract.cacheAppcPrice(skuDetails.getAppcPrice());
-          loadPaymentsAvailable(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode());
+          checkForUnfinishedTransaction(buyItemProperties, walletGenerationModel, skuDetails);
           fragmentView.setSkuInformation(
               new SkuDetailsModel(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode(),
                   skuDetails.getAppcPrice(), skuDetails.getSku()));
@@ -143,7 +144,7 @@ class PaymentMethodsPresenter {
   }
 
   private void checkForUnconsumedPurchased(WalletGenerationModel walletGenerationModel,
-      final BuyItemProperties buyItemProperties) {
+      final SkuDetails skuDetails, final BuyItemProperties buyItemProperties) {
     PurchasesListener purchasesListener = new PurchasesListener() {
       @Override public void onResponse(PurchasesModel purchasesModel) {
         if (!purchasesModel.hasError()) {
@@ -155,7 +156,7 @@ class PaymentMethodsPresenter {
             }
           }
         }
-        provideSkuDetailsInformation(buyItemProperties);
+        loadPaymentsAvailable(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode());
       }
     };
     paymentMethodsInteract.checkForUnconsumedPurchased(buyItemProperties.getPackageName(),
@@ -192,7 +193,7 @@ class PaymentMethodsPresenter {
       @Override public void walletAddressRetrieved(WalletGenerationModel walletGenerationModel) {
         if (!walletGenerationModel.hasError()) {
           fragmentView.saveWalletInformation(walletGenerationModel);
-          checkForUnfinishedTransaction(buyItemProperties, walletGenerationModel);
+          provideSkuDetailsInformation(walletGenerationModel, buyItemProperties);
         } else {
           handleShowInstallDialog();
         }
@@ -201,16 +202,16 @@ class PaymentMethodsPresenter {
   }
 
   private void checkForUnfinishedTransaction(final BuyItemProperties buyItemProperties,
-      final WalletGenerationModel walletGenerationModel) {
+      final WalletGenerationModel walletGenerationModel, final SkuDetails skuDetails) {
     TransactionsListener transactionsListener = new TransactionsListener() {
       @Override public void onResponse(TransactionsListModel transactionsListModel) {
         List<TransactionModel> transactionModels = transactionsListModel.getTransactionModelList();
         if (!transactionModels.isEmpty() && shouldResumeTransaction(transactionModels.get(0)
             .getTransaction())) {
-          fragmentView.resumeTransaction(transactionModels.get(0)
-              .getUid());
+          TransactionModel transactionModel = transactionModels.get(0);
+          fragmentView.navigateToAdyen(transactionModel.getGateway(), transactionModel.getUid());
         } else {
-          checkForUnconsumedPurchased(walletGenerationModel, buyItemProperties);
+          checkForUnconsumedPurchased(walletGenerationModel, skuDetails, buyItemProperties);
         }
       }
     };

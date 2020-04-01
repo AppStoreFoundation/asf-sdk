@@ -15,9 +15,11 @@ interface IabView {
 
   void redirectToWalletInstallation(Intent intent);
 
+  /**
+   * Pass a non-empty uid if you want to resume a transaction. Otherwise send null or empty
+   */
   void navigateToAdyen(String selectedRadioButton, String walletAddress, String signature,
-      String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku,
-      boolean shouldResume, String uid);
+      String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku, String uid);
 
   void startIntentSenderForResult(IntentSender intentSender, int requestCode);
 

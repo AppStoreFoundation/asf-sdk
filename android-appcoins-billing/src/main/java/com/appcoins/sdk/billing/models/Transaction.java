@@ -6,13 +6,16 @@ public class Transaction {
   private final String hash;
   private final String orderReference;
   private final String status;
+  private String gateway;
 
-  public Transaction(String uid, String hash, String orderReference, String status) {
+  public Transaction(String uid, String hash, String orderReference, String status,
+      String gateway) {
 
     this.uid = uid;
     this.hash = hash;
     this.orderReference = orderReference;
     this.status = status;
+    this.gateway = gateway;
   }
 
   public Transaction() {
@@ -20,6 +23,7 @@ public class Transaction {
     this.hash = "";
     this.orderReference = "";
     this.status = "";
+    this.gateway = "";
   }
 
   public String getUid() {
@@ -36,6 +40,10 @@ public class Transaction {
 
   public String getStatus() {
     return status;
+  }
+
+  public String getGateway() {
+    return gateway;
   }
 
   public enum Status {

@@ -61,7 +61,12 @@ public class TransactionMapper {
     }
     String orderReference = jsonObject.getString("reference");
     String status = jsonObject.getString("status");
-    Transaction transaction = new Transaction(uid, hash, orderReference, status);
+    String gatewayName = "";
+    JSONObject gateway = jsonObject.optJSONObject("gateway");
+    if (gateway != null) {
+      gatewayName = gateway.getString("name");
+    }
+    Transaction transaction = new Transaction(uid, hash, orderReference, status, gatewayName);
     return new TransactionModel(transaction, !isSuccess(code), code);
   }
 }

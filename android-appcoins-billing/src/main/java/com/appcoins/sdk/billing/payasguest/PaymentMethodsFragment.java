@@ -183,7 +183,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    outState.putString(SELECTED_RADIO_KEY, selectedRadioButton);
+    if (selectedRadioButton != null) {
+      outState.putString(SELECTED_RADIO_KEY, selectedRadioButton);
+    }
   }
 
   @Override public void onDestroyView() {
@@ -318,13 +320,12 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     iabView.redirectToWalletInstallation(intent);
   }
 
-  @Override
-  public void navigateToAdyen(String selectedRadioButton, boolean shouldResume, String uid) {
+  @Override public void navigateToAdyen(String paymentMethod, String uid) {
     if (walletGenerationModel.getWalletAddress() != null && skuDetailsModel != null) {
-      iabView.navigateToAdyen(selectedRadioButton, walletGenerationModel.getWalletAddress(),
+      iabView.navigateToAdyen(paymentMethod, walletGenerationModel.getWalletAddress(),
           walletGenerationModel.getSignature(), skuDetailsModel.getFiatPrice(),
           skuDetailsModel.getFiatPriceCurrencyCode(), skuDetailsModel.getAppcPrice(),
-          skuDetailsModel.getSku(), shouldResume, uid);
+          buyItemProperties.getSku(), uid);
     } else {
       showError();
     }
@@ -425,10 +426,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void sendPurchaseStartEvent(String appcPrice) {
     iabView.sendPurchaseStartEvent(appcPrice);
-  }
-
-  @Override public void resumeTransaction(String uid) {
-    navigateToAdyen(selectedRadioButton, true, uid);
   }
 
   private void setInitialRadioButtonSelected() {

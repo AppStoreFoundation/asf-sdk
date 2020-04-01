@@ -41,6 +41,10 @@ public class TransactionModel {
     return transaction.getStatus();
   }
 
+  public String getGateway() {
+    return transaction.getGateway();
+  }
+
   public boolean hasError() {
     return error;
   }
