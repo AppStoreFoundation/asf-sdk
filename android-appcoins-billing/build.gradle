@@ -11,6 +11,7 @@ android {
 
     versionCode VERSION_CODE
     versionName VERSION_NAME
+    buildConfigField "boolean", "URI_COMMUNICATION", "true"
   }
 
   buildTypes {
