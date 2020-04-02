@@ -14,9 +14,13 @@ public class PaymentMethodsModel {
     this.hasError = hasError;
   }
 
-  public PaymentMethodsModel() {
+  private PaymentMethodsModel() {
     this.paymentMethods = new ArrayList<>();
     this.hasError = true;
+  }
+
+  public static PaymentMethodsModel createErrorPaymentMethodsModel() {
+    return new PaymentMethodsModel();
   }
 
   public List<PaymentMethod> getPaymentMethods() {

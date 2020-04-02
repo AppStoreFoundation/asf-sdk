@@ -14,12 +14,16 @@ import com.appcoins.sdk.billing.listeners.PurchasesModel;
 import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
 import com.appcoins.sdk.billing.listeners.payasguest.PaymentMethodsListener;
 import com.appcoins.sdk.billing.models.GamificationModel;
+import com.appcoins.sdk.billing.models.Transaction;
+import com.appcoins.sdk.billing.models.TransactionsListModel;
 import com.appcoins.sdk.billing.models.billing.RemoteProduct;
 import com.appcoins.sdk.billing.models.billing.SkuDetailsModel;
 import com.appcoins.sdk.billing.models.billing.SkuPurchase;
+import com.appcoins.sdk.billing.models.billing.TransactionModel;
 import com.appcoins.sdk.billing.models.payasguest.PaymentMethod;
 import com.appcoins.sdk.billing.models.payasguest.PaymentMethodsModel;
 import com.appcoins.sdk.billing.models.payasguest.WalletGenerationModel;
+import java.util.List;
 
 import static com.appcoins.sdk.billing.payasguest.IabActivity.CREDIT_CARD;
 import static com.appcoins.sdk.billing.payasguest.IabActivity.PAYPAL;
@@ -97,26 +101,22 @@ class PaymentMethodsPresenter {
     paymentMethodsInteract.cancelRequests();
   }
 
-  private void provideSkuDetailsInformation(BuyItemProperties buyItemProperties,
-      boolean walletGenerated) {
-    if (!walletGenerated) {
-      SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
-        @Override public void onResponse(boolean error, SkuDetails skuDetails) {
-          if (!error) {
-            paymentMethodsInteract.cacheAppcPrice(skuDetails.getAppcPrice());
-            loadPaymentsAvailable(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode());
-            fragmentView.setSkuInformation(new SkuDetailsModel(skuDetails.getFiatPrice(),
-                skuDetails.getFiatPriceCurrencyCode(), skuDetails.getAppcPrice(),
-                skuDetails.getSku()));
-          } else {
-            handleShowInstallDialog();
-          }
+  private void provideSkuDetailsInformation(final WalletGenerationModel walletGenerationModel,
+      final BuyItemProperties buyItemProperties) {
+    SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
+      @Override public void onResponse(boolean error, SkuDetails skuDetails) {
+        if (!error) {
+          paymentMethodsInteract.cacheAppcPrice(skuDetails.getAppcPrice());
+          checkForUnfinishedTransaction(buyItemProperties, walletGenerationModel, skuDetails);
+          fragmentView.setSkuInformation(
+              new SkuDetailsModel(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode(),
+                  skuDetails.getAppcPrice(), skuDetails.getSku()));
+        } else {
+          handleShowInstallDialog();
         }
-      };
-      paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
-    } else {
-      handleShowInstallDialog();
-    }
+      }
+    };
+    paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
   }
 
   private void loadPaymentsAvailable(final String fiatPrice, String fiatCurrency) {
@@ -143,23 +143,25 @@ class PaymentMethodsPresenter {
     paymentMethodsInteract.loadPaymentsAvailable(fiatPrice, fiatCurrency, paymentMethodsListener);
   }
 
-  private void checkForUnconsumedPurchased(String packageName, final String sku,
-      String walletAddress, String signature, String type) {
+  private void checkForUnconsumedPurchased(WalletGenerationModel walletGenerationModel,
+      final SkuDetails skuDetails, final BuyItemProperties buyItemProperties) {
     PurchasesListener purchasesListener = new PurchasesListener() {
       @Override public void onResponse(PurchasesModel purchasesModel) {
         if (!purchasesModel.hasError()) {
           for (SkuPurchase skuPurchase : purchasesModel.getSkuPurchases()) {
-            if (isSelectedItem(skuPurchase.getProduct(), sku)) {
+            if (isSelectedItem(skuPurchase.getProduct(), buyItemProperties.getSku())) {
               paymentMethodsInteract.cancelRequests();
               fragmentView.showItemAlreadyOwnedError(skuPurchase);
               return;
             }
           }
         }
+        loadPaymentsAvailable(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode());
       }
     };
-    paymentMethodsInteract.checkForUnconsumedPurchased(packageName, walletAddress, signature, type,
-        purchasesListener);
+    paymentMethodsInteract.checkForUnconsumedPurchased(buyItemProperties.getPackageName(),
+        walletGenerationModel.getWalletAddress(), walletGenerationModel.getSignature(),
+        buyItemProperties.getType(), purchasesListener);
   }
 
   private boolean isSelectedItem(RemoteProduct product, String sku) {
@@ -189,13 +191,34 @@ class PaymentMethodsPresenter {
   private WalletInteractListener createWalletInteractListener() {
     return new WalletInteractListener() {
       @Override public void walletAddressRetrieved(WalletGenerationModel walletGenerationModel) {
-        fragmentView.saveWalletInformation(walletGenerationModel);
-        provideSkuDetailsInformation(buyItemProperties, walletGenerationModel.hasError());
-        checkForUnconsumedPurchased(buyItemProperties.getPackageName(), buyItemProperties.getSku(),
-            walletGenerationModel.getWalletAddress(), walletGenerationModel.getSignature(),
-            buyItemProperties.getType());
+        if (!walletGenerationModel.hasError()) {
+          fragmentView.saveWalletInformation(walletGenerationModel);
+          provideSkuDetailsInformation(walletGenerationModel, buyItemProperties);
+        } else {
+          handleShowInstallDialog();
+        }
       }
     };
+  }
+
+  private void checkForUnfinishedTransaction(final BuyItemProperties buyItemProperties,
+      final WalletGenerationModel walletGenerationModel, final SkuDetails skuDetails) {
+    TransactionsListener transactionsListener = new TransactionsListener() {
+      @Override public void onResponse(TransactionsListModel transactionsListModel) {
+        List<TransactionModel> transactionModels = transactionsListModel.getTransactionModelList();
+        if (!transactionModels.isEmpty() && shouldResumeTransaction(transactionModels.get(0)
+            .getTransaction())) {
+          TransactionModel transactionModel = transactionModels.get(0);
+          fragmentView.resumeAdyenTransaction(transactionModel.getGateway(),
+              transactionModel.getUid());
+        } else {
+          checkForUnconsumedPurchased(walletGenerationModel, skuDetails, buyItemProperties);
+        }
+      }
+    };
+    paymentMethodsInteract.checkForUnfinishedTransaction(walletGenerationModel.getWalletAddress(),
+        walletGenerationModel.getSignature(), buyItemProperties.getSku(),
+        buyItemProperties.getPackageName(), transactionsListener);
   }
 
   private boolean isAdyen(String selectedRadioButton) {
@@ -216,5 +239,9 @@ class PaymentMethodsPresenter {
   private boolean isAptoideRedirect(Intent intent) {
     return intent.getPackage() != null && intent.getPackage()
         .equals(BuildConfig.APTOIDE_PACKAGE_NAME);
+  }
+
+  private boolean shouldResumeTransaction(Transaction transaction) {
+    return transaction.getStatus() == Transaction.Status.PROCESSING;
   }
 }

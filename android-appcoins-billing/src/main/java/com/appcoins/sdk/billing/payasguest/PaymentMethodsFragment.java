@@ -183,7 +183,9 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   @Override public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    outState.putString(SELECTED_RADIO_KEY, selectedRadioButton);
+    if (selectedRadioButton != null) {
+      outState.putString(SELECTED_RADIO_KEY, selectedRadioButton);
+    }
   }
 
   @Override public void onDestroyView() {
@@ -318,12 +320,23 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     iabView.redirectToWalletInstallation(intent);
   }
 
-  @Override public void navigateToAdyen(String selectedRadioButton) {
+  @Override public void navigateToAdyen(String paymentMethod) {
     if (walletGenerationModel.getWalletAddress() != null && skuDetailsModel != null) {
-      iabView.navigateToAdyen(selectedRadioButton, walletGenerationModel.getWalletAddress(),
+      iabView.navigateToAdyen(paymentMethod, walletGenerationModel.getWalletAddress(),
           walletGenerationModel.getSignature(), skuDetailsModel.getFiatPrice(),
           skuDetailsModel.getFiatPriceCurrencyCode(), skuDetailsModel.getAppcPrice(),
-          skuDetailsModel.getSku());
+          buyItemProperties.getSku());
+    } else {
+      showError();
+    }
+  }
+
+  @Override public void resumeAdyenTransaction(String paymentMethod, String uid) {
+    if (walletGenerationModel.getWalletAddress() != null && skuDetailsModel != null) {
+      iabView.resumeAdyenTransaction(paymentMethod, walletGenerationModel.getWalletAddress(),
+          walletGenerationModel.getSignature(), skuDetailsModel.getFiatPrice(),
+          skuDetailsModel.getFiatPriceCurrencyCode(), skuDetailsModel.getAppcPrice(),
+          buyItemProperties.getSku(), uid);
     } else {
       showError();
     }

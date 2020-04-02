@@ -9,10 +9,12 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Build;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,7 @@ import android.widget.TextView;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.payasguest.CardNumberFocusChangeListener;
 import com.appcoins.sdk.billing.listeners.payasguest.CardNumberTextWatcher;
+import com.appcoins.sdk.billing.listeners.payasguest.CreditCardOnKeyListener;
 import com.appcoins.sdk.billing.listeners.payasguest.CvvTextWatcher;
 import com.appcoins.sdk.billing.listeners.payasguest.ExpiryDateTextWatcher;
 import com.appcoins.sdk.billing.utils.PaymentErrorViewLayout;
@@ -477,9 +480,11 @@ public class AdyenPaymentFragmentLayout {
     expiryDateEditText.addTextChangedListener(
         new ExpiryDateTextWatcher(creditCardLayout, expiryDateEditText, cvvEditText,
             cardNumberEditText));
+    expiryDateEditText.setOnKeyListener(
+        new CreditCardOnKeyListener(cardNumberEditText, expiryDateEditText));
     cvvEditText.addTextChangedListener(
         new CvvTextWatcher(creditCardLayout, cvvEditText, expiryDateEditText));
-
+    cvvEditText.setOnKeyListener(new CreditCardOnKeyListener(expiryDateEditText, cvvEditText));
     expiryDateEditText.setVisibility(View.INVISIBLE);
     cvvEditText.setVisibility(View.INVISIBLE);
     creditCardLayout.addView(genericCardView);
@@ -524,6 +529,12 @@ public class AdyenPaymentFragmentLayout {
     editText.setInputType(InputType.TYPE_CLASS_NUMBER);
     editText.setBackgroundColor(Color.parseColor("#00000000"));
     editText.setTextSize(14);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      editText.setAutoSizeTextTypeUniformWithConfiguration(11, 14, 1, TypedValue.COMPLEX_UNIT_SP);
+    } else {
+      editText.setEllipsize(TextUtils.TruncateAt.END);
+      editText.setMaxLines(1);
+    }
     editText.setTextColor(Color.parseColor("#292929"));
     editText.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
 
@@ -546,6 +557,12 @@ public class AdyenPaymentFragmentLayout {
     editText.setInputType(InputType.TYPE_CLASS_NUMBER);
     editText.setBackgroundColor(Color.parseColor("#00000000"));
     editText.setTextSize(14);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      editText.setAutoSizeTextTypeUniformWithConfiguration(11, 14, 1, TypedValue.COMPLEX_UNIT_SP);
+    } else {
+      editText.setEllipsize(TextUtils.TruncateAt.END);
+      editText.setMaxLines(1);
+    }
     editText.setTextColor(Color.parseColor("#292929"));
     editText.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
 
@@ -570,6 +587,8 @@ public class AdyenPaymentFragmentLayout {
     cardNumberEditText.setTextColor(Color.parseColor("#292929"));
     cardNumberEditText.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
     cardNumberEditText.setHint(translations.getString(iab_card_number));
+    cardNumberEditText.setEllipsize(TextUtils.TruncateAt.END);
+    cardNumberEditText.setMaxLines(1);
     cardNumberEditText.setHintTextColor(Color.parseColor("#9d9d9d"));
     cardNumberEditText.setLayoutParams(layoutParams);
     cardNumberEditText.setInputType(InputType.TYPE_CLASS_NUMBER);

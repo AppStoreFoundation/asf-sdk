@@ -32,7 +32,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Serializable {
   final static String INAPP_PURCHASE_ID_LIST = "INAPP_PURCHASE_ID_LIST";
@@ -204,14 +203,6 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract(billingRepository);
 
     return guestPurchaseInteract.consumeGuestPurchase(walletId, packageName, purchaseToken);
-  }
-
-  private void waitForPurchases(CountDownLatch countDownLatch) {
-    try {
-      countDownLatch.await(MESSAGE_RESPONSE_WAIT_TIMEOUT_IN_MILLIS, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
   }
 
   private Bundle buildEmptyBundle() {

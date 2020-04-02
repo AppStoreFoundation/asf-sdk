@@ -76,7 +76,7 @@ public class AdyenPaymentInteract {
           purchaseListener);
     } else {
       Log.w("TAG", "Unknown transaction type"); //This shouldn't happen as we are verifying before
-      purchaseListener.onResponse(new PurchaseModel());
+      purchaseListener.onResponse(PurchaseModel.createErrorPurchaseModel());
     }
   }
 

@@ -29,6 +29,7 @@ import com.appcoins.sdk.billing.layouts.AdyenPaymentFragmentLayout;
 import com.appcoins.sdk.billing.layouts.CardNumberEditText;
 import com.appcoins.sdk.billing.layouts.FieldValidationListener;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
+import com.appcoins.sdk.billing.mappers.TransactionMapper;
 import com.appcoins.sdk.billing.models.billing.AdyenPaymentInfo;
 import com.appcoins.sdk.billing.models.payasguest.StoredMethodDetails;
 import com.appcoins.sdk.billing.service.BdsService;
@@ -40,6 +41,7 @@ import com.appcoins.sdk.billing.service.address.WalletAddressService;
 import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
 import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
+import com.appcoins.sdk.billing.utils.EnumMapper;
 import com.sdk.appcoins_adyen.models.ExpiryDate;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 import com.sdk.appcoins_adyen.utils.RedirectUtils;
@@ -65,6 +67,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private final static String FIAT_CURRENCY_KEY = "fiat_currency";
   private final static String APPC_VALUE_KEY = "appc_value";
   private final static String SKU_KEY = "sku_key";
+  private final static String TO_RESUME_TRANSACTION_UID = "transaction_uid";
   private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private IabView iabView;
   private AdyenPaymentInfo adyenPaymentInfo;
@@ -74,12 +77,35 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   private BigDecimal serverFiatPrice;
   private TranslationsRepository translations;
 
-  public static AdyenPaymentFragment newInstance(String selectedRadioButton, String walletAddress,
-      String signature, String fiatPrice, String fiatPriceCurrencyCode, String appcPrice,
-      String sku, BuyItemProperties buyItemProperties) {
+  public static AdyenPaymentFragment newStartTransactionInstance(String paymentMethod,
+      String walletAddress, String signature, String fiatPrice, String fiatPriceCurrencyCode,
+      String appcPrice, String sku, BuyItemProperties buyItemProperties) {
     AdyenPaymentFragment adyenPaymentFragment = new AdyenPaymentFragment();
+    Bundle bundle =
+        createBaseAdyenPaymentFragmentBundle(paymentMethod, walletAddress, signature, fiatPrice,
+            fiatPriceCurrencyCode, appcPrice, sku, buyItemProperties);
+    adyenPaymentFragment.setArguments(bundle);
+    return adyenPaymentFragment;
+  }
+
+  public static AdyenPaymentFragment newResumeTransactionInstance(String paymentMethod,
+      String walletAddress, String signature, String fiatPrice, String fiatPriceCurrencyCode,
+      String appcPrice, String sku, String toResumeTransactionId,
+      BuyItemProperties buyItemProperties) {
+    AdyenPaymentFragment adyenPaymentFragment = new AdyenPaymentFragment();
+    Bundle bundle =
+        createBaseAdyenPaymentFragmentBundle(paymentMethod, walletAddress, signature, fiatPrice,
+            fiatPriceCurrencyCode, appcPrice, sku, buyItemProperties);
+    bundle.putString(TO_RESUME_TRANSACTION_UID, toResumeTransactionId);
+    adyenPaymentFragment.setArguments(bundle);
+    return adyenPaymentFragment;
+  }
+
+  private static Bundle createBaseAdyenPaymentFragmentBundle(String paymentMethod,
+      String walletAddress, String signature, String fiatPrice, String fiatPriceCurrencyCode,
+      String appcPrice, String sku, BuyItemProperties buyItemProperties) {
     Bundle bundle = new Bundle();
-    bundle.putString(PAYMENT_METHOD_KEY, selectedRadioButton);
+    bundle.putString(PAYMENT_METHOD_KEY, paymentMethod);
     bundle.putString(WALLET_ADDRESS_KEY, walletAddress);
     bundle.putString(SIGNATURE_KEY, signature);
     bundle.putString(FIAT_VALUE_KEY, fiatPrice);
@@ -87,8 +113,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     bundle.putString(APPC_VALUE_KEY, appcPrice);
     bundle.putString(SKU_KEY, sku);
     bundle.putSerializable(BUY_ITEM_PROPERTIES, buyItemProperties);
-    adyenPaymentFragment.setArguments(bundle);
-    return adyenPaymentFragment;
+    return bundle;
   }
 
   @Override public void onAttach(Context context) {
@@ -107,7 +132,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     adyenPaymentInfo = extractBundleInfo();
     AdyenRepository adyenRepository = new AdyenRepository(
         new BdsService(BuildConfig.HOST_WS + "/broker/", BdsService.TIME_OUT_IN_MILLIS),
-        new AdyenListenerProvider(new AdyenMapper()));
+        new AdyenListenerProvider(new AdyenMapper(new TransactionMapper(new EnumMapper()))));
     Service apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
     Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, BdsService.TIME_OUT_IN_MILLIS);
     OemIdExtractor extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
@@ -205,7 +230,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     layout.getCardNumberEditText()
         .setText(getString(savedInstanceState, CARD_NUMBER_KEY, ""));
     String expiryDate = savedInstanceState.getString(EXPIRY_DATE_KEY);
-    if (expiryDate != null) {
+    if (expiryDate != null && !expiryDate.equals("")) {
       EditText expiryEditText = layout.getExpiryDateEditText();
       expiryEditText.setVisibility(View.VISIBLE);
       expiryEditText.setText(expiryDate);
@@ -213,7 +238,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
           .length());
     }
     String cvv = savedInstanceState.getString(CVV_KEY);
-    if (cvv != null) {
+    if (cvv != null && !cvv.equals("")) {
       EditText cvvEditText = layout.getCvvEditText();
       cvvEditText.setVisibility(View.VISIBLE);
       cvvEditText.setText(cvv);
@@ -431,10 +456,14 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     String fiatPrice = getBundleString(FIAT_VALUE_KEY);
     String fiatCurrency = getBundleString(FIAT_CURRENCY_KEY);
     String appcPrice = getBundleString(APPC_VALUE_KEY);
+    String toResumeTransactionId = null;
+    if (getArguments().containsKey(TO_RESUME_TRANSACTION_UID)) {
+      toResumeTransactionId = getArguments().getString(TO_RESUME_TRANSACTION_UID);
+    }
     BuyItemProperties buyItemProperties = getBundleBuyItemProperties(BUY_ITEM_PROPERTIES);
 
     return new AdyenPaymentInfo(paymentMethod, walletAddress, signature, fiatPrice, fiatCurrency,
-        appcPrice, buyItemProperties);
+        appcPrice, toResumeTransactionId, buyItemProperties);
   }
 
   private void attach(Context context) {

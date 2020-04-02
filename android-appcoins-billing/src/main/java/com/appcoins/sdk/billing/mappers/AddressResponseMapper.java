@@ -11,7 +11,7 @@ public class AddressResponseMapper {
 
   public AddressModel map(RequestResponse requestResponse, String defaultAddress) {
     JSONObject jsonObject;
-    AddressModel addressModel = new AddressModel(defaultAddress);
+    AddressModel addressModel = AddressModel.createDefaultAddressModel(defaultAddress);
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     if (isSuccess(code) && response != null) {
@@ -33,7 +33,7 @@ public class AddressResponseMapper {
 
   public AddressModel mapDeveloper(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    AddressModel addressModel = new AddressModel("");
+    AddressModel addressModel = AddressModel.createDefaultAddressModel("");
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     if (isSuccess(code) && response != null) {

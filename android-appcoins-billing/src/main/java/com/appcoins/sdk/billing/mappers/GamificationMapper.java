@@ -15,7 +15,7 @@ public class GamificationMapper {
 
   public GamificationModel mapToMaxBonus(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    GamificationModel gamificationModel = new GamificationModel();
+    GamificationModel gamificationModel = GamificationModel.createErrorGamificationModel();
     int code = requestResponse.getResponseCode();
     String response = requestResponse.getResponse();
     if (isSuccess(code) && response != null) {

@@ -19,10 +19,14 @@ public class GamificationModel {
     this.error = false;
   }
 
-  public GamificationModel() {
+  private GamificationModel() {
     this.maxBonus = -1;
     this.status = "";
     this.error = true;
+  }
+
+  public static GamificationModel createErrorGamificationModel() {
+    return new GamificationModel();
   }
 
   public int getMaxBonus() {
