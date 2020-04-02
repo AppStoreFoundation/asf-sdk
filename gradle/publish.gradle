@@ -1,7 +1,8 @@
 ext {
-  VERSION_CODE = 5
-  VERSION_NAME_SUFFIX = System.getenv("BUILD_NAME_SUFFIX") != null ? System.getenv("BUILD_NAME_SUFFIX") : ""
-  VERSION_NAME = "0.5.5." + VERSION_CODE + VERSION_NAME_SUFFIX
+  VERSION_CODE = 90
+  VERSION_NAME_SUFFIX =
+      System.getenv("BUILD_NAME_SUFFIX") != null ? System.getenv("BUILD_NAME_SUFFIX") : ""
+  VERSION_NAME = "0.5.5.5" + VERSION_NAME_SUFFIX
   VERSION = VERSION_NAME
   GROUP = "com.blockchainds"
 }
