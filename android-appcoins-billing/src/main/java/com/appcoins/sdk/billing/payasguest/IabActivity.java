@@ -141,8 +141,8 @@ public class IabActivity extends Activity implements IabView {
   public void navigateToAdyen(String paymentMethod, String walletAddress, String signature,
       String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku) {
     AdyenPaymentFragment adyenPaymentFragment =
-        AdyenPaymentFragment.newInstance(paymentMethod, walletAddress, signature, fiatPrice,
-            fiatPriceCurrencyCode, appcPrice, sku, null, buyItemProperties);
+        AdyenPaymentFragment.newStartTransactionInstance(paymentMethod, walletAddress, signature,
+            fiatPrice, fiatPriceCurrencyCode, appcPrice, sku, buyItemProperties);
     navigateTo(adyenPaymentFragment);
   }
 
@@ -150,8 +150,8 @@ public class IabActivity extends Activity implements IabView {
   public void resumeAdyenTransaction(String paymentMethod, String walletAddress, String signature,
       String fiatPrice, String fiatPriceCurrencyCode, String appcPrice, String sku, String uid) {
     AdyenPaymentFragment adyenPaymentFragment =
-        AdyenPaymentFragment.newInstance(paymentMethod, walletAddress, signature, fiatPrice,
-            fiatPriceCurrencyCode, appcPrice, sku, uid, buyItemProperties);
+        AdyenPaymentFragment.newResumeTransactionInstance(paymentMethod, walletAddress, signature,
+            fiatPrice, fiatPriceCurrencyCode, appcPrice, sku, uid, buyItemProperties);
     navigateTo(adyenPaymentFragment);
   }
 
