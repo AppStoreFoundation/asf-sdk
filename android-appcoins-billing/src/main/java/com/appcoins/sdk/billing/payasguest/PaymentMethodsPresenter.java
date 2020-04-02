@@ -70,7 +70,7 @@ class PaymentMethodsPresenter {
   void onPositiveButtonClicked(String selectedRadioButton) {
     if (isAdyen(selectedRadioButton)) {
       sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
-      fragmentView.navigateToAdyen(selectedRadioButton, null);
+      fragmentView.navigateToAdyen(selectedRadioButton);
     } else {
       sendPaymentMethodEvent(selectedRadioButton, BillingAnalytics.EVENT_NEXT);
       Intent intent = walletInstallationIntentBuilder.getWalletInstallationIntent();
@@ -209,7 +209,8 @@ class PaymentMethodsPresenter {
         if (!transactionModels.isEmpty() && shouldResumeTransaction(transactionModels.get(0)
             .getTransaction())) {
           TransactionModel transactionModel = transactionModels.get(0);
-          fragmentView.navigateToAdyen(transactionModel.getGateway(), transactionModel.getUid());
+          fragmentView.resumeAdyenTransaction(transactionModel.getGateway(),
+              transactionModel.getUid());
         } else {
           checkForUnconsumedPurchased(walletGenerationModel, skuDetails, buyItemProperties);
         }

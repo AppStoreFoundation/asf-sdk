@@ -518,13 +518,6 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     throw new IllegalArgumentException(key + "data not found");
   }
 
-  private boolean getBundleBoolean(String key) {
-    if (getArguments().containsKey(key)) {
-      return getArguments().getBoolean(key);
-    }
-    throw new IllegalArgumentException(key + "data not found");
-  }
-
   private BuyItemProperties getBundleBuyItemProperties(String key) {
     if (getArguments().containsKey(key)) {
       return (BuyItemProperties) getArguments().getSerializable(key);

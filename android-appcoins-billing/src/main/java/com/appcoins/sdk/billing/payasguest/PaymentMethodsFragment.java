@@ -320,9 +320,20 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     iabView.redirectToWalletInstallation(intent);
   }
 
-  @Override public void navigateToAdyen(String paymentMethod, String uid) {
+  @Override public void navigateToAdyen(String paymentMethod) {
     if (walletGenerationModel.getWalletAddress() != null && skuDetailsModel != null) {
       iabView.navigateToAdyen(paymentMethod, walletGenerationModel.getWalletAddress(),
+          walletGenerationModel.getSignature(), skuDetailsModel.getFiatPrice(),
+          skuDetailsModel.getFiatPriceCurrencyCode(), skuDetailsModel.getAppcPrice(),
+          buyItemProperties.getSku());
+    } else {
+      showError();
+    }
+  }
+
+  @Override public void resumeAdyenTransaction(String paymentMethod, String uid) {
+    if (walletGenerationModel.getWalletAddress() != null && skuDetailsModel != null) {
+      iabView.resumeAdyenTransaction(paymentMethod, walletGenerationModel.getWalletAddress(),
           walletGenerationModel.getSignature(), skuDetailsModel.getFiatPrice(),
           skuDetailsModel.getFiatPriceCurrencyCode(), skuDetailsModel.getAppcPrice(),
           buyItemProperties.getSku(), uid);

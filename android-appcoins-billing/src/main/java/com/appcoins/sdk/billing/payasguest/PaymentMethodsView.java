@@ -18,7 +18,9 @@ interface PaymentMethodsView {
 
   void redirectToWalletInstallation(Intent intent);
 
-  void navigateToAdyen(String paymentMethod, String uid);
+  void navigateToAdyen(String paymentMethod);
+
+  void resumeAdyenTransaction(String paymentMethod, String uid);
 
   void setRadioButtonSelected(String radioButtonSelected);
 

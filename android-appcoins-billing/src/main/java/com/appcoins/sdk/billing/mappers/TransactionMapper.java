@@ -31,7 +31,6 @@ public class TransactionMapper {
   }
 
   public TransactionsListModel mapTransactionListResponse(RequestResponse requestResponse) {
-    JSONObject jsonObject;
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     TransactionsListModel transactionsListModel = new TransactionsListModel();
@@ -40,9 +39,13 @@ public class TransactionMapper {
       try {
         JSONArray jsonArray = new JSONObject(response).optJSONArray("items");
         for (int i = 0; i < jsonArray.length(); i++) {
-          jsonObject = jsonArray.getJSONObject(i);
-          TransactionModel transactionModel = createTransactionModel(jsonObject, code);
-          transactionModels.add(transactionModel);
+          try {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            TransactionModel transactionModel = createTransactionModel(jsonObject, code);
+            transactionModels.add(transactionModel);
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
         }
         transactionsListModel = new TransactionsListModel(transactionModels, false);
       } catch (JSONException e) {
