@@ -41,7 +41,7 @@ public class TransactionModel {
     return transaction.getOrderReference();
   }
 
-  public String getStatus() {
+  public Transaction.Status getStatus() {
     return transaction.getStatus();
   }
 

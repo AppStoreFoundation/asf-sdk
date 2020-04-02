@@ -298,8 +298,8 @@ class AdyenPaymentPresenter {
         adyenPaymentInfo.getSignature(), getTransactionListener);
   }
 
-  private boolean isTransactionCompleted(String status) {
-    return status.equalsIgnoreCase(String.valueOf(Status.COMPLETED));
+  private boolean isTransactionCompleted(Status status) {
+    return status == Status.COMPLETED;
   }
 
   private void createBundle(final TransactionModel transactionModel) {
@@ -333,10 +333,10 @@ class AdyenPaymentPresenter {
     handler.postDelayed(runnable, 3000);
   }
 
-  private boolean paymentFailed(String status) {
-    return status.equalsIgnoreCase(String.valueOf(Status.FAILED)) || status.equalsIgnoreCase(
-        String.valueOf(Status.CANCELED)) || status.equalsIgnoreCase(
-        String.valueOf(Status.INVALID_TRANSACTION));
+  private boolean paymentFailed(Status status) {
+    return status == Status.FAILED
+        || status == Status.CANCELED
+        || status == Status.INVALID_TRANSACTION;
   }
 
   private AdyenPaymentMethod mapPaymentToService(String paymentType) {

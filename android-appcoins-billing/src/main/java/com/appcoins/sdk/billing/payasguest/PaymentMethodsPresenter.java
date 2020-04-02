@@ -242,7 +242,6 @@ class PaymentMethodsPresenter {
   }
 
   private boolean shouldResumeTransaction(Transaction transaction) {
-    String status = transaction.getStatus();
-    return status.equalsIgnoreCase(Transaction.Status.PROCESSING.toString());
+    return transaction.getStatus() == Transaction.Status.PROCESSING;
   }
 }

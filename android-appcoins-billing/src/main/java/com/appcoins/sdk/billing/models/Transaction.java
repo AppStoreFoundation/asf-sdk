@@ -5,10 +5,10 @@ public class Transaction {
   private final String uid;
   private final String hash;
   private final String orderReference;
-  private final String status;
+  private final Status status;
   private String gateway;
 
-  public Transaction(String uid, String hash, String orderReference, String status,
+  public Transaction(String uid, String hash, String orderReference, Status status,
       String gateway) {
 
     this.uid = uid;
@@ -22,7 +22,7 @@ public class Transaction {
     this.uid = "";
     this.hash = "";
     this.orderReference = "";
-    this.status = "";
+    this.status = Status.INVALID_TRANSACTION;
     this.gateway = "";
   }
 
@@ -42,7 +42,7 @@ public class Transaction {
     return orderReference;
   }
 
-  public String getStatus() {
+  public Status getStatus() {
     return status;
   }
 

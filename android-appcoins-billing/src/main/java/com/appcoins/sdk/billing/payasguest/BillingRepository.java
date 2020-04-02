@@ -11,6 +11,7 @@ import com.appcoins.sdk.billing.service.BdsService;
 import com.appcoins.sdk.billing.service.RequestResponse;
 import com.appcoins.sdk.billing.service.Service;
 import com.appcoins.sdk.billing.service.ServiceResponseListener;
+import com.appcoins.sdk.billing.utils.EnumMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -144,7 +145,7 @@ public class BillingRepository {
       final TransactionsListener transactionsListener) {
     ServiceResponseListener serviceResponseListener = new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
-        TransactionMapper transactionMapper = new TransactionMapper();
+        TransactionMapper transactionMapper = new TransactionMapper(new EnumMapper());
         TransactionsListModel transactionsListModel =
             transactionMapper.mapTransactionListResponse(requestResponse);
         transactionsListener.onResponse(transactionsListModel);

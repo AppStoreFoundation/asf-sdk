@@ -41,6 +41,7 @@ import com.appcoins.sdk.billing.service.address.WalletAddressService;
 import com.appcoins.sdk.billing.service.adyen.AdyenListenerProvider;
 import com.appcoins.sdk.billing.service.adyen.AdyenMapper;
 import com.appcoins.sdk.billing.service.adyen.AdyenRepository;
+import com.appcoins.sdk.billing.utils.EnumMapper;
 import com.sdk.appcoins_adyen.models.ExpiryDate;
 import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 import com.sdk.appcoins_adyen.utils.RedirectUtils;
@@ -110,7 +111,7 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     adyenPaymentInfo = extractBundleInfo();
     AdyenRepository adyenRepository = new AdyenRepository(
         new BdsService(BuildConfig.HOST_WS + "/broker/", BdsService.TIME_OUT_IN_MILLIS),
-        new AdyenListenerProvider(new AdyenMapper(new TransactionMapper())));
+        new AdyenListenerProvider(new AdyenMapper(new TransactionMapper(new EnumMapper()))));
     Service apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
     Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, BdsService.TIME_OUT_IN_MILLIS);
     OemIdExtractor extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
