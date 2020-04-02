@@ -17,14 +17,20 @@ public class EnumMapperTest {
   @Test public void transactionStatusMappingTest() {
     String[] transactionStatusString = {
         "PENDING", "PENDING SERVICE AUTHORIZATION", "SETTLED", "PROCESSING", "COMPLETED",
-        "PENDING USER PAYMENT", "INVALID TRANSACTION", "FAILED", "CANCELED"
+        "PENDING USER PAYMENT", "INVALID TRANSACTION", "FAILED", "CANCELED", "ERROR"
     };
     Transaction.Status[] transactionStatus = Transaction.Status.values();
     Assert.assertEquals(transactionStatusString.length, transactionStatus.length);
     for (int i = 0; i < transactionStatusString.length; i++) {
       Assert.assertEquals(
-          enumMapper.parseToEnum(Transaction.Status.class, transactionStatusString[i]),
-          transactionStatus[i]);
+          enumMapper.parseToEnum(Transaction.Status.class, transactionStatusString[i],
+              Transaction.Status.ERROR), transactionStatus[i]);
     }
+  }
+
+  @Test public void transactionStatusMappingNoMapValueTest() {
+    Assert.assertEquals(
+        enumMapper.parseToEnum(Transaction.Status.class, "RANDOMVALUE", Transaction.Status.ERROR),
+        Transaction.Status.ERROR);
   }
 }
