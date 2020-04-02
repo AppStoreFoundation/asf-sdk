@@ -20,12 +20,16 @@ public class AdyenPaymentMethodsModel {
     this.error = error;
   }
 
-  public AdyenPaymentMethodsModel() {
+  private AdyenPaymentMethodsModel() {
     this.value = null;
     this.currency = "";
     this.paymentMethod = "";
     this.storedMethodDetails = null;
     this.error = true;
+  }
+
+  public static AdyenPaymentMethodsModel createErrorAdyenPaymentMethodsModel() {
+    return new AdyenPaymentMethodsModel();
   }
 
   public BigDecimal getValue() {

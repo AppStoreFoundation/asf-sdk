@@ -17,7 +17,7 @@ import static com.appcoins.sdk.billing.utils.ServiceUtils.isSuccess;
 public class PurchaseMapper {
 
   public PurchaseModel map(RequestResponse requestResponse) {
-    PurchaseModel purchaseModel = new PurchaseModel();
+    PurchaseModel purchaseModel = PurchaseModel.createErrorPurchaseModel();
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     if (isSuccess(code) && response != null) {
@@ -54,7 +54,7 @@ public class PurchaseMapper {
       }
       purchasesModel = new PurchasesModel(skuPurchases, false);
     } else {
-      purchasesModel = new PurchasesModel();
+      purchasesModel = PurchasesModel.createErrorPurchasesModel();
     }
     return purchasesModel;
   }

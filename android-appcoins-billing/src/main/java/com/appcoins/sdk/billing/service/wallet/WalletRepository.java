@@ -47,7 +47,8 @@ public class WalletRepository {
 
   public WalletGenerationModel requestWalletSync(String id) {
     final CountDownLatch countDownLatch = new CountDownLatch(1);
-    final WalletGenerationModel[] walletGenerationModel = { new WalletGenerationModel() };
+    final WalletGenerationModel[] walletGenerationModel =
+        { WalletGenerationModel.createErrorWalletGenerationModel() };
 
     Map<String, String> queries = new HashMap<>();
     queries.put("id", id);

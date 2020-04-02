@@ -33,7 +33,7 @@ public class AdyenTransactionModel {
     this.responseCode = responseCode;
   }
 
-  public AdyenTransactionModel(int responseCode) {
+  private AdyenTransactionModel(int responseCode) {
     this.uid = "";
     this.hash = "";
     this.orderReference = "";
@@ -46,6 +46,10 @@ public class AdyenTransactionModel {
     this.refusalReasonCode = -1;
     this.error = true;
     this.responseCode = responseCode;
+  }
+
+  public static AdyenTransactionModel createErrorAdyenTransactionModel(int code) {
+    return new AdyenTransactionModel(code);
   }
 
   public String getUid() {

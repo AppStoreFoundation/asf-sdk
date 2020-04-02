@@ -15,9 +15,13 @@ public class TransactionsListModel {
     this.hasError = hasError;
   }
 
-  public TransactionsListModel() {
+  private TransactionsListModel() {
     this.transactionModelList = Collections.emptyList();
     this.hasError = true;
+  }
+
+  public static TransactionsListModel createErrorTransactionListModel() {
+    return new TransactionsListModel();
   }
 
   public List<TransactionModel> getTransactionModelList() {

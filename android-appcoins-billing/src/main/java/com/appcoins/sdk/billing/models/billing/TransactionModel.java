@@ -16,9 +16,13 @@ public class TransactionModel {
   }
 
   public TransactionModel(int responseCode) {
-    this.transaction = new Transaction();
+    this.transaction = Transaction.createErrorTransaction();
     this.error = true;
     this.responseCode = responseCode;
+  }
+
+  public static TransactionModel createErrorTransactionModel(int responseCode) {
+    return new TransactionModel(responseCode);
   }
 
   public Transaction getTransaction() {

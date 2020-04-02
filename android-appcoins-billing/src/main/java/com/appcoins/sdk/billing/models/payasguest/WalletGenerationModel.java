@@ -13,11 +13,15 @@ public class WalletGenerationModel {
     this.error = error;
   }
 
-  public WalletGenerationModel() {
+  private WalletGenerationModel() {
 
     this.walletAddress = "";
     this.signature = "";
     this.error = true;
+  }
+
+  public static WalletGenerationModel createErrorWalletGenerationModel() {
+    return new WalletGenerationModel();
   }
 
   public String getWalletAddress() {

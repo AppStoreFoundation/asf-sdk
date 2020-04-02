@@ -18,7 +18,7 @@ public class TransactionMapper {
     JSONObject jsonObject;
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
-    TransactionModel transactionModel = new TransactionModel(code);
+    TransactionModel transactionModel = TransactionModel.createErrorTransactionModel(code);
     if (isSuccess(code) && response != null) {
       try {
         jsonObject = new JSONObject(response);
@@ -33,7 +33,8 @@ public class TransactionMapper {
   public TransactionsListModel mapTransactionListResponse(RequestResponse requestResponse) {
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
-    TransactionsListModel transactionsListModel = new TransactionsListModel();
+    TransactionsListModel transactionsListModel =
+        TransactionsListModel.createErrorTransactionListModel();
     List<TransactionModel> transactionModels = new ArrayList<>();
     if (isSuccess(code) && response != null) {
       try {

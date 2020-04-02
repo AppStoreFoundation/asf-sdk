@@ -30,7 +30,8 @@ public class AdyenMapper {
     JSONObject jsonObject;
     int code = requestResponse.getResponseCode();
     String response = requestResponse.getResponse();
-    AdyenTransactionModel adyenTransactionModel = new AdyenTransactionModel(code);
+    AdyenTransactionModel adyenTransactionModel =
+        AdyenTransactionModel.createErrorAdyenTransactionModel(code);
     String uid;
     String hash;
     String orderReference;
@@ -74,7 +75,8 @@ public class AdyenMapper {
 
   public AdyenPaymentMethodsModel mapPaymentMethodsResponse(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    AdyenPaymentMethodsModel paymentMethodsResponse = new AdyenPaymentMethodsModel();
+    AdyenPaymentMethodsModel paymentMethodsResponse =
+        AdyenPaymentMethodsModel.createErrorAdyenPaymentMethodsModel();
     String response = requestResponse.getResponse();
     int code = requestResponse.getResponseCode();
     BigDecimal value;

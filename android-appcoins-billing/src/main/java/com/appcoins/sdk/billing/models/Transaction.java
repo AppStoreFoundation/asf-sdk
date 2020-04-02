@@ -18,12 +18,16 @@ public class Transaction {
     this.gateway = gateway;
   }
 
-  public Transaction() {
+  private Transaction() {
     this.uid = "";
     this.hash = "";
     this.orderReference = "";
     this.status = "";
     this.gateway = "";
+  }
+
+  public static Transaction createErrorTransaction() {
+    return new Transaction();
   }
 
   public String getUid() {

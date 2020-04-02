@@ -11,9 +11,13 @@ public class AddressModel {
     this.hasError = hasError;
   }
 
-  public AddressModel(String address) {
+  private AddressModel(String address) {
     this.address = address;
     this.hasError = true;
+  }
+
+  public static AddressModel createDefaultAddressModel(String defaultAddress) {
+    return new AddressModel(defaultAddress);
   }
 
   public String getAddress() {

@@ -19,7 +19,7 @@ public class PaymentMethodsResponseMapper {
 
   public PaymentMethodsModel map(RequestResponse requestResponse) {
     JSONObject jsonObject;
-    PaymentMethodsModel paymentMethodsModel = new PaymentMethodsModel();
+    PaymentMethodsModel paymentMethodsModel = PaymentMethodsModel.createErrorPaymentMethodsModel();
     String response = requestResponse.getResponse();
     List<PaymentMethod> paymentMethods = new ArrayList<>();
     int code = requestResponse.getResponseCode();

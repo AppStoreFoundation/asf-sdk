@@ -11,9 +11,13 @@ public class PurchaseModel {
     this.hasError = hasError;
   }
 
-  public PurchaseModel() {
+  private PurchaseModel() {
     this.purchase = null;
     this.hasError = true;
+  }
+
+  public static PurchaseModel createErrorPurchaseModel() {
+    return new PurchaseModel();
   }
 
   public SkuPurchase getPurchase() {

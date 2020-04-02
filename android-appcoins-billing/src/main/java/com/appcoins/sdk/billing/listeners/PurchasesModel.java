@@ -19,6 +19,10 @@ public class PurchasesModel {
     this.error = true;
   }
 
+  public static PurchasesModel createErrorPurchasesModel() {
+    return new PurchasesModel();
+  }
+
   public List<SkuPurchase> getSkuPurchases() {
     return skuPurchases;
   }
