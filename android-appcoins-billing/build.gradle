@@ -18,6 +18,7 @@ android {
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     versionCode VERSION_CODE
     versionName VERSION_NAME
+    buildConfigField "boolean", "URI_COMMUNICATION", "true"
     buildConfigField 'String', 'RAKAM_API_KEY', project.RAKAM_API_KEY
     buildConfigField "int", "MIN_SDK_VERSION", "$minSdkVersion.apiLevel"
   }
