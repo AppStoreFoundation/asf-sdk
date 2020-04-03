@@ -488,6 +488,7 @@ public class PaymentMethodsFragmentLayout {
     setMargins(layoutParams, 0, 0, 16, 0);
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
+    background.setColor(Color.WHITE);
     background.setStroke(dpToPx(1), Color.WHITE);
     background.setCornerRadius(dpToPx(6));
     button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
@@ -567,6 +568,7 @@ public class PaymentMethodsFragmentLayout {
     background.setShape(GradientDrawable.RECTANGLE);
     background.setStroke(dpToPx(1), Color.parseColor("#e3e3e3"));
     background.setCornerRadius(dpToPx(6));
+    background.setColor(Color.WHITE);
     setBackground(relativeLayout, background);
     setMargins(layoutParams, start, top, 0, 0);
     relativeLayout.setLayoutParams(layoutParams);
@@ -726,6 +728,7 @@ public class PaymentMethodsFragmentLayout {
     background.setShape(GradientDrawable.RECTANGLE);
     background.setStroke(dpToPx(1), Color.parseColor("#e3e3e3"));
     background.setCornerRadius(dpToPx(6));
+    background.setColor(Color.WHITE);
     setBackground(relativeLayout, background);
     setMargins(layoutParams, start, top, 0, 0);
     relativeLayout.setLayoutParams(layoutParams);
@@ -1034,6 +1037,7 @@ public class PaymentMethodsFragmentLayout {
     if (selectedBackground == null) {
       selectedBackground = new GradientDrawable();
       selectedBackground.setShape(GradientDrawable.RECTANGLE);
+      selectedBackground.setColor(Color.WHITE);
       selectedBackground.setStroke(dpToPx(1), Color.parseColor("#fe6e76"));
       selectedBackground.setCornerRadius(dpToPx(6));
     }
@@ -1043,6 +1047,7 @@ public class PaymentMethodsFragmentLayout {
   private GradientDrawable getDefaultGradientDrawable() {
     if (defaultBackground == null) {
       defaultBackground = new GradientDrawable();
+      defaultBackground.setColor(Color.WHITE);
       defaultBackground.setShape(GradientDrawable.RECTANGLE);
       defaultBackground.setStroke(dpToPx(1), Color.parseColor("#e3e3e3"));
       defaultBackground.setCornerRadius(dpToPx(6));

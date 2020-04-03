@@ -351,6 +351,7 @@ public class AdyenPaymentFragmentLayout {
     setMargins(layoutParams, 0, 0, 16, 0);
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
+    background.setColor(Color.WHITE);
     background.setStroke(dpToPx(1), Color.WHITE);
     background.setCornerRadius(dpToPx(6));
     button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
@@ -462,6 +463,7 @@ public class AdyenPaymentFragmentLayout {
 
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
+    background.setColor(Color.WHITE);
     background.setStroke(dpToPx(1), Color.parseColor("#fd7a6a"));
     background.setCornerRadius(dpToPx(6));
     setBackground(creditCardLayout, background);
@@ -523,6 +525,7 @@ public class AdyenPaymentFragmentLayout {
     setConstraint(layoutParams, RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, 0, 12, 0);
     editText.setHint(translations.getString(iab_card_cvv));
+    editText.setGravity(Gravity.CENTER);
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
     editText.setLayoutParams(layoutParams);
@@ -544,13 +547,14 @@ public class AdyenPaymentFragmentLayout {
   private EditText buildExpiryDateEditText() {
     EditText editText = new EditText(activity);
     RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(dpToPx(70), ViewGroup.LayoutParams.MATCH_PARENT);
+        new RelativeLayout.LayoutParams(dpToPx(80), ViewGroup.LayoutParams.MATCH_PARENT);
     editText.setFilters(new InputFilter[] {
         new InputFilter.LengthFilter(CardValidationUtils.DATE_MAX_LENGTH)
     });
     editText.setHint(translations.getString(iab_card_expiry));
     editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
     editText.setHintTextColor(Color.parseColor("#9d9d9d"));
+    editText.setGravity(Gravity.CENTER);
     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
     setMargins(layoutParams, 0, 0, 104, 0);
     editText.setLayoutParams(layoutParams);
@@ -576,7 +580,8 @@ public class AdyenPaymentFragmentLayout {
             + CardValidationUtils.MAX_DIGIT_SEPARATOR_COUNT)
     });
     RelativeLayout.LayoutParams layoutParams =
-        new RelativeLayout.LayoutParams(dpToPx(140), ViewGroup.LayoutParams.MATCH_PARENT);
+        new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT);
 
     layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
     setConstraint(layoutParams, RelativeLayout.RIGHT_OF, genericCardId);
