@@ -113,7 +113,8 @@ public class AdyenRepository {
     body.put("payment.method", adyenPaymentParams.getCardPaymentMethod());
     body.put("price.currency", transactionInformation.getCurrency());
     putIfNotNull(body, "domain", transactionInformation.getPackageName());
-    putIfNotNull(body, "metadata", transactionInformation.getMetadata());
+    String metadata = parseMetaData(transactionInformation.getMetadata());
+    putIfNotNull(body, "metadata", metadata);
     body.put("method", transactionInformation.getPaymentType());
     putIfNotNull(body, "origin", transactionInformation.getOrigin());
     putIfNotNull(body, "reference", transactionInformation.getReference());
@@ -129,6 +130,17 @@ public class AdyenRepository {
     putIfNotNull(body, "wallets.developer", transactionWallets.getDeveloperWalletAddress());
     putIfNotNull(body, "callback_url", transactionInformation.getCallbackUrl());
     return body;
+  }
+
+  private String parseMetaData(String metadata) {
+    String parsedMetadata = metadata;
+    if (metadata != null && (metadata.contains("{") || metadata.contains("["))) {
+      parsedMetadata = metadata.replace("\"", "\\" + "\"");
+      parsedMetadata = "\"" + parsedMetadata + "\"";
+      parsedMetadata = parsedMetadata.replace("\n", "")
+          .replace("\t", "");
+    }
+    return parsedMetadata;
   }
 
   private void putIfNotNull(Map<String, Object> map, String key, String value) {

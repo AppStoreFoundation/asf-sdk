@@ -73,8 +73,7 @@ public class TransactionMapper {
     String orderReference = jsonObject.getString("reference");
     String status = jsonObject.getString("status");
     Transaction.Status transactionStatus =
-        (Transaction.Status) enumMapper.parseToEnum(Transaction.Status.class, status,
-            Transaction.Status.ERROR);
+        enumMapper.parseToEnum(Transaction.Status.class, status, Transaction.Status.ERROR);
     String gatewayName = "";
     JSONObject gateway = jsonObject.optJSONObject("gateway");
     if (gateway != null) {

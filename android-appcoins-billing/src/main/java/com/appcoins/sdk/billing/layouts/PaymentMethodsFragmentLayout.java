@@ -816,6 +816,7 @@ public class PaymentMethodsFragmentLayout {
 
     GradientDrawable background = new GradientDrawable();
     background.setShape(GradientDrawable.RECTANGLE);
+    background.setColor(Color.WHITE);
     background.setStroke(dpToPx(1), Color.parseColor("#e3e3e3"));
     background.setCornerRadius(dpToPx(6));
     setBackground(relativeLayout, background);
