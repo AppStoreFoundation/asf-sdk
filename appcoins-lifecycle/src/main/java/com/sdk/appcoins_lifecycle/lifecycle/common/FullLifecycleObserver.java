@@ -1,7 +1,7 @@
-package com.asf.appcoins.sdk.ads.lifecycle.common;
+package com.sdk.appcoins_lifecycle.lifecycle.common;
 
-import com.asf.appcoins.sdk.ads.lifecycle.LifecycleObserver;
-import com.asf.appcoins.sdk.ads.lifecycle.LifecycleOwner;
+import com.sdk.appcoins_lifecycle.lifecycle.LifecycleObserver;
+import com.sdk.appcoins_lifecycle.lifecycle.LifecycleOwner;
 
 interface FullLifecycleObserver extends LifecycleObserver {
 

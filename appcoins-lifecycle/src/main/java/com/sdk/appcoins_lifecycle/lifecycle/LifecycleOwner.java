@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.lifecycle;
+package com.sdk.appcoins_lifecycle.lifecycle;
 
 /**
  * A class that has an Android lifecycle. These events can be used by custom components to

@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.lifecycle.common;
+package com.sdk.appcoins_lifecycle.lifecycle.common;
 
 import java.util.HashMap;
 import java.util.Map;

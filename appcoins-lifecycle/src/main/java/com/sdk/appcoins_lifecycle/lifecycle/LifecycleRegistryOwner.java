@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.lifecycle;
+package com.sdk.appcoins_lifecycle.lifecycle;
 
 /**
  * @deprecated Use {@code android.support.v7.app.AppCompatActivity}

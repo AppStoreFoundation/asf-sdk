@@ -1,9 +1,9 @@
-package com.asf.appcoins.sdk.ads.lifecycle.common;
+package com.sdk.appcoins_lifecycle.lifecycle.common;
 
-import com.asf.appcoins.sdk.ads.lifecycle.Lifecycle;
-import com.asf.appcoins.sdk.ads.lifecycle.LifecycleEventObserver;
-import com.asf.appcoins.sdk.ads.lifecycle.LifecycleObserver;
-import com.asf.appcoins.sdk.ads.lifecycle.LifecycleOwner;
+import com.sdk.appcoins_lifecycle.lifecycle.Lifecycle;
+import com.sdk.appcoins_lifecycle.lifecycle.LifecycleEventObserver;
+import com.sdk.appcoins_lifecycle.lifecycle.LifecycleObserver;
+import com.sdk.appcoins_lifecycle.lifecycle.LifecycleOwner;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

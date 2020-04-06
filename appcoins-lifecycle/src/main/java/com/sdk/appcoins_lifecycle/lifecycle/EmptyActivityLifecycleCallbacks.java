@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.lifecycle;
+package com.sdk.appcoins_lifecycle.lifecycle;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

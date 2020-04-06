@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.lifecycle;
+package com.sdk.appcoins_lifecycle.lifecycle;
 
 /**
  * Class that can receive any lifecycle change and dispatch it to the receiver.

@@ -1,6 +1,6 @@
-package com.asf.appcoins.sdk.ads.lifecycle.common;
+package com.sdk.appcoins_lifecycle.lifecycle.common;
 
-import com.asf.appcoins.sdk.ads.lifecycle.LifecycleEventObserver;
+import com.sdk.appcoins_lifecycle.lifecycle.LifecycleEventObserver;
 
 /**
  * Class that can receive any lifecycle change and dispatch it to the receiver.

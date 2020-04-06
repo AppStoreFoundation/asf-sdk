@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import com.asf.appcoins.sdk.ads.lifecycle.LifecycleDispatcher;
-import com.asf.appcoins.sdk.ads.lifecycle.ProcessLifecycleOwner;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.manager.PoAManager;
+import com.sdk.appcoins_lifecycle.lifecycle.LifecycleDispatcher;
+import com.sdk.appcoins_lifecycle.lifecycle.ProcessLifecycleOwner;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;

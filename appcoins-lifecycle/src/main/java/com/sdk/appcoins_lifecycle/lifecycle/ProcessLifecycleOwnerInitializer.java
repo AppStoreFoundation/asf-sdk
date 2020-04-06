@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.lifecycle;
+package com.sdk.appcoins_lifecycle.lifecycle;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;

@@ -1,8 +1,8 @@
-package com.asf.appcoins.sdk.ads.lifecycle.common;
+package com.sdk.appcoins_lifecycle.lifecycle.common;
 
-import com.asf.appcoins.sdk.ads.lifecycle.Lifecycle;
-import com.asf.appcoins.sdk.ads.lifecycle.LifecycleEventObserver;
-import com.asf.appcoins.sdk.ads.lifecycle.LifecycleOwner;
+import com.sdk.appcoins_lifecycle.lifecycle.Lifecycle;
+import com.sdk.appcoins_lifecycle.lifecycle.LifecycleEventObserver;
+import com.sdk.appcoins_lifecycle.lifecycle.LifecycleOwner;
 
 /**
  * An internal implementation of {@link LifecycleObserver} that relies on reflection.

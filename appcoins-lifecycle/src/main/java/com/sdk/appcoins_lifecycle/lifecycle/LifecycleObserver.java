@@ -1,4 +1,4 @@
-package com.asf.appcoins.sdk.ads.lifecycle;
+package com.sdk.appcoins_lifecycle.lifecycle;
 
 /**
  * Marks a class as a LifecycleObserver. It does not have any methods, instead, relies on

@@ -1,23 +1,23 @@
-package com.asf.appcoins.sdk.ads.lifecycle;
+package com.sdk.appcoins_lifecycle.lifecycle;
 
-import com.asf.appcoins.sdk.ads.lifecycle.common.FastSafeIterableMap;
-import com.asf.appcoins.sdk.ads.lifecycle.common.Lifecycling;
+import com.sdk.appcoins_lifecycle.lifecycle.common.FastSafeIterableMap;
+import com.sdk.appcoins_lifecycle.lifecycle.common.Lifecycling;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.Event.ON_CREATE;
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.Event.ON_DESTROY;
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.Event.ON_PAUSE;
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.Event.ON_RESUME;
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.Event.ON_START;
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.Event.ON_STOP;
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.State.CREATED;
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.State.DESTROYED;
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.State.INITIALIZED;
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.State.RESUMED;
-import static com.asf.appcoins.sdk.ads.lifecycle.Lifecycle.State.STARTED;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.Event.ON_CREATE;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.Event.ON_DESTROY;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.Event.ON_PAUSE;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.Event.ON_RESUME;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.Event.ON_START;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.Event.ON_STOP;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.State.CREATED;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.State.DESTROYED;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.State.INITIALIZED;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.State.RESUMED;
+import static com.sdk.appcoins_lifecycle.lifecycle.Lifecycle.State.STARTED;
 
 /**
  * An implementation of {@link Lifecycle} that can handle multiple observers.
