@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import com.asf.appcoins.sdk.ads.lifecycle.LifecycleDispatcher;
+import com.asf.appcoins.sdk.ads.lifecycle.ProcessLifecycleOwner;
 import com.asf.appcoins.sdk.ads.poa.PoAServiceConnector;
 import com.asf.appcoins.sdk.ads.poa.manager.PoAManager;
 
@@ -55,9 +57,12 @@ final class AppCoinsAdsImpl implements AppCoinsAds {
     this.context = application;
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      LifecycleDispatcher.init(context);
+      ProcessLifecycleOwner.init(context);
       PoAManager.init(application, poaConnector, networkId);
-      LifeCycleListener.get(application)
-          .setListener(PoAManager.get());
+      ProcessLifecycleOwner.get()
+          .getLifecycle()
+          .addObserver(PoAManager.get());
     }
   }
 }
