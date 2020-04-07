@@ -464,7 +464,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     Bundle intent = appcoinsBillingStubHelper.getBuyIntent(buyItemProperties.getApiVersion(),
         buyItemProperties.getPackageName(), buyItemProperties.getSku(), buyItemProperties.getType(),
         buyItemProperties.getDeveloperPayload()
-            .getDeveloperPayload());
+            .getRawPayload());
 
     PendingIntent pendingIntent = intent.getParcelable(KEY_BUY_INTENT);
     layout.getIntentLoadingView()
