@@ -54,6 +54,11 @@ class RakamEventLogger implements EventLogger {
     Map<String, Object> properties = new LinkedHashMap<>();
     putIfNotNull(properties, "_ip", true);
     putIfNotNull(properties, "_carrier", getCarrier());
+    String libraryPackageName = BuildConfig.LIBRARY_PACKAGE_NAME;
+    if (BuildConfig.DEBUG) {
+      libraryPackageName = libraryPackageName.concat(".dev");
+    }
+    properties.put("aptoide_package", libraryPackageName);
     properties.put("_device_brand", Build.BRAND);
     properties.put("_device_id", Build.ID);
     properties.put("_device_manufacturer", Build.MANUFACTURER);
