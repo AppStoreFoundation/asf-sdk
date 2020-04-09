@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
-import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
 import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
@@ -76,8 +75,7 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     String iabAction = WalletUtils.getIabAction();
     Intent serviceIntent = new Intent(iabAction);
     serviceIntent.setPackage(packageName);
-    if (!context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
-        && BuildConfig.URI_COMMUNICATION) {
+    if (!context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)) {
       bindFailedBehaviour();
     }
   }
