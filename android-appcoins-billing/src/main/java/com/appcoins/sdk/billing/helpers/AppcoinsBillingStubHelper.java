@@ -271,7 +271,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     if (intentServices != null && !intentServices.isEmpty()) {
       return context.bindService(serviceIntent, new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName name, IBinder service) {
-          serviceAppcoinsBilling = Stub.asInterface(service, "");
+          serviceAppcoinsBilling = Stub.asInterface(service);
           startPurchaseAfterConnectionListener.startPurchaseAfterBind();
           Log.d(TAG, "onServiceConnected() called service = [" + serviceAppcoinsBilling + "]");
         }
@@ -305,7 +305,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
 
   public static abstract class Stub {
 
-    public static AppcoinsBilling asInterface(IBinder service, String componentName) {
+    public static AppcoinsBilling asInterface(IBinder service) {
       if (WalletBinderUtil.bindType == BindType.WALLET_NOT_INSTALLED
           || !WalletUtils.hasWalletInstalled()) {
         return AppcoinsBillingStubHelper.getInstance();
