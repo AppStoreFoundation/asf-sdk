@@ -24,7 +24,6 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
   @Override public void onServiceConnected(ComponentName name, IBinder service) {
     Log.d(TAG,
         "onServiceConnected() called with: name = [" + name + "], service = [" + service + "]");
-    WalletBinderUtil.onServiceConnected();
     connectionLifeCycle.onConnect(name, service, listener);
   }
 

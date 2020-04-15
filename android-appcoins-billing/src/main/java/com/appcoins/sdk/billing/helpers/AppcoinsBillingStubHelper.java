@@ -306,7 +306,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   public static abstract class Stub {
 
     public static AppcoinsBilling asInterface(IBinder service) {
-      if (WalletBinderUtil.bindType == BindType.WALLET_NOT_INSTALLED
+      if (WalletBinderUtil.getBindType() == BindType.WALLET_NOT_INSTALLED
           || !WalletUtils.hasWalletInstalled()) {
         return AppcoinsBillingStubHelper.getInstance();
       } else {
@@ -314,8 +314,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
             new SharedPreferencesRepository(WalletUtils.getContext(),
                 SharedPreferencesRepository.TTL_IN_SECONDS);
         AppcoinsBilling appcoinsBilling;
-        if (UriCommunicationAppcoinsBilling.class.getSimpleName()
-            .equals(componentName)) {
+        if (WalletBinderUtil.getBindType() == BindType.URI_CONNECTION) {
           SyncIpcMessageRequester messageRequester =
               MessageRequesterFactory.create(new LifecycleActivityProvider(WalletUtils.getContext()),
                   BuildConfig.BDS_WALLET_PACKAGE_NAME,

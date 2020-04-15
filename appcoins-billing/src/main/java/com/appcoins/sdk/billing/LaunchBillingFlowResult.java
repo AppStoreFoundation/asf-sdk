@@ -1,19 +1,28 @@
 package com.appcoins.sdk.billing;
 
-public class LaunchBillingFlowResult {
-  private final Object responseCode;
-  private final Object buyIntent;
+import android.app.PendingIntent;
+import android.content.Intent;
 
-  public LaunchBillingFlowResult(Object responseCode, Object buyIntent) {
+public class LaunchBillingFlowResult {
+  private final int responseCode;
+  private final PendingIntent buyIntent;
+  private final Intent rawIntent;
+
+  public LaunchBillingFlowResult(int responseCode, PendingIntent buyIntent, Intent rawIntent) {
     this.responseCode = responseCode;
     this.buyIntent = buyIntent;
+    this.rawIntent = rawIntent;
   }
 
-  public Object getResponseCode() {
+  public Intent getRawIntent() {
+    return rawIntent;
+  }
+
+  public int getResponseCode() {
     return responseCode;
   }
 
-  public Object getBuyIntent() {
+  public PendingIntent getBuyIntent() {
     return buyIntent;
   }
 }

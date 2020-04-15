@@ -14,9 +14,6 @@ import com.appcoins.sdk.billing.helpers.WalletUtils;
 
 public class WalletBinderUtil {
 
-  public static final Object object = new Object();
-  public static final int TIME_TO_WAIT_FOR_BIND_IN_MILLIS = 2000;
-  public static boolean isTimeout = true;
   public static BindType bindType = BindType.AIDL;
 
   public static void walletNotInstalledBehaviour(ServiceConnection connection) {
@@ -37,14 +34,6 @@ public class WalletBinderUtil {
     }
   }
 
-  public static void onServiceConnected() {
-
-    isTimeout = false;
-    synchronized (object) {
-      object.notifyAll();
-    }
-  }
-
   public static void walletInstalledBehaviour(Context context, final ServiceConnection connection,
       Intent serviceIntent, int serviceIntentFlags) {
     if (!context.bindService(serviceIntent, connection, serviceIntentFlags)) {
@@ -52,26 +41,6 @@ public class WalletBinderUtil {
     } else {
       bindType = BindType.AIDL;
     }
-
-    checkBind(connection);
-  }
-
-  private static void checkBind(final ServiceConnection connection) {
-    new Thread(new Runnable() {
-      @Override public void run() {
-        synchronized (object) {
-          try {
-            object.wait(TIME_TO_WAIT_FOR_BIND_IN_MILLIS);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-            bindFailedBehaviour(connection);
-          }
-        }
-        if (isTimeout) {
-          bindFailedBehaviour(connection);
-        }
-      }
-    }).start();
   }
 
   public static void bindService(Context context, Intent serviceIntent,
@@ -81,5 +50,9 @@ public class WalletBinderUtil {
     } else {
       walletNotInstalledBehaviour(connection);
     }
+  }
+
+  public static BindType getBindType() {
+    return bindType;
   }
 }
