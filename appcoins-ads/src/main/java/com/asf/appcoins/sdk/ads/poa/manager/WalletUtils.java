@@ -17,12 +17,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import com.appcoins.sdk.billing.helpers.TranslationsModel;
-import com.appcoins.sdk.billing.helpers.TranslationsXmlParser;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.asf.appcoins.sdk.ads.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.poa_wallet_not_installed_notification_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.poa_wallet_not_installed_notification_title;
 
 public class WalletUtils {
 
@@ -162,27 +164,32 @@ public class WalletUtils {
   }
 
   private static boolean userFromIran(String userCountry) {
-    String loweredUserCountry = userCountry.toLowerCase();
-    return loweredUserCountry.equals("ir") || loweredUserCountry.equals("iran");
+    return userCountry.equalsIgnoreCase("ir") || userCountry.equalsIgnoreCase("iran");
   }
 
   private static String getUserCountry(Context context) {
-    try {
-      TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-      String simCountry = tm.getSimCountryIso();
-      if (simCountry != null && simCountry.length() == 2) {
-        return simCountry;
-      } else if (tm.getPhoneType()
-          != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
-        String networkCountry = tm.getNetworkCountryIso();
-        if (networkCountry != null && networkCountry.length() == 2) {
-          return networkCountry;
-        }
-      }
-    } catch (Exception ignored) {
-    }
-    return Locale.getDefault()
+    TelephonyManager telephonyManager =
+        (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+    String userCountry = Locale.getDefault()
         .getCountry();
+    String simCountry = telephonyManager.getSimCountryIso();
+    if (hasCorrectCountryFormat(simCountry)) {
+      userCountry = simCountry;
+    } else if (isPhoneTypeReliable(telephonyManager)) { // device is not 3G (would be unreliable)
+      String networkCountry = telephonyManager.getNetworkCountryIso();
+      if (hasCorrectCountryFormat(networkCountry)) {
+        userCountry = networkCountry;
+      }
+    }
+    return userCountry;
+  }
+
+  private static boolean hasCorrectCountryFormat(String country) {
+    return country != null && country.length() == 2;
+  }
+
+  private static boolean isPhoneTypeReliable(TelephonyManager telephonyManager) {
+    return telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA;
   }
 
   private static Intent getNotificationIntentForBrowser(String url, PackageManager packageManager) {
@@ -253,23 +260,14 @@ public class WalletUtils {
     builder = new Notification.Builder(context, channelId);
     builder.setContentIntent(pendingIntent);
 
-    TranslationsModel translationsModel = fetchTranslations();
+    TranslationsRepository translations = TranslationsRepository.getInstance(context);
 
     builder.setSmallIcon(intent.getExtras()
         .getInt(IDENTIFIER_KEY))
         .setAutoCancel(true)
-        .setContentTitle(translationsModel.getPoaNotificationTitle())
-        .setContentText(translationsModel.getPoaNotificationBody());
+        .setContentTitle(translations.getString(poa_wallet_not_installed_notification_title))
+        .setContentText(translations.getString(poa_wallet_not_installed_notification_body));
     return builder.build();
-  }
-
-  private static TranslationsModel fetchTranslations() {
-    Locale locale = Locale.getDefault();
-    TranslationsXmlParser translationsParser = new TranslationsXmlParser(context);
-    if (iabAction.equals(com.appcoins.billing.sdk.BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
-      return translationsParser.parseTranslationXml("fa", "IR");
-    }
-    return translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
   }
 
   private static boolean isAppInstalled(String packageName, PackageManager packageManager) {
@@ -311,18 +309,26 @@ public class WalletUtils {
     pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
     builder = new Notification.Builder(context);
-    builder.setPriority(Notification.PRIORITY_MAX);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+      builder.setPriority(Notification.PRIORITY_MAX);
+    }
     builder.setContentIntent(pendingIntent);
     builder.setVibrate(new long[0]);
 
-    TranslationsModel translationsModel = fetchTranslations();
+    TranslationsRepository translations = TranslationsRepository.getInstance(context);
 
     builder.setSmallIcon(intent.getExtras()
         .getInt(IDENTIFIER_KEY))
         .setAutoCancel(true)
-        .setContentTitle(translationsModel.getPoaNotificationTitle())
-        .setContentText(translationsModel.getPoaNotificationBody());
+        .setContentTitle(translations.getString(poa_wallet_not_installed_notification_title))
+        .setContentText(translations.getString(poa_wallet_not_installed_notification_body));
 
-    return builder.build();
+    Notification notification;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+      notification = builder.build();
+    } else {
+      notification = builder.getNotification();
+    }
+    return notification;
   }
 }

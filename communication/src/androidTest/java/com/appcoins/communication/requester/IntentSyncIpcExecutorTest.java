@@ -1,7 +1,7 @@
 package com.appcoins.communication.requester;
 
 import android.content.Intent;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

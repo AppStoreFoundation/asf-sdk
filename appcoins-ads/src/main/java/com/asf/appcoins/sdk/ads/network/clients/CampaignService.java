@@ -1,9 +1,10 @@
 package com.asf.appcoins.sdk.ads.network.clients;
 
 import android.net.Uri;
-import com.asf.appcoins.sdk.ads.network.QueryParams;
+import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.asf.appcoins.sdk.ads.network.Interceptor;
 import com.asf.appcoins.sdk.ads.network.LogCreator;
+import com.asf.appcoins.sdk.ads.network.QueryParams;
 import com.asf.appcoins.sdk.ads.network.responses.GetResponseHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,23 +19,20 @@ public class CampaignService implements Runnable {
 
   public static final String PACKAGE_NAME = "packageName";
   public static final String VER_CODE = "vercode";
-  public static final String COUNTRY_CODE = "countryCode";
   public static final String SORT = "sort";
   public static final String BY = "by";
   public static final String VALID = "valid";
   public static final String TYPE = "type";
-
-  private String packageName;
-  private int versionCode;
   protected final String serviceUrl;
   protected final QueryParams params;
   protected final Interceptor interceptor;
   protected GetResponseHandler getResponseHandler;
   protected URL urlConnection;
-  protected String concat;
+  private String packageName;
+  private int versionCode;
 
-  public CampaignService(String packageName, int versionCode, String serviceUrl, Interceptor interceptor,
-      QueryParams params, GetResponseHandler getResponseHandler) {
+  public CampaignService(String packageName, int versionCode, String serviceUrl,
+      Interceptor interceptor, QueryParams params, GetResponseHandler getResponseHandler) {
     this.packageName = packageName;
     this.versionCode = versionCode;
     this.serviceUrl = serviceUrl;
@@ -63,6 +61,7 @@ public class CampaignService implements Runnable {
 
     HttpURLConnection connection = (HttpURLConnection) urlConnection.openConnection();
     connection.setRequestMethod("GET");
+    connection.setRequestProperty("User-Agent", WalletUtils.getUserAgent());
     Map<String, List<String>> requestProperties = connection.getRequestProperties();
 
     connection.connect();
@@ -90,8 +89,8 @@ public class CampaignService implements Runnable {
     return response;
   }
 
-  private String buildURL(){
-    Uri campaignUri = Uri.parse(serviceUrl+"/campaign/listall?")
+  private String buildURL() {
+    Uri campaignUri = Uri.parse(serviceUrl + "/campaign/listall?")
         .buildUpon()
         .appendQueryParameter(PACKAGE_NAME, packageName)
         .appendQueryParameter(VER_CODE, Integer.toString(versionCode))

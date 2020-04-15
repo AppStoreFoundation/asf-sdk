@@ -1,21 +1,28 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.appcoins.billing.sdk">
 
-  <uses-permission android:name="com.appcoins.BILLING" />
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+  <uses-permission android:name="com.appcoins.BILLING"/>
+
   <application>
     <activity
         android:name="com.appcoins.sdk.billing.helpers.InstallDialogActivity"
-        android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+    <activity
+        android:name="com.appcoins.sdk.billing.payasguest.IabActivity"
+        android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+    <activity
+        android:name="com.appcoins.sdk.billing.WebViewActivity"
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
     <activity android:name="com.appcoins.sdk.billing.UriCommunicationActivity">
       <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
+        <action android:name="android.intent.action.VIEW"/>
         <data
             android:host="billing"
             android:path="/communication/requester/1"
-            android:scheme="appcoins" />
-        <category android:name="android.intent.category.DEFAULT" />
+            android:scheme="appcoins"/>
+        <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>
-
   </application>
 </manifest>

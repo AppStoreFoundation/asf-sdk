@@ -1,17 +1,26 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.kezong.fat-aar' //https://github.com/kezong/fat-aar-android
 
 android {
   compileSdkVersion COMPILE_SDK_VERSION
 
+  repositories {
+    maven { url "https://dl.bintray.com/aptoide/Aptoide" }
+  }
+
+  configurations.embed.transitive = true //Needed for kezong.fat-aar plugin
+
   defaultConfig {
     minSdkVersion MIN_SDK_VERSION
     targetSdkVersion TARGET_SDK_VERSION
-
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     versionCode VERSION_CODE
     versionName VERSION_NAME
     buildConfigField "boolean", "URI_COMMUNICATION", "true"
+    buildConfigField 'String', 'RAKAM_API_KEY', project.RAKAM_API_KEY
+    buildConfigField "int", "MIN_SDK_VERSION", "$minSdkVersion.apiLevel"
   }
 
   buildTypes {
@@ -33,6 +42,8 @@ android {
           project.CAFE_BAZAAR_WALLET_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+      buildConfigField 'String', 'BACKEND_BASE',
+          "\"" + project.ROPSTEN_NETWORK_BACKEND_BASE_HOST + "\""
       buildConfigField 'String', 'SERVICE_BIND_LIST',
           "\"" + project.APTOIDE_PACKAGE_NAME_DEV.replace('\"', '') +
               "," +
@@ -40,6 +51,11 @@ android {
               "," +
               project.CAFE_BAZAAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
+      buildConfigField 'String', 'ADYEN_PUBLIC_KEY', project.ADYEN_PUBLIC_KEY_DEV
+      buildConfigField 'String', 'DEFAULT_OEM_ADDRESS', "\"" + project.DEFAULT_OEM_ADDRESS + "\""
+      buildConfigField 'String', 'DEFAULT_STORE_ADDRESS',
+          "\"" + project.DEFAULT_STORE_ADDRESS + "\""
+      buildConfigField 'String', 'BDS_BASE_HOST', project.BDS_BASE_HOST_DEV
     }
     release {
       minifyEnabled false
@@ -60,6 +76,8 @@ android {
           project.CAFE_BAZAAR_WALLET_PACKAGE_NAME
       buildConfigField 'String', 'HOST_WS',
           "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST_WS + "\""
+      buildConfigField 'String', 'BACKEND_BASE',
+          "\"" + project.MAIN_NETWORK_BACKEND_BASE_HOST + "\""
       buildConfigField 'String', 'SERVICE_BIND_LIST',
           "\"" + project.APTOIDE_PACKAGE_NAME.replace('\"', '') +
               "," +
@@ -67,6 +85,11 @@ android {
               "," +
               project.CAFE_BAZAAR_WALLET_PACKAGE_NAME.replace('\"', '') +
               "\""
+      buildConfigField 'String', 'ADYEN_PUBLIC_KEY', project.ADYEN_PUBLIC_KEY
+      buildConfigField 'String', 'DEFAULT_OEM_ADDRESS', "\"" + project.DEFAULT_OEM_ADDRESS + "\""
+      buildConfigField 'String', 'DEFAULT_STORE_ADDRESS',
+          "\"" + project.DEFAULT_STORE_ADDRESS + "\""
+      buildConfigField 'String', 'BDS_BASE_HOST', project.BDS_BASE_HOST_PROD
       minifyEnabled false
     }
   }
@@ -74,7 +97,17 @@ android {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation 'aptoide-client-v8:aptoide-analytics-core:1.0.4'
+  embed 'aptoide-client-v8:aptoide-analytics-core:1.0.4' //Needed so that if the dev use SDK the lib is automatically included
+
+  testImplementation 'junit:junit:4.12'
+  testImplementation 'org.mockito:mockito-core:2.28.2'
+  testImplementation 'org.json:json:20190722'
+  androidTestImplementation 'com.android.support.test:runner:1.0.2'
+  androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
   api project(path: ':appcoins-billing')
+  api project(':appcoins-adyen')
   api project(path: ':communication')
 }
 

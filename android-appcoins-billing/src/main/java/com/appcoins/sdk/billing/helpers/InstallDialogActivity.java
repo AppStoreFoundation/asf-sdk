@@ -1,9 +1,9 @@
 package com.appcoins.sdk.billing.helpers;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -30,15 +31,25 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
+import com.appcoins.sdk.billing.analytics.BillingAnalytics;
+import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Locale;
 
 import static android.graphics.Typeface.BOLD;
 import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.getUserCountry;
 import static com.appcoins.sdk.billing.helpers.CafeBazaarUtils.userFromIran;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.appcoins_wallet;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_wallet_not_installed_popup_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_wallet_not_installed_popup_close_button;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_wallet_not_installed_popup_close_install;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_body;
+import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iap_wallet_and_appstore_not_installed_popup_button;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.generateRandomId;
+import static com.appcoins.sdk.billing.utils.LayoutUtils.setBackground;
 
 public class InstallDialogActivity extends Activity {
 
@@ -46,7 +57,6 @@ public class InstallDialogActivity extends Activity {
   public final static String LOADING_DIALOG_CARD = "loading_dialog_install";
   public final static int REQUEST_CODE = 10001;
   public final static int ERROR_RESULT_CODE = 6;
-  private final static String TRANSLATIONS = "translations";
   private final static int MINIMUM_APTOIDE_VERSION = 9908;
   private final static int RESULT_USER_CANCELED = 1;
   private static final String DIALOG_WALLET_INSTALL_GRAPHIC = "dialog_wallet_install_graphic";
@@ -60,17 +70,30 @@ public class InstallDialogActivity extends Activity {
       "bazaar://details?id=" + BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
   private static final String CAFE_BAZAAR_WEB_URL =
       "https://cafebazaar.ir/app/" + BuildConfig.CAFE_BAZAAR_WALLET_PACKAGE_NAME;
+  private static final String FIRST_IMPRESSION_KEY = "first_impression";
+  private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private final String appBannerResourcePath = "appcoins-wallet/resources/app-banner";
   public AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   public BuyItemProperties buyItemProperties;
-  private TranslationsModel translationsModel;
-  private RelativeLayout installationDialog;
+  private TranslationsRepository translations;
+  private boolean firstImpression = true;
+
+  public static Intent newIntent(Context context, BuyItemProperties buyItemProperties) {
+    Intent intent = new Intent(context, InstallDialogActivity.class);
+    intent.putExtra(BUY_ITEM_PROPERTIES, buyItemProperties);
+    return intent;
+  }
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    BillingAnalytics billingAnalytics =
+        new BillingAnalytics(AnalyticsManagerProvider.provideAnalyticsManager());
     appcoinsBillingStubHelper = AppcoinsBillingStubHelper.getInstance();
-    buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(
-        AppcoinsBillingStubHelper.BUY_ITEM_PROPERTIES);
+    buyItemProperties = (BuyItemProperties) getIntent().getSerializableExtra(BUY_ITEM_PROPERTIES);
+    translations = TranslationsRepository.getInstance(this);
+    if (savedInstanceState != null) {
+      firstImpression = savedInstanceState.getBoolean(FIRST_IMPRESSION_KEY, true);
+    }
     String storeUrl = "market://details?id="
         + BuildConfig.BDS_WALLET_PACKAGE_NAME
         + "&utm_source=appcoinssdk&app_source="
@@ -80,15 +103,10 @@ public class InstallDialogActivity extends Activity {
     Log.d("InstallDialogActivity",
         "com.appcoins.sdk.billing.helpers.InstallDialogActivity started");
 
-    if (savedInstanceState != null) {
-      translationsModel = (TranslationsModel) savedInstanceState.get(TRANSLATIONS);
-    } else {
-      fetchTranslations();
-    }
-
-    installationDialog = setupInstallationDialog(storeUrl);
+    RelativeLayout installationDialog = setupInstallationDialog(storeUrl);
 
     showInstallationDialog(installationDialog);
+    handlePurchaseStartEvent(billingAnalytics);
   }
 
   @Override protected void onResume() {
@@ -105,7 +123,7 @@ public class InstallDialogActivity extends Activity {
 
   @Override protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    outState.putSerializable(TRANSLATIONS, translationsModel);
+    outState.putBoolean(FIRST_IMPRESSION_KEY, firstImpression);
   }
 
   @Override public void onBackPressed() {
@@ -122,27 +140,39 @@ public class InstallDialogActivity extends Activity {
     finishActivity(resultCode, data);
   }
 
+  private void handlePurchaseStartEvent(BillingAnalytics billingAnalytics) {
+    if (firstImpression) {
+      billingAnalytics.sendPurchaseStartEvent(buyItemProperties.getPackageName(),
+          buyItemProperties.getSku(), "0.0", buyItemProperties.getType(),
+          BillingAnalytics.START_INSTALL);
+      firstImpression = false;
+    }
+  }
+
   private void showLoadingDialog() {
-    int layoutOrientation = getLayoutOrientation();
+    boolean isLandscape = getLayoutOrientation() == Configuration.ORIENTATION_LANDSCAPE;
 
     RelativeLayout backgroundLayout = buildBackground();
 
-    RelativeLayout dialogLayout = buildDialogLayout(layoutOrientation);
+    RelativeLayout dialogLayout = buildDialogLayout(isLandscape);
     backgroundLayout.addView(dialogLayout);
     ProgressBar progressBar = new ProgressBar(this);
     RelativeLayout.LayoutParams layoutParams =
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
             RelativeLayout.LayoutParams.WRAP_CONTENT);
     layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+    progressBar.getIndeterminateDrawable()
+        .setColorFilter(Color.parseColor("#fd786b"), PorterDuff.Mode.MULTIPLY);
     progressBar.setLayoutParams(layoutParams);
     dialogLayout.addView(progressBar);
     showInstallationDialog(backgroundLayout);
   }
 
-  public void makeTheStoredPurchase() {
+  private void makeTheStoredPurchase() {
     Bundle intent = appcoinsBillingStubHelper.getBuyIntent(buyItemProperties.getApiVersion(),
         buyItemProperties.getPackageName(), buyItemProperties.getSku(), buyItemProperties.getType(),
-        buyItemProperties.getDeveloperPayload());
+        buyItemProperties.getDeveloperPayload()
+            .getRawPayload());
 
     PendingIntent pendingIntent = intent.getParcelable(KEY_BUY_INTENT);
     try {
@@ -169,27 +199,28 @@ public class InstallDialogActivity extends Activity {
   }
 
   private RelativeLayout setupInstallationDialog(String storeUrl) {
-    int layoutOrientation = getLayoutOrientation();
+    boolean isLandscape = getLayoutOrientation() == Configuration.ORIENTATION_LANDSCAPE;
 
     RelativeLayout backgroundLayout = buildBackground();
 
-    RelativeLayout dialogLayout = buildDialogLayout(layoutOrientation);
+    RelativeLayout dialogLayout = buildDialogLayout(isLandscape);
     backgroundLayout.addView(dialogLayout);
 
     ImageView appBanner = buildAppBanner();
     dialogLayout.addView(appBanner);
 
-    ImageView appIcon = buildAppIcon(layoutOrientation, dialogLayout);
+    ImageView appIcon = buildAppIcon(isLandscape, dialogLayout);
     backgroundLayout.addView(appIcon);
 
-    TextView dialogBody = buildDialogBody(layoutOrientation, appIcon);
+    TextView dialogBody = buildDialogBody(isLandscape, appIcon);
     backgroundLayout.addView(dialogBody);
 
-    Button installButton =
-        buildInstallButton(dialogLayout, translationsModel.getInstallationButtonString(), storeUrl);
+    Button installButton = buildInstallButton(dialogLayout,
+        translations.getString(iab_wallet_not_installed_popup_close_install), storeUrl);
     backgroundLayout.addView(installButton);
 
-    Button skipButton = buildSkipButton(installButton, translationsModel.getSkipButtonString());
+    Button skipButton = buildSkipButton(installButton,
+        translations.getString(iab_wallet_not_installed_popup_close_button));
     backgroundLayout.addView(skipButton);
 
     showAppRelatedImagery(appIcon, appBanner, dialogBody);
@@ -205,22 +236,19 @@ public class InstallDialogActivity extends Activity {
     setContentView(dialogLayout, layoutParams);
   }
 
-  @SuppressLint("ResourceType") private RelativeLayout buildBackground() {
+  private RelativeLayout buildBackground() {
     int backgroundColor = Color.parseColor("#64000000");
     RelativeLayout backgroundLayout = new RelativeLayout(this);
-    backgroundLayout.setId(1);
     backgroundLayout.setBackgroundColor(backgroundColor);
     return backgroundLayout;
   }
 
-  @SuppressLint("ResourceType")
   private Button buildSkipButton(Button installButton, String skipButtonText) {
     int skipButtonColor = Color.parseColor("#8f000000");
     Button skipButton = new Button(this);
     skipButton.setText(skipButtonText);
     skipButton.setTextSize(12);
     skipButton.setTextColor(skipButtonColor);
-    skipButton.setId(7);
     skipButton.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
     skipButton.setBackgroundColor(Color.TRANSPARENT);
     skipButton.setIncludeFontPadding(false);
@@ -246,14 +274,13 @@ public class InstallDialogActivity extends Activity {
     return skipButton;
   }
 
-  @SuppressLint("ResourceType")
   private Button buildInstallButton(RelativeLayout dialogLayout, String installButtonText,
       final String storeUrl) {
     Button installButton = new Button(this);
     installButton.setText(installButtonText);
     installButton.setTextSize(12);
     installButton.setTextColor(Color.parseColor(INSTALL_BUTTON_TEXT_COLOR));
-    installButton.setId(6);
+    installButton.setId(generateRandomId());
     installButton.setGravity(Gravity.CENTER);
     installButton.setIncludeFontPadding(false);
     installButton.setPadding(0, 0, 0, 0);
@@ -261,7 +288,7 @@ public class InstallDialogActivity extends Activity {
     GradientDrawable installButtonDrawable = new GradientDrawable();
     installButtonDrawable.setColor(Color.parseColor(INSTALL_BUTTON_COLOR));
     installButtonDrawable.setCornerRadius(dpToPx(16));
-    installButton.setBackground(installButtonDrawable);
+    setBackground(installButton, installButtonDrawable);
 
     RelativeLayout.LayoutParams installButtonParams =
         new RelativeLayout.LayoutParams(dpToPx(110), dpToPx(36));
@@ -308,18 +335,16 @@ public class InstallDialogActivity extends Activity {
     }
   }
 
-  @SuppressLint("ResourceType")
-  private TextView buildDialogBody(int layoutOrientation, ImageView appIcon) {
+  private TextView buildDialogBody(boolean isLandscape, ImageView appIcon) {
     int dialogBodyColor = Color.parseColor("#4a4a4a");
     TextView dialogBody = new TextView(this);
-    dialogBody.setId(5);
     dialogBody.setMaxLines(2);
     dialogBody.setTextColor(dialogBodyColor);
     dialogBody.setTextSize(16);
     dialogBody.setGravity(Gravity.CENTER_HORIZONTAL);
     int dialogBodyWidth = RelativeLayout.LayoutParams.MATCH_PARENT;
     int textMarginTop = dpToPx(20);
-    if (layoutOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+    if (isLandscape) {
       dialogBodyWidth = dpToPx(384);
       textMarginTop = dpToPx(10);
     }
@@ -334,44 +359,23 @@ public class InstallDialogActivity extends Activity {
   }
 
   private SpannableStringBuilder setHighlightDialogBody() {
-    String dialogBody = String.format(translationsModel.getInstallationDialogBody(),
-        translationsModel.getDialogStringHighlight());
+    String highlightedString = translations.getString(appcoins_wallet);
+    String dialogBody = String.format(translations.getString(iab_wallet_not_installed_popup_body),
+        highlightedString);
     SpannableStringBuilder messageStylized = new SpannableStringBuilder(dialogBody);
-    messageStylized.setSpan(new StyleSpan(BOLD),
-        dialogBody.indexOf(translationsModel.getDialogStringHighlight()),
-        dialogBody.indexOf(translationsModel.getDialogStringHighlight())
-            + translationsModel.getDialogStringHighlight()
-            .length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+    messageStylized.setSpan(new StyleSpan(BOLD), dialogBody.indexOf(highlightedString),
+        dialogBody.indexOf(highlightedString) + highlightedString.length(),
+        Spannable.SPAN_INCLUSIVE_INCLUSIVE);
     return messageStylized;
   }
 
-  private void fetchTranslations() {
-    if (WalletUtils.getIabAction()
-        .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
-      if (translationsModel == null) {
-        TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
-        translationsModel = translationsParser.parseTranslationXml("fa", "IR");
-      }
-    } else {
-      Locale locale = Locale.getDefault();
-      if (translationsModel == null || !translationsModel.getLanguageCode()
-          .equalsIgnoreCase(locale.getLanguage()) || !translationsModel.getCountryCode()
-          .equalsIgnoreCase(locale.getCountry())) {
-        TranslationsXmlParser translationsParser = new TranslationsXmlParser(this);
-        translationsModel =
-            translationsParser.parseTranslationXml(locale.getLanguage(), locale.getCountry());
-      }
-    }
-  }
-
-  @SuppressLint("ResourceType")
-  private ImageView buildAppIcon(int layoutOrientation, RelativeLayout dialogLayout) {
+  private ImageView buildAppIcon(boolean isLandscape, RelativeLayout dialogLayout) {
     ImageView appIcon = new ImageView(this);
-    appIcon.setId(4);
+    appIcon.setId(generateRandomId());
     appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
     int appIconMarginTop = dpToPx(85);
     int appIconSize = dpToPx(66);
-    if (layoutOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+    if (isLandscape) {
       appIconMarginTop = dpToPx(80);
       appIconSize = dpToPx(80);
     }
@@ -384,9 +388,8 @@ public class InstallDialogActivity extends Activity {
     return appIcon;
   }
 
-  @SuppressLint("ResourceType") private ImageView buildAppBanner() {
+  private ImageView buildAppBanner() {
     ImageView appBanner = new ImageView(this);
-    appBanner.setId(3);
     appBanner.setScaleType(ImageView.ScaleType.CENTER_CROP);
     RelativeLayout.LayoutParams appBannerParams =
         new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dpToPx(120));
@@ -395,16 +398,15 @@ public class InstallDialogActivity extends Activity {
     return appBanner;
   }
 
-  @SuppressLint("ResourceType") private RelativeLayout buildDialogLayout(int layoutOrientation) {
+  private RelativeLayout buildDialogLayout(boolean isLandscape) {
     RelativeLayout dialogLayout = new RelativeLayout(this);
+    dialogLayout.setId(generateRandomId());
     dialogLayout.setClipToPadding(false);
-    dialogLayout.setId(2);
-
     dialogLayout.setBackgroundColor(Color.WHITE);
 
     int dialogLayoutMargins = dpToPx(12);
     int cardWidth = RelativeLayout.LayoutParams.MATCH_PARENT;
-    if (layoutOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+    if (isLandscape) {
       cardWidth = dpToPx(384);
     }
     RelativeLayout.LayoutParams dialogLayoutParams =
@@ -499,8 +501,9 @@ public class InstallDialogActivity extends Activity {
 
   private void buildAlertNoBrowserAndStores() {
     AlertDialog.Builder alert = new AlertDialog.Builder(this);
-    String value = translationsModel.getAlertDialogMessage();
-    String dismissValue = translationsModel.getAlertDialogDismissButton();
+    String value = translations.getString(iap_wallet_and_appstore_not_installed_popup_body);
+    String dismissValue =
+        translations.getString(iap_wallet_and_appstore_not_installed_popup_button);
     alert.setMessage(value);
     alert.setCancelable(true);
     alert.setPositiveButton(dismissValue, new DialogInterface.OnClickListener() {
