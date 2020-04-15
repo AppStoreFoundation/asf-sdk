@@ -40,7 +40,6 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   final static String INAPP_PURCHASE_DATA_LIST = "INAPP_PURCHASE_DATA_LIST";
   final static String INAPP_DATA_SIGNATURE_LIST = "INAPP_DATA_SIGNATURE_LIST";
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
-  private static final int MESSAGE_RESPONSE_WAIT_TIMEOUT_IN_MILLIS = 35000;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int SUPPORTED_API_VERSION = 3;
@@ -315,18 +314,16 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
                 SharedPreferencesRepository.TTL_IN_SECONDS);
         AppcoinsBilling appcoinsBilling;
         if (WalletBinderUtil.getBindType() == BindType.URI_CONNECTION) {
-          SyncIpcMessageRequester messageRequester =
-              MessageRequesterFactory.create(new LifecycleActivityProvider(WalletUtils.getContext()),
-                  BuildConfig.BDS_WALLET_PACKAGE_NAME,
-                  "appcoins://billing/communication/processor/1",
-                  "appcoins://billing/communication/requester/1",
-                  MESSAGE_RESPONSE_WAIT_TIMEOUT_IN_MILLIS);
+          SyncIpcMessageRequester messageRequester = MessageRequesterFactory.create(
+              new LifecycleActivityProvider(WalletUtils.getContext()),
+              BuildConfig.BDS_WALLET_PACKAGE_NAME, "appcoins://billing/communication/processor/1",
+              "appcoins://billing/communication/requester/1", BdsService.TIME_OUT_IN_MILLIS);
           appcoinsBilling = new UriCommunicationAppcoinsBilling(messageRequester);
         } else {
           appcoinsBilling = AppcoinsBilling.Stub.asInterface(service);
         }
-        return new AppcoinsBillingWrapper(appcoinsBilling,
-            sharedPreferencesRepository.getWalletId(), MESSAGE_RESPONSE_WAIT_TIMEOUT_IN_MILLIS);
+        return new AppcoinsBillingWrapper(appcoinsBilling, AppCoinsPendingIntentCaller.instance,
+            sharedPreferencesRepository.getWalletId(), BdsService.TIME_OUT_IN_MILLIS);
       }
     }
   }

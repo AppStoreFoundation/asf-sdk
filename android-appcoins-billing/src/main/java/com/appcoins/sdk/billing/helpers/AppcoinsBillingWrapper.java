@@ -20,11 +20,14 @@ import static com.appcoins.sdk.billing.payasguest.BillingRepository.RESPONSE_SUC
 class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
 
   private final AppcoinsBilling appcoinsBilling;
+  private final AppCoinsPendingIntentCaller pendingIntentCaller;
   private final String walletId;
-  private long timeoutInMillis;
+  private int timeoutInMillis;
 
-  AppcoinsBillingWrapper(AppcoinsBilling appcoinsBilling, String walletId, long timeoutInMillis) {
+  AppcoinsBillingWrapper(AppcoinsBilling appcoinsBilling,
+      AppCoinsPendingIntentCaller pendingIntentCaller, String walletId, int timeoutInMillis) {
     this.appcoinsBilling = appcoinsBilling;
+    this.pendingIntentCaller = pendingIntentCaller;
     this.walletId = walletId;
     this.timeoutInMillis = timeoutInMillis;
   }
@@ -42,7 +45,10 @@ class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
 
   @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
       String developerPayload) throws RemoteException {
-    return appcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type, developerPayload);
+    Bundle bundle =
+        appcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type, developerPayload);
+    pendingIntentCaller.saveIntent(bundle);
+    return bundle;
   }
 
   @Override public Bundle getPurchases(int apiVersion, String packageName, String type,
@@ -83,7 +89,7 @@ class AppcoinsBillingWrapper implements AppcoinsBilling, Serializable {
     int responseCode = RESPONSE_ERROR;
     if (walletId != null && apiVersion == 3) {
       BillingRepository billingRepository =
-          new BillingRepository(new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS));
+          new BillingRepository(new BdsService(BuildConfig.HOST_WS, timeoutInMillis));
       GuestPurchasesInteract guestPurchaseInteract = new GuestPurchasesInteract(billingRepository);
       responseCode =
           guestPurchaseInteract.consumeGuestPurchase(this.walletId, packageName, purchaseToken);

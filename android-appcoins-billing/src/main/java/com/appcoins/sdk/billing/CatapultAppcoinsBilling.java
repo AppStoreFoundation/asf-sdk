@@ -1,9 +1,12 @@
 package com.appcoins.sdk.billing;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.util.Log;
 import com.appcoins.sdk.billing.exceptions.ServiceConnectionException;
+import com.appcoins.sdk.billing.helpers.AppCoinsPendingIntentCaller;
 import com.appcoins.sdk.billing.helpers.EventLogger;
 import com.appcoins.sdk.billing.helpers.PayloadHelper;
 import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
@@ -62,18 +65,15 @@ public class CatapultAppcoinsBilling implements AppcoinsBillingClient {
         return responseCode;
       }
 
-      //hacking
-      //PendingIntent pendingIntent = launchBillingFlowResult.getBuyIntent();
-      //activity.startIntentSenderForResult(pendingIntent.getIntentSender(), REQUEST_CODE,
-      //    new Intent(), 0, 0, 0);
-
-      activity.startActivityForResult(launchBillingFlowResult.getRawIntent(), REQUEST_CODE);
+      PendingIntent pendingIntent = launchBillingFlowResult.getBuyIntent();
+      AppCoinsPendingIntentCaller.startPendingAppCoinsIntent(activity,
+          pendingIntent.getIntentSender(), REQUEST_CODE, null, 0, 0, 0);
     } catch (NullPointerException e) {
       e.printStackTrace();
       return ResponseCode.ERROR.getValue();
-      //} catch (IntentSender.SendIntentException e) {
-      //  e.printStackTrace();
-      //  return ResponseCode.ERROR.getValue();
+    } catch (IntentSender.SendIntentException e) {
+      e.printStackTrace();
+      return ResponseCode.ERROR.getValue();
     } catch (ServiceConnectionException e) {
       e.printStackTrace();
       return ResponseCode.SERVICE_UNAVAILABLE.getValue();
