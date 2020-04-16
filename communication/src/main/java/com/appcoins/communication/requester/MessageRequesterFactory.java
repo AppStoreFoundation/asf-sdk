@@ -1,6 +1,5 @@
 package com.appcoins.communication.requester;
 
-import android.content.Context;
 import com.appcoins.communication.SyncIpcMessageRequester;
 
 public class MessageRequesterFactory {
@@ -16,10 +15,11 @@ public class MessageRequesterFactory {
    * @return {@link SyncIpcMessageRequester} that allows you to communicate with the processor
    * application
    */
-  public static SyncIpcMessageRequester create(Context context, String processorPackage,
-      String processorActivityUri, String requesterActivityUri, int timeout) {
+  public static SyncIpcMessageRequester create(ActivityProvider activityProvider,
+      String processorPackage, String processorActivityUri, String requesterActivityUri,
+      int timeout) {
     return new IntentSyncIpcMessageSender(
-        new MessageRequesterSender(context, processorPackage, processorActivityUri,
+        new MessageRequesterSender(activityProvider, processorPackage, processorActivityUri,
             requesterActivityUri), new MessageRequesterSynchronizer(), new IdGenerator(), timeout);
   }
 }

@@ -24,6 +24,7 @@ import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.SkuDetailsResult;
 import com.appcoins.sdk.billing.UriCommunicationAppcoinsBilling;
 import com.appcoins.sdk.billing.WSServiceController;
+import com.appcoins.sdk.billing.WalletBinderUtil;
 import com.appcoins.sdk.billing.listeners.StartPurchaseAfterBindListener;
 import com.appcoins.sdk.billing.payasguest.BillingRepository;
 import com.appcoins.sdk.billing.payasguest.IabActivity;
@@ -39,7 +40,6 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   final static String INAPP_PURCHASE_DATA_LIST = "INAPP_PURCHASE_DATA_LIST";
   final static String INAPP_DATA_SIGNATURE_LIST = "INAPP_DATA_SIGNATURE_LIST";
   private static final String TAG = AppcoinsBillingStubHelper.class.getSimpleName();
-  private static final int MESSAGE_RESPONSE_WAIT_TIMEOUT_IN_MILLIS = 35000;
   private static AppcoinsBilling serviceAppcoinsBilling;
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int SUPPORTED_API_VERSION = 3;
@@ -254,7 +254,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     return null;
   }
 
-  public boolean createRepository(
+  public void createRepository(
       final StartPurchaseAfterBindListener startPurchaseAfterConnectionListener) {
 
     String packageName = WalletUtils.getBillingServicePackageName();
@@ -268,9 +268,9 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
     if (intentServices != null && !intentServices.isEmpty()) {
-      return context.bindService(serviceIntent, new ServiceConnection() {
+      WalletBinderUtil.bindService(context, serviceIntent, new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName name, IBinder service) {
-          serviceAppcoinsBilling = Stub.asInterface(service, "");
+          serviceAppcoinsBilling = Stub.asInterface(service);
           startPurchaseAfterConnectionListener.startPurchaseAfterBind();
           Log.d(TAG, "onServiceConnected() called service = [" + serviceAppcoinsBilling + "]");
         }
@@ -280,7 +280,6 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         }
       }, Context.BIND_AUTO_CREATE);
     }
-    return false;
   }
 
   private boolean hasRequiredFields(String type, String sku) {
@@ -304,28 +303,26 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
 
   public static abstract class Stub {
 
-    public static AppcoinsBilling asInterface(IBinder service, String componentName) {
-      if (!WalletUtils.hasWalletInstalled()) {
+    public static AppcoinsBilling asInterface(IBinder service) {
+      if (WalletBinderUtil.getBindType() == BindType.WALLET_NOT_INSTALLED) {
         return AppcoinsBillingStubHelper.getInstance();
       } else {
         SharedPreferencesRepository sharedPreferencesRepository =
             new SharedPreferencesRepository(WalletUtils.getContext(),
                 SharedPreferencesRepository.TTL_IN_SECONDS);
         AppcoinsBilling appcoinsBilling;
-        if (UriCommunicationAppcoinsBilling.class.getSimpleName()
-            .equals(componentName)) {
-          SyncIpcMessageRequester messageRequester =
-              MessageRequesterFactory.create(WalletUtils.getContext(),
-                  BuildConfig.BDS_WALLET_PACKAGE_NAME,
-                  "appcoins://billing/communication/processor/1",
-                  "appcoins://billing/communication/requester/1",
-                  MESSAGE_RESPONSE_WAIT_TIMEOUT_IN_MILLIS);
+        if (WalletBinderUtil.getBindType() == BindType.URI_CONNECTION) {
+          SyncIpcMessageRequester messageRequester = MessageRequesterFactory.create(
+              new LifecycleActivityProvider(WalletUtils.getContext()),
+              BuildConfig.BDS_WALLET_PACKAGE_NAME, "appcoins://billing/communication/processor/1",
+              "appcoins://billing/communication/requester/1", BdsService.TIME_OUT_IN_MILLIS);
           appcoinsBilling = new UriCommunicationAppcoinsBilling(messageRequester);
         } else {
           appcoinsBilling = AppcoinsBilling.Stub.asInterface(service);
         }
         return new AppcoinsBillingWrapper(appcoinsBilling,
-            sharedPreferencesRepository.getWalletId(), MESSAGE_RESPONSE_WAIT_TIMEOUT_IN_MILLIS);
+            AppCoinsPendingIntentCaller.getInstance(), sharedPreferencesRepository.getWalletId(),
+            BdsService.TIME_OUT_IN_MILLIS);
       }
     }
   }

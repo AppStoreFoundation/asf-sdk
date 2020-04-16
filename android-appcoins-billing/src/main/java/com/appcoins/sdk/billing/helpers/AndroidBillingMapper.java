@@ -1,5 +1,6 @@
 package com.appcoins.sdk.billing.helpers;
 
+import android.app.PendingIntent;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -137,11 +138,8 @@ public class AndroidBillingMapper {
 
   public static LaunchBillingFlowResult mapBundleToHashMapGetIntent(Bundle bundle) {
 
-    LaunchBillingFlowResult launchBillingFlowResult =
-        new LaunchBillingFlowResult(bundle.get("RESPONSE_CODE"),
-            bundle.getParcelable("BUY_INTENT"));
-
-    return launchBillingFlowResult;
+    return new LaunchBillingFlowResult(bundle.getInt("RESPONSE_CODE"),
+        (PendingIntent) bundle.getParcelable("BUY_INTENT"));
   }
 
   public static ArrayList<SkuDetails> mapSkuDetailsFromWS(String skuType,

@@ -6,9 +6,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
-import com.appcoins.billing.sdk.BuildConfig;
-import com.appcoins.sdk.billing.helpers.AppcoinsBillingStubHelper;
-import com.appcoins.sdk.billing.helpers.IBinderWalletNotInstalled;
 import com.appcoins.sdk.billing.helpers.WalletUtils;
 import com.appcoins.sdk.billing.listeners.AppCoinsBillingStateListener;
 
@@ -47,12 +44,14 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
     this.listener = listener;
     if (WalletUtils.hasWalletInstalled()) {
       hasWalletInstalled = true;
-      String packageName = WalletUtils.getBillingServicePackageName();
-      walletInstalledBehaviour(packageName);
     } else {
       hasWalletInstalled = false;
-      walletNotInstalledBehaviour();
     }
+    String packageName = WalletUtils.getBillingServicePackageName();
+    String iabAction = WalletUtils.getIabAction();
+    Intent serviceIntent = new Intent(iabAction);
+    serviceIntent.setPackage(packageName);
+    WalletBinderUtil.bindService(context, serviceIntent, this, Context.BIND_AUTO_CREATE);
   }
 
   @Override public void endConnection() {
@@ -60,25 +59,5 @@ public class RepositoryServiceConnection implements ServiceConnection, Repositor
       context.unbindService(this);
     }
     connectionLifeCycle.onDisconnect(listener);
-  }
-
-  private void walletNotInstalledBehaviour() {
-    onServiceConnected(new ComponentName("", AppcoinsBillingStubHelper.class.getSimpleName()),
-        new IBinderWalletNotInstalled());
-  }
-
-  private void bindFailedBehaviour() {
-    onServiceConnected(new ComponentName("", UriCommunicationAppcoinsBilling.class.getSimpleName()),
-        new IBinderWalletNotInstalled());
-  }
-
-  private void walletInstalledBehaviour(String packageName) {
-    String iabAction = WalletUtils.getIabAction();
-    Intent serviceIntent = new Intent(iabAction);
-    serviceIntent.setPackage(packageName);
-    if (!context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
-        && BuildConfig.URI_COMMUNICATION) {
-      bindFailedBehaviour();
-    }
   }
 }
