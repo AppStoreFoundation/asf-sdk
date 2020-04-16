@@ -254,7 +254,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     return null;
   }
 
-  public boolean createRepository(
+  public void createRepository(
       final StartPurchaseAfterBindListener startPurchaseAfterConnectionListener) {
 
     String packageName = WalletUtils.getBillingServicePackageName();
@@ -268,7 +268,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     List<ResolveInfo> intentServices = context.getPackageManager()
         .queryIntentServices(serviceIntent, 0);
     if (intentServices != null && !intentServices.isEmpty()) {
-      return context.bindService(serviceIntent, new ServiceConnection() {
+      WalletBinderUtil.bindService(context, serviceIntent, new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName name, IBinder service) {
           serviceAppcoinsBilling = Stub.asInterface(service);
           startPurchaseAfterConnectionListener.startPurchaseAfterBind();
@@ -280,7 +280,6 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         }
       }, Context.BIND_AUTO_CREATE);
     }
-    return false;
   }
 
   private boolean hasRequiredFields(String type, String sku) {
@@ -305,8 +304,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   public static abstract class Stub {
 
     public static AppcoinsBilling asInterface(IBinder service) {
-      if (WalletBinderUtil.getBindType() == BindType.WALLET_NOT_INSTALLED
-          || !WalletUtils.hasWalletInstalled()) {
+      if (WalletBinderUtil.getBindType() == BindType.WALLET_NOT_INSTALLED) {
         return AppcoinsBillingStubHelper.getInstance();
       } else {
         SharedPreferencesRepository sharedPreferencesRepository =
@@ -322,8 +320,9 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         } else {
           appcoinsBilling = AppcoinsBilling.Stub.asInterface(service);
         }
-        return new AppcoinsBillingWrapper(appcoinsBilling, AppCoinsPendingIntentCaller.instance,
-            sharedPreferencesRepository.getWalletId(), BdsService.TIME_OUT_IN_MILLIS);
+        return new AppcoinsBillingWrapper(appcoinsBilling,
+            AppCoinsPendingIntentCaller.getInstance(), sharedPreferencesRepository.getWalletId(),
+            BdsService.TIME_OUT_IN_MILLIS);
       }
     }
   }
