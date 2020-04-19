@@ -65,9 +65,13 @@ public class PayloadHelper {
       return null;
     }
     Uri uri = Uri.parse(uriString);
-    if (!uri.getScheme()
-        .equalsIgnoreCase(SCHEME)) {
-      throw new IllegalArgumentException();
+    try {
+      if (!uri.getScheme().equalsIgnoreCase(SCHEME)) {
+        throw new IllegalArgumentException();
+      }
+    } catch (NullPointerException e) {
+      e.printStackTrace();
+      return null;
     }
     return uri;
   }
