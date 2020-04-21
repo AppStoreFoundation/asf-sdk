@@ -34,13 +34,13 @@ public class PayloadHelper {
     Uri.Builder builder = new Uri.Builder();
     builder.scheme(SCHEME)
         .authority("appcoins.io");
-    if (developerPayload != null) {
+    if (developerPayload != null && !developerPayload.isEmpty()) {
       builder.appendQueryParameter(PAYLOAD_PARAMETER, developerPayload);
     }
-    if (orderReference != null) {
+    if (orderReference != null && !orderReference.isEmpty()) {
       builder.appendQueryParameter(ORDER_PARAMETER, orderReference);
     }
-    if (origin != null) {
+    if (origin != null && !origin.isEmpty()) {
       builder.appendQueryParameter(ORIGIN_PARAMETER, origin);
     }
     return builder.toString();
@@ -65,8 +65,7 @@ public class PayloadHelper {
       return null;
     }
     Uri uri = Uri.parse(uriString);
-    if (!uri.getScheme()
-        .equalsIgnoreCase(SCHEME)) {
+    if (!SCHEME.equalsIgnoreCase(uri.getScheme())) {
       throw new IllegalArgumentException();
     }
     return uri;
