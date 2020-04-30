@@ -85,6 +85,7 @@ dependencies {
 
   androidTestImplementation lib.android_test_runner
   api project(':android-appcoins-billing')
+  api project(path: ':appcoins-lifecycle')
 }
 
 //region Publishing

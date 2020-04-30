@@ -1,6 +1,5 @@
 package com.asf.appcoins.sdk.ads.poa.manager;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -9,7 +8,6 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.util.Log;
 import com.asf.appcoins.sdk.ads.BuildConfig;
-import com.asf.appcoins.sdk.ads.LifeCycleListener;
 import com.asf.appcoins.sdk.ads.WalletPoAServiceListenner;
 import com.asf.appcoins.sdk.ads.network.AppCoinsClient;
 import com.asf.appcoins.sdk.ads.network.QueryParams;
@@ -27,13 +25,15 @@ import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementListenner;
 import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementRepository;
 import com.asf.appcoins.sdk.ads.repository.AppcoinsAdvertisementThreadGetCampaign;
 import com.asf.appcoins.sdk.ads.repository.ResponseCode;
+import com.sdk.appcoins_lifecycle.lifecycle.Lifecycle;
+import com.sdk.appcoins_lifecycle.lifecycle.LifecycleObserver;
+import com.sdk.appcoins_lifecycle.lifecycle.common.OnLifecycleEvent;
 import java.math.BigInteger;
 
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_REGISTER_CAMPAIGN;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SEND_PROOF;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_SET_NETWORK;
 import static com.asf.appcoins.sdk.ads.poa.MessageListener.MSG_STOP_PROCESS;
-import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PREFERENCE_WALLET_PCKG_NAME;
 
 /**
  * Class that will manage the PoA process, by sending the proofs on the correct time. By handling
@@ -42,16 +42,20 @@ import static com.asf.appcoins.sdk.ads.poa.PoAServiceConnector.PREFERENCE_WALLET
  * Created by Joao Raimundo on 06/04/2018.
  */
 
-public class PoAManager implements LifeCycleListener.Listener, CheckConnectivityResponseListener,
-    GetCampaignResponseListener, DialogVisibleListener, WalletPoAServiceListenner {
+public class PoAManager
+    implements LifecycleObserver, CheckConnectivityResponseListener, GetCampaignResponseListener,
+    DialogVisibleListener, WalletPoAServiceListenner {
 
   public static final String TAG = PoAManager.class.getName();
   private static final String FINISHED_KEY = "finished";
   private static final int PREFERENCES_LISTENER_DELAY = 1000;
   /** The instance of the manager */
   private static PoAManager instance;
+  private static boolean showPopUpNotification;
+  private static String POA_NOTIFICATION_VALUE = "POA_NOTIFICATION";
   private final SharedPreferences preferences;
   private final AppCoinsClient appcoinsClient;
+  boolean fromBackground = false;
   /** The connector with the wallet service, receiver of the messages of the PoA. */
   private PoAServiceConnector poaConnector;
   /** The application context */
@@ -74,14 +78,11 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
   private BigInteger campaignId;
   private boolean foreground = false;
   private boolean dialogVisible = false;
-  boolean fromBackground = false;
   private Handler handleRetryConnection = new Handler();
   private int connectionRetries = 0;
   private boolean isWalletInstalled;
   private AppcoinsAdvertisementRepository appcoinsAdvertisementRepository;
   private AppcoinsAdvertisementConnection appcoinsAdvertisementConnection;
-  private static boolean showPopUpNotification;
-  private static String POA_NOTIFICATION_VALUE = "POA_NOTIFICATION";
 
   public PoAManager(SharedPreferences preferences, PoAServiceConnector connector, Context context,
       int networkId, AppCoinsClient appcoinsClient) {
@@ -264,7 +265,12 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     }
   }
 
-  @Override public void onBecameForeground(Activity activity) {
+  @OnLifecycleEvent(Lifecycle.Event.ON_STOP) public void onBackground() {
+    foreground = false;
+    fromBackground = true;
+  }
+
+  @OnLifecycleEvent(Lifecycle.Event.ON_START) public void onForeground() {
     isWalletInstalled = WalletUtils.hasWalletInstalled();
     foreground = true;
 
@@ -275,11 +281,6 @@ public class PoAManager implements LifeCycleListener.Listener, CheckConnectivity
     if (!getSharedPreferencesBoolean(FINISHED_KEY)) {
       handleCampaign();
     }
-  }
-
-  @Override public void onBecameBackground() {
-    foreground = false;
-    fromBackground = true;
   }
 
   private void sendMSGRegisterCampaign(String packageName, String id) {
