@@ -135,12 +135,12 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         new AdyenListenerProvider(new AdyenMapper(new TransactionMapper(new EnumMapper()))));
     Service apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
     Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, BdsService.TIME_OUT_IN_MILLIS);
-    OemIdExtractor extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
+    OemIdExtractor extractorV2 = new OemIdExtractorV2(getActivity().getApplicationContext());
 
     AddressService addressService = new AddressService(getActivity().getApplicationContext(),
         new WalletAddressService(apiService, BuildConfig.DEFAULT_STORE_ADDRESS,
             BuildConfig.DEFAULT_OEM_ADDRESS), new DeveloperAddressService(ws75Service),
-        Build.MANUFACTURER, Build.MODEL, new OemIdExtractorService(extractorV1));
+        Build.MANUFACTURER, Build.MODEL, new OemIdExtractorService(extractorV2));
     BillingRepository billingRepository = new BillingRepository(apiService);
 
     BillingAnalytics billingAnalytics =

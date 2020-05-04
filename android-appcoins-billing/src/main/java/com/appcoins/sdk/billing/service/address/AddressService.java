@@ -1,6 +1,7 @@
 package com.appcoins.sdk.billing.service.address;
 
 import android.content.Context;
+import android.util.Log;
 import com.appcoins.sdk.billing.models.AddressModel;
 import com.appcoins.sdk.billing.payasguest.AdyenPaymentInteract.AddressListener;
 
@@ -43,6 +44,7 @@ public class AddressService {
     } else {
       String installerPackageName = getInstallerPackageName(packageName);
       String oemId = oemIdExtractorService.extractOemId(packageName);
+      Log.e("123456789: ", oemId);
       walletAddressService.getOemAddressForPackage(installerPackageName, deviceManufacturer,
           deviceInfo, oemId, addressListener);
     }
