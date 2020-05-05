@@ -44,7 +44,6 @@ public class AddressService {
     } else {
       String installerPackageName = getInstallerPackageName(packageName);
       String oemId = oemIdExtractorService.extractOemId(packageName);
-      Log.e("123456789: ", oemId);
       walletAddressService.getOemAddressForPackage(installerPackageName, deviceManufacturer,
           deviceInfo, oemId, addressListener);
     }
