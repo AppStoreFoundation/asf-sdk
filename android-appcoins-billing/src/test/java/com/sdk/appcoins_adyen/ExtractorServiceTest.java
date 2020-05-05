@@ -1,9 +1,11 @@
 package com.sdk.appcoins_adyen;
 
 import com.appcoins.sdk.billing.payasguest.OemIdExtractor;
-import com.appcoins.sdk.billing.payasguest.OemIdExtractorV1;
-import com.appcoins.sdk.billing.payasguest.OemIdExtractorV2;
+import com.appcoins.sdk.billing.payasguest.OemIdExtractorFromExternalLib;
+import com.appcoins.sdk.billing.payasguest.OemIdExtractorFromProperties;
 import com.appcoins.sdk.billing.service.address.OemIdExtractorService;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,21 +15,26 @@ import static org.mockito.Mockito.when;
 
 public class ExtractorServiceTest {
 
-  private OemIdExtractor extractorV2;
-  private OemIdExtractor extractorV1;
+  private OemIdExtractor oemIdExtractorFromExternalLib;
+  private OemIdExtractor oemIdExtractorFromProperties;
+  private List<OemIdExtractor> oemIdExtractorList;
 
   @Before public void setup() {
-    extractorV2 = mock(OemIdExtractorV2.class);
-    extractorV1 = mock(OemIdExtractorV1.class);
+    this.oemIdExtractorFromExternalLib = mock(OemIdExtractorFromExternalLib.class);
+    this.oemIdExtractorFromProperties = mock(OemIdExtractorFromProperties.class);
+    this.oemIdExtractorList = new ArrayList<>();
+    oemIdExtractorList.add(this.oemIdExtractorFromExternalLib);
+    oemIdExtractorList.add(this.oemIdExtractorFromProperties);
   }
 
   @Test public void extractorServiceV2Test() {
 
-    when(extractorV2.extract("com.appcoins.toolbox")).thenReturn("toolbox_oemIdv2");
-    when(extractorV1.extract("com.appcoins.toolbox")).thenReturn("toolbox_oemIdv1");
+    when(oemIdExtractorFromExternalLib.extract("com.appcoins.toolbox")).thenReturn(
+        "toolbox_oemIdv2");
+    when(oemIdExtractorFromProperties.extract("com.appcoins.toolbox")).thenReturn(
+        "toolbox_oemIdv1");
 
-    OemIdExtractorService oemIdExtractorService =
-        new OemIdExtractorService(extractorV1, extractorV2);
+    OemIdExtractorService oemIdExtractorService = new OemIdExtractorService(oemIdExtractorList);
 
     String oemIdResult = oemIdExtractorService.extractOemId("com.appcoins.toolbox");
     Assert.assertEquals(oemIdResult, "toolbox_oemIdv2");
@@ -35,11 +42,11 @@ public class ExtractorServiceTest {
 
   @Test public void extractorServiceV1Test() {
 
-    when(extractorV2.extract("com.appcoins.toolbox")).thenReturn("");
-    when(extractorV1.extract("com.appcoins.toolbox")).thenReturn("toolbox_oemIdv1");
+    when(oemIdExtractorFromExternalLib.extract("com.appcoins.toolbox")).thenReturn("");
+    when(oemIdExtractorFromProperties.extract("com.appcoins.toolbox")).thenReturn(
+        "toolbox_oemIdv1");
 
-    OemIdExtractorService oemIdExtractorService =
-        new OemIdExtractorService(extractorV1, extractorV2);
+    OemIdExtractorService oemIdExtractorService = new OemIdExtractorService(oemIdExtractorList);
 
     String oemIdResult = oemIdExtractorService.extractOemId("com.appcoins.toolbox");
     Assert.assertEquals(oemIdResult, "toolbox_oemIdv1");
@@ -47,13 +54,12 @@ public class ExtractorServiceTest {
 
   @Test public void extractorServiceNullTest() {
 
-    when(extractorV2.extract("com.appcoins.toolbox")).thenReturn(null);
-    when(extractorV1.extract("com.appcoins.toolbox")).thenReturn(null);
+    when(oemIdExtractorFromExternalLib.extract("com.appcoins.toolbox")).thenReturn(null);
+    when(oemIdExtractorFromProperties.extract("com.appcoins.toolbox")).thenReturn(null);
 
-    OemIdExtractorService oemIdExtractorService =
-        new OemIdExtractorService(extractorV1, extractorV2);
+    OemIdExtractorService oemIdExtractorService = new OemIdExtractorService(oemIdExtractorList);
 
     String oemIdResult = oemIdExtractorService.extractOemId("com.appcoins.toolbox");
-    Assert.assertEquals(oemIdResult, null);
+    Assert.assertEquals(oemIdResult, "");
   }
 }

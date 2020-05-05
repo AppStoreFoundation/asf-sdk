@@ -7,12 +7,11 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class OemIdExtractorV1 implements OemIdExtractor {
+public class OemIdExtractorFromProperties implements OemIdExtractor {
 
   private Context context;
 
-  OemIdExtractorV1(Context context) {
-
+  OemIdExtractorFromProperties(Context context) {
     this.context = context;
   }
 

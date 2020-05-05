@@ -47,9 +47,11 @@ import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 import com.sdk.appcoins_adyen.utils.RedirectUtils;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_1;
@@ -610,8 +612,15 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
   }
 
   private OemIdExtractorService createOemIdExtractorService() {
-    OemIdExtractor extractorV2 = new OemIdExtractorV2(getActivity().getApplicationContext());
-    OemIdExtractor extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
-    return new OemIdExtractorService(extractorV1, extractorV2);
+    Context context = getActivity().getApplicationContext();
+    List<OemIdExtractor> oemIdExtractorsList = new ArrayList<>();
+
+    OemIdExtractor oemIdExtractorFromExternalLib = new OemIdExtractorFromExternalLib(context);
+    OemIdExtractor oemIdExtractorFromProperties = new OemIdExtractorFromProperties(context);
+
+    oemIdExtractorsList.add(oemIdExtractorFromExternalLib);
+    oemIdExtractorsList.add(oemIdExtractorFromProperties);
+
+    return new OemIdExtractorService(oemIdExtractorsList);
   }
 }
