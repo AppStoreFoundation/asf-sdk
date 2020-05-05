@@ -19,7 +19,7 @@ android {
   }
 
   buildTypes {
-   release {
+    release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
@@ -43,5 +43,3 @@ dependencies {
   api project(':android-appcoins-billing')
   api project(path: ':appcoins-ads')
 }
-
-
