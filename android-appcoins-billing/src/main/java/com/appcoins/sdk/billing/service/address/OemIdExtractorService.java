@@ -14,7 +14,7 @@ public class OemIdExtractorService {
 
   String extractOemId(String packageName) {
     String oemId = extractorV2.extract(packageName);
-    if (oemId != null || !oemId.isEmpty()) {
+    if (oemId != null && !oemId.isEmpty()) {
       return oemId;
     }
     return extractorV1.extract(packageName);
