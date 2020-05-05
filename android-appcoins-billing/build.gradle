@@ -99,8 +99,7 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.72"
   implementation fileTree(include: ['*.jar'], dir: 'libs')
   implementation 'aptoide-client-v8:aptoide-analytics-core:1.0.4'
-  embed 'aptoide-client-v8:aptoide-analytics-core:1.0.4'
-  //Needed so that if the dev use SDK the lib is automatically included
+  embed 'aptoide-client-v8:aptoide-analytics-core:1.0.4' //Needed so that if the dev use SDK the lib is automatically included
   testImplementation 'junit:junit:4.12'
   testImplementation 'org.mockito:mockito-core:2.28.2'
   testImplementation 'org.json:json:20190722'
