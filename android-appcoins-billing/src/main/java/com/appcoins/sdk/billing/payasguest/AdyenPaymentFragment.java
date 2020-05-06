@@ -47,9 +47,11 @@ import com.sdk.appcoins_adyen.utils.CardValidationUtils;
 import com.sdk.appcoins_adyen.utils.RedirectUtils;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 import static com.appcoins.sdk.billing.helpers.translations.TranslationsKeys.iab_purchase_support_1;
@@ -135,12 +137,13 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
         new AdyenListenerProvider(new AdyenMapper(new TransactionMapper(new EnumMapper()))));
     Service apiService = new BdsService(BuildConfig.HOST_WS, BdsService.TIME_OUT_IN_MILLIS);
     Service ws75Service = new BdsService(BuildConfig.BDS_BASE_HOST, BdsService.TIME_OUT_IN_MILLIS);
-    OemIdExtractor extractorV1 = new OemIdExtractorV1(getActivity().getApplicationContext());
+
+    OemIdExtractorService oemIdExtractorService = createOemIdExtractorService();
 
     AddressService addressService = new AddressService(getActivity().getApplicationContext(),
         new WalletAddressService(apiService, BuildConfig.DEFAULT_STORE_ADDRESS,
             BuildConfig.DEFAULT_OEM_ADDRESS), new DeveloperAddressService(ws75Service),
-        Build.MANUFACTURER, Build.MODEL, new OemIdExtractorService(extractorV1));
+        Build.MANUFACTURER, Build.MODEL, oemIdExtractorService);
     BillingRepository billingRepository = new BillingRepository(apiService);
 
     BillingAnalytics billingAnalytics =
@@ -606,5 +609,18 @@ public class AdyenPaymentFragment extends Fragment implements AdyenPaymentView {
     String value = savedInstance.getString(key);
     if (value == null) value = defaultValue;
     return value;
+  }
+
+  private OemIdExtractorService createOemIdExtractorService() {
+    Context context = getActivity().getApplicationContext();
+    List<OemIdExtractor> oemIdExtractorsList = new ArrayList<>();
+
+    OemIdExtractor oemIdExtractorFromExternalLib = new OemIdExtractorFromExternalLib(context);
+    OemIdExtractor oemIdExtractorFromProperties = new OemIdExtractorFromProperties(context);
+
+    oemIdExtractorsList.add(oemIdExtractorFromExternalLib);
+    oemIdExtractorsList.add(oemIdExtractorFromProperties);
+
+    return new OemIdExtractorService(oemIdExtractorsList);
   }
 }

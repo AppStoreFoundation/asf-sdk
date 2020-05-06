@@ -38,7 +38,11 @@ public class WalletAddressService {
     queries.put("package.name", packageName);
     queries.put("device.manufacturer", manufacturer);
     queries.put("device.model", model);
-    queries.put("oemid", storeId);
+
+    if (storeId != null) {
+      queries.put("oemid", storeId);
+    }
+
     ServiceResponseListener serviceResponseListener = new ServiceResponseListener() {
       @Override public void onResponseReceived(RequestResponse requestResponse) {
         AddressResponseMapper addressResponseMapper = new AddressResponseMapper();
