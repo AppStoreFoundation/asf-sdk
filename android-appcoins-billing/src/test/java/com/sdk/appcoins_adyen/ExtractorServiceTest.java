@@ -60,6 +60,6 @@ public class ExtractorServiceTest {
     OemIdExtractorService oemIdExtractorService = new OemIdExtractorService(oemIdExtractorList);
 
     String oemIdResult = oemIdExtractorService.extractOemId("com.appcoins.toolbox");
-    Assert.assertEquals(oemIdResult, "");
+    Assert.assertEquals(oemIdResult, null);
   }
 }
