@@ -1,5 +1,6 @@
 package com.appcoins.sdk.billing.service.address;
 
+import com.appcoins.sdk.billing.BuildConfig;
 import com.appcoins.sdk.billing.payasguest.OemIdExtractor;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class OemIdExtractorService {
         return oemId;
       }
     }
-    return new String();
+    return null;
   }
 }
 
