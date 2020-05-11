@@ -13,7 +13,7 @@ import android.os.Bundle;
 @SuppressWarnings("UnknownNullness") // TODO https://issuetracker.google.com/issues/112197238
 public class ReportFragment extends Fragment {
   private static final String REPORT_FRAGMENT_TAG =
-      "androidx.lifecycle" + ".LifecycleDispatcher.report_fragment_tag";
+      "com.sdk.appcoins_lifecycle" + ".LifecycleDispatcher.report_fragment_tag";
   private ActivityInitializationListener mProcessListener;
 
   public static void injectIfNeededIn(Activity activity) {
