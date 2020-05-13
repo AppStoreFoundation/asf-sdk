@@ -22,10 +22,10 @@ public class LayoutUtils {
     String densityPath;
     switch (displayMetrics.densityDpi) {
       case DisplayMetrics.DENSITY_LOW:
-        densityPath = "drawable-ldpi";
+        densityPath = "drawable-ldpi/";
         break;
       case DisplayMetrics.DENSITY_MEDIUM:
-        densityPath = "drawable-mdpi";
+        densityPath = "drawable-mdpi/";
         break;
       case DisplayMetrics.DENSITY_HIGH:
       case DisplayMetrics.DENSITY_TV:
