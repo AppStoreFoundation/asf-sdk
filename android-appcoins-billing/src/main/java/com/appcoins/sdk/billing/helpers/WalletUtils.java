@@ -25,6 +25,7 @@ public class WalletUtils {
   private static String iabAction;
   private static String userAgent = null;
   private static Long payAsGuestSessionId;
+  private static LifecycleActivityProvider lifecycleActivityProvider;
 
   public static boolean hasWalletInstalled() {
     if (billingPackageName == null) {
@@ -102,12 +103,25 @@ public class WalletUtils {
     return versionCode;
   }
 
+  public static void initIap(Context context) {
+    Context applicationContext = context.getApplicationContext();
+    WalletUtils.context = applicationContext;
+    if (lifecycleActivityProvider == null) {
+      lifecycleActivityProvider = new LifecycleActivityProvider(applicationContext);
+    }
+  }
+
+  public static LifecycleActivityProvider getLifecycleActivityProvider() {
+    return lifecycleActivityProvider;
+  }
+
   public static Context getContext() {
     return context;
   }
 
   public static void setContext(Context context) {
-    WalletUtils.context = context.getApplicationContext();
+    WalletUtils.context = context;
+    initIap(context);
   }
 
   static void setPayAsGuestSessionId() {
