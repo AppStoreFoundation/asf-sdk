@@ -312,10 +312,11 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
                 SharedPreferencesRepository.TTL_IN_SECONDS);
         AppcoinsBilling appcoinsBilling;
         if (WalletBinderUtil.getBindType() == BindType.URI_CONNECTION) {
-          SyncIpcMessageRequester messageRequester = MessageRequesterFactory.create(
-              new LifecycleActivityProvider(WalletUtils.getContext()),
-              BuildConfig.BDS_WALLET_PACKAGE_NAME, "appcoins://billing/communication/processor/1",
-              "appcoins://billing/communication/requester/1", BdsService.TIME_OUT_IN_MILLIS);
+          SyncIpcMessageRequester messageRequester =
+              MessageRequesterFactory.create(WalletUtils.getLifecycleActivityProvider(),
+                  BuildConfig.BDS_WALLET_PACKAGE_NAME,
+                  "appcoins://billing/communication/processor/1",
+                  "appcoins://billing/communication/requester/1", BdsService.TIME_OUT_IN_MILLIS);
           appcoinsBilling = new UriCommunicationAppcoinsBilling(messageRequester);
         } else {
           appcoinsBilling = AppcoinsBilling.Stub.asInterface(service);
