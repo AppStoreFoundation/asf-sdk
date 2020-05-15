@@ -59,6 +59,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
 
   private final static String BUY_ITEM_PROPERTIES = "buy_item_properties";
   private static String SELECTED_RADIO_KEY = "selected_radio";
+  private static final String SEND_WALLET_INSTALLED_KEY = "first_impression";
   private IabView iabView;
   private BuyItemProperties buyItemProperties;
   private PaymentMethodsPresenter paymentMethodsPresenter;
@@ -70,6 +71,8 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private SkuPurchase itemAlreadyOwnedPurchase;
   private TranslationsRepository translations;
   private Context context;
+  private BillingAnalytics billingAnalytics;
+  private boolean sendWalletInstalled = true;
 
   public static PaymentMethodsFragment newInstance(BuyItemProperties buyItemProperties) {
     PaymentMethodsFragment paymentMethodsFragment = new PaymentMethodsFragment();
@@ -106,7 +109,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     PaymentMethodsRepository paymentMethodsRepository = new PaymentMethodsRepository(apiService);
     BillingRepository billingRepository = new BillingRepository(apiService);
     AnalyticsManager analyticsManager = AnalyticsManagerProvider.provideAnalyticsManager();
-    BillingAnalytics billingAnalytics = new BillingAnalytics(analyticsManager);
+    billingAnalytics = new BillingAnalytics(analyticsManager);
 
     WalletInteract walletInteract =
         new WalletInteract(sharedPreferencesRepository, walletRepository);
@@ -176,6 +179,12 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
           makeTheStoredPurchase();
         }
       });
+      if (sendWalletInstalled) {
+        sendWalletInstalled = false;
+        billingAnalytics.sendPaymentSuccessEvent(buyItemProperties.getPackageName(),
+            buyItemProperties.getSku(), "0.0", BillingAnalytics.PAYMENT_METHOD_INSTALL_WALLET,
+            buyItemProperties.getType());
+      }
     } else {
       paymentMethodsPresenter.prepareUi();
     }
@@ -186,6 +195,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     if (selectedRadioButton != null) {
       outState.putString(SELECTED_RADIO_KEY, selectedRadioButton);
     }
+    outState.putBoolean(SEND_WALLET_INSTALLED_KEY, sendWalletInstalled);
   }
 
   @Override public void onDestroyView() {
@@ -271,6 +281,7 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
   private void onRotation(Bundle savedInstanceState) {
     if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_RADIO_KEY)) {
       selectedRadioButton = savedInstanceState.getString(SELECTED_RADIO_KEY);
+      sendWalletInstalled = savedInstanceState.getBoolean(SEND_WALLET_INSTALLED_KEY);
       setRadioButtonSelected(selectedRadioButton);
       setPositiveButtonText(selectedRadioButton);
     }

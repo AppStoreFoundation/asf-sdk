@@ -10,6 +10,7 @@ public class BillingAnalytics implements EventSender {
   public static final String EVENT_CANCEL = "cancel";
   public static final String EVENT_BUY = "buy";
   public static final String EVENT_NEXT = "next";
+  public static final String PAYMENT_METHOD_INSTALL_WALLET = "install_wallet";
   static final String PAYMENT_METHOD_CC = "credit_card";
   static final String PAYMENT_METHOD_PAYPAL = "paypal";
   static final String PAYMENT_START = "appcoins_guest_sdk_payment_start";
