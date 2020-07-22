@@ -130,6 +130,18 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       Intent intent;
       if (hasRequiredFields(type, sku) && !WalletUtils.getIabAction()
           .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
+
+        //Change code
+        List<String> skuList = new ArrayList<>();
+        skuList.add(sku);
+        Bundle skuBundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(skuList);
+        Bundle bundleSkuResponse = new Bundle();
+        getSkuDetailsFromService(packageName, type, skuBundle, bundleSkuResponse);
+
+        ArrayList<SkuDetails> skuDetails =
+            (ArrayList<SkuDetails>) bundleSkuResponse.get("DETAILS_LIST");
+        buyItemProperties.setSkuTitle(skuDetails.get(0).getTitle());
+
         intent = IabActivity.newIntent(context, buyItemProperties);
       } else {
         if (WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
