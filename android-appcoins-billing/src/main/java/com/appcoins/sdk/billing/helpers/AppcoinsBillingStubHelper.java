@@ -135,12 +135,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         List<String> skuList = new ArrayList<>();
         skuList.add(sku);
         Bundle skuBundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(skuList);
-        Bundle bundleSkuResponse = new Bundle();
-        getSkuDetailsFromService(packageName, type, skuBundle, bundleSkuResponse);
-
         ArrayList<SkuDetails> skuDetails =
-            (ArrayList<SkuDetails>) bundleSkuResponse.get("DETAILS_LIST");
-        buyItemProperties.setSkuTitle(skuDetails.get(0).getTitle());
+            getSkuDetailsFromService(packageName, type, skuBundle);
+        buyItemProperties.setSkuTitle(skuDetails.get(0)
+            .getTitle());
 
         intent = IabActivity.newIntent(context, buyItemProperties);
       } else {
@@ -234,6 +232,12 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     responseWs.putInt(Utils.RESPONSE_CODE, 0);
     ArrayList<String> skuDetails = buildResponse(skuDetailsResult);
     responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
+  }
+
+  private ArrayList<SkuDetails> getSkuDetailsFromService(String packageName, String type,
+      Bundle skusBundle){
+    List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
+    return requestSkuDetails(sku, packageName, type);
   }
 
   private ArrayList<SkuDetails> requestSkuDetails(List<String> sku, String packageName,
