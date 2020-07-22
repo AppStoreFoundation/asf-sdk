@@ -10,16 +10,19 @@ import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.FrameLayout;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.WebViewActivity;
 import com.appcoins.sdk.billing.analytics.AnalyticsManagerProvider;
 import com.appcoins.sdk.billing.analytics.BillingAnalytics;
 import com.appcoins.sdk.billing.helpers.InstallDialogActivity;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
+import com.appcoins.sdk.billing.listeners.SingleSkuDetailsListener;
 import com.appcoins.sdk.billing.listeners.payasguest.ActivityResultListener;
 
 import static com.appcoins.sdk.billing.helpers.Utils.RESPONSE_CODE;
@@ -183,7 +186,15 @@ public class IabActivity extends Activity implements IabView {
   }
 
   @Override public void navigateToPaymentSelection() {
-    navigateTo(PaymentMethodsFragment.newInstance(buyItemProperties));
+    SingleSkuDetailsAsync skuDetailsAsync = new SingleSkuDetailsAsync(buyItemProperties, new SingleSkuDetailsListener() {
+      @Override public void onResponse(boolean error, SkuDetails skuDetails) {
+        if(!error)
+          navigateTo(PaymentMethodsFragment.newInstance(buyItemProperties));
+        else
+          closeWithBillingUnavailable();
+      }
+    });
+    skuDetailsAsync.execute(AsyncTask.THREAD_POOL_EXECUTOR);
   }
 
   @Override public void navigateToInstallDialog() {

@@ -9,6 +9,7 @@ public class BuyItemProperties implements Serializable {
   private String sku;
   private String type;
   private DeveloperPayload developerPayload;
+  private String title;
 
   public BuyItemProperties(int apiVersion, String packageName, String sku, String type,
       DeveloperPayload developerPayload) {
@@ -37,5 +38,13 @@ public class BuyItemProperties implements Serializable {
 
   public String getType() {
     return type;
+  }
+
+  public void setSkuTitle(String title) {
+    this.title = title;
+  }
+
+  public String getSkuTitle() {
+    return this.title;
   }
 }

@@ -11,6 +11,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -165,7 +166,7 @@ public class PaymentMethodsFragmentLayout {
     appcPriceView = createAppcPriceView();
     ImageView iconImageView = createAppIconLayout(icon);
     appNameView = createAppNameLayout(appName);
-    TextView skuView = createSkuLayout(buyItemProperties.getSku());
+    TextView skuView = createSkuLayout(buyItemProperties.getSkuTitle());
 
     paymentMethodHeaderLayout.addView(iconImageView);
     paymentMethodHeaderLayout.addView(appNameView);
@@ -220,6 +221,7 @@ public class PaymentMethodsFragmentLayout {
     textView.setMaxLines(1);
     textView.setTextColor(Color.parseColor("#8a000000"));
     textView.setTextSize(12);
+    Log.d("Test sku",sku);
     textView.setText(sku);
     textView.setLayoutParams(layoutParams);
     return textView;

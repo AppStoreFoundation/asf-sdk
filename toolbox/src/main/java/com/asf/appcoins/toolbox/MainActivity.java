@@ -84,7 +84,7 @@ public class MainActivity extends Activity {
 
   public void onBuyGasButtonClicked(View arg0) {
     BillingFlowParams billingFlowParams =
-        new BillingFlowParams("gas", SkuType.inapp.toString(), null, null, null);
+        new BillingFlowParams("escapedchar", SkuType.inapp.toString(), null, null, null);
 
     Activity act = this;
     Thread t = new Thread(() -> {
