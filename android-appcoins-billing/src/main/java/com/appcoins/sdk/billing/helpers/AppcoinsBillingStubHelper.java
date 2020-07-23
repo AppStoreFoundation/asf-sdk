@@ -134,14 +134,12 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         if (Looper.myLooper() == Looper.getMainLooper()) {
           Thread t = new Thread(new Runnable() {
             @Override public void run() {
-              //Change code
               List<String> skuList = new ArrayList<>();
               skuList.add(sku);
               Bundle skuBundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(skuList);
               ArrayList<SkuDetails> skuDetails =
                   getSkuDetailsFromService(packageName, type, skuBundle);
-              buyItemProperties.setSkuTitle(skuDetails.get(0)
-                  .getTitle());
+              buyItemProperties.setSkuDetails(skuDetails.get(0));
               latch.countDown();
             }
           });
@@ -155,13 +153,11 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
             return bundle;
           }
         } else {
-          //Change code
           List<String> skuList = new ArrayList<>();
           skuList.add(sku);
           Bundle skuBundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(skuList);
           ArrayList<SkuDetails> skuDetails = getSkuDetailsFromService(packageName, type, skuBundle);
-          buyItemProperties.setSkuTitle(skuDetails.get(0)
-              .getTitle());
+          buyItemProperties.setSkuDetails(skuDetails.get(0));
         }
 
         intent = IabActivity.newIntent(context, buyItemProperties);
@@ -275,7 +271,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         String response =
             WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuSendList,
                 WalletUtils.getUserAgent());
-        skuDetailsList.addAll(AndroidBillingMapper.mapSkuDetailsFromWS(type, response));
+        skuDetailsList.addAll(AndroidBillingMapper.mapSingleSkuDetails(type, response));
         skuSendList.clear();
       }
     }

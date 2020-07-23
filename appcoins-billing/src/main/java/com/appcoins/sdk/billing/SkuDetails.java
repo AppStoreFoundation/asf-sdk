@@ -1,6 +1,8 @@
 package com.appcoins.sdk.billing;
 
-public class SkuDetails {
+import java.io.Serializable;
+
+public class SkuDetails implements Serializable {
   private final String itemType;
   private final String sku;
   private final String type;

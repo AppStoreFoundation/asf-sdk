@@ -2,6 +2,7 @@ package com.appcoins.sdk.billing.payasguest;
 
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
@@ -106,18 +107,17 @@ class PaymentMethodsPresenter {
     SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
       @Override public void onResponse(boolean error, SkuDetails skuDetails) {
         if (!error) {
-
+          paymentMethodsInteract.cacheAppcPrice(skuDetails.getAppcPrice());
+          checkForUnfinishedTransaction(buyItemProperties, walletGenerationModel, skuDetails);
+          fragmentView.setSkuInformation(
+              new SkuDetailsModel(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode(),
+                  skuDetails.getAppcPrice(), skuDetails.getSku()));
         } else {
           handleShowInstallDialog();
         }
       }
     };
-    SkuDetails skuDetails = buyItemProperties.getSkuDetails();
-    paymentMethodsInteract.cacheAppcPrice(skuDetails.getAppcPrice());
-    checkForUnfinishedTransaction(buyItemProperties, walletGenerationModel, skuDetails);
-    fragmentView.setSkuInformation(
-        new SkuDetailsModel(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode(),
-            skuDetails.getAppcPrice(), skuDetails.getSku()));
+    paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
   }
 
   private void loadPaymentsAvailable(final String fiatPrice, String fiatCurrency) {
