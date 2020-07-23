@@ -124,11 +124,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
         new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository,
             billingRepository);
 
-    paymentMethodsInteract.requestSkuDetails(buyItemProperties, new SingleSkuDetailsListener(){
-      @Override public void onResponse(boolean error, SkuDetails skuDetails) {
-
-      }
-    });
     WalletInstallationIntentBuilder walletInstallationIntentBuilder =
         new WalletInstallationIntentBuilder(context.getPackageManager(), context.getPackageName(),
             context.getApplicationContext());
