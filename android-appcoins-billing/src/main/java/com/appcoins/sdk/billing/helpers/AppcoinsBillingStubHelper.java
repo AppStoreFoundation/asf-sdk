@@ -88,7 +88,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       if (Looper.myLooper() == Looper.getMainLooper()) {
         Thread t = new Thread(new Runnable() {
           @Override public void run() {
-            getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+            getSingleSkuDetailsFromService(packageName, type, skusBundle, responseWs);
             latch.countDown();
           }
         });
@@ -100,7 +100,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
           responseWs.putInt(Utils.RESPONSE_CODE, ResponseCode.SERVICE_UNAVAILABLE.getValue());
         }
       } else {
-        getSkuDetailsFromService(packageName, type, skusBundle, responseWs);
+        getSingleSkuDetailsFromService(packageName, type, skusBundle, responseWs);
       }
     }
     return responseWs;
@@ -134,12 +134,12 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         if (Looper.myLooper() == Looper.getMainLooper()) {
           Thread t = new Thread(new Runnable() {
             @Override public void run() {
+              //Change code
               List<String> skuList = new ArrayList<>();
               skuList.add(sku);
               Bundle skuBundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(skuList);
-              ArrayList<SkuDetails> skuDetails =
-                  getSkuDetailsFromService(packageName, type, skuBundle);
-              buyItemProperties.setSkuDetails(skuDetails.get(0));
+              SkuDetails skuDetails = getSingleSkuDetailsFromService(packageName, type, skuBundle);
+              buyItemProperties.setSkuDetails(skuDetails);
               latch.countDown();
             }
           });
@@ -153,11 +153,12 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
             return bundle;
           }
         } else {
+          //Change code
           List<String> skuList = new ArrayList<>();
           skuList.add(sku);
           Bundle skuBundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(skuList);
-          ArrayList<SkuDetails> skuDetails = getSkuDetailsFromService(packageName, type, skuBundle);
-          buyItemProperties.setSkuDetails(skuDetails.get(0));
+          SkuDetails skuDetails = getSingleSkuDetailsFromService(packageName, type, skuBundle);
+          buyItemProperties.setSkuDetails(skuDetails);
         }
 
         intent = IabActivity.newIntent(context, buyItemProperties);
@@ -244,7 +245,7 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     return bundleResponse;
   }
 
-  private void getSkuDetailsFromService(String packageName, String type, Bundle skusBundle,
+  private void getSingleSkuDetailsFromService(String packageName, String type, Bundle skusBundle,
       Bundle responseWs) {
     List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
     ArrayList<SkuDetails> skuDetailsList = requestSkuDetails(sku, packageName, type);
@@ -254,10 +255,10 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     responseWs.putStringArrayList("DETAILS_LIST", skuDetails);
   }
 
-  private ArrayList<SkuDetails> getSkuDetailsFromService(String packageName, String type,
+  private SkuDetails getSingleSkuDetailsFromService(String packageName, String type,
       Bundle skusBundle) {
     List<String> sku = skusBundle.getStringArrayList(Utils.GET_SKU_DETAILS_ITEM_LIST);
-    return requestSkuDetails(sku, packageName, type);
+    return requestSingleSkuDetails(sku, packageName, type);
   }
 
   private ArrayList<SkuDetails> requestSkuDetails(List<String> sku, String packageName,
@@ -271,11 +272,18 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
         String response =
             WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, skuSendList,
                 WalletUtils.getUserAgent());
-        skuDetailsList.addAll(AndroidBillingMapper.mapSingleSkuDetails(type, response));
+        skuDetailsList.addAll(AndroidBillingMapper.mapSkuDetailsFromWS(type, response));
         skuSendList.clear();
       }
     }
     return skuDetailsList;
+  }
+
+  private SkuDetails requestSingleSkuDetails(List<String> sku, String packageName, String type) {
+    String response =
+        WSServiceController.getSkuDetailsService(BuildConfig.HOST_WS, packageName, sku,
+            WalletUtils.getUserAgent());
+    return AndroidBillingMapper.mapSingleSkuDetails(type, response);
   }
 
   private ArrayList<String> buildResponse(SkuDetailsResult skuDetailsResult) {
