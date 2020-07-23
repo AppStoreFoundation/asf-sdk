@@ -106,17 +106,18 @@ class PaymentMethodsPresenter {
     SingleSkuDetailsListener listener = new SingleSkuDetailsListener() {
       @Override public void onResponse(boolean error, SkuDetails skuDetails) {
         if (!error) {
-          paymentMethodsInteract.cacheAppcPrice(skuDetails.getAppcPrice());
-          checkForUnfinishedTransaction(buyItemProperties, walletGenerationModel, skuDetails);
-          fragmentView.setSkuInformation(
-              new SkuDetailsModel(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode(),
-                  skuDetails.getAppcPrice(), skuDetails.getSku()));
+
         } else {
           handleShowInstallDialog();
         }
       }
     };
-    paymentMethodsInteract.requestSkuDetails(buyItemProperties, listener);
+    SkuDetails skuDetails = buyItemProperties.getSkuDetails();
+    paymentMethodsInteract.cacheAppcPrice(skuDetails.getAppcPrice());
+    checkForUnfinishedTransaction(buyItemProperties, walletGenerationModel, skuDetails);
+    fragmentView.setSkuInformation(
+        new SkuDetailsModel(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode(),
+            skuDetails.getAppcPrice(), skuDetails.getSku()));
   }
 
   private void loadPaymentsAvailable(final String fiatPrice, String fiatCurrency) {

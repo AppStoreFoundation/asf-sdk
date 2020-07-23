@@ -166,7 +166,7 @@ public class PaymentMethodsFragmentLayout {
     appcPriceView = createAppcPriceView();
     ImageView iconImageView = createAppIconLayout(icon);
     appNameView = createAppNameLayout(appName);
-    TextView skuView = createSkuLayout(buyItemProperties.getSkuTitle());
+    TextView skuView = createSkuLayout(buyItemProperties.getSkuDetails().getTitle());
 
     paymentMethodHeaderLayout.addView(iconImageView);
     paymentMethodHeaderLayout.addView(appNameView);

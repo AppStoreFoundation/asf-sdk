@@ -47,4 +47,8 @@ public class BuyItemProperties implements Serializable {
   public String getSkuTitle() {
     return this.title;
   }
+
+  public SkuDetails getSkuDetails() {
+    return null;
+  }
 }
