@@ -106,8 +106,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
     return responseWs;
   }
 
-  @Override public Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
-      String developerPayload) {
+  @Override public Bundle getBuyIntent(int apiVersion, final String packageName, final String sku,
+      final String type, String developerPayload) {
     if (WalletUtils.hasWalletInstalled()) {
       try {
         return serviceAppcoinsBilling.getBuyIntent(apiVersion, packageName, sku, type,
@@ -130,14 +130,40 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       Intent intent;
       if (hasRequiredFields(type, sku) && !WalletUtils.getIabAction()
           .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
+        final CountDownLatch latch = new CountDownLatch(1);
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+          Thread t = new Thread(new Runnable() {
+            @Override public void run() {
+              //Change code
+              List<String> skuList = new ArrayList<>();
+              skuList.add(sku);
+              Bundle skuBundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(skuList);
+              ArrayList<SkuDetails> skuDetails =
+                  getSkuDetailsFromService(packageName, type, skuBundle);
+              buyItemProperties.setSkuTitle(skuDetails.get(0)
+                  .getTitle());
+              latch.countDown();
+            }
+          });
+          t.start();
+          try {
+            latch.await();
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+            Bundle bundle = new Bundle();
+            bundle.putInt(Utils.RESPONSE_CODE, ResponseCode.BILLING_UNAVAILABLE.getValue());
+            return bundle;
+          }
+        } else {
+          //Change code
+          List<String> skuList = new ArrayList<>();
+          skuList.add(sku);
+          Bundle skuBundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(skuList);
+          ArrayList<SkuDetails> skuDetails = getSkuDetailsFromService(packageName, type, skuBundle);
+          buyItemProperties.setSkuTitle(skuDetails.get(0)
+              .getTitle());
+        }
 
-        //Change code
-        List<String> skuList = new ArrayList<>();
-        skuList.add(sku);
-        Bundle skuBundle = AndroidBillingMapper.mapArrayListToBundleSkuDetails(skuList);
-        ArrayList<SkuDetails> skuDetails = getSkuDetailsFromService(packageName, type, skuBundle);
-        buyItemProperties.setSkuTitle(skuDetails.get(0)
-            .getTitle());
         intent = IabActivity.newIntent(context, buyItemProperties);
       } else {
         if (WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
