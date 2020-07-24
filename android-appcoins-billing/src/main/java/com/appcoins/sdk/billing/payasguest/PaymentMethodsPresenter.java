@@ -2,7 +2,6 @@ package com.appcoins.sdk.billing.payasguest;
 
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 import com.appcoins.billing.sdk.BuildConfig;
 import com.appcoins.sdk.billing.BuyItemProperties;
 import com.appcoins.sdk.billing.SkuDetails;
