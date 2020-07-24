@@ -119,7 +119,6 @@ public class PaymentMethodsFragment extends Fragment implements PaymentMethodsVi
     PaymentMethodsInteract paymentMethodsInteract =
         new PaymentMethodsInteract(walletInteract, gamificationInteract, paymentMethodsRepository,
             billingRepository);
-
     WalletInstallationIntentBuilder walletInstallationIntentBuilder =
         new WalletInstallationIntentBuilder(context.getPackageManager(), context.getPackageName(),
             context.getApplicationContext());
