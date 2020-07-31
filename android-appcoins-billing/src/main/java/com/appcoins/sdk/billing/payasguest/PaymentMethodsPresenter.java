@@ -109,7 +109,7 @@ class PaymentMethodsPresenter {
     checkForUnfinishedTransaction(buyItemProperties, walletGenerationModel, skuDetails);
     fragmentView.setSkuInformation(
         new SkuDetailsModel(skuDetails.getFiatPrice(), skuDetails.getFiatPriceCurrencyCode(),
-            skuDetails.getAppcPrice(), skuDetails.getSku()));
+            skuDetails.getAppcPrice()));
   }
 
   private void loadPaymentsAvailable(final String fiatPrice, String fiatCurrency) {

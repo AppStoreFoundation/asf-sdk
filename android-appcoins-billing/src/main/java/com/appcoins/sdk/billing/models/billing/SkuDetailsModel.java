@@ -5,14 +5,11 @@ public class SkuDetailsModel {
   private String fiatPrice;
   private String fiatPriceCurrencyCode;
   private String appcPrice;
-  private String sku;
 
-  public SkuDetailsModel(String fiatPrice, String fiatPriceCurrencyCode, String appcPrice,
-      String sku) {
+  public SkuDetailsModel(String fiatPrice, String fiatPriceCurrencyCode, String appcPrice) {
     this.fiatPrice = fiatPrice;
     this.fiatPriceCurrencyCode = fiatPriceCurrencyCode;
     this.appcPrice = appcPrice;
-    this.sku = sku;
   }
 
   public String getFiatPrice() {
@@ -25,9 +22,5 @@ public class SkuDetailsModel {
 
   public String getAppcPrice() {
     return appcPrice;
-  }
-
-  public String getSku() {
-    return sku;
   }
 }

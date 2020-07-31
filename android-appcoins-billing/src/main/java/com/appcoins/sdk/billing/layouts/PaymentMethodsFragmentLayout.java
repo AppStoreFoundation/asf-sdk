@@ -22,6 +22,7 @@ import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.appcoins.sdk.billing.BuyItemProperties;
+import com.appcoins.sdk.billing.SkuDetails;
 import com.appcoins.sdk.billing.helpers.translations.TranslationsRepository;
 import com.appcoins.sdk.billing.payasguest.IabActivity;
 import com.appcoins.sdk.billing.utils.PaymentErrorViewLayout;
@@ -165,7 +166,8 @@ public class PaymentMethodsFragmentLayout {
     appcPriceView = createAppcPriceView();
     ImageView iconImageView = createAppIconLayout(icon);
     appNameView = createAppNameLayout(appName);
-    TextView skuView = createSkuLayout(buyItemProperties.getSkuDetails().getTitle());
+    String title = buyItemProperties.getSkuDetails().getTitle();
+    TextView skuView = createSkuLayout(title);
 
     paymentMethodHeaderLayout.addView(iconImageView);
     paymentMethodHeaderLayout.addView(appNameView);

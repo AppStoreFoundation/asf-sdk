@@ -44,6 +44,8 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
   private static AppcoinsBillingStubHelper appcoinsBillingStubHelper;
   private static int SUPPORTED_API_VERSION = 3;
   private static int MAX_SKUS_SEND_WS = 49; // 0 to 49
+  private static SkuDetails skuDetails;
+  private static BuyItemProperties buyItemProperties;
 
   private AppcoinsBillingStubHelper() {
     appcoinsBillingStubHelper = this;
@@ -123,37 +125,12 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
           new DeveloperPayload(developerPayload, PayloadHelper.getPayload(developerPayload),
               PayloadHelper.getOrderReference(developerPayload),
               PayloadHelper.getOrigin(developerPayload));
-      final BuyItemProperties buyItemProperties =
-          new BuyItemProperties(apiVersion, packageName, sku, type, developerPayloadObject);
 
       final Context context = WalletUtils.getContext();
       Intent intent;
       if (hasRequiredFields(type, sku) && !WalletUtils.getIabAction()
           .equals(BuildConfig.CAFE_BAZAAR_IAB_BIND_ACTION)) {
-        final CountDownLatch latch = new CountDownLatch(1);
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-          Thread t = new Thread(new Runnable() {
-            @Override public void run() {
-              SkuDetails skuDetails = getMappedSkuDetails(sku, packageName, type);
-              buyItemProperties.setSkuDetails(skuDetails);
-              latch.countDown();
-            }
-          });
-          t.start();
-          try {
-            latch.await();
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-            Bundle bundle = new Bundle();
-            bundle.putInt(Utils.RESPONSE_CODE, ResponseCode.BILLING_UNAVAILABLE.getValue());
-            return bundle;
-          }
-        } else {
-          SkuDetails skuDetails = getMappedSkuDetails(sku, packageName, type);
-          buyItemProperties.setSkuDetails(skuDetails);
-        }
-
-        intent = IabActivity.newIntent(context, buyItemProperties);
+        return startPayAsGuest(apiVersion, packageName, sku, type, developerPayloadObject, context);
       } else {
         if (WalletUtils.deviceSupportsWallet(Build.VERSION.SDK_INT)) {
           intent = InstallDialogActivity.newIntent(context, buyItemProperties);
@@ -172,6 +149,40 @@ public final class AppcoinsBillingStubHelper implements AppcoinsBilling, Seriali
       response.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
       return response;
     }
+  }
+
+  private Bundle startPayAsGuest(int apiVersion, final String packageName, final String sku,
+      final String type, DeveloperPayload developerPayloadObject, final Context context) {
+    final CountDownLatch latch = new CountDownLatch(1);
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+      Thread t = new Thread(new Runnable() {
+        @Override public void run() {
+          skuDetails = getMappedSkuDetails(sku, packageName, type);
+          latch.countDown();
+        }
+      });
+      t.start();
+      try {
+        latch.await();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+        Bundle bundle = new Bundle();
+        bundle.putInt(Utils.RESPONSE_CODE, ResponseCode.BILLING_UNAVAILABLE.getValue());
+        return bundle;
+      }
+    } else {
+      skuDetails = getMappedSkuDetails(sku, packageName, type);
+    }
+    buyItemProperties =
+        new BuyItemProperties(apiVersion, packageName, sku, type, developerPayloadObject,
+            skuDetails);
+    Intent intent = IabActivity.newIntent(context, buyItemProperties);
+    PendingIntent pendingIntent =
+        PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    Bundle response = new Bundle();
+    response.putParcelable("BUY_INTENT", pendingIntent);
+    response.putInt(Utils.RESPONSE_CODE, ResponseCode.OK.getValue());
+    return response;
   }
 
   @Override public Bundle getPurchases(int apiVersion, final String packageName, String type,
